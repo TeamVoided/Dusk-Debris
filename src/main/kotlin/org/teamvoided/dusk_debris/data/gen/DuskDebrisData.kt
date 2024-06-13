@@ -6,7 +6,7 @@ import net.minecraft.registry.RegistrySetBuilder
 import org.teamvoided.template.Template.log
 
 @Suppress("unused")
-class TemplateData : DataGeneratorEntrypoint {
+class DuskDebrisData : DataGeneratorEntrypoint {
     override fun onInitializeDataGenerator(gen: FabricDataGenerator) {
         log.info("Hello from DataGen")
         val pack = gen.createPack()

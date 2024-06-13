@@ -5,7 +5,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 @Suppress("unused")
-object Template {
+object DuskDebris {
     const val MODID = "template"
 
     @JvmField

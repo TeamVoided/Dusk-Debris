@@ -28,13 +28,13 @@ repositories {
 println("Task: " + gradle.startParameter.taskNames.joinToString(","))
 
 modSettings {
-    entrypoint("main", "org.teamvoided.template.Template::init")
-    entrypoint("client", "org.teamvoided.template.TemplateClient::init")
-    entrypoint("fabric-datagen", "org.teamvoided.template.data.gen.TemplateData")
+    entrypoint("main", "org.teamvoided.dusk_debris.DuskDebris::init")
+    entrypoint("client", "org.teamvoided.dusk_debris.DuskDebrisClient::init")
+    entrypoint("fabric-datagen", "org.teamvoided.dusk_debris.data.gen.DuskDebrisData")
 
     mixinFile("${modId()}.client.mixins.json")
-//    mixinFile("${modId()}.mixins.json")
-//    accessWidener("${modId()}.accesswidener")
+    mixinFile("${modId()}.mixins.json")
+    accessWidener("${modId()}.accesswidener")
 }
 
 dependencies {
