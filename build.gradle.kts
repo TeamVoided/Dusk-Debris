@@ -86,7 +86,7 @@ tasks {
     jar {
         val valTaskNames = gradle.startParameter.taskNames
         if (!valTaskNames.contains("runDataGen")) {
-            exclude("org/teamvoided/template/data/gen/*")
+            exclude("org/teamvoided/dusk-debris/data/gen/*")
         } else {
             println("Running datagen for task ${valTaskNames.joinToString(" ")}")
         }

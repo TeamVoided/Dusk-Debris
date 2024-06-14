@@ -34,7 +34,7 @@ object DuskBlockFamilies {
         BlockFamilies.register(DuskBlocks.CHARRED_PLANKS)
             .stairs(DuskBlocks.CHARRED_STAIRS)
             .slab(DuskBlocks.CHARRED_SLAB)
-//            .door(DuskBlocks.CHARRED_DOOR)
+            .door(DuskBlocks.CHARRED_DOOR)
 //            .trapdoor(DuskBlocks.CHARRED_TRAPDOOR)
 //            .fence(DuskBlocks.CHARRED_FENCE)
 //            .fenceGate(DuskBlocks.CHARRED_FENCE_GATE)

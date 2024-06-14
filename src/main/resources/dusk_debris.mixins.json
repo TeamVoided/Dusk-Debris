@@ -3,7 +3,9 @@
   "minVersion": "0.8",
   "package": "org.teamvoided.dusk_debris.mixin",
   "compatibilityLevel": "JAVA_21",
-  "mixins": [],
+  "mixins": [
+    "WitherSkeletonEntityMixin"
+  ],
   "injectors": {
     "defaultRequire": 1
   }

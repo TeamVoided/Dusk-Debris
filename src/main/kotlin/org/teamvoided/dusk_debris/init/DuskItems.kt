@@ -3,6 +3,7 @@ package org.teamvoided.dusk_autumn.init
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents.ModifyEntries
 import net.minecraft.block.Block
+import net.minecraft.block.Blocks
 import net.minecraft.item.*
 import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
@@ -33,14 +34,15 @@ object DuskItems {
     val CHARRED_PLANKS = register("charred_planks", BlockItem(DuskBlocks.CHARRED_PLANKS))
     val CHARRED_STAIRS = register("charred_stairs", BlockItem(DuskBlocks.CHARRED_STAIRS))
     val CHARRED_SLAB = register("charred_slab", BlockItem(DuskBlocks.CHARRED_SLAB))
-    val CHARRED_DOOR = register("charred_door", BlockItem(DuskBlocks.CHARRED_DOOR))
+    val CHARRED_DOOR = register("charred_door", TallBlockItem(DuskBlocks.CHARRED_DOOR, Item.Settings()))
     val CHARRED_TRAPDOOR = register("charred_trapdoor", BlockItem(DuskBlocks.CHARRED_TRAPDOOR))
     val CHARRED_FENCE = register("charred_fence", BlockItem(DuskBlocks.CHARRED_FENCE))
     val CHARRED_FENCE_GATE = register("charred_fence_gate", BlockItem(DuskBlocks.CHARRED_FENCE_GATE))
     val CHARRED_BUTTON = register("charred_button", BlockItem(DuskBlocks.CHARRED_BUTTON))
     val CHARRED_PRESSURE_PLATE = register("charred_pressure_plate", BlockItem(DuskBlocks.CHARRED_PRESSURE_PLATE))
-    val CHARRED_SIGN = register("charred_sign", BlockItem(DuskBlocks.CHARRED_SIGN))
-    val CHARRED_HANGING_SIGN = register("charred_hanging_sign", BlockItem(DuskBlocks.CHARRED_HANGING_SIGN))
+    val CHARRED_SIGN = register("charred_sign", SignItem((Item.Settings()).maxCount(16), DuskBlocks.CHARRED_SIGN, DuskBlocks.CHARRED_WALL_SIGN))
+    val CHARRED_HANGING_SIGN = register("charred_hanging_sign", HangingSignItem(DuskBlocks.CHARRED_HANGING_SIGN, DuskBlocks.CHARRED_WALL_HANGING_SIGN, (Item.Settings()).maxCount(16)))
+
 
 //add void util compat
 
