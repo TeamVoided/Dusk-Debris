@@ -38,8 +38,11 @@ modSettings {
 }
 
 dependencies {
+    val geckolib_version = "4.5.1"
+
     modImplementation(fileTree("libs"))
     modImplementation(libs.modmenu)
+//    modImplementation("software.bernie.geckolib:geckolib-fabric-1.20.6:${geckolib_version}")
 }
 
 loom {

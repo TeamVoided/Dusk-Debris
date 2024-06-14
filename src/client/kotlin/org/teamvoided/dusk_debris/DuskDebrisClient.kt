@@ -1,6 +1,6 @@
-package org.teamvoided.template
+package org.teamvoided.dusk_debris
 
-import org.teamvoided.template.Template.log
+import org.teamvoided.dusk_debris.DuskDebris.log
 
 @Suppress("unused")
 object DuskDebrisClient{
