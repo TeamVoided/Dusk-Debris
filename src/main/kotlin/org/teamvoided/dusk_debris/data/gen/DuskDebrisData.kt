@@ -25,6 +25,7 @@ class DuskDebrisData : DataGeneratorEntrypoint {
         pack.addProvider(::EnglishTranslationProvider)
 //        pack.addProvider(::RecipesProvider)
 //        pack.addProvider(::BlockLootTableProvider)
+//        pack.addProvider(::EntityLootTableProvider)
     }
 
     override fun buildRegistry(gen: RegistrySetBuilder) {

@@ -35,28 +35,30 @@ class EntityLootTableProvider(o: FabricDataOutput, val r: CompletableFuture<Hold
                 LootPool.builder().rolls(Utils.constantNum(1))
                     .with(EmptyEntry.builder().weight(10))
                     .with(LootTableEntry.method_428(DuskLootTables.ENDERMAN_OVERWORLD_GENERIC).weight(10))
-                    .with(LootTableEntry.method_428(DuskLootTables.ENDERMAN_NETHER_GENERIC)
-                        .conditionally(
-                            LocationCheckLootCondition.builder(
-                                LocationPredicate.Builder.create().method_9024(
-                                    BiomeTags.NETHER.registry.registryKey()
-                                )
-                            )
-                        ).weight(10)
-                    )
-                    .with(LootTableEntry.method_428(DuskLootTables.ENDERMAN_NETHER_GENERIC)
-                        .conditionally(
-                            LocationCheckLootCondition.builder(
-                                LocationPredicate.Builder.create().method_9024(
-                                    HolderSet.createDirect(
-                                        biomes.getHolderOrThrow(Biomes.JUNGLE),
-                                        biomes.getHolderOrThrow(Biomes.SPARSE_JUNGLE),
-                                        biomes.getHolderOrThrow(Biomes.BAMBOO_JUNGLE)
+                    .with(
+                        LootTableEntry.method_428(DuskLootTables.ENDERMAN_NETHER_GENERIC)
+                            .conditionally(
+                                LocationCheckLootCondition.builder(
+                                    LocationPredicate.Builder.create().method_9024(
+                                        biomes.getTagOrThrow(BiomeTags.NETHER)
                                     )
                                 )
-                            )
-                        ).weight(10)
+                            ).weight(10)
                     )
+//                    .with(
+//                        LootTableEntry.method_428(DuskLootTables.ENDERMAN_NETHER_GENERIC)
+//                            .conditionally(
+//                                LocationCheckLootCondition.builder(
+//                                    LocationPredicate.Builder.create().method_9024(
+//                                        HolderSet.createDirect(
+//                                            biomes.getHolderOrThrow(Biomes.JUNGLE),
+//                                            biomes.getHolderOrThrow(Biomes.SPARSE_JUNGLE),
+//                                            biomes.getHolderOrThrow(Biomes.BAMBOO_JUNGLE)
+//                                        )
+//                                    )
+//                                )
+//                            ).weight(10)
+//                    )
                     .with(LootTableEntry.method_428(DuskLootTables.ENDERMAN_OVERWORLD_DESERT).weight(10))
 
             )
