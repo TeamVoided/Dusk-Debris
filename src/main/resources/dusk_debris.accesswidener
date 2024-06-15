@@ -3,3 +3,4 @@ accessible method net/minecraft/block/Blocks legacyStairsOf (Lnet/minecraft/bloc
 accessible method net/minecraft/util/Identifier <init> (Ljava/lang/String;Ljava/lang/String;)V
 accessible field net/minecraft/data/client/model/BlockStateModelGenerator sandstoneModels Ljava/util/Map;
 mutable field net/minecraft/data/client/model/BlockStateModelGenerator sandstoneModels Ljava/util/Map;
+accessible method net/minecraft/block/sign/SignType register (Lnet/minecraft/block/sign/SignType;)Lnet/minecraft/block/sign/SignType;

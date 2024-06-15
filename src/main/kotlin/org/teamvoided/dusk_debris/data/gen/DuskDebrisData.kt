@@ -3,13 +3,13 @@ package org.teamvoided.dusk_debris.data.gen
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator
 import net.minecraft.registry.RegistrySetBuilder
+import org.teamvoided.dusk_debris.DuskDebris.log
+import org.teamvoided.dusk_debris.data.gen.providers.EnglishTranslationProvider
+import org.teamvoided.dusk_debris.data.gen.providers.ModelProvider
 import org.teamvoided.dusk_debris.data.gen.tags.BiomeTagsProvider
 import org.teamvoided.dusk_debris.data.gen.tags.BlockTagsProvider
-import org.teamvoided.dusk_debris.data.gen.tags.ItemTagsProvider
 import org.teamvoided.dusk_debris.data.gen.tags.EntityTypeTagsProvider
-import org.teamvoided.dusk_debris.data.gen.providers.ModelProvider
-import org.teamvoided.dusk_debris.data.gen.providers.EnglishTranslationProvider
-import org.teamvoided.dusk_debris.DuskDebris.log
+import org.teamvoided.dusk_debris.data.gen.tags.ItemTagsProvider
 
 @Suppress("unused")
 class DuskDebrisData : DataGeneratorEntrypoint {

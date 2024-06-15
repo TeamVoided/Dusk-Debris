@@ -4,7 +4,6 @@ package org.teamvoided.dusk_debris.data.gen.providers
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider
 import net.minecraft.block.Block
-import net.minecraft.block.Blocks
 import net.minecraft.data.client.ItemModelGenerator
 import net.minecraft.data.client.model.*
 import net.minecraft.util.Identifier
@@ -17,9 +16,9 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
     private val ALL_KRY: TextureKey = TextureKey.of("all")
 
     val blockFamily = listOf(
-        DuskBlockFamilies.VOLCANIC_SANDSTONE,
-        DuskBlockFamilies.CUT_VOLCANIC_SANDSTONE,
-        DuskBlockFamilies.SMOOTH_VOLCANIC_SANDSTONE,
+        DuskBlockFamilies.VOLCANIC_SANDSTONE_FAMILY,
+        DuskBlockFamilies.CUT_VOLCANIC_SANDSTONE_FAMILY,
+        DuskBlockFamilies.SMOOTH_VOLCANIC_SANDSTONE_FAMILY,
         DuskBlockFamilies.CHARRED
     )
 
@@ -40,6 +39,22 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
                 texture.put(TextureKey.SIDE, Texture.getId(DuskBlocks.CHISELED_VOLCANIC_SANDSTONE))
             }
         )
+        blockFamily.forEach {
+            gen.registerCubeAllModelTexturePool(it.baseBlock).family(it)
+        }
+
+//        gen.registerRod(DuskBlocks.GUNPOWDER_BARREL)
+        gen.blockStateCollector.accept(
+            VariantsBlockStateSupplier.create(
+                DuskBlocks.GUNPOWDER_BARREL,
+                BlockStateVariant.create().put(VariantSettings.MODEL, ModelIds.getBlockModelId(DuskBlocks.GUNPOWDER_BARREL))
+            ).coordinate(
+                gen.createUpDefaultFacingVariantMap()
+            )
+        )
+
+
+
         gen.registerCubeAllModelTexturePool(DuskBlocks.VOLCANIC_SAND)
         gen.registerDustable(DuskBlocks.SUSPICIOUS_VOLCANIC_SAND)
         gen.registerLog(DuskBlocks.CHARRED_LOG)
@@ -53,9 +68,6 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
             DuskBlocks.CHARRED_HANGING_SIGN,
             DuskBlocks.CHARRED_WALL_HANGING_SIGN
         )
-        blockFamily.forEach {
-            gen.registerCubeAllModelTexturePool(it.baseBlock).family(it)
-        }
 //        gen.registerSingleton(DuskBlocks.SMOOTH_VOLCANIC_SANDSTONE) {
 //            TexturedModel.getCubeAll(Texture.getSubId(DuskBlocks.VOLCANIC_SANDSTONE, "_top"))
 //        }

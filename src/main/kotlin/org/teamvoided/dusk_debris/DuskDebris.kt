@@ -3,8 +3,11 @@ package org.teamvoided.dusk_debris
 import net.minecraft.util.Identifier
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.teamvoided.dusk_autumn.init.*
+import org.teamvoided.dusk_autumn.init.DuskEntities
+import org.teamvoided.dusk_autumn.init.DuskItems
+import org.teamvoided.dusk_autumn.init.DuskWorldgen
 import org.teamvoided.dusk_debris.init.DuskBlocks
+import org.teamvoided.dusk_debris.init.DuskItemGroups
 
 @Suppress("unused")
 object DuskDebris {

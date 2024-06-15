@@ -1,9 +1,6 @@
 package org.teamvoided.dusk_autumn.init
 
-import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents
-import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents.ModifyEntries
 import net.minecraft.block.Block
-import net.minecraft.block.Blocks
 import net.minecraft.item.*
 import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
@@ -13,6 +10,8 @@ import org.teamvoided.dusk_debris.init.DuskBlocks
 
 @Suppress("unused", "MemberVisibilityCanBePrivate")
 object DuskItems {
+
+    val GUNPOWDER_BARREL = register("gunpowder_barrel", BlockItem(DuskBlocks.GUNPOWDER_BARREL))
 
     val VOLCANIC_SAND = register("volcanic_sand", BlockItem(DuskBlocks.VOLCANIC_SAND))
     val SUSPICIOUS_VOLCANIC_SAND = register("suspicious_volcanic_sand", BlockItem(DuskBlocks.SUSPICIOUS_VOLCANIC_SAND))
@@ -47,32 +46,7 @@ object DuskItems {
 //add void util compat
 
 
-    fun init() {
-        ItemGroupEvents.modifyEntriesEvent(ItemGroups.NATURAL_BLOCKS)
-            .register(ModifyEntries {
-                it.addAfter(
-                    Items.CUT_RED_SANDSTONE_SLAB,
-                    SUSPICIOUS_VOLCANIC_SAND,
-                    VOLCANIC_SANDSTONE,
-                    VOLCANIC_SANDSTONE_STAIRS,
-                    VOLCANIC_SANDSTONE_SLAB,
-                    VOLCANIC_SANDSTONE_WALL,
-                    CHISELED_VOLCANIC_SANDSTONE,
-                    SMOOTH_VOLCANIC_SANDSTONE,
-                    SMOOTH_VOLCANIC_SANDSTONE_STAIRS,
-                    SMOOTH_VOLCANIC_SANDSTONE_SLAB,
-                    CUT_VOLCANIC_SANDSTONE,
-                    CUT_VOLCANIC_SANDSTONE_SLAB,
-                )
-            })
-        ItemGroupEvents.modifyEntriesEvent(ItemGroups.NATURAL_BLOCKS)
-            .register(ModifyEntries {
-                it.addAfter(
-                    Items.RED_SAND,
-                    VOLCANIC_SAND
-                )
-            })
-    }
+    fun init() {}
 
     fun register(id: String, item: Item): Item = Registry.register(Registries.ITEM, id(id), item)
 

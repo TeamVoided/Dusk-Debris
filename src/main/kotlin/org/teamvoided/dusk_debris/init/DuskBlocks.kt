@@ -4,7 +4,10 @@ import net.minecraft.block.*
 import net.minecraft.block.Blocks.legacyStairsOf
 import net.minecraft.block.enums.NoteBlockInstrument
 import net.minecraft.block.piston.PistonBehavior
-import net.minecraft.block.sign.*
+import net.minecraft.block.sign.CeilingHangingSignBlock
+import net.minecraft.block.sign.SignBlock
+import net.minecraft.block.sign.WallHangingSignBlock
+import net.minecraft.block.sign.WallSignBlock
 import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
 import net.minecraft.sound.BlockSoundGroup
@@ -13,12 +16,20 @@ import net.minecraft.util.Color
 import net.minecraft.util.math.Direction
 import org.teamvoided.dusk_debris.DuskDebris.id
 import org.teamvoided.dusk_debris.block.DuskBlockFamilies
+import org.teamvoided.dusk_debris.block.GunpowderBarrelBlock
 
 @Suppress("HasPlatformType", "MemberVisibilityCanBePrivate", "unused", "DEPRECATION")
 object DuskBlocks {
     val charredLogColor = MapColor.BLACK
     val charredPlanksColor = MapColor.DEEPSLATE
 
+    val GUNPOWDER_BARREL = register(
+        "gunpowder_barrel",
+        GunpowderBarrelBlock(
+            AbstractBlock.Settings.create().mapColor(MapColor.FIRE).instrument(NoteBlockInstrument.BASS)
+                .strength(1f, 0.0f).sounds(BlockSoundGroup.WOOD).lavaIgnitable().solidBlock(Blocks::nonSolid)
+        )
+    )
 
     val VOLCANIC_SAND = register(
         "volcanic_sand",
