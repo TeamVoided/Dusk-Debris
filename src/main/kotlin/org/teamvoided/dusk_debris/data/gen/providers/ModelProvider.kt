@@ -3,17 +3,17 @@ package org.teamvoided.dusk_debris.data.gen.providers
 
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider
-import net.minecraft.block.Block
 import net.minecraft.data.client.ItemModelGenerator
-import net.minecraft.data.client.model.*
-import net.minecraft.util.Identifier
+import net.minecraft.data.client.model.BlockStateModelGenerator
+import net.minecraft.data.client.model.Texture
+import net.minecraft.data.client.model.TextureKey
+import net.minecraft.data.client.model.TexturedModel
 import org.teamvoided.dusk_debris.block.DuskBlockFamilies
 import org.teamvoided.dusk_debris.init.DuskBlocks
-import java.util.*
+import org.teamvoided.dusk_debris.util.sixDirectionalBlock
 
 class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
 
-    private val ALL_KRY: TextureKey = TextureKey.of("all")
 
     val blockFamily = listOf(
         DuskBlockFamilies.VOLCANIC_SANDSTONE_FAMILY,
@@ -44,22 +44,14 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
             gen.registerCubeAllModelTexturePool(it.baseBlock).family(it)
         }
 
-        gen.blockStateCollector.accept(
-            VariantsBlockStateSupplier.create(
-                DuskBlocks.GUNPOWDER_BARREL,
-                BlockStateVariant.create().put(VariantSettings.MODEL, ModelIds.getBlockModelId(DuskBlocks.GUNPOWDER_BARREL))
-            ).coordinate(
-                gen.createUpDefaultFacingVariantMap()
-            )
-        )
-//        gen.registerSingleton(DuskBlocks.GUNPOWDER_BARREL, TexturedModel.CUBE_BOTTOM_TOP)
+        gen.sixDirectionalBlock(DuskBlocks.GUNPOWDER_BARREL)
+
         gen.registerLog(DuskBlocks.CYPRUS_LOG)
             .log(DuskBlocks.CYPRUS_LOG)
             .wood(DuskBlocks.CYPRUS_WOOD)
         gen.registerLog(DuskBlocks.STRIPPED_CYPRUS_LOG)
             .log(DuskBlocks.STRIPPED_CYPRUS_LOG)
             .wood(DuskBlocks.STRIPPED_CYPRUS_WOOD)
-
 
 
         gen.registerSimpleCubeAll(DuskBlocks.VOLCANIC_SAND)
@@ -75,36 +67,15 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
             DuskBlocks.CHARRED_HANGING_SIGN,
             DuskBlocks.CHARRED_WALL_HANGING_SIGN
         )
+        gen.registerHangingSign(
+            DuskBlocks.STRIPPED_CYPRUS_LOG,
+            DuskBlocks.CYPRUS_HANGING_SIGN,
+            DuskBlocks.CYPRUS_WALL_HANGING_SIGN
+        )
 //        gen.registerSingleton(DuskBlocks.SMOOTH_VOLCANIC_SANDSTONE) {
 //            TexturedModel.getCubeAll(Texture.getSubId(DuskBlocks.VOLCANIC_SANDSTONE, "_top"))
 //        }
     }
+
     override fun generateItemModels(gen: ItemModelGenerator) {}
-
-//    private fun BlockStateModelGenerator.parentedModel(block: Block, parent: Identifier): Identifier = this.parentedModel(block, block, parent)
-
-    private fun BlockStateModelGenerator.parentedModel(
-        block: Block,
-        textBlock: Block,
-        parent: Identifier
-    ): Identifier =
-        Model(parent.myb, Optional.empty(), ALL_KRY)
-            .upload(block.model(), Texture().put(ALL_KRY, textBlock.model()), this.modelCollector)
-
-    private fun BlockStateModelGenerator.parentedModel(
-        block: Identifier,
-        textBlock: Block,
-        parent: Identifier
-    ): Identifier =
-        Model(parent.myb, Optional.empty(), ALL_KRY)
-            .upload(block, Texture().put(ALL_KRY, textBlock.model()), this.modelCollector)
-
-
-    private
-    val <T : Any?> T.myb get() = Optional.ofNullable(this)
-
-    private fun Block.modelSuffix(str: String) = this.model().suffix(str)
-
-    private fun Identifier.suffix(str: String) = Identifier(this.namespace, "${this.path}$str")
-    private fun Block.model(): Identifier = ModelIds.getBlockModelId(this)
 }
