@@ -30,17 +30,32 @@ object DuskBlockFamilies {
             .slab(DuskBlocks.SMOOTH_VOLCANIC_SANDSTONE_SLAB)
             .build()
 
-//    val CYPRUS_FAMILY: BlockFamily =
-//        BlockFamilies.register(DuskBlocks.CHARRED_PLANKS)
-//            .stairs(DuskBlocks.CHARRED_STAIRS)
-//            .slab(DuskBlocks.CHARRED_SLAB)
-//            .group("wooden")
-//            .unlockCriterionName("has_planks")
-//            .build()
-    val CYPRUS_BLOCK_SET_TYPE: BlockSetType = BlockSetType.CHERRY
+    val CYPRUS_FAMILY: BlockFamily =
+        BlockFamilies.register(DuskBlocks.CYPRUS_PLANKS)
+            .stairs(DuskBlocks.CYPRUS_STAIRS)
+            .slab(DuskBlocks.CYPRUS_SLAB)
+            .group("wooden")
+            .unlockCriterionName("has_planks")
+            .build()
+    val CYPRUS_BLOCK_SET_TYPE: BlockSetType =
+        BlockSetTypeBuilder()
+            .openableByHand(true)
+            .openableByWindCharge(true)
+            .buttonActivatedByArrows(true)
+            .soundGroup(BlockSoundGroup.WOOD)
+            .doorOpenSound(SoundEvents.BLOCK_CHERRY_WOOD_DOOR_OPEN)
+            .doorCloseSound(SoundEvents.BLOCK_CHERRY_WOOD_DOOR_CLOSE)
+            .trapdoorOpenSound(SoundEvents.BLOCK_CHERRY_WOOD_TRAPDOOR_OPEN)
+            .trapdoorCloseSound(SoundEvents.BLOCK_CHERRY_WOOD_TRAPDOOR_CLOSE)
+            .pressurePlateClickOnSound(SoundEvents.BLOCK_CHERRY_WOOD_PRESSURE_PLATE_CLICK_ON)
+            .pressurePlateClickOffSound(SoundEvents.BLOCK_CHERRY_WOOD_PRESSURE_PLATE_CLICK_OFF)
+            .buttonClickOnSound(SoundEvents.BLOCK_CHERRY_WOOD_BUTTON_CLICK_ON)
+            .buttonClickOffSound(SoundEvents.BLOCK_CHERRY_WOOD_BUTTON_CLICK_OFF)
+            .pressurePlateActivationRule(BlockSetType.PressurePlateSensitivity.EVERYTHING)
+            .register(id("charred"))
     val CYPRUS_SIGN_TYPE: SignType = SignType.register(SignType("cyprus", CYPRUS_BLOCK_SET_TYPE))
 
-    val CHARRED: BlockFamily =
+    val CHARRED_FAMILY: BlockFamily =
         BlockFamilies.register(DuskBlocks.CHARRED_PLANKS)
             .stairs(DuskBlocks.CHARRED_STAIRS)
             .slab(DuskBlocks.CHARRED_SLAB)

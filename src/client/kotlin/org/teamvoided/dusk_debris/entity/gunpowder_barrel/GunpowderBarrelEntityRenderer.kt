@@ -1,4 +1,4 @@
-package org.teamvoided.dusk_debris.entity.crab
+package org.teamvoided.dusk_debris.entity.gunpowder_barrel
 
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
@@ -6,7 +6,6 @@ import net.minecraft.client.render.VertexConsumerProvider
 import net.minecraft.client.render.block.BlockRenderManager
 import net.minecraft.client.render.entity.EntityRenderer
 import net.minecraft.client.render.entity.EntityRendererFactory
-import net.minecraft.client.render.entity.TntMinecartEntityRenderer
 import net.minecraft.client.texture.SpriteAtlasTexture
 import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.util.Identifier

@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "bottom": "dusk_debris:block/gunpowder_barrel_bottom",
+    "side": "dusk_debris:block/gunpowder_barrel_side",
+    "top": "dusk_debris:block/gunpowder_barrel_top"
+  }
+}

@@ -19,7 +19,8 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
         DuskBlockFamilies.VOLCANIC_SANDSTONE_FAMILY,
         DuskBlockFamilies.CUT_VOLCANIC_SANDSTONE_FAMILY,
         DuskBlockFamilies.SMOOTH_VOLCANIC_SANDSTONE_FAMILY,
-        DuskBlockFamilies.CHARRED
+        DuskBlockFamilies.CYPRUS_FAMILY,
+        DuskBlockFamilies.CHARRED_FAMILY
     )
 
     override fun generateBlockStateModels(gen: BlockStateModelGenerator) {
@@ -43,7 +44,6 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
             gen.registerCubeAllModelTexturePool(it.baseBlock).family(it)
         }
 
-//        gen.registerRod(DuskBlocks.GUNPOWDER_BARREL)
         gen.blockStateCollector.accept(
             VariantsBlockStateSupplier.create(
                 DuskBlocks.GUNPOWDER_BARREL,
@@ -52,10 +52,17 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
                 gen.createUpDefaultFacingVariantMap()
             )
         )
+//        gen.registerSingleton(DuskBlocks.GUNPOWDER_BARREL, TexturedModel.CUBE_BOTTOM_TOP)
+        gen.registerLog(DuskBlocks.CYPRUS_LOG)
+            .log(DuskBlocks.CYPRUS_LOG)
+            .wood(DuskBlocks.CYPRUS_WOOD)
+        gen.registerLog(DuskBlocks.STRIPPED_CYPRUS_LOG)
+            .log(DuskBlocks.STRIPPED_CYPRUS_LOG)
+            .wood(DuskBlocks.STRIPPED_CYPRUS_WOOD)
 
 
 
-        gen.registerCubeAllModelTexturePool(DuskBlocks.VOLCANIC_SAND)
+        gen.registerSimpleCubeAll(DuskBlocks.VOLCANIC_SAND)
         gen.registerDustable(DuskBlocks.SUSPICIOUS_VOLCANIC_SAND)
         gen.registerLog(DuskBlocks.CHARRED_LOG)
             .log(DuskBlocks.CHARRED_LOG)
@@ -72,7 +79,6 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
 //            TexturedModel.getCubeAll(Texture.getSubId(DuskBlocks.VOLCANIC_SANDSTONE, "_top"))
 //        }
     }
-
     override fun generateItemModels(gen: ItemModelGenerator) {}
 
 //    private fun BlockStateModelGenerator.parentedModel(block: Block, parent: Identifier): Identifier = this.parentedModel(block, block, parent)

@@ -6,8 +6,10 @@ import net.minecraft.block.enums.NoteBlockInstrument
 import net.minecraft.block.piston.PistonBehavior
 import net.minecraft.block.sign.CeilingHangingSignBlock
 import net.minecraft.block.sign.SignBlock
+import net.minecraft.block.sign.SignType
 import net.minecraft.block.sign.WallHangingSignBlock
 import net.minecraft.block.sign.WallSignBlock
+import net.minecraft.data.family.BlockFamilies
 import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
 import net.minecraft.sound.BlockSoundGroup
@@ -30,11 +32,10 @@ object DuskBlocks {
         )
     )
 
-
-    val CYPRUS_LOG = register("charred_log", Blocks.logOf(charredPlanksColor, charredLogColor))
-    val STRIPPED_CYPRUS_LOG = register("stripped_charred_log", Blocks.logOf(charredPlanksColor, charredPlanksColor))
+    val CYPRUS_LOG = register("cyprus_log", Blocks.logOf(charredPlanksColor, charredLogColor))
+    val STRIPPED_CYPRUS_LOG = register("stripped_cyprus_log", Blocks.logOf(charredPlanksColor, charredPlanksColor))
     val CYPRUS_WOOD = register(
-        "charred_wood",
+        "cyprus_wood",
         PillarBlock(
             AbstractBlock.Settings.create().mapColor(charredLogColor).instrument(NoteBlockInstrument.BASS)
                 .strength(2.0f)
@@ -42,7 +43,7 @@ object DuskBlocks {
         )
     )
     val STRIPPED_CYPRUS_WOOD = register(
-        "stripped_charred_wood",
+        "stripped_cyprus_wood",
         PillarBlock(
             AbstractBlock.Settings.create().mapColor(charredPlanksColor).instrument(NoteBlockInstrument.BASS)
                 .strength(2.0f)
@@ -56,79 +57,82 @@ object DuskBlocks {
                 .strength(2.0f, 3.0f).sounds(BlockSoundGroup.WOOD).lavaIgnitable()
         )
     )
-    val CYPRUS_STAIRS = register("charred_stairs", legacyStairsOf(CYPRUS_PLANKS))
+    val CYPRUS_STAIRS = register("cyprus_stairs", legacyStairsOf(CYPRUS_PLANKS))
     val CYPRUS_SLAB = register(
-        "charred_slab",
+        "cyprus_slab",
         SlabBlock(
             AbstractBlock.Settings.create().mapColor(charredPlanksColor).instrument(NoteBlockInstrument.BASS)
                 .strength(2.0f, 3.0f).sounds(BlockSoundGroup.WOOD).lavaIgnitable()
         )
     )
     val CYPRUS_DOOR = register(
-        "charred_door",
+        "cyprus_door",
         DoorBlock(
-            DuskBlockFamilies.CYPRUS_BLOCK_SET_TYPE,
+            BlockSetType.CHERRY,
             AbstractBlock.Settings.create().mapColor(charredPlanksColor).instrument(NoteBlockInstrument.BASS)
                 .strength(3.0f).nonOpaque().pistonBehavior(PistonBehavior.DESTROY).lavaIgnitable()
         )
     )
     val CYPRUS_TRAPDOOR = register(
-        "charred_trapdoor", TrapdoorBlock(
-            DuskBlockFamilies.CYPRUS_BLOCK_SET_TYPE,
-            AbstractBlock.Settings.create().mapColor(charredPlanksColor).instrument(NoteBlockInstrument.BASS).strength(3.0f).nonOpaque().allowsSpawning(Blocks::nonSpawnable).lavaIgnitable()
+        "cyprus_trapdoor", TrapdoorBlock(
+            BlockSetType.CHERRY,
+            AbstractBlock.Settings.create().mapColor(charredPlanksColor).instrument(NoteBlockInstrument.BASS)
+                .strength(3.0f).nonOpaque().allowsSpawning(Blocks::nonSpawnable).lavaIgnitable()
         )
     )
     val CYPRUS_SIGN = register(
-        "charred_sign",
+        "cyprus_sign",
         SignBlock(
-            DuskBlockFamilies.CYPRUS_SIGN_TYPE,
-            AbstractBlock.Settings.create().mapColor(charredPlanksColor).solid().instrument(NoteBlockInstrument.BASS).noCollision().strength(1.0f).lavaIgnitable()
+            SignType.CHERRY,
+            AbstractBlock.Settings.create().mapColor(charredPlanksColor).solid().instrument(NoteBlockInstrument.BASS)
+                .noCollision().strength(1.0f).lavaIgnitable()
         )
     )
     val CYPRUS_WALL_SIGN = register(
-        "charred_wall_sign",
+        "cyprus_wall_sign",
         WallSignBlock(
-            DuskBlockFamilies.CYPRUS_SIGN_TYPE,
+            SignType.CHERRY,
             AbstractBlock.Settings.create().mapColor(charredPlanksColor).solid().instrument(NoteBlockInstrument.BASS)
                 .noCollision().strength(1.0f).dropsLike(CYPRUS_SIGN).lavaIgnitable()
         )
     )
     val CYPRUS_HANGING_SIGN = register(
-        "charred_hanging_sign",
+        "cyprus_hanging_sign",
         CeilingHangingSignBlock(
-            DuskBlockFamilies.CYPRUS_SIGN_TYPE,
-            AbstractBlock.Settings.create().mapColor(charredLogColor).solid().instrument(NoteBlockInstrument.BASS).noCollision().strength(1.0f).lavaIgnitable()
+            SignType.CHERRY,
+            AbstractBlock.Settings.create().mapColor(charredLogColor).solid().instrument(NoteBlockInstrument.BASS)
+                .noCollision().strength(1.0f).lavaIgnitable()
         )
     )
     val CYPRUS_WALL_HANGING_SIGN = register(
-        "charred_wall_hanging_sign",
+        "cyprus_wall_hanging_sign",
         WallHangingSignBlock(
-            DuskBlockFamilies.CYPRUS_SIGN_TYPE,
+            SignType.CHERRY,
             AbstractBlock.Settings.create().mapColor(charredLogColor).solid()
                 .instrument(NoteBlockInstrument.BASS).noCollision().strength(1.0f).lavaIgnitable()
                 .dropsLike(Blocks.OAK_HANGING_SIGN)
         )
     )
-    val CYPRUS_BUTTON = register("charred_button", Blocks.buttonOf(DuskBlockFamilies.CYPRUS_BLOCK_SET_TYPE))
+    val CYPRUS_BUTTON = register("cyprus_button", Blocks.buttonOf(BlockSetType.CHERRY))
     val CYPRUS_FENCE = register(
-        "charred_fence",
+        "cyprus_fence",
         FenceBlock(
             AbstractBlock.Settings.create().mapColor(charredPlanksColor)
                 .instrument(NoteBlockInstrument.BASS).strength(2.0f, 3.0f).sounds(BlockSoundGroup.WOOD)
         )
     )
     val CYPRUS_FENCE_GATE = register(
-        "charred_fence_gate",
+        "cyprus_fence_gate",
         FenceGateBlock(
-            DuskBlockFamilies.CYPRUS_SIGN_TYPE,
+            SignType.CHERRY,
             AbstractBlock.Settings.create().mapColor(charredPlanksColor).solid()
                 .instrument(NoteBlockInstrument.BASS).strength(2.0f, 3.0f)
         )
     )
     val CYPRUS_PRESSURE_PLATE = register(
-        "charred_pressure_plate",
+        "cyprus_pressure_plate",
         PressurePlateBlock(
-            DuskBlockFamilies.CYPRUS_BLOCK_SET_TYPE,
+            BlockSetType.CHERRY,
             AbstractBlock.Settings.create().mapColor(charredPlanksColor).solid()
                 .instrument(NoteBlockInstrument.BASS).noCollision().strength(0.5f)
                 .pistonBehavior(PistonBehavior.DESTROY)

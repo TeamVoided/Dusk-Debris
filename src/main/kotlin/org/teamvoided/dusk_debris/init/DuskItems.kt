@@ -13,6 +13,22 @@ object DuskItems {
 
     val GUNPOWDER_BARREL = register("gunpowder_barrel", BlockItem(DuskBlocks.GUNPOWDER_BARREL))
 
+    val CYPRUS_LOG = register("cyprus_log", BlockItem(DuskBlocks.CYPRUS_LOG))
+    val CYPRUS_WOOD = register("cyprus_wood", BlockItem(DuskBlocks.CYPRUS_WOOD))
+    val STRIPPED_CYPRUS_LOG = register("stripped_cyprus_log", BlockItem(DuskBlocks.STRIPPED_CYPRUS_LOG))
+    val STRIPPED_CYPRUS_WOOD = register("stripped_cyprus_wood", BlockItem(DuskBlocks.STRIPPED_CYPRUS_WOOD))
+    val CYPRUS_PLANKS = register("cyprus_planks", BlockItem(DuskBlocks.CYPRUS_PLANKS))
+    val CYPRUS_STAIRS = register("cyprus_stairs", BlockItem(DuskBlocks.CYPRUS_STAIRS))
+    val CYPRUS_SLAB = register("cyprus_slab", BlockItem(DuskBlocks.CYPRUS_SLAB))
+    val CYPRUS_DOOR = register("cyprus_door", TallBlockItem(DuskBlocks.CYPRUS_DOOR, Item.Settings()))
+    val CYPRUS_TRAPDOOR = register("cyprus_trapdoor", BlockItem(DuskBlocks.CYPRUS_TRAPDOOR))
+    val CYPRUS_FENCE = register("cyprus_fence", BlockItem(DuskBlocks.CYPRUS_FENCE))
+    val CYPRUS_FENCE_GATE = register("cyprus_fence_gate", BlockItem(DuskBlocks.CYPRUS_FENCE_GATE))
+    val CYPRUS_BUTTON = register("cyprus_button", BlockItem(DuskBlocks.CYPRUS_BUTTON))
+    val CYPRUS_PRESSURE_PLATE = register("cyprus_pressure_plate", BlockItem(DuskBlocks.CYPRUS_PRESSURE_PLATE))
+    val CYPRUS_SIGN = register("cyprus_sign", SignItem((Item.Settings()).maxCount(16), DuskBlocks.CYPRUS_SIGN, DuskBlocks.CYPRUS_WALL_SIGN))
+    val CYPRUS_HANGING_SIGN = register("cyprus_hanging_sign", HangingSignItem(DuskBlocks.CYPRUS_HANGING_SIGN, DuskBlocks.CYPRUS_WALL_HANGING_SIGN, (Item.Settings()).maxCount(16)))
+
     val VOLCANIC_SAND = register("volcanic_sand", BlockItem(DuskBlocks.VOLCANIC_SAND))
     val SUSPICIOUS_VOLCANIC_SAND = register("suspicious_volcanic_sand", BlockItem(DuskBlocks.SUSPICIOUS_VOLCANIC_SAND))
     val VOLCANIC_SANDSTONE = register("volcanic_sandstone", BlockItem(DuskBlocks.VOLCANIC_SANDSTONE))

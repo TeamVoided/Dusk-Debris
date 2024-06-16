@@ -28,10 +28,18 @@ class GunpowderBarrelEntity(entityType: EntityType<out GunpowderBarrelEntity>, w
     Entity(entityType, world), Ownable {
     private var causingEntity: LivingEntity? = null
     private var field_52318 = false
+
     init {
-        this.inanimate = true
+        this.inanimate = false
     }
-    constructor(world: World, x: Double, y: Double, z: Double, igniter: LivingEntity?) : this(DuskEntities.GUNPOWDER_BARREL, world) {
+
+    constructor(
+        world: World,
+        x: Double,
+        y: Double,
+        z: Double,
+        igniter: LivingEntity?
+    ) : this(DuskEntities.GUNPOWDER_BARREL, world) {
         this.setPosition(x, y, z)
         val d = world.random.nextDouble() * 6.2831854820251465
         this.setVelocity(-sin(d) * 0.02, 0.20000000298023224, -cos(d) * 0.02)
@@ -68,7 +76,7 @@ class GunpowderBarrelEntity(entityType: EntityType<out GunpowderBarrelEntity>, w
             this.velocity = velocity.multiply(0.7, -0.5, 0.7)
         }
 
-        val i = this.fuse - 1
+        val i = this.fuse - if (this.isOnFire || this.isInLava) 3 else 1
         this.fuse = i
         if (i <= 0) {
             this.discard()
@@ -78,7 +86,7 @@ class GunpowderBarrelEntity(entityType: EntityType<out GunpowderBarrelEntity>, w
         } else {
             this.updateWaterState()
             if (world.isClient) {
-                world.addParticle(ParticleTypes.SMOKE, this.x, this.y + 0.5, this.z, 0.0, 0.0, 0.0)
+                world.addParticle(ParticleTypes.FLAME, this.x, this.y + 1.0, this.z, 0.0, 0.0, 0.0)
             }
         }
     }
@@ -170,7 +178,6 @@ class GunpowderBarrelEntity(entityType: EntityType<out GunpowderBarrelEntity>, w
                     power
                 )
             }
-
             override fun getBlastResistance(
                 explosion: Explosion,
                 world: BlockView,
