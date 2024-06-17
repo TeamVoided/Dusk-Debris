@@ -9,8 +9,10 @@ import net.minecraft.entity.data.TrackedDataHandlerRegistry
 import net.minecraft.fluid.FluidState
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.nbt.NbtHelper
+import net.minecraft.particle.DefaultParticleType
 import net.minecraft.particle.ParticleTypes
 import net.minecraft.registry.RegistryKeys
+import net.minecraft.sound.SoundEvents
 import net.minecraft.unmapped.C_zbvyjshu
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.BlockView
@@ -19,6 +21,7 @@ import net.minecraft.world.World.ExplosionSourceType
 import net.minecraft.world.explosion.Explosion
 import net.minecraft.world.explosion.ExplosionBehavior
 import org.teamvoided.dusk_autumn.init.DuskEntities
+import org.teamvoided.dusk_debris.data.DuskBlockTags
 import org.teamvoided.dusk_debris.init.DuskBlocks
 import java.util.*
 import kotlin.math.cos
@@ -27,8 +30,7 @@ import kotlin.math.sin
 class GunpowderBarrelEntity(entityType: EntityType<out GunpowderBarrelEntity>, world: World) :
     Entity(entityType, world), Ownable {
     private var causingEntity: LivingEntity? = null
-    private var field_52318 = false
-
+    private var passedThoughPortal = false
     init {
         this.inanimate = false
     }
@@ -52,6 +54,7 @@ class GunpowderBarrelEntity(entityType: EntityType<out GunpowderBarrelEntity>, w
 
     override fun initDataTracker(builder: DataTracker.Builder) {
         builder.add(FUSE, DEFAULT_FUSE)
+        builder.add(EXPLOSION_POWER, DEFAULT_EXPLOSION_POWER)
         builder.add(BLOCK_STATE, DuskBlocks.GUNPOWDER_BARREL.defaultState)
     }
 
@@ -86,37 +89,58 @@ class GunpowderBarrelEntity(entityType: EntityType<out GunpowderBarrelEntity>, w
         } else {
             this.updateWaterState()
             if (world.isClient) {
-                world.addParticle(ParticleTypes.FLAME, this.x, this.y + 1.0, this.z, 0.0, 0.0, 0.0)
+                world.addParticle(
+                    smallParticle,
+                    this.x,
+                    this.y + 1.0,
+                    this.z,
+                    0.0,
+                    0.0,
+                    0.0
+                )
             }
         }
     }
 
     private fun explode() {
-        val explosionPower = 4.0f
         world.createExplosion(
-            this, Explosion.createDamageSource(
+            this,
+            Explosion.createDamageSource(
                 this.world,
                 this
-            ), if (this.field_52318) netherPortalDestroyer else null,
+            ), if (this.passedThoughPortal) netherPortalDestroyer else blockDestroyer,
             this.x,
             this.getBodyY(0.0625),
-            this.z, explosionPower, false, ExplosionSourceType.TRIGGER
+            this.z,
+            explosionPower.toFloat(),
+            false,
+            ExplosionSourceType.TNT,
+            ParticleTypes.GUST_EMITTER_LARGE,
+            ParticleTypes.GUST_EMITTER_SMALL,
+            SoundEvents.ENTITY_BREEZE_WIND_BURST
         )
     }
 
     override fun writeCustomDataToNbt(nbt: NbtCompound) {
         nbt.putShort(FUSE_KEY, fuse.toShort())
+        nbt.putShort(EXPLOSION_POWER_KEY, explosionPower.toShort())
         nbt.put(BLOCK_STATE_KEY, NbtHelper.fromBlockState(this.blockState))
     }
 
     override fun readCustomDataFromNbt(nbt: NbtCompound) {
         this.fuse = nbt.getShort(FUSE_KEY).toInt()
+        this.explosionPower = nbt.getFloat(EXPLOSION_POWER_KEY).toInt()
         if (nbt.contains(BLOCK_STATE_KEY, 10)) {
             this.blockState = NbtHelper.toBlockState(
                 world
                     .filteredLookup(RegistryKeys.BLOCK), nbt.getCompound(BLOCK_STATE_KEY)
             )
         }
+    }
+
+    fun setProperties(power: Int, blockState: BlockState) {
+        this.explosionPower = power
+        this.blockState = blockState
     }
 
     override fun getOwner(): LivingEntity? {
@@ -135,21 +159,25 @@ class GunpowderBarrelEntity(entityType: EntityType<out GunpowderBarrelEntity>, w
         set(fuse) {
             dataTracker.set(FUSE, fuse)
         }
-
+    var explosionPower: Int
+        get() = dataTracker.get(EXPLOSION_POWER)
+        set(explosionPower) {
+            dataTracker.set(EXPLOSION_POWER, explosionPower)
+        }
     var blockState: BlockState
         get() = dataTracker.get(BLOCK_STATE)
         set(state) {
             dataTracker.set(BLOCK_STATE, state)
         }
 
-    private fun method_61174(bl: Boolean) {
-        this.field_52318 = bl
+    private fun hasTraveledDimensions(bl: Boolean) {
+        this.passedThoughPortal = bl
     }
 
     override fun moveToWorld(c_zbvyjshu: C_zbvyjshu): Entity? {
         val entity = super.moveToWorld(c_zbvyjshu)
         if (entity is GunpowderBarrelEntity) {
-            entity.method_61174(true)
+            entity.hasTraveledDimensions(true)
         }
         return entity
     }
@@ -157,11 +185,49 @@ class GunpowderBarrelEntity(entityType: EntityType<out GunpowderBarrelEntity>, w
     companion object {
         private val FUSE: TrackedData<Int> =
             DataTracker.registerData(GunpowderBarrelEntity::class.java, TrackedDataHandlerRegistry.INTEGER)
+        private val EXPLOSION_POWER: TrackedData<Int> =
+            DataTracker.registerData(GunpowderBarrelEntity::class.java, TrackedDataHandlerRegistry.INTEGER)
         private val BLOCK_STATE: TrackedData<BlockState> =
             DataTracker.registerData(GunpowderBarrelEntity::class.java, TrackedDataHandlerRegistry.BLOCK_STATE)
         private const val DEFAULT_FUSE = 100
+        private const val DEFAULT_EXPLOSION_POWER = 5
         private const val BLOCK_STATE_KEY = "block_state"
         const val FUSE_KEY: String = "fuse"
+        const val EXPLOSION_POWER_KEY: String = "explosion_power"
+        val smallParticle: DefaultParticleType = if (BLOCK_STATE == DuskBlocks.ANCIENT_BLACK_POWDER_BARREL) ParticleTypes.SOUL_FIRE_FLAME else ParticleTypes.FLAME
+        private val blockDestroyer: ExplosionBehavior = object : ExplosionBehavior() {
+            override fun canDestroyBlock(
+                explosion: Explosion,
+                world: BlockView,
+                pos: BlockPos,
+                state: BlockState,
+                power: Float
+            ): Boolean {
+                return if (!state.isIn(DuskBlockTags.GUNPOWDER_BARREL_DESTROYS)) false else super.canDestroyBlock(
+                    explosion,
+                    world,
+                    pos,
+                    state,
+                    power
+                )
+            }
+
+            override fun getBlastResistance(
+                explosion: Explosion,
+                world: BlockView,
+                pos: BlockPos,
+                blockState: BlockState,
+                fluidState: FluidState
+            ): Optional<Float> {
+                return if (!blockState.isIn(DuskBlockTags.GUNPOWDER_BARREL_DESTROYS)) Optional.empty() else super.getBlastResistance(
+                    explosion,
+                    world,
+                    pos,
+                    blockState,
+                    fluidState
+                )
+            }
+        }
         private val netherPortalDestroyer: ExplosionBehavior = object : ExplosionBehavior() {
             override fun canDestroyBlock(
                 explosion: Explosion,
@@ -170,7 +236,7 @@ class GunpowderBarrelEntity(entityType: EntityType<out GunpowderBarrelEntity>, w
                 state: BlockState,
                 power: Float
             ): Boolean {
-                return if (state.isOf(Blocks.NETHER_PORTAL)) false else super.canDestroyBlock(
+                return if (!state.isIn(DuskBlockTags.GUNPOWDER_BARREL_DESTROYS) || state.isOf(Blocks.NETHER_PORTAL)) false else super.canDestroyBlock(
                     explosion,
                     world,
                     pos,
@@ -178,6 +244,7 @@ class GunpowderBarrelEntity(entityType: EntityType<out GunpowderBarrelEntity>, w
                     power
                 )
             }
+
             override fun getBlastResistance(
                 explosion: Explosion,
                 world: BlockView,
@@ -185,7 +252,7 @@ class GunpowderBarrelEntity(entityType: EntityType<out GunpowderBarrelEntity>, w
                 blockState: BlockState,
                 fluidState: FluidState
             ): Optional<Float> {
-                return if (blockState.isOf(Blocks.NETHER_PORTAL)) Optional.empty() else super.getBlastResistance(
+                return if (!blockState.isIn(DuskBlockTags.GUNPOWDER_BARREL_DESTROYS) || blockState.isOf(Blocks.NETHER_PORTAL)) Optional.empty() else super.getBlastResistance(
                     explosion,
                     world,
                     pos,

@@ -3,13 +3,15 @@ package org.teamvoided.dusk_debris.data.gen.providers
 
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider
+import net.minecraft.block.Block
 import net.minecraft.data.client.ItemModelGenerator
-import net.minecraft.data.client.model.BlockStateModelGenerator
-import net.minecraft.data.client.model.Texture
-import net.minecraft.data.client.model.TextureKey
-import net.minecraft.data.client.model.TexturedModel
+import net.minecraft.data.client.model.*
+import net.minecraft.state.property.Properties
+import net.minecraft.util.Identifier
+import org.teamvoided.dusk_debris.DuskDebris.id
 import org.teamvoided.dusk_debris.block.DuskBlockFamilies
 import org.teamvoided.dusk_debris.init.DuskBlocks
+import org.teamvoided.dusk_debris.init.DuskItems
 import org.teamvoided.dusk_debris.util.sixDirectionalBlock
 
 class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
@@ -19,7 +21,7 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
         DuskBlockFamilies.VOLCANIC_SANDSTONE_FAMILY,
         DuskBlockFamilies.CUT_VOLCANIC_SANDSTONE_FAMILY,
         DuskBlockFamilies.SMOOTH_VOLCANIC_SANDSTONE_FAMILY,
-        DuskBlockFamilies.CYPRUS_FAMILY,
+        DuskBlockFamilies.CYPRESS_FAMILY,
         DuskBlockFamilies.CHARRED_FAMILY
     )
 
@@ -45,14 +47,25 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
         }
 
         gen.sixDirectionalBlock(DuskBlocks.GUNPOWDER_BARREL)
+        gen.sixDirectionalBlock(DuskBlocks.STRONGHOLD_GUNPOWDER_BARREL)
+        gen.sixDirectionalBlock(DuskBlocks.ANCIENT_BLACK_POWDER_BARREL)
+        gen.registerItemModel(DuskItems.BLUNDERBOMB)
+        gen.blockStateCollector.accept(
+            VariantsBlockStateSupplier.create(DuskBlocks.BLUNDERBOMB_BLOCK).coordinate(
+                BlockStateModelGenerator.createBooleanModelMap(
+                    Properties.HANGING,
+                    Identifier.of("dusk_debris", "block/blunderbomb_hanging"),
+                    Identifier.of("dusk_debris", "block/blunderbomb")
+                )
+            )
+        )
 
-        gen.registerLog(DuskBlocks.CYPRUS_LOG)
-            .log(DuskBlocks.CYPRUS_LOG)
-            .wood(DuskBlocks.CYPRUS_WOOD)
-        gen.registerLog(DuskBlocks.STRIPPED_CYPRUS_LOG)
-            .log(DuskBlocks.STRIPPED_CYPRUS_LOG)
-            .wood(DuskBlocks.STRIPPED_CYPRUS_WOOD)
-
+        gen.registerLog(DuskBlocks.CYPRESS_LOG)
+            .log(DuskBlocks.CYPRESS_LOG)
+            .wood(DuskBlocks.CYPRESS_WOOD)
+        gen.registerLog(DuskBlocks.STRIPPED_CYPRESS_LOG)
+            .log(DuskBlocks.STRIPPED_CYPRESS_LOG)
+            .wood(DuskBlocks.STRIPPED_CYPRESS_WOOD)
 
         gen.registerSimpleCubeAll(DuskBlocks.VOLCANIC_SAND)
         gen.registerDustable(DuskBlocks.SUSPICIOUS_VOLCANIC_SAND)
@@ -68,9 +81,9 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
             DuskBlocks.CHARRED_WALL_HANGING_SIGN
         )
         gen.registerHangingSign(
-            DuskBlocks.STRIPPED_CYPRUS_LOG,
-            DuskBlocks.CYPRUS_HANGING_SIGN,
-            DuskBlocks.CYPRUS_WALL_HANGING_SIGN
+            DuskBlocks.STRIPPED_CYPRESS_LOG,
+            DuskBlocks.CYPRESS_HANGING_SIGN,
+            DuskBlocks.CYPRESS_WALL_HANGING_SIGN
         )
 //        gen.registerSingleton(DuskBlocks.SMOOTH_VOLCANIC_SANDSTONE) {
 //            TexturedModel.getCubeAll(Texture.getSubId(DuskBlocks.VOLCANIC_SANDSTONE, "_top"))

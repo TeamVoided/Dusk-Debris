@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.teamvoided.voidlib.woodset.block.sign.VoidSign;
+import org.teamvoided.dusk_debris.block.voided.sign.VoidSign;
 
 @Mixin(BlockEntityType.class)
 public class BlockEntityTypeMixin {

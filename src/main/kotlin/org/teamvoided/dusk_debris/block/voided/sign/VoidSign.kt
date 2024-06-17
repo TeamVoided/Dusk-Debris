@@ -1,4 +1,4 @@
-package org.teamvoided.voidlib.woodset.block.sign
+package org.teamvoided.dusk_debris.block.voided.sign
 
 import net.minecraft.util.Identifier
 

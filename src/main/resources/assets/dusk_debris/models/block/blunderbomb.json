@@ -1,0 +1,7 @@
+{
+  "parent": "dusk_debris:block/bomb",
+  "textures": {
+    "all": "dusk_debris:block/blunderbomb",
+    "particle": "dusk_debris:item/blunderbomb"
+  }
+}

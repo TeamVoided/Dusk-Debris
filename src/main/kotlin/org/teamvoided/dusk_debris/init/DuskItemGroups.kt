@@ -10,7 +10,6 @@ import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
 import net.minecraft.registry.RegistryKey
 import net.minecraft.text.Text
-import org.teamvoided.dusk_autumn.init.DuskItems
 import org.teamvoided.dusk_debris.DuskDebris.id
 import kotlin.jvm.optionals.getOrNull
 
@@ -24,6 +23,25 @@ object DuskItemGroups {
                 entries.addStacks(
                     mutableSetOf(
                         ItemStack(DuskItems.GUNPOWDER_BARREL),
+                        ItemStack(DuskItems.STRONGHOLD_GUNPOWDER_BARREL),
+                        ItemStack(DuskItems.ANCIENT_BLACK_POWDER_BARREL),
+                        ItemStack(DuskItems.BLUNDERBOMB),
+
+                        ItemStack(DuskItems.CYPRESS_LOG),
+                        ItemStack(DuskItems.CYPRESS_WOOD),
+                        ItemStack(DuskItems.STRIPPED_CYPRESS_LOG),
+                        ItemStack(DuskItems.STRIPPED_CYPRESS_WOOD),
+                        ItemStack(DuskItems.CYPRESS_PLANKS),
+                        ItemStack(DuskItems.CYPRESS_STAIRS),
+                        ItemStack(DuskItems.CYPRESS_SLAB),
+                        ItemStack(DuskItems.CYPRESS_DOOR),
+                        ItemStack(DuskItems.CYPRESS_TRAPDOOR),
+                        ItemStack(DuskItems.CYPRESS_FENCE),
+                        ItemStack(DuskItems.CYPRESS_FENCE_GATE),
+                        ItemStack(DuskItems.CYPRESS_BUTTON),
+                        ItemStack(DuskItems.CYPRESS_PRESSURE_PLATE),
+                        ItemStack(DuskItems.CYPRESS_SIGN),
+                        ItemStack(DuskItems.CYPRESS_HANGING_SIGN),
 
                         ItemStack(DuskItems.VOLCANIC_SAND),
                         ItemStack(DuskItems.SUSPICIOUS_VOLCANIC_SAND),

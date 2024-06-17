@@ -9,7 +9,7 @@ import net.minecraft.util.Identifier
 import org.teamvoided.dusk_debris.DuskDebris.id
 
 object DuskBlockSetType {
-    val CYPRUS_BLOCK_SET_TYPE: BlockSetType =
+    val CYPRESS_BLOCK_SET_TYPE: BlockSetType =
         BlockSetTypeBuilder()
             .openableByHand(true)
             .openableByWindCharge(true)
@@ -24,8 +24,8 @@ object DuskBlockSetType {
             .buttonClickOnSound(SoundEvents.BLOCK_CHERRY_WOOD_BUTTON_CLICK_ON)
             .buttonClickOffSound(SoundEvents.BLOCK_CHERRY_WOOD_BUTTON_CLICK_OFF)
             .pressurePlateActivationRule(BlockSetType.PressurePlateSensitivity.EVERYTHING)
-            .register(id("charred"))
-    val CYPRUS_SIGN_TYPE: SignType = SignType.register(SignType(id("cyprus"), CYPRUS_BLOCK_SET_TYPE))
+            .register(id("cypress"))
+    val CYPRESS_SIGN_TYPE: SignType = SignType.register(SignType(id("cypress"), CYPRESS_BLOCK_SET_TYPE))
 
 
     val CHARRED_BLOCK_SET_TYPE: BlockSetType =

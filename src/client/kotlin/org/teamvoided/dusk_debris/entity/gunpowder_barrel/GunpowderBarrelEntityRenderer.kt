@@ -6,6 +6,7 @@ import net.minecraft.client.render.VertexConsumerProvider
 import net.minecraft.client.render.block.BlockRenderManager
 import net.minecraft.client.render.entity.EntityRenderer
 import net.minecraft.client.render.entity.EntityRendererFactory
+import net.minecraft.client.render.entity.TntMinecartEntityRenderer
 import net.minecraft.client.texture.SpriteAtlasTexture
 import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.util.Identifier
@@ -45,14 +46,14 @@ class GunpowderBarrelEntityRenderer(context: EntityRendererFactory.Context) : En
         matrices.rotate(Axis.Y_POSITIVE.rotationDegrees(-90.0f))
         matrices.translate(-0.5f, -0.5f, 0.5f)
         matrices.rotate(Axis.Y_POSITIVE.rotationDegrees(90.0f))
-//        TntMinecartEntityRenderer.renderFlashingBlock(
-//            this.blockRenderManager,
-//            gunpowderBlockEntity.blockState,
-//            matrices,
-//            vertexConsumers,
-//            i,
-//            j / 5 % 2 == 0
-//        )
+        TntMinecartEntityRenderer.renderFlashingBlock(
+            this.blockRenderManager,
+            gunpowderBlockEntity.blockState,
+            matrices,
+            vertexConsumers,
+            i,
+            j / 5 % 2 == 0
+        )
         matrices.pop()
         super.render(gunpowderBlockEntity, f, g, matrices, vertexConsumers, i)
     }

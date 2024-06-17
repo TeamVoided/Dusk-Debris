@@ -4,12 +4,14 @@ import com.mojang.serialization.MapCodec
 import net.minecraft.block.Block
 import net.minecraft.block.BlockState
 import net.minecraft.block.Blocks
+import net.minecraft.block.LanternBlock
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.entity.projectile.ProjectileEntity
 import net.minecraft.item.ItemPlacementContext
 import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
+import net.minecraft.particle.ParticleTypes
 import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvents
 import net.minecraft.stat.Stats
@@ -23,11 +25,14 @@ import net.minecraft.util.hit.BlockHitResult
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
 import net.minecraft.world.World
+import net.minecraft.world.WorldView
 import net.minecraft.world.event.GameEvent
 import net.minecraft.world.explosion.Explosion
 import org.teamvoided.dusk_debris.entity.GunpowderBarrelEntity
+import org.teamvoided.dusk_debris.init.DuskBlocks
 
-class GunpowderBarrelBlock(settings: Settings) : Block(settings) {
+class GunpowderBarrelBlock(val power: Int = 5, settings: Settings) : Block(settings) {
+
     public override fun getCodec(): MapCodec<GunpowderBarrelBlock> {
         return CODEC
     }
@@ -72,8 +77,12 @@ class GunpowderBarrelBlock(settings: Settings) : Block(settings) {
                 pos.z.toDouble() + 0.5,
                 explosion.causingEntity
             )
-            val i = gunpowderBarrelEntity.fuse
-            gunpowderBarrelEntity.fuse = (world.random.nextInt(i / 4) + i / 8).toShort().toInt()
+            gunpowderBarrelEntity.setProperties(
+                this.power,
+                this.defaultState
+            )
+            val fuse = gunpowderBarrelEntity.fuse
+            gunpowderBarrelEntity.fuse = (world.random.nextInt(fuse / 5) + fuse / 10).toShort().toInt()
             world.spawnEntity(gunpowderBarrelEntity)
         }
     }
@@ -134,6 +143,7 @@ class GunpowderBarrelBlock(settings: Settings) : Block(settings) {
     companion object {
         val CODEC: MapCodec<GunpowderBarrelBlock> = createCodec { settings: Settings ->
             GunpowderBarrelBlock(
+                5,
                 settings
             )
         }
@@ -155,6 +165,10 @@ class GunpowderBarrelBlock(settings: Settings) : Block(settings) {
                         pos.z.toDouble() + 0.5,
                         igniter
                     )
+                gunpowderBarrelEntity.setProperties(
+                    (world.getBlockState(pos).block as GunpowderBarrelBlock).power,
+                    world.getBlockState(pos)
+                )
                 world.spawnEntity(gunpowderBarrelEntity)
                 world.playSound(
                     null,
