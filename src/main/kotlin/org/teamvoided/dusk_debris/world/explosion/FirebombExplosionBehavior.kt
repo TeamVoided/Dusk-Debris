@@ -12,17 +12,9 @@ import net.minecraft.world.explosion.Explosion
 import net.minecraft.world.explosion.ExplosionBehavior
 import java.util.*
 
-open class SpecialExplosionBehavior(
-    private val destroyCondition: TagKey<Block>,
-    private val damageCondition: TagKey<EntityType<*>>,
-    private val knockbackMultiplier: Float,
-    private val damageMultiplier: Float
+class FirebombExplosionBehavior(
+    private val destroyCondition: TagKey<Block>
 ) : ExplosionBehavior() {
-
-//    fun SpecialExplosionBehavior(destroyTag: TagKey<Block>, damageTag: TagKey<EntityType<*>>) {
-//        SpecialExplosionBehavior(destroyTag, damageTag, null, null)
-//    }
-
     override fun getBlastResistance(
         explosion: Explosion,
         world: BlockView,
@@ -46,15 +38,14 @@ open class SpecialExplosionBehavior(
     }
 
     override fun shouldDamage(explosion: Explosion, entity: Entity): Boolean {
-        return if (entity.type.isIn(damageCondition)) false
-        else super.shouldDamage(explosion, entity)
+        return false
     }
 
     override fun getKnockbackMultiplier(target: Entity): Float {
-        return knockbackMultiplier * super.getKnockbackMultiplier(target)
+        return 0f
     }
 
     override fun calculateDamage(explosion: Explosion, entity: Entity): Float {
-        return damageMultiplier * super.calculateDamage(explosion, entity)
+        return 0f
     }
 }

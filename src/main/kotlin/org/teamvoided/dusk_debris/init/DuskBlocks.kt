@@ -9,13 +9,10 @@ import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
 import net.minecraft.sound.BlockSoundGroup
 import net.minecraft.sound.SoundEvents
-import net.minecraft.util.math.BlockPos
+import net.minecraft.util.Color
 import net.minecraft.util.math.Direction
-import net.minecraft.world.BlockView
 import org.teamvoided.dusk_debris.DuskDebris.id
-import org.teamvoided.dusk_debris.block.DuskBlockFamilies
-import org.teamvoided.dusk_debris.block.DuskBlockSetType
-import org.teamvoided.dusk_debris.block.GunpowderBarrelBlock
+import org.teamvoided.dusk_debris.block.*
 import org.teamvoided.dusk_debris.block.voided.sign.VoidCeilingHangingSignBlock
 import org.teamvoided.dusk_debris.block.voided.sign.VoidSignBlock
 import org.teamvoided.dusk_debris.block.voided.sign.VoidWallHangingSignBlock
@@ -36,7 +33,8 @@ object DuskBlocks {
         "gunpowder_barrel",
         GunpowderBarrelBlock(
             4,
-            AbstractBlock.Settings.create().mapColor(MapColor.FIRE).instrument(NoteBlockInstrument.BASS)
+            1f,
+            AbstractBlock.Settings.create().mapColor(Blocks.FIRE.defaultMapColor).instrument(NoteBlockInstrument.BASS)
                 .strength(1f, 0.0f).sounds(BlockSoundGroup.WOOD).lavaIgnitable().solidBlock(Blocks::nonSolid)
         )
     )
@@ -44,7 +42,8 @@ object DuskBlocks {
         "stronghold_gunpowder_barrel",
         GunpowderBarrelBlock(
             8,
-            AbstractBlock.Settings.create().mapColor(MapColor.FIRE).instrument(NoteBlockInstrument.BASS)
+            2f,
+            AbstractBlock.Settings.create().mapColor(Blocks.FIRE.defaultMapColor).instrument(NoteBlockInstrument.BASS)
                 .strength(1.5f, 0.0f).sounds(BlockSoundGroup.WOOD).lavaIgnitable().solidBlock(Blocks::nonSolid)
         )
     )
@@ -52,13 +51,21 @@ object DuskBlocks {
         "ancient_black_powder_barrel",
         GunpowderBarrelBlock(
             12,
-            AbstractBlock.Settings.create().mapColor(MapColor.LIGHT_BLUE).instrument(NoteBlockInstrument.BASS)
+            4f,
+            AbstractBlock.Settings.create().mapColor(Blocks.SOUL_FIRE.defaultMapColor).instrument(NoteBlockInstrument.BASS)
                 .strength(2f, 0.0f).sounds(BlockSoundGroup.WOOD).lavaIgnitable().solidBlock(Blocks::nonSolid)
         )
     )
     val BLUNDERBOMB_BLOCK = register(
         "blunderbomb",
         BlunderbombBlock(
+            AbstractBlock.Settings.create().mapColor(MapColor.FIRE).instrument(NoteBlockInstrument.HAT)
+                .strength(1f, 0.0f).sounds(BlockSoundGroup.GLASS).solidBlock(Blocks::nonSolid)
+        )
+    )
+    val FIREBOMB_BLOCK = register(
+        "firebomb",
+        FirebombBlock(
             AbstractBlock.Settings.create().mapColor(MapColor.FIRE).instrument(NoteBlockInstrument.HAT)
                 .strength(1f, 0.0f).sounds(BlockSoundGroup.GLASS).solidBlock(Blocks::nonSolid)
         )
@@ -177,7 +184,8 @@ object DuskBlocks {
 
     val VOLCANIC_SAND = register(
         "volcanic_sand",
-        Block(
+        GravelBlock(
+            Color(1644825),
             AbstractBlock.Settings.create().mapColor(MapColor.BLACK).instrument(NoteBlockInstrument.SNARE)
                 .strength(0.5f)
                 .sounds(BlockSoundGroup.SAND)

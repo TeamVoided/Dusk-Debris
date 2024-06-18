@@ -7,6 +7,7 @@ import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
 import org.teamvoided.dusk_debris.DuskDebris.id
 import org.teamvoided.dusk_debris.entity.BlunderbombEntity
+import org.teamvoided.dusk_debris.entity.FirebombEntity
 import org.teamvoided.dusk_debris.entity.GunpowderBarrelEntity
 
 object DuskEntities {
@@ -27,6 +28,13 @@ object DuskEntities {
     val BLUNDERBOMB = register(
         "blunderbomb",
         EntityType.Builder.create(EntityType.EntityFactory(::BlunderbombEntity), SpawnGroup.MISC)
+            .setDimensions(0.33f, 0.33f)
+            .maxTrackingRange(4)
+            .trackingTickInterval(10)
+    )
+    val FIREBOMB = register(
+        "firebomb",
+        EntityType.Builder.create(EntityType.EntityFactory(::FirebombEntity), SpawnGroup.MISC)
             .setDimensions(0.33f, 0.33f)
             .maxTrackingRange(4)
             .trackingTickInterval(10)

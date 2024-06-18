@@ -6,15 +6,17 @@ import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
 import org.teamvoided.dusk_debris.DuskDebris.id
 import org.teamvoided.dusk_debris.item.BlunderbombItem
+import org.teamvoided.dusk_debris.item.FirebombItem
 
 
 @Suppress("unused", "MemberVisibilityCanBePrivate")
 object DuskItems {
 
     val GUNPOWDER_BARREL = register("gunpowder_barrel", BlockItem(DuskBlocks.GUNPOWDER_BARREL))
-    val STRONGHOLD_GUNPOWDER_BARREL = register("stronghold_gunpowder_barrel", BlockItem(DuskBlocks.STRONGHOLD_GUNPOWDER_BARREL))
-    val ANCIENT_BLACK_POWDER_BARREL = register("ancient_black_powder_barrel", BlockItem(DuskBlocks.ANCIENT_BLACK_POWDER_BARREL))
+    val STRONGHOLD_GUNPOWDER_BARREL = register("stronghold_gunpowder_barrel", BlockItem(DuskBlocks.STRONGHOLD_GUNPOWDER_BARREL, Item.Settings().maxCount(16)))
+    val ANCIENT_BLACK_POWDER_BARREL = register("ancient_black_powder_barrel", BlockItem(DuskBlocks.ANCIENT_BLACK_POWDER_BARREL,  Item.Settings().maxCount(1)))
     val BLUNDERBOMB = register("blunderbomb", BlunderbombItem(DuskBlocks.BLUNDERBOMB_BLOCK, Item.Settings().maxCount(16)))
+    val FIREBOMB = register("firebomb", FirebombItem(DuskBlocks.FIREBOMB_BLOCK, Item.Settings().maxCount(16)))
 
     val CYPRESS_LOG = register("cypress_log", BlockItem(DuskBlocks.CYPRESS_LOG))
     val CYPRESS_WOOD = register("cypress_wood", BlockItem(DuskBlocks.CYPRESS_WOOD))

@@ -18,12 +18,15 @@ class BlockTagsProvider(output: FabricDataOutput, registriesFuture: CompletableF
     }
 
     fun duskTags() {
-        getOrCreateTagBuilder(DuskBlockTags.BLUNDERBOMB_DESTROYS)
+        getOrCreateTagBuilder(DuskBlockTags.FIREBOMB_DESTROYS)
             .add(Blocks.TNT)
-            .add(DuskBlocks.BLUNDERBOMB_BLOCK)
             .add(DuskBlocks.GUNPOWDER_BARREL)
             .add(DuskBlocks.STRONGHOLD_GUNPOWDER_BARREL)
             .add(DuskBlocks.ANCIENT_BLACK_POWDER_BARREL)
+        getOrCreateTagBuilder(DuskBlockTags.BLUNDERBOMB_DESTROYS)
+            .addOptionalTag(DuskBlockTags.FIREBOMB_DESTROYS)
+            .add(DuskBlocks.BLUNDERBOMB_BLOCK)
+            .add(DuskBlocks.FIREBOMB_BLOCK)
         getOrCreateTagBuilder(DuskBlockTags.GUNPOWDER_BARREL_DESTROYS)
             .addOptionalTag(DuskBlockTags.BLUNDERBOMB_DESTROYS)
             .add(Blocks.NETHER_PORTAL)

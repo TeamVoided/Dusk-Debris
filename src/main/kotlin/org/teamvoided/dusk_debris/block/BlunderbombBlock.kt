@@ -1,21 +1,15 @@
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by FernFlower decompiler)
-//
-package net.minecraft.block
+package org.teamvoided.dusk_debris.block
 
 import com.mojang.serialization.MapCodec
-import net.minecraft.block.entity.BlockEntity
+import net.minecraft.block.*
 import net.minecraft.entity.Entity
 import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.mob.ZombieEntity
 import net.minecraft.entity.passive.BatEntity
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.entity.projectile.ProjectileEntity
-import net.minecraft.fluid.FluidState
 import net.minecraft.fluid.Fluids
 import net.minecraft.item.ItemPlacementContext
-import net.minecraft.item.ItemStack
+import net.minecraft.particle.ParticleTypes
 import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvents
 import net.minecraft.state.StateManager
@@ -29,10 +23,11 @@ import net.minecraft.world.*
 import net.minecraft.world.explosion.Explosion
 import net.minecraft.world.explosion.ExplosionBehavior
 import org.teamvoided.dusk_debris.data.DuskBlockTags
-import org.teamvoided.dusk_debris.entity.GunpowderBarrelEntity
-import java.util.*
+import org.teamvoided.dusk_debris.data.DuskEntityTypeTags
+import org.teamvoided.dusk_debris.entity.BlunderbombEntity
+import org.teamvoided.dusk_debris.world.explosion.SpecialExplosionBehavior
 
-class BlunderbombBlock(settings: Settings) : Block(settings), Waterloggable {
+open class BlunderbombBlock(settings: Settings) : Block(settings), Waterloggable {
     public override fun getCodec(): MapCodec<BlunderbombBlock> {
         return CODEC
     }
@@ -41,6 +36,13 @@ class BlunderbombBlock(settings: Settings) : Block(settings), Waterloggable {
         this.defaultState =
             (stateManager.defaultState).with(HANGING, false).with(WATERLOGGED, false)
     }
+
+    open val explosionBehavior: ExplosionBehavior = SpecialExplosionBehavior(
+        DuskBlockTags.BLUNDERBOMB_DESTROYS,
+        DuskEntityTypeTags.BLUNDERBOMB_DOES_NOT_DAMAGE,
+        1.1f,
+        1f
+    )
 
     override fun onSteppedOn(world: World, pos: BlockPos, state: BlockState, entity: Entity) {
         if (!entity.bypassesSteppingEffects()) {
@@ -51,40 +53,45 @@ class BlunderbombBlock(settings: Settings) : Block(settings), Waterloggable {
     }
 
     override fun onLandedUpon(world: World, state: BlockState, pos: BlockPos, entity: Entity, fallDistance: Float) {
-        if (entity !is ZombieEntity) {
-            this.tryBreakBomb(world, state, pos, entity, 3)
-        }
-
+        this.tryBreakBomb(world, state, pos, entity, 3)
         super.onLandedUpon(world, state, pos, entity, fallDistance)
     }
 
     override fun onProjectileHit(world: World, state: BlockState, hit: BlockHitResult, projectile: ProjectileEntity) {
         val blockPos = hit.blockPos
         if (!world.isClient && projectile.canModifyAt(world, blockPos) && projectile.canBreakBlocks(world)) {
-            this.explodeBomb(world, blockPos, defaultExplosionPower)
+            this.explode(world, blockPos, explosionBehavior)
+            projectile.kill()
         }
     }
 
 
     override fun onDestroyedByExplosion(world: World, pos: BlockPos, explosion: Explosion) {
-        val randomChance = world.getRandom().nextInt(10)
-        if (randomChance > 3) this.explodeBomb(
-            world,
-            pos,
-            defaultExplosionPower / randomChance
-        )
+        if (!world.isClient) this.explode(world, pos, explosionBehaviorOnExploded)
         return super.onDestroyedByExplosion(world, pos, explosion)
+    }
+
+    private fun breaksBomb(world: World, entity: Entity): Boolean {
+        return if (entity !is BatEntity) {
+            if (entity !is LivingEntity) {
+                false
+            } else {
+                entity is PlayerEntity || world.gameRules.getBooleanValue(GameRules.DO_MOB_GRIEFING)
+            }
+        } else {
+            false
+        }
     }
 
     private fun tryBreakBomb(world: World, state: BlockState, pos: BlockPos, entity: Entity, inverseChance: Int) {
         if (this.breaksBomb(world, entity)) {
             if (!world.isClient && world.random.nextInt(inverseChance) == 0 && state.isOf(this)) {
-                this.explodeBomb(world, pos, defaultExplosionPower)
+                this.explode(world, pos, explosionBehavior)
             }
         }
     }
 
-    private fun explodeBomb(world: World, pos: BlockPos, explosionPower: Float) {
+    open fun explode(world: World, pos: BlockPos, explosionBehavior: ExplosionBehavior) {
         world.playSound(
             null,
             pos,
@@ -94,32 +101,27 @@ class BlunderbombBlock(settings: Settings) : Block(settings), Waterloggable {
             0.9f + world.random.nextFloat() * 0.2f
         )
         world.breakBlock(pos, false)
+        super.spawnBreakParticles(world, null, pos, this.defaultState)
         world.createExplosion(
             null,
             Explosion.createDamageSource(
                 world,
                 null
-            ), blockDestroyer,
-            pos.x + 0.5, pos.y + 0.5, pos.z + 0.5,
-            explosionPower, false, World.ExplosionSourceType.TNT
+            ), explosionBehavior,
+            pos.x + 0.5,
+            pos.y + 0.5,
+            pos.z + 0.5,
+            DEFAULT_EXPLOSION_POWER,
+            false,
+            World.ExplosionSourceType.TNT,
+            ParticleTypes.BUBBLE,
+            ParticleTypes.BUBBLE,
+            SoundEvents.ENTITY_GENERIC_EXPLODE
         )
     }
 
     override fun shouldDropItemsOnExplosion(explosion: Explosion): Boolean {
         return false
-    }
-
-
-    override fun afterBreak(
-        world: World,
-        player: PlayerEntity,
-        pos: BlockPos,
-        state: BlockState,
-        blockEntity: BlockEntity?,
-        stack: ItemStack
-    ) {
-        super.afterBreak(world, player, pos, state, blockEntity, stack)
-        this.explodeBomb(world, pos, defaultExplosionPower)
     }
 
     override fun getStateForNeighborUpdate(
@@ -184,18 +186,6 @@ class BlunderbombBlock(settings: Settings) : Block(settings), Waterloggable {
         builder.add(HANGING, WATERLOGGED)
     }
 
-    private fun breaksBomb(world: World, entity: Entity): Boolean {
-        return if (entity !is BatEntity) {
-            if (entity !is LivingEntity) {
-                false
-            } else {
-                entity is PlayerEntity || world.gameRules.getBooleanValue(GameRules.DO_MOB_GRIEFING)
-            }
-        } else {
-            false
-        }
-    }
-
 
     companion object {
         val CODEC: MapCodec<BlunderbombBlock> = createCodec { settings: Settings ->
@@ -207,44 +197,18 @@ class BlunderbombBlock(settings: Settings) : Block(settings), Waterloggable {
         private val HANGING_SHAPE: VoxelShape = createCuboidShape(4.0, 3.0, 4.0, 12.0, 11.0, 12.0)
         val HANGING: BooleanProperty = Properties.HANGING
         val WATERLOGGED: BooleanProperty = Properties.WATERLOGGED
-        private val defaultExplosionPower = 2f
+        const val DEFAULT_EXPLOSION_POWER = 2f
 
         protected fun attachedDirection(state: BlockState): Direction {
             return if (state.get(HANGING)) Direction.DOWN else Direction.UP
         }
 
-        private val blockDestroyer: ExplosionBehavior = object : ExplosionBehavior() {
-            override fun canDestroyBlock(
-                explosion: Explosion,
-                world: BlockView,
-                pos: BlockPos,
-                state: BlockState,
-                power: Float
-            ): Boolean {
-                return if (!state.isIn(DuskBlockTags.BLUNDERBOMB_DESTROYS)) false else super.canDestroyBlock(
-                    explosion,
-                    world,
-                    pos,
-                    state,
-                    power
-                )
-            }
-
-            override fun getBlastResistance(
-                explosion: Explosion,
-                world: BlockView,
-                pos: BlockPos,
-                blockState: BlockState,
-                fluidState: FluidState
-            ): Optional<Float> {
-                return if (!blockState.isIn(DuskBlockTags.BLUNDERBOMB_DESTROYS)) Optional.empty() else super.getBlastResistance(
-                    explosion,
-                    world,
-                    pos,
-                    blockState,
-                    fluidState
-                )
-            }
-        }
+        private val randomNumber = (Math.random() * Math.random()).toFloat()
+        val explosionBehaviorOnExploded: SpecialExplosionBehavior = SpecialExplosionBehavior(
+            DuskBlockTags.BLUNDERBOMB_DESTROYS,
+            DuskEntityTypeTags.BLUNDERBOMB_DOES_NOT_DAMAGE,
+            randomNumber,
+            randomNumber / 3
+        )
     }
 }

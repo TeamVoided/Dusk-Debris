@@ -7,8 +7,9 @@ import org.teamvoided.dusk_debris.DuskDebris.id
 
 object DuskBlockTags {
     val TEST = create("test")
-    val BLUNDERBOMB_DESTROYS = create("blunderbombs_destroy")
-    val GUNPOWDER_BARREL_DESTROYS = create("explosives_destroy")
+    val FIREBOMB_DESTROYS = create("firebomb_destroys")
+    val BLUNDERBOMB_DESTROYS = create("blunderbomb_destroys")
+    val GUNPOWDER_BARREL_DESTROYS = create("gunpowder_barrel_destroys")
 
     fun create(id: String): TagKey<Block> = TagKey.of(RegistryKeys.BLOCK, id(id))
 }

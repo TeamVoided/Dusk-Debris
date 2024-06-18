@@ -7,7 +7,7 @@ import net.minecraft.client.particle.Particle
 import net.minecraft.client.particle.ParticleFactory
 import net.minecraft.client.world.ClientWorld
 import net.minecraft.particle.DefaultParticleType
-import net.minecraft.particle.ParticleTypes
+import org.teamvoided.dusk_debris.init.DuskParticles
 
 @Environment(EnvType.CLIENT)
 class GunpowderExplosionEmitterParticle(world: ClientWorld, x: Double, y: Double, z: Double) :
@@ -18,10 +18,10 @@ class GunpowderExplosionEmitterParticle(world: ClientWorld, x: Double, y: Double
 
     override fun tick() {
         for (i in 0..5) {
-            val x = this.x + (random.nextDouble() - random.nextDouble()) * 4.0
-            val y = this.y + (random.nextDouble() - random.nextDouble()) * 4.0
-            val z = this.z + (random.nextDouble() - random.nextDouble()) * 4.0
-            world.addParticle(ParticleTypes.EXPLOSION, x, y, z, (age.toFloat() / maxAge.toFloat()).toDouble(), 0.0, 0.0)
+            val x = this.x + (random.nextDouble() - random.nextDouble()) * 4
+            val y = this.y + (random.nextDouble() - random.nextDouble()) * 4
+            val z = this.z + (random.nextDouble() - random.nextDouble()) * 4
+            world.addParticle(DuskParticles.GUNPOWDER_EXPLOSION_SMOKE, x, y, z, (age.toFloat() / maxAge.toFloat()).toDouble(), 0.0, 0.0)
         }
 
         ++this.age
@@ -35,14 +35,14 @@ class GunpowderExplosionEmitterParticle(world: ClientWorld, x: Double, y: Double
         override fun createParticle(
             defaultParticleType: DefaultParticleType,
             world: ClientWorld,
-            d: Double,
-            e: Double,
-            f: Double,
-            g: Double,
-            h: Double,
-            i: Double
+            x: Double,
+            y: Double,
+            z: Double,
+            velocityX: Double,
+            velocityY: Double,
+            velocityZ: Double
         ): Particle {
-            return GunpowderExplosionEmitterParticle(world, d, e, f)
+            return GunpowderExplosionEmitterParticle(world, x, y, z)
         }
     }
 }

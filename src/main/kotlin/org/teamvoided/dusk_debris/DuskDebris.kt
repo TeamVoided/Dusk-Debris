@@ -8,6 +8,7 @@ import org.teamvoided.dusk_debris.init.DuskItems
 import org.teamvoided.dusk_autumn.init.DuskWorldgen
 import org.teamvoided.dusk_debris.init.DuskBlocks
 import org.teamvoided.dusk_debris.init.DuskItemGroups
+import org.teamvoided.dusk_debris.init.DuskParticles
 
 @Suppress("unused")
 object DuskDebris {
@@ -23,6 +24,7 @@ object DuskDebris {
         DuskItemGroups.init()
         DuskEntities.init()
         DuskWorldgen.init()
+        DuskParticles.init()
     }
 
     fun id(path: String) = Identifier.of(MODID, path)

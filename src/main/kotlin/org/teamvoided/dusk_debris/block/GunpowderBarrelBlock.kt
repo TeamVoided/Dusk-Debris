@@ -31,7 +31,7 @@ import net.minecraft.world.explosion.Explosion
 import org.teamvoided.dusk_debris.entity.GunpowderBarrelEntity
 import org.teamvoided.dusk_debris.init.DuskBlocks
 
-class GunpowderBarrelBlock(val power: Int = 5, settings: Settings) : Block(settings) {
+class GunpowderBarrelBlock(val power: Int = 5, val knockbackMultiplier: Float = 1f, settings: Settings) : Block(settings) {
 
     public override fun getCodec(): MapCodec<GunpowderBarrelBlock> {
         return CODEC
@@ -79,6 +79,7 @@ class GunpowderBarrelBlock(val power: Int = 5, settings: Settings) : Block(setti
             )
             gunpowderBarrelEntity.setProperties(
                 this.power,
+                this.knockbackMultiplier,
                 this.defaultState
             )
             val fuse = gunpowderBarrelEntity.fuse
@@ -144,6 +145,7 @@ class GunpowderBarrelBlock(val power: Int = 5, settings: Settings) : Block(setti
         val CODEC: MapCodec<GunpowderBarrelBlock> = createCodec { settings: Settings ->
             GunpowderBarrelBlock(
                 5,
+                1f,
                 settings
             )
         }
@@ -167,6 +169,7 @@ class GunpowderBarrelBlock(val power: Int = 5, settings: Settings) : Block(setti
                     )
                 gunpowderBarrelEntity.setProperties(
                     (world.getBlockState(pos).block as GunpowderBarrelBlock).power,
+                    (world.getBlockState(pos).block as GunpowderBarrelBlock).knockbackMultiplier,
                     world.getBlockState(pos)
                 )
                 world.spawnEntity(gunpowderBarrelEntity)

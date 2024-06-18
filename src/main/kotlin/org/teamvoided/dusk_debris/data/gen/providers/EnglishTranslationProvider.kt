@@ -18,6 +18,7 @@ class EnglishTranslationProvider(o: FabricDataOutput, r: CompletableFuture<Holde
 
     val items = listOf(
         DuskItems.BLUNDERBOMB,
+        DuskItems.FIREBOMB,
         DuskItems.GUNPOWDER_BARREL,
         DuskItems.STRONGHOLD_GUNPOWDER_BARREL,
         DuskItems.ANCIENT_BLACK_POWDER_BARREL,

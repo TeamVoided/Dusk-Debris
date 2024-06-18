@@ -59,6 +59,16 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
                 )
             )
         )
+        gen.registerItemModel(DuskItems.FIREBOMB)
+        gen.blockStateCollector.accept(
+            VariantsBlockStateSupplier.create(DuskBlocks.FIREBOMB_BLOCK).coordinate(
+                BlockStateModelGenerator.createBooleanModelMap(
+                    Properties.HANGING,
+                    Identifier.of("dusk_debris", "block/firebomb_hanging"),
+                    Identifier.of("dusk_debris", "block/firebomb")
+                )
+            )
+        )
 
         gen.registerLog(DuskBlocks.CYPRESS_LOG)
             .log(DuskBlocks.CYPRESS_LOG)
