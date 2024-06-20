@@ -42,8 +42,9 @@ open class BlunderbombEntity : ThrownItemEntity {
         DuskBlockTags.BLUNDERBOMB_DESTROYS,
         DuskEntityTypeTags.BLUNDERBOMB_DOES_NOT_DAMAGE,
         1.1f,
-        17f
+        12f
     )
+    open val hitDamage = 5.0f
     open val trailingParticle: ParticleEffect = ParticleTypes.SMOKE
 
     constructor(
@@ -63,7 +64,7 @@ open class BlunderbombEntity : ThrownItemEntity {
     }
 
     private fun getParticleParameters(): ParticleEffect {
-        return (BlockStateParticleEffect(ParticleTypes.BLOCK, getDefaultBlock().defaultState))
+        return (ItemStackParticleEffect(ParticleTypes.ITEM, defaultItem.defaultStack))
     }
 
     override fun handleStatus(status: Byte) {
@@ -75,9 +76,9 @@ open class BlunderbombEntity : ThrownItemEntity {
                     this.x,
                     this.y,
                     this.z,
-                    random.nextDouble(),
-                    random.nextDouble(),
-                    random.nextDouble()
+                    random.nextDouble() * 2,
+                    random.nextDouble() * 2,
+                    random.nextDouble() * 2
                 )
             }
         }
@@ -85,7 +86,7 @@ open class BlunderbombEntity : ThrownItemEntity {
 
     override fun onEntityHit(entityHitResult: EntityHitResult) {
         super.onEntityHit(entityHitResult)
-        entityHitResult.entity.damage(this.damageSources.thrown(this, this.owner), 0.0f)
+        entityHitResult.entity.damage(this.damageSources.thrown(this, this.owner), hitDamage)
     }
 
     override fun onCollision(hitResult: HitResult) {
@@ -139,10 +140,6 @@ open class BlunderbombEntity : ThrownItemEntity {
 
     override fun getDefaultItem(): Item {
         return DuskItems.BLUNDERBOMB
-    }
-
-    private fun getDefaultBlock(): Block {
-        return (defaultItem as BlockItem).block
     }
 
 

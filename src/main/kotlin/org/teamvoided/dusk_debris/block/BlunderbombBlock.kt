@@ -48,19 +48,19 @@ open class BlunderbombBlock(settings: Settings) : HorizontalFacingBlock(settings
         DuskBlockTags.BLUNDERBOMB_DESTROYS,
         DuskEntityTypeTags.BLUNDERBOMB_DOES_NOT_DAMAGE,
         1.1f,
-        17f
+        12f
     )
 
     private val explosionBehaviorOnExploded: ExplosionBehavior = BlunderbombExplosionBehavior(
         DuskBlockTags.BLUNDERBOMB_DESTROYS,
         DuskEntityTypeTags.BLUNDERBOMB_DOES_NOT_DAMAGE,
         Math.random().toFloat(),
-        Math.random().toFloat() * 7.5f
+        Math.random().toFloat() * 3 + 4f
     )
 
     override fun onSteppedOn(world: World, pos: BlockPos, state: BlockState, entity: Entity) {
         if (!entity.bypassesSteppingEffects()) {
-            this.tryBreakBomb(world, state, pos, entity, 512)
+            this.tryBreakBomb(world, state, pos, entity, 257)
         }
 
         super.onSteppedOn(world, pos, state, entity)

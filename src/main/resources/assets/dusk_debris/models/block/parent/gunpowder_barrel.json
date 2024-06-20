@@ -23,9 +23,9 @@
         "down": {
           "texture": "#side",
           "uv": [
-            0,
-            0,
             16,
+            0,
+            0,
             16
           ],
           "cullface": "down"
@@ -38,7 +38,8 @@
             16,
             16
           ],
-          "cullface": "up"
+          "cullface": "up",
+          "rotation": 180
         },
         "north": {
           "texture": "#front",
@@ -71,7 +72,7 @@
           "cullface": "west"
         },
         "east": {
-          "texture": "#bottom",
+          "texture": "#top",
           "uv": [
             0,
             0,

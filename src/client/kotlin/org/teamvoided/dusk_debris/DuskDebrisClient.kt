@@ -26,10 +26,7 @@ object DuskDebrisClient {
         DuskBlocks.CHARRED_DOOR,
         DuskBlocks.CHARRED_TRAPDOOR,
     )
-    val translucentBlock = listOf(
-        DuskBlocks.BLUNDERBOMB_BLOCK,
-        DuskBlocks.FIREBOMB_BLOCK
-    )
+//    val translucentBlock = listOf()
 
     fun init() {
         log.info("Hello from Client")
@@ -54,8 +51,8 @@ object DuskDebrisClient {
         cutoutBlock.forEach {
             BlockRenderLayerMap.INSTANCE.putBlock(it, RenderLayer.getCutout())
         }
-        translucentBlock.forEach {
-            BlockRenderLayerMap.INSTANCE.putBlock(it, RenderLayer.getTranslucent())
-        }
+//        translucentBlock.forEach {
+//            BlockRenderLayerMap.INSTANCE.putBlock(it, RenderLayer.getTranslucent())
+//        }
     }
 }

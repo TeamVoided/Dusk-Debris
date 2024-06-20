@@ -54,21 +54,18 @@ fun BlockStateModelGenerator.rollableBlock(block: Block) {
 
 fun BlockStateModelGenerator.gunpowderBarrelBlock(block: Block) {
     val front = Texture.getSubId(block, "_front")
-    val bottom = Texture.getSubId(block, "_bottom")
     val side = Texture.getSubId(block, "_side")
     val top = Texture.getSubId(block, "_top")
     val texture = Texture()
-        .put(TextureKey.PARTICLE, front)
+        .put(TextureKey.PARTICLE, side)
         .put(TextureKey.FRONT, front)
         .put(TextureKey.SIDE, side)
-        .put(TextureKey.BOTTOM, bottom)
         .put(TextureKey.TOP, top)
     val model = block(
         "parent/gunpowder_barrel",
         TextureKey.PARTICLE,
         TextureKey.FRONT,
         TextureKey.SIDE,
-        TextureKey.BOTTOM,
         TextureKey.TOP
     ).upload(block, texture, this.modelCollector)
     this.blockStateCollector.accept(

@@ -29,10 +29,11 @@ class FirebombEntity : BlunderbombEntity {
 
 
     override val trailingParticle = ParticleTypes.FLAME
-//    DustColorTransitionParticleEffect(FIRE, GREY, 1.0F)
+    override val hitDamage = 0.0f
     override var explosionBehavior: ExplosionBehavior = FirebombExplosionBehavior(
         DuskBlockTags.FIREBOMB_DESTROYS
     )
+//    DustColorTransitionParticleEffect(FIRE, GREY, 1.0F)
 
     override fun explode() {
         val firebombRadius = 4.0
@@ -48,7 +49,7 @@ class FirebombEntity : BlunderbombEntity {
         ) { obj: Entity -> obj.isAlive && !obj.type.isIn(DuskEntityTypeTags.FIREBOMB_DOES_NOT_DAMAGE) }
         entitiesNearby.forEach {
             it.damage(this.damageSources.onFire(), 3f)
-            it.fireTicks += 160
+            it.fireTicks += 200
         }
         super.explode()
     }
