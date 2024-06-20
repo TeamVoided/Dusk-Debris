@@ -15,6 +15,9 @@ import kotlin.jvm.optionals.getOrNull
 
 
 object DuskItemGroups {
+    val RIBBONS = DuskBlocks.RIBBON_BLOCKS_LIST.forEach {
+        ItemStack(it.asItem())
+    }
     val DUSK_TAB: ItemGroup = register("dusk_items",
         FabricItemGroup.builder()
             .icon { ItemStack(DuskItems.VOLCANIC_SAND) }
@@ -27,6 +30,7 @@ object DuskItemGroups {
                         ItemStack(DuskItems.ANCIENT_BLACK_POWDER_BARREL),
                         ItemStack(DuskItems.BLUNDERBOMB),
                         ItemStack(DuskItems.FIREBOMB),
+                        ItemStack(DuskItems.LIGHT_BLUE_RIBBON),
 
                         ItemStack(DuskItems.CYPRESS_LOG),
                         ItemStack(DuskItems.CYPRESS_WOOD),
@@ -104,10 +108,12 @@ object DuskItemGroups {
                 )
             })
     }
+
     @Suppress("SameParameterValue")
     private fun register(name: String, itemGroup: ItemGroup): ItemGroup {
         return Registry.register(Registries.ITEM_GROUP, id(name), itemGroup)
     }
+
     fun getKey(itemGroup: ItemGroup): RegistryKey<ItemGroup>? {
         return Registries.ITEM_GROUP.getKey(itemGroup)?.getOrNull()
     }

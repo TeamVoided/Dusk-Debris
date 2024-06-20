@@ -25,7 +25,7 @@ object DuskDebrisClient {
         DuskBlocks.CYPRESS_TRAPDOOR,
         DuskBlocks.CHARRED_DOOR,
         DuskBlocks.CHARRED_TRAPDOOR,
-    )
+    ) + DuskBlocks.RIBBON_BLOCKS_LIST
 //    val translucentBlock = listOf()
 
     fun init() {
@@ -37,7 +37,7 @@ object DuskDebrisClient {
             })
         ParticleFactoryRegistry.getInstance()
             .register(DuskParticles.GUNPOWDER_EXPLOSION_EMMITER, ParticleFactoryRegistry.PendingParticleFactory {
-                ParticleFactory { _, world, x, y, z, _, _, _ -> GunpowderExplosionEmitterParticle(world, x, y, z, 8f) }
+                ParticleFactory { _, world, x, y, z, _, _, _ -> GunpowderExplosionEmitterParticle(world, x, y, z, 4f) }
             })
         ParticleFactoryRegistry.getInstance()
             .register(DuskParticles.BLUNDERBOMB_EMMITER, ParticleFactoryRegistry.PendingParticleFactory {

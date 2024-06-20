@@ -2,10 +2,22 @@ package org.teamvoided.dusk_debris.init
 
 import net.minecraft.block.Block
 import net.minecraft.block.dispenser.DispenserBlock
+import net.minecraft.block.dispenser.ItemDispenserBehavior
+import net.minecraft.entity.Entity
+import net.minecraft.entity.LivingEntity
+import net.minecraft.entity.TntEntity
+import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.*
 import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
+import net.minecraft.sound.SoundCategory
+import net.minecraft.sound.SoundEvents
+import net.minecraft.util.math.BlockPointer
+import net.minecraft.world.World
+import net.minecraft.world.event.GameEvent
 import org.teamvoided.dusk_debris.DuskDebris.id
+import org.teamvoided.dusk_debris.block.GunpowderBarrelBlock
+import org.teamvoided.dusk_debris.entity.GunpowderBarrelEntity
 import org.teamvoided.dusk_debris.item.BlunderbombItem
 import org.teamvoided.dusk_debris.item.FirebombItem
 
@@ -14,10 +26,18 @@ import org.teamvoided.dusk_debris.item.FirebombItem
 object DuskItems {
 
     val GUNPOWDER_BARREL = register("gunpowder_barrel", BlockItem(DuskBlocks.GUNPOWDER_BARREL))
-    val STRONGHOLD_GUNPOWDER_BARREL = register("stronghold_gunpowder_barrel", BlockItem(DuskBlocks.STRONGHOLD_GUNPOWDER_BARREL, Item.Settings().maxCount(16)))
-    val ANCIENT_BLACK_POWDER_BARREL = register("ancient_black_powder_barrel", BlockItem(DuskBlocks.ANCIENT_BLACK_POWDER_BARREL,  Item.Settings().maxCount(1)))
-    val BLUNDERBOMB = register("blunderbomb", BlunderbombItem(DuskBlocks.BLUNDERBOMB_BLOCK, Item.Settings().maxCount(16)))
+    val STRONGHOLD_GUNPOWDER_BARREL = register(
+        "stronghold_gunpowder_barrel",
+        BlockItem(DuskBlocks.STRONGHOLD_GUNPOWDER_BARREL, Item.Settings().maxCount(16))
+    )
+    val ANCIENT_BLACK_POWDER_BARREL = register(
+        "ancient_black_powder_barrel",
+        BlockItem(DuskBlocks.ANCIENT_BLACK_POWDER_BARREL, Item.Settings().maxCount(1))
+    )
+    val BLUNDERBOMB =
+        register("blunderbomb", BlunderbombItem(DuskBlocks.BLUNDERBOMB_BLOCK, Item.Settings().maxCount(16)))
     val FIREBOMB = register("firebomb", FirebombItem(DuskBlocks.FIREBOMB_BLOCK, Item.Settings().maxCount(16)))
+    val LIGHT_BLUE_RIBBON = register("light_blue_ribbon", BlockItem(DuskBlocks.LIGHT_BLUE_RIBBON, Item.Settings()))
 
     val CYPRESS_LOG = register("cypress_log", BlockItem(DuskBlocks.CYPRESS_LOG))
     val CYPRESS_WOOD = register("cypress_wood", BlockItem(DuskBlocks.CYPRESS_WOOD))
@@ -32,21 +52,37 @@ object DuskItems {
     val CYPRESS_FENCE_GATE = register("cypress_fence_gate", BlockItem(DuskBlocks.CYPRESS_FENCE_GATE))
     val CYPRESS_BUTTON = register("cypress_button", BlockItem(DuskBlocks.CYPRESS_BUTTON))
     val CYPRESS_PRESSURE_PLATE = register("cypress_pressure_plate", BlockItem(DuskBlocks.CYPRESS_PRESSURE_PLATE))
-    val CYPRESS_SIGN = register("cypress_sign", SignItem((Item.Settings()).maxCount(16), DuskBlocks.CYPRESS_SIGN, DuskBlocks.CYPRESS_WALL_SIGN))
-    val CYPRESS_HANGING_SIGN = register("cypress_hanging_sign", HangingSignItem(DuskBlocks.CYPRESS_HANGING_SIGN, DuskBlocks.CYPRESS_WALL_HANGING_SIGN, Item.Settings().maxCount(16)))
+    val CYPRESS_SIGN = register(
+        "cypress_sign",
+        SignItem((Item.Settings()).maxCount(16), DuskBlocks.CYPRESS_SIGN, DuskBlocks.CYPRESS_WALL_SIGN)
+    )
+    val CYPRESS_HANGING_SIGN = register(
+        "cypress_hanging_sign",
+        HangingSignItem(
+            DuskBlocks.CYPRESS_HANGING_SIGN,
+            DuskBlocks.CYPRESS_WALL_HANGING_SIGN,
+            Item.Settings().maxCount(16)
+        )
+    )
 
     val VOLCANIC_SAND = register("volcanic_sand", BlockItem(DuskBlocks.VOLCANIC_SAND))
     val SUSPICIOUS_VOLCANIC_SAND = register("suspicious_volcanic_sand", BlockItem(DuskBlocks.SUSPICIOUS_VOLCANIC_SAND))
     val VOLCANIC_SANDSTONE = register("volcanic_sandstone", BlockItem(DuskBlocks.VOLCANIC_SANDSTONE))
-    val VOLCANIC_SANDSTONE_STAIRS = register("volcanic_sandstone_stairs", BlockItem(DuskBlocks.VOLCANIC_SANDSTONE_STAIRS))
+    val VOLCANIC_SANDSTONE_STAIRS =
+        register("volcanic_sandstone_stairs", BlockItem(DuskBlocks.VOLCANIC_SANDSTONE_STAIRS))
     val VOLCANIC_SANDSTONE_SLAB = register("volcanic_sandstone_slab", BlockItem(DuskBlocks.VOLCANIC_SANDSTONE_SLAB))
     val VOLCANIC_SANDSTONE_WALL = register("volcanic_sandstone_wall", BlockItem(DuskBlocks.VOLCANIC_SANDSTONE_WALL))
     val CUT_VOLCANIC_SANDSTONE = register("cut_volcanic_sandstone", BlockItem(DuskBlocks.CUT_VOLCANIC_SANDSTONE))
-    val CUT_VOLCANIC_SANDSTONE_SLAB = register("cut_volcanic_sandstone_slab", BlockItem(DuskBlocks.CUT_VOLCANIC_SANDSTONE_SLAB))
-    val CHISELED_VOLCANIC_SANDSTONE = register("chiseled_volcanic_sandstone", BlockItem(DuskBlocks.CHISELED_VOLCANIC_SANDSTONE))
-    val SMOOTH_VOLCANIC_SANDSTONE = register("smooth_volcanic_sandstone", BlockItem(DuskBlocks.SMOOTH_VOLCANIC_SANDSTONE))
-    val SMOOTH_VOLCANIC_SANDSTONE_STAIRS = register("smooth_volcanic_sandstone_stairs", BlockItem(DuskBlocks.SMOOTH_VOLCANIC_SANDSTONE_STAIRS))
-    val SMOOTH_VOLCANIC_SANDSTONE_SLAB = register("smooth_volcanic_sandstone_slab", BlockItem(DuskBlocks.SMOOTH_VOLCANIC_SANDSTONE_SLAB))
+    val CUT_VOLCANIC_SANDSTONE_SLAB =
+        register("cut_volcanic_sandstone_slab", BlockItem(DuskBlocks.CUT_VOLCANIC_SANDSTONE_SLAB))
+    val CHISELED_VOLCANIC_SANDSTONE =
+        register("chiseled_volcanic_sandstone", BlockItem(DuskBlocks.CHISELED_VOLCANIC_SANDSTONE))
+    val SMOOTH_VOLCANIC_SANDSTONE =
+        register("smooth_volcanic_sandstone", BlockItem(DuskBlocks.SMOOTH_VOLCANIC_SANDSTONE))
+    val SMOOTH_VOLCANIC_SANDSTONE_STAIRS =
+        register("smooth_volcanic_sandstone_stairs", BlockItem(DuskBlocks.SMOOTH_VOLCANIC_SANDSTONE_STAIRS))
+    val SMOOTH_VOLCANIC_SANDSTONE_SLAB =
+        register("smooth_volcanic_sandstone_slab", BlockItem(DuskBlocks.SMOOTH_VOLCANIC_SANDSTONE_SLAB))
 
     val CHARRED_LOG = register("charred_log", BlockItem(DuskBlocks.CHARRED_LOG))
     val CHARRED_WOOD = register("charred_wood", BlockItem(DuskBlocks.CHARRED_WOOD))
@@ -61,8 +97,18 @@ object DuskItems {
     val CHARRED_FENCE_GATE = register("charred_fence_gate", BlockItem(DuskBlocks.CHARRED_FENCE_GATE))
     val CHARRED_BUTTON = register("charred_button", BlockItem(DuskBlocks.CHARRED_BUTTON))
     val CHARRED_PRESSURE_PLATE = register("charred_pressure_plate", BlockItem(DuskBlocks.CHARRED_PRESSURE_PLATE))
-    val CHARRED_SIGN = register("charred_sign", SignItem((Item.Settings()).maxCount(16), DuskBlocks.CHARRED_SIGN, DuskBlocks.CHARRED_WALL_SIGN))
-    val CHARRED_HANGING_SIGN = register("charred_hanging_sign", HangingSignItem(DuskBlocks.CHARRED_HANGING_SIGN, DuskBlocks.CHARRED_WALL_HANGING_SIGN, Item.Settings().maxCount(16)))
+    val CHARRED_SIGN = register(
+        "charred_sign",
+        SignItem((Item.Settings()).maxCount(16), DuskBlocks.CHARRED_SIGN, DuskBlocks.CHARRED_WALL_SIGN)
+    )
+    val CHARRED_HANGING_SIGN = register(
+        "charred_hanging_sign",
+        HangingSignItem(
+            DuskBlocks.CHARRED_HANGING_SIGN,
+            DuskBlocks.CHARRED_WALL_HANGING_SIGN,
+            Item.Settings().maxCount(16)
+        )
+    )
 
 
 //add void util compat
@@ -71,8 +117,44 @@ object DuskItems {
     fun init() {
         DispenserBlock.registerBehavior(BLUNDERBOMB)
         DispenserBlock.registerBehavior(FIREBOMB)
+        registerGunpowderDispensedBehavior(DuskBlocks.GUNPOWDER_BARREL)
+        registerGunpowderDispensedBehavior(DuskBlocks.STRONGHOLD_GUNPOWDER_BARREL)
+        registerGunpowderDispensedBehavior(DuskBlocks.ANCIENT_BLACK_POWDER_BARREL)
     }
 
+    fun registerGunpowderDispensedBehavior(block: Block) = DispenserBlock.registerBehavior(block, object : ItemDispenserBehavior() {
+        override fun dispenseSilently(pointer: BlockPointer, stack: ItemStack): ItemStack {
+            val world: World = pointer.world()
+            val blockPos = pointer.pos().offset(pointer.state().get(DispenserBlock.FACING))
+            val explosiveEntity = GunpowderBarrelEntity(
+                world,
+                blockPos.x.toDouble() + 0.5,
+                blockPos.y.toDouble(),
+                blockPos.z.toDouble() + 0.5,
+                null as LivingEntity?
+            )
+            explosiveEntity.setProperties(
+                (block as GunpowderBarrelBlock).power,
+                (block).knockbackMultiplier,
+                block.defaultState
+//                world.getBlockState(blockPos) LMAO
+            )
+            world.spawnEntity(explosiveEntity)
+            world.playSound(
+                null as PlayerEntity?,
+                explosiveEntity.x,
+                explosiveEntity.y,
+                explosiveEntity.z,
+                SoundEvents.ENTITY_TNT_PRIMED,
+                SoundCategory.BLOCKS,
+                1.0f,
+                1.0f
+            )
+            world.emitGameEvent(null as Entity?, GameEvent.ENTITY_PLACE, blockPos)
+            stack.decrement(1)
+            return stack
+        }
+    })
     fun register(id: String, item: Item): Item = Registry.register(Registries.ITEM, id(id), item)
 
     fun BlockItem(block: Block) = BlockItem(block, Item.Settings())

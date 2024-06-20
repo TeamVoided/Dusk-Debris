@@ -22,12 +22,12 @@ class GunpowderExplosionEmitterParticle(world: ClientWorld, x: Double, y: Double
             val x = (random.nextDouble() - random.nextDouble())
             val y = (random.nextDouble() - random.nextDouble())
             val z = (random.nextDouble() - random.nextDouble())
-            val a = sqrt(x * x + y * y + z * z - y)
+            val a = sqrt(x * x + y * y + z * z)
             world.addParticle(
                 DuskParticles.GUNPOWDER_EXPLOSION_SMOKE,
-                this.x + ((radius * x) / a),
-                this.y + ((radius * y) / a),
-                this.z + ((radius * z) / a),
+                this.x + (((random.nextDouble() * radius) * x) / a),
+                this.y + (((random.nextDouble() * radius) * y) / a),
+                this.z + (((random.nextDouble() * radius) * z) / a),
                 0.0,
                 0.0,
                 0.0

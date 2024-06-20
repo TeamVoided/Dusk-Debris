@@ -17,7 +17,6 @@ import org.teamvoided.dusk_debris.block.voided.sign.VoidCeilingHangingSignBlock
 import org.teamvoided.dusk_debris.block.voided.sign.VoidSignBlock
 import org.teamvoided.dusk_debris.block.voided.sign.VoidWallHangingSignBlock
 import org.teamvoided.dusk_debris.block.voided.sign.VoidWallSignBlock
-import java.util.function.ToIntFunction
 
 @Suppress("HasPlatformType", "MemberVisibilityCanBePrivate", "unused", "DEPRECATION")
 object DuskBlocks {
@@ -72,6 +71,16 @@ object DuskBlocks {
                 .strength(1f, 0.0f).sounds(BlockSoundGroup.GLASS).solidBlock(Blocks::nonSolid)
                 .luminance { _: BlockState -> 8 }
         )
+    )
+    val LIGHT_BLUE_RIBBON = register(
+        "light_blue_ribbon",
+        RibbonBlock(
+            AbstractBlock.Settings.create().mapColor(Blocks.LIGHT_BLUE_WOOL.defaultMapColor).strength(0.1F)
+                .sounds(BlockSoundGroup.WOOL).noCollision()
+        )
+    )
+    val RIBBON_BLOCKS_LIST = listOf(
+        LIGHT_BLUE_RIBBON
     )
 
 

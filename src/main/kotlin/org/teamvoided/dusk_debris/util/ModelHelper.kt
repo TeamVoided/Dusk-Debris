@@ -1,13 +1,17 @@
 package org.teamvoided.dusk_debris.util
 
 import net.minecraft.block.Block
+import net.minecraft.block.Blocks
 import net.minecraft.block.enums.JigsawOrientation
 import net.minecraft.data.client.model.*
 import net.minecraft.item.Item
+import net.minecraft.item.Items
 import net.minecraft.state.property.Properties
 import net.minecraft.util.Identifier
 import org.teamvoided.dusk_debris.DuskDebris
 import java.util.*
+import java.util.stream.Collectors
+import java.util.stream.IntStream
 
 
 val ALL_KRY: TextureKey = TextureKey.of("all")
@@ -108,6 +112,45 @@ fun BlockStateModelGenerator.throwableBlock(item: Item, block: Block) {
             )
         ).coordinate(BlockStateModelGenerator.createNorthDefaultHorizontalRotationStates())
     )
+}
+
+
+fun BlockStateModelGenerator.ribbon(block: Block) {
+    this.excludeFromSimpleItemModelGeneration(block)
+    this.registerItemModel(block.asItem())
+    this.blockStateCollector.accept(
+        MultipartBlockStateSupplier.create(block).with(
+            getBlockStateVariants(block, 4)
+        )
+    )
+}
+
+fun getBlockStateVariants(block: Block, variants: Int): List<BlockStateVariant> {
+    return IntStream.range(1, variants + 1).mapToObj { i: Int ->
+        BlockStateVariant.create().put(
+            VariantSettings.MODEL,
+            ModelIds.getBlockSubModelId(block, "_$i")
+        )
+    }.collect(Collectors.toList())
+}
+
+private fun BlockStateModelGenerator.registerBamboo() {
+    this.excludeFromSimpleItemModelGeneration(Blocks.BAMBOO)
+    this.blockStateCollector.accept(
+        MultipartBlockStateSupplier.create(Blocks.BAMBOO).with(
+            getBambooBlockStateVariants(0)
+        )
+    )
+}
+
+fun getBambooBlockStateVariants(age: Int): List<BlockStateVariant> {
+    val string = "_age$age"
+    return IntStream.range(1, 5).mapToObj { i: Int ->
+        BlockStateVariant.create().put(
+            VariantSettings.MODEL,
+            ModelIds.getBlockSubModelId(Blocks.BAMBOO, "" + i + string)
+        )
+    }.collect(Collectors.toList())
 }
 
 //fun BlockStateModelGenerator.temp(block: Block, texture: Texture) {

@@ -5,12 +5,11 @@ import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider
 import net.minecraft.data.client.ItemModelGenerator
 import net.minecraft.data.client.model.*
-import net.minecraft.state.property.Properties
-import net.minecraft.util.Identifier
 import org.teamvoided.dusk_debris.block.DuskBlockFamilies
 import org.teamvoided.dusk_debris.init.DuskBlocks
 import org.teamvoided.dusk_debris.init.DuskItems
 import org.teamvoided.dusk_debris.util.gunpowderBarrelBlock
+import org.teamvoided.dusk_debris.util.ribbon
 import org.teamvoided.dusk_debris.util.throwableBlock
 
 class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
@@ -41,6 +40,9 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
                 texture.put(TextureKey.SIDE, Texture.getId(DuskBlocks.CHISELED_VOLCANIC_SANDSTONE))
             }
         )
+        DuskBlocks.RIBBON_BLOCKS_LIST.forEach {
+            gen.ribbon(it)
+        }
         blockFamily.forEach {
             gen.registerCubeAllModelTexturePool(it.baseBlock).family(it)
         }
@@ -48,7 +50,7 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
         gen.gunpowderBarrelBlock(DuskBlocks.GUNPOWDER_BARREL)
         gen.gunpowderBarrelBlock(DuskBlocks.STRONGHOLD_GUNPOWDER_BARREL)
         gen.gunpowderBarrelBlock(DuskBlocks.ANCIENT_BLACK_POWDER_BARREL)
-        gen.throwableBlock( DuskItems.BLUNDERBOMB, DuskBlocks.BLUNDERBOMB_BLOCK)
+        gen.throwableBlock(DuskItems.BLUNDERBOMB, DuskBlocks.BLUNDERBOMB_BLOCK)
         gen.throwableBlock(DuskItems.FIREBOMB, DuskBlocks.FIREBOMB_BLOCK)
 
         gen.registerLog(DuskBlocks.CYPRESS_LOG)

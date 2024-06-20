@@ -131,7 +131,7 @@ class GunpowderBarrelEntity(entityType: EntityType<out GunpowderBarrelEntity>, w
             false,
             ExplosionSourceType.TNT,
             ParticleTypes.SMOKE,
-            DuskParticleEffect(2.0f),
+            DuskParticleEffect(explosionPower.toFloat()),
             SoundEvents.ENTITY_GENERIC_EXPLODE
         )
     }
