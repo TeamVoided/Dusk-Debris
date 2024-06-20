@@ -10,9 +10,11 @@ import org.teamvoided.dusk_debris.DuskDebris.id
 object DuskParticles {
     val GUNPOWDER_EXPLOSION_EMMITER: DefaultParticleType = FabricParticleTypes.simple()
     val GUNPOWDER_EXPLOSION_SMOKE: DefaultParticleType = FabricParticleTypes.simple()
+    val BLUNDERBOMB_EMMITER: DefaultParticleType = FabricParticleTypes.simple()
 
     fun init() {
         Registry.register(Registries.PARTICLE_TYPE, id("gunpowder_explosion_smoke"), GUNPOWDER_EXPLOSION_SMOKE)
         Registry.register(Registries.PARTICLE_TYPE, id("gunpowder_explosion_emitter"), GUNPOWDER_EXPLOSION_EMMITER)
+        Registry.register(Registries.PARTICLE_TYPE, id("blunderbomb_emitter"), BLUNDERBOMB_EMMITER)
     }
 }

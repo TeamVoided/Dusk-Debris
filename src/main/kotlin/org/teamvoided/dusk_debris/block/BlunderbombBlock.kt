@@ -7,6 +7,7 @@ import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.passive.BatEntity
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.entity.projectile.ProjectileEntity
+import net.minecraft.fluid.FluidState
 import net.minecraft.fluid.Fluids
 import net.minecraft.item.ItemPlacementContext
 import net.minecraft.particle.ParticleTypes
@@ -14,46 +15,59 @@ import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvents
 import net.minecraft.state.StateManager
 import net.minecraft.state.property.BooleanProperty
+import net.minecraft.state.property.DirectionProperty
 import net.minecraft.state.property.Properties
 import net.minecraft.util.hit.BlockHitResult
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
 import net.minecraft.util.shape.VoxelShape
+import net.minecraft.util.shape.VoxelShapes
 import net.minecraft.world.*
 import net.minecraft.world.explosion.Explosion
 import net.minecraft.world.explosion.ExplosionBehavior
+import org.teamvoided.dusk_autumn.init.DuskEntities
 import org.teamvoided.dusk_debris.data.DuskBlockTags
 import org.teamvoided.dusk_debris.data.DuskEntityTypeTags
 import org.teamvoided.dusk_debris.entity.BlunderbombEntity
-import org.teamvoided.dusk_debris.world.explosion.SpecialExplosionBehavior
+import org.teamvoided.dusk_debris.world.explosion.BlunderbombExplosionBehavior
 
-open class BlunderbombBlock(settings: Settings) : Block(settings), Waterloggable {
+open class BlunderbombBlock(settings: Settings) : HorizontalFacingBlock(settings), Waterloggable {
     public override fun getCodec(): MapCodec<BlunderbombBlock> {
         return CODEC
     }
 
     init {
         this.defaultState =
-            (stateManager.defaultState).with(HANGING, false).with(WATERLOGGED, false)
+            (stateManager.defaultState)
+                .with(FACING, Direction.NORTH)
+                .with(HANGING, false)
+                .with(WATERLOGGED, false)
     }
 
-    open val explosionBehavior: ExplosionBehavior = SpecialExplosionBehavior(
+    open val explosionBehavior: ExplosionBehavior = BlunderbombExplosionBehavior(
         DuskBlockTags.BLUNDERBOMB_DESTROYS,
         DuskEntityTypeTags.BLUNDERBOMB_DOES_NOT_DAMAGE,
         1.1f,
-        1f
+        17f
+    )
+
+    private val explosionBehaviorOnExploded: ExplosionBehavior = BlunderbombExplosionBehavior(
+        DuskBlockTags.BLUNDERBOMB_DESTROYS,
+        DuskEntityTypeTags.BLUNDERBOMB_DOES_NOT_DAMAGE,
+        Math.random().toFloat(),
+        Math.random().toFloat() * 7.5f
     )
 
     override fun onSteppedOn(world: World, pos: BlockPos, state: BlockState, entity: Entity) {
         if (!entity.bypassesSteppingEffects()) {
-            this.tryBreakBomb(world, state, pos, entity, 100)
+            this.tryBreakBomb(world, state, pos, entity, 512)
         }
 
         super.onSteppedOn(world, pos, state, entity)
     }
 
     override fun onLandedUpon(world: World, state: BlockState, pos: BlockPos, entity: Entity, fallDistance: Float) {
-        this.tryBreakBomb(world, state, pos, entity, 3)
+        this.tryBreakBomb(world, state, pos, entity, 4)
         super.onLandedUpon(world, state, pos, entity, fallDistance)
     }
 
@@ -92,32 +106,15 @@ open class BlunderbombBlock(settings: Settings) : Block(settings), Waterloggable
     }
 
     open fun explode(world: World, pos: BlockPos, explosionBehavior: ExplosionBehavior) {
-        world.playSound(
-            null,
-            pos,
-            SoundEvents.BLOCK_GLASS_BREAK,
-            SoundCategory.BLOCKS,
-            0.7f,
-            0.9f + world.random.nextFloat() * 0.2f
-        )
         world.breakBlock(pos, false)
-        super.spawnBreakParticles(world, null, pos, this.defaultState)
-        world.createExplosion(
-            null,
-            Explosion.createDamageSource(
-                world,
-                null
-            ), explosionBehavior,
-            pos.x + 0.5,
-            pos.y + 0.5,
-            pos.z + 0.5,
-            DEFAULT_EXPLOSION_POWER,
-            false,
-            World.ExplosionSourceType.TNT,
-            ParticleTypes.BUBBLE,
-            ParticleTypes.BUBBLE,
-            SoundEvents.ENTITY_GENERIC_EXPLODE
+        val blunderbombEntity = BlunderbombEntity(
+            world,
+            pos.x.toDouble() + 0.5,
+            pos.y.toDouble() + Math.random() * 0.8,
+            pos.z.toDouble() + 0.5,
+            explosionBehavior
         )
+        world.spawnEntity(blunderbombEntity)
     }
 
     override fun shouldDropItemsOnExplosion(explosion: Explosion): Boolean {
@@ -159,13 +156,20 @@ open class BlunderbombBlock(settings: Settings) : Block(settings), Waterloggable
             val direction = var3[var5]
             if (direction.axis === Direction.Axis.Y) {
                 val blockState =
-                    defaultState.with(HANGING, direction == Direction.UP)
+                    defaultState
+                        .with(HANGING, direction == Direction.UP)
+                        .with(FACING, ctx.playerFacing.opposite)
                 if (blockState.canPlaceAt(ctx.world, ctx.blockPos)) {
                     return blockState.with(WATERLOGGED, fluidState.fluid === Fluids.WATER)
                 }
             }
         }
         return null
+    }
+
+    override fun getFluidState(state: BlockState): FluidState {
+        return if (state.get(LanternBlock.WATERLOGGED)) Fluids.WATER.getStill(false)
+        else super.getFluidState(state)
     }
 
     override fun canPlaceAt(state: BlockState, world: WorldView, pos: BlockPos): Boolean {
@@ -182,8 +186,12 @@ open class BlunderbombBlock(settings: Settings) : Block(settings), Waterloggable
         return if (state.get(HANGING)) HANGING_SHAPE else STANDING_SHAPE
     }
 
+    override fun getCullingShape(state: BlockState, world: BlockView, pos: BlockPos): VoxelShape {
+        return VoxelShapes.empty()
+    }
+
     override fun appendProperties(builder: StateManager.Builder<Block, BlockState>) {
-        builder.add(HANGING, WATERLOGGED)
+        builder.add(FACING, HANGING, WATERLOGGED)
     }
 
 
@@ -193,22 +201,15 @@ open class BlunderbombBlock(settings: Settings) : Block(settings), Waterloggable
                 settings
             )
         }
-        private val STANDING_SHAPE: VoxelShape = createCuboidShape(4.0, 0.0, 4.0, 12.0, 8.0, 12.0)
-        private val HANGING_SHAPE: VoxelShape = createCuboidShape(4.0, 3.0, 4.0, 12.0, 11.0, 12.0)
+        private val STANDING_SHAPE: VoxelShape = createCuboidShape(5.0, 0.0, 5.0, 11.0, 6.0, 11.0)
+        private val HANGING_SHAPE: VoxelShape = createCuboidShape(5.0, 4.0, 5.0, 11.0, 10.0, 11.0)
+        val FACING: DirectionProperty = HorizontalFacingBlock.FACING
         val HANGING: BooleanProperty = Properties.HANGING
         val WATERLOGGED: BooleanProperty = Properties.WATERLOGGED
-        const val DEFAULT_EXPLOSION_POWER = 2f
+        const val DEFAULT_EXPLOSION_POWER = 3f
 
         protected fun attachedDirection(state: BlockState): Direction {
             return if (state.get(HANGING)) Direction.DOWN else Direction.UP
         }
-
-        private val randomNumber = (Math.random() * Math.random()).toFloat()
-        val explosionBehaviorOnExploded: SpecialExplosionBehavior = SpecialExplosionBehavior(
-            DuskBlockTags.BLUNDERBOMB_DESTROYS,
-            DuskEntityTypeTags.BLUNDERBOMB_DOES_NOT_DAMAGE,
-            randomNumber,
-            randomNumber / 3
-        )
     }
 }

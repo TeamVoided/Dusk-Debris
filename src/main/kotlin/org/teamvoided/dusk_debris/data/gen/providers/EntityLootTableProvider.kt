@@ -11,13 +11,12 @@ import net.minecraft.loot.entry.EmptyEntry
 import net.minecraft.loot.entry.ItemEntry
 import net.minecraft.loot.entry.LootTableEntry
 import net.minecraft.predicate.entity.LocationPredicate
-import net.minecraft.registry.*
+import net.minecraft.registry.HolderLookup
+import net.minecraft.registry.RegistryKey
+import net.minecraft.registry.RegistryKeys
 import net.minecraft.registry.tag.BiomeTags
-import net.minecraft.world.biome.Biome
-import net.minecraft.world.biome.Biomes
 import org.teamvoided.dusk_autumn.util.Utils
 import org.teamvoided.dusk_debris.data.DuskLootTables
-import java.util.*
 import java.util.concurrent.CompletableFuture
 import java.util.function.BiConsumer
 

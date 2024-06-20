@@ -1,12 +1,12 @@
 package org.teamvoided.dusk_debris.entity
 
 import net.minecraft.block.Block
-import org.teamvoided.dusk_debris.block.BlunderbombBlock
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.projectile.thrown.ThrownItemEntity
 import net.minecraft.item.BlockItem
 import net.minecraft.item.Item
+import net.minecraft.particle.BlockStateParticleEffect
 import net.minecraft.particle.ItemStackParticleEffect
 import net.minecraft.particle.ParticleEffect
 import net.minecraft.particle.ParticleTypes
@@ -18,11 +18,13 @@ import net.minecraft.world.World
 import net.minecraft.world.explosion.Explosion
 import net.minecraft.world.explosion.ExplosionBehavior
 import org.teamvoided.dusk_autumn.init.DuskEntities
+import org.teamvoided.dusk_debris.block.BlunderbombBlock
 import org.teamvoided.dusk_debris.data.DuskBlockTags
 import org.teamvoided.dusk_debris.data.DuskEntityTypeTags
-import org.teamvoided.dusk_debris.init.DuskBlocks
 import org.teamvoided.dusk_debris.init.DuskItems
-import org.teamvoided.dusk_debris.world.explosion.SpecialExplosionBehavior
+import org.teamvoided.dusk_debris.world.explosion.BlunderbombExplosionBehavior
+import kotlin.math.cos
+import kotlin.math.sin
 
 open class BlunderbombEntity : ThrownItemEntity {
     constructor(entityType: EntityType<out BlunderbombEntity>, world: World) : super(entityType, world)
@@ -36,27 +38,46 @@ open class BlunderbombEntity : ThrownItemEntity {
 
     constructor(world: World, x: Double, y: Double, z: Double) : super(DuskEntities.BLUNDERBOMB, x, y, z, world)
 
-    open val trailingParticle: ParticleEffect = ParticleTypes.SMOKE
-    open val explosionBehavior: ExplosionBehavior = SpecialExplosionBehavior(
+    open var explosionBehavior: ExplosionBehavior = BlunderbombExplosionBehavior(
         DuskBlockTags.BLUNDERBOMB_DESTROYS,
         DuskEntityTypeTags.BLUNDERBOMB_DOES_NOT_DAMAGE,
         1.1f,
-        1f
+        17f
     )
+    open val trailingParticle: ParticleEffect = ParticleTypes.SMOKE
+
+    constructor(
+        world: World,
+        x: Double,
+        y: Double,
+        z: Double,
+        customExplosionBehavior: ExplosionBehavior
+    ) : this(DuskEntities.BLUNDERBOMB, world) {
+        val randVelocity = world.random.nextDouble() * 6.3
+        this.setPosition(x, y, z)
+        this.setVelocity(-sin(randVelocity) * 0.02, 0.04, -cos(randVelocity) * 0.02)
+        this.prevX = x
+        this.prevY = y
+        this.prevZ = z
+        explosionBehavior = customExplosionBehavior
+    }
+
+    private fun getParticleParameters(): ParticleEffect {
+        return (BlockStateParticleEffect(ParticleTypes.BLOCK, getDefaultBlock().defaultState))
+    }
 
     override fun handleStatus(status: Byte) {
         if (status.toInt() == 3) {
-            val scatter = 0.08
-
+            val particleEffect = this.getParticleParameters()
             for (i in 0..7) {
                 world.addParticle(
-                    ItemStackParticleEffect(ParticleTypes.ITEM, this.stack),
+                    particleEffect,
                     this.x,
                     this.y,
                     this.z,
-                    (random.nextFloat().toDouble() - 0.5) * scatter,
-                    (random.nextFloat().toDouble() - 0.5) * scatter,
-                    (random.nextFloat().toDouble() - 0.5) * scatter
+                    random.nextDouble(),
+                    random.nextDouble(),
+                    random.nextDouble()
                 )
             }
         }
@@ -99,17 +120,11 @@ open class BlunderbombEntity : ThrownItemEntity {
             0.7f,
             0.9f + world.random.nextFloat() * 0.2f
         )
-        world.syncWorldEvent(
-            null,
-            2001,
-            this.blockPos,
-            Block.getRawIdFromState(getDefaultBlock().defaultState)
-        )
         world.createExplosion(
             this, Explosion.createDamageSource(
                 this.world,
                 this
-            ), explosionBehavior,
+            ), this.explosionBehavior,
             this.x,
             this.getBodyY(0.0625),
             this.z,
@@ -118,7 +133,7 @@ open class BlunderbombEntity : ThrownItemEntity {
             World.ExplosionSourceType.TNT,
             ParticleTypes.BUBBLE,
             ParticleTypes.BUBBLE,
-            SoundEvents.AMBIENT_CAVE
+            SoundEvents.BLOCK_RESPAWN_ANCHOR_DEPLETE
         )
     }
 

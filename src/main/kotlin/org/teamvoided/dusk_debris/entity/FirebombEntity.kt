@@ -1,25 +1,23 @@
 package org.teamvoided.dusk_debris.entity
 
-import net.minecraft.block.Block
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.LivingEntity
 import net.minecraft.item.Item
 import net.minecraft.particle.DustColorTransitionParticleEffect
 import net.minecraft.particle.ParticleTypes
-import net.minecraft.sound.SoundCategory
-import net.minecraft.sound.SoundEvents
 import net.minecraft.util.math.Box
 import net.minecraft.util.math.Vec3d
 import net.minecraft.world.World
+import net.minecraft.world.explosion.ExplosionBehavior
 import org.teamvoided.dusk_autumn.init.DuskEntities
-import org.teamvoided.dusk_debris.block.BlunderbombBlock
 import org.teamvoided.dusk_debris.data.DuskBlockTags
 import org.teamvoided.dusk_debris.data.DuskEntityTypeTags
-import org.teamvoided.dusk_debris.init.DuskBlocks
 import org.teamvoided.dusk_debris.init.DuskItems
 import org.teamvoided.dusk_debris.world.explosion.FirebombExplosionBehavior
-import org.teamvoided.dusk_debris.world.explosion.SpecialExplosionBehavior
+import kotlin.math.cos
+import kotlin.math.sin
+import kotlin.math.sqrt
 
 class FirebombEntity : BlunderbombEntity {
     constructor(entityType: EntityType<out FirebombEntity>, world: World) : super(entityType, world)
@@ -30,13 +28,14 @@ class FirebombEntity : BlunderbombEntity {
 
 
 
-    override val trailingParticle = DustColorTransitionParticleEffect(FIRE, GREY, 1.0F)
-    override val explosionBehavior = FirebombExplosionBehavior(
+    override val trailingParticle = ParticleTypes.FLAME
+//    DustColorTransitionParticleEffect(FIRE, GREY, 1.0F)
+    override var explosionBehavior: ExplosionBehavior = FirebombExplosionBehavior(
         DuskBlockTags.FIREBOMB_DESTROYS
     )
 
     override fun explode() {
-        val firebombRadius = 3.0
+        val firebombRadius = 4.0
         val entitiesNearby = world.getOtherEntities(
             this, Box(
                 this.x - firebombRadius,
@@ -48,8 +47,8 @@ class FirebombEntity : BlunderbombEntity {
             )
         ) { obj: Entity -> obj.isAlive && !obj.type.isIn(DuskEntityTypeTags.FIREBOMB_DOES_NOT_DAMAGE) }
         entitiesNearby.forEach {
-            it.damage(this.damageSources.onFire(), 4f)
-            it.fireTicks += 100
+            it.damage(this.damageSources.onFire(), 3f)
+            it.fireTicks += 160
         }
         super.explode()
     }
@@ -59,7 +58,7 @@ class FirebombEntity : BlunderbombEntity {
     }
 
     companion object {
-        val FIRE = Vec3d.unpackRgb(0xffffff).toVector3f()
-        val GREY = Vec3d.unpackRgb(0xff5500).toVector3f()
+        val FIRE = Vec3d.unpackRgb(0xFFCA2B).toVector3f()
+        val GREY = Vec3d.unpackRgb(0x0C0400).toVector3f()
     }
 }

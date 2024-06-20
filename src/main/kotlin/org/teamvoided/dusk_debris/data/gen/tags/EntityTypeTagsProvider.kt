@@ -4,13 +4,10 @@ import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider
 import net.minecraft.entity.EntityType
 import net.minecraft.registry.HolderLookup
-import net.minecraft.registry.tag.BiomeTags
-import net.minecraft.world.biome.Biome
-import net.minecraft.world.biome.util.MultiNoiseBiomeSourceParameterList.Preset
+import net.minecraft.registry.tag.EntityTypeTags
+import org.teamvoided.dusk_autumn.init.DuskEntities
 import org.teamvoided.dusk_debris.data.DuskEntityTypeTags
-import java.util.*
 import java.util.concurrent.CompletableFuture
-import java.util.stream.Stream
 
 class EntityTypeTagsProvider(output: FabricDataOutput, registriesFuture: CompletableFuture<HolderLookup.Provider>) :
     FabricTagProvider.EntityTypeTagProvider(output, registriesFuture) {
@@ -29,6 +26,9 @@ class EntityTypeTagsProvider(output: FabricDataOutput, registriesFuture: Complet
 //            .add(EntityType.TROPICAL_FISH)
 //            .add(EntityType.TADPOLE)
 //            .add(EntityType.DROWNED)
+        getOrCreateTagBuilder(EntityTypeTags.IMPACT_PROJECTILES)
+            .add(DuskEntities.FIREBOMB)
+            .add(DuskEntities.BLUNDERBOMB)
         getOrCreateTagBuilder(DuskEntityTypeTags.GUNPOWDER_BARREL_DOES_NOT_DAMAGE)
             .add(EntityType.ITEM_FRAME)
             .add(EntityType.GLOW_ITEM_FRAME)

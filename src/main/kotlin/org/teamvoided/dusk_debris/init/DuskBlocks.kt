@@ -17,6 +17,7 @@ import org.teamvoided.dusk_debris.block.voided.sign.VoidCeilingHangingSignBlock
 import org.teamvoided.dusk_debris.block.voided.sign.VoidSignBlock
 import org.teamvoided.dusk_debris.block.voided.sign.VoidWallHangingSignBlock
 import org.teamvoided.dusk_debris.block.voided.sign.VoidWallSignBlock
+import java.util.function.ToIntFunction
 
 @Suppress("HasPlatformType", "MemberVisibilityCanBePrivate", "unused", "DEPRECATION")
 object DuskBlocks {
@@ -52,7 +53,8 @@ object DuskBlocks {
         GunpowderBarrelBlock(
             12,
             4f,
-            AbstractBlock.Settings.create().mapColor(Blocks.SOUL_FIRE.defaultMapColor).instrument(NoteBlockInstrument.BASS)
+            AbstractBlock.Settings.create().mapColor(Blocks.SOUL_FIRE.defaultMapColor)
+                .instrument(NoteBlockInstrument.BASS)
                 .strength(2f, 0.0f).sounds(BlockSoundGroup.WOOD).lavaIgnitable().solidBlock(Blocks::nonSolid)
         )
     )
@@ -68,8 +70,10 @@ object DuskBlocks {
         FirebombBlock(
             AbstractBlock.Settings.create().mapColor(MapColor.FIRE).instrument(NoteBlockInstrument.HAT)
                 .strength(1f, 0.0f).sounds(BlockSoundGroup.GLASS).solidBlock(Blocks::nonSolid)
+                .luminance { _: BlockState -> 8 }
         )
     )
+
 
     val CYPRESS_LOG = register("cypress_log", Blocks.logOf(charredPlanksColor, charredLogColor))
     val STRIPPED_CYPRESS_LOG = register("stripped_cypress_log", Blocks.logOf(charredPlanksColor, charredPlanksColor))

@@ -1,6 +1,7 @@
 package org.teamvoided.dusk_debris.init
 
 import net.minecraft.block.Block
+import net.minecraft.block.dispenser.DispenserBlock
 import net.minecraft.item.*
 import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
@@ -67,7 +68,10 @@ object DuskItems {
 //add void util compat
 
 
-    fun init() {}
+    fun init() {
+        DispenserBlock.registerBehavior(BLUNDERBOMB)
+        DispenserBlock.registerBehavior(FIREBOMB)
+    }
 
     fun register(id: String, item: Item): Item = Registry.register(Registries.ITEM, id(id), item)
 

@@ -1,31 +1,25 @@
 package org.teamvoided.dusk_debris.entity
 
 import net.minecraft.block.BlockState
-import net.minecraft.block.Blocks
 import net.minecraft.entity.*
 import net.minecraft.entity.data.DataTracker
 import net.minecraft.entity.data.TrackedData
 import net.minecraft.entity.data.TrackedDataHandlerRegistry
-import net.minecraft.fluid.FluidState
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.nbt.NbtHelper
 import net.minecraft.particle.ParticleTypes
 import net.minecraft.registry.RegistryKeys
 import net.minecraft.sound.SoundEvents
 import net.minecraft.unmapped.C_zbvyjshu
-import net.minecraft.util.math.BlockPos
-import net.minecraft.world.BlockView
 import net.minecraft.world.World
 import net.minecraft.world.World.ExplosionSourceType
 import net.minecraft.world.explosion.Explosion
-import net.minecraft.world.explosion.ExplosionBehavior
 import org.teamvoided.dusk_autumn.init.DuskEntities
 import org.teamvoided.dusk_debris.data.DuskBlockTags
 import org.teamvoided.dusk_debris.data.DuskEntityTypeTags
 import org.teamvoided.dusk_debris.init.DuskBlocks
 import org.teamvoided.dusk_debris.init.DuskParticles
-import org.teamvoided.dusk_debris.world.explosion.SpecialExplosionBehavior
-import java.util.*
+import org.teamvoided.dusk_debris.world.explosion.GunpowderBarrelExplosionBehavior
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -33,13 +27,13 @@ class GunpowderBarrelEntity(entityType: EntityType<out GunpowderBarrelEntity>, w
     Entity(entityType, world), Ownable {
     private var causingEntity: LivingEntity? = null
     private var passedThoughPortal = false
-    private val explosionBehavior: SpecialExplosionBehavior = SpecialExplosionBehavior(
+    private val explosionBehavior: GunpowderBarrelExplosionBehavior = GunpowderBarrelExplosionBehavior(
         DuskBlockTags.GUNPOWDER_BARREL_DESTROYS,
         DuskEntityTypeTags.GUNPOWDER_BARREL_DOES_NOT_DAMAGE,
         explosionKnockback,
         1f
     )
-    private val explosionBehaviorPostDimensionChange: SpecialExplosionBehavior = SpecialExplosionBehavior(
+    private val explosionBehaviorPostDimensionChange: GunpowderBarrelExplosionBehavior = GunpowderBarrelExplosionBehavior(
         DuskBlockTags.BLUNDERBOMB_DESTROYS,
         DuskEntityTypeTags.GUNPOWDER_BARREL_DOES_NOT_DAMAGE,
         explosionKnockback,

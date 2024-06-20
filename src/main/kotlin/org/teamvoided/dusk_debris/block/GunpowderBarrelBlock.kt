@@ -4,20 +4,20 @@ import com.mojang.serialization.MapCodec
 import net.minecraft.block.Block
 import net.minecraft.block.BlockState
 import net.minecraft.block.Blocks
-import net.minecraft.block.LanternBlock
+import net.minecraft.block.CrafterBlock
+import net.minecraft.block.enums.JigsawOrientation
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.entity.projectile.ProjectileEntity
 import net.minecraft.item.ItemPlacementContext
 import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
-import net.minecraft.particle.ParticleTypes
 import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvents
 import net.minecraft.stat.Stats
 import net.minecraft.state.StateManager
 import net.minecraft.state.property.BooleanProperty
-import net.minecraft.state.property.DirectionProperty
+import net.minecraft.state.property.EnumProperty
 import net.minecraft.state.property.Properties
 import net.minecraft.util.Hand
 import net.minecraft.util.ItemInteractionResult
@@ -25,13 +25,12 @@ import net.minecraft.util.hit.BlockHitResult
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
 import net.minecraft.world.World
-import net.minecraft.world.WorldView
 import net.minecraft.world.event.GameEvent
 import net.minecraft.world.explosion.Explosion
 import org.teamvoided.dusk_debris.entity.GunpowderBarrelEntity
-import org.teamvoided.dusk_debris.init.DuskBlocks
 
-class GunpowderBarrelBlock(val power: Int = 5, val knockbackMultiplier: Float = 1f, settings: Settings) : Block(settings) {
+class GunpowderBarrelBlock(val power: Int = 5, val knockbackMultiplier: Float = 1f, settings: Settings) :
+    Block(settings) {
 
     public override fun getCodec(): MapCodec<GunpowderBarrelBlock> {
         return CODEC
@@ -130,15 +129,27 @@ class GunpowderBarrelBlock(val power: Int = 5, val knockbackMultiplier: Float = 
     }
 
     override fun appendProperties(builder: StateManager.Builder<Block, BlockState>) {
-        builder.add(UNSTABLE, FACING)
+        builder.add(UNSTABLE, ORIENTATION)
     }
 
     init {
-        this.defaultState = defaultState.with(UNSTABLE, false).with(FACING, Direction.UP)
+        this.defaultState = defaultState
+            .with(UNSTABLE, false)
+            .with(ORIENTATION, JigsawOrientation.NORTH_UP)
     }
 
     override fun getPlacementState(ctx: ItemPlacementContext): BlockState {
-        return defaultState.with(FACING, ctx.side)
+        val direction = ctx.playerLookDirection.opposite
+        val var10000 = when (direction) {
+            Direction.DOWN -> ctx.playerFacing.opposite
+            Direction.UP -> ctx.playerFacing
+            Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST -> Direction.UP
+            else -> throw MatchException(null as String?, null as Throwable?)
+        }
+        return defaultState.with(
+            ORIENTATION,
+            JigsawOrientation.byDirections(direction, var10000)
+        )
     }
 
     companion object {
@@ -150,7 +161,7 @@ class GunpowderBarrelBlock(val power: Int = 5, val knockbackMultiplier: Float = 
             )
         }
 
-        val FACING: DirectionProperty = Properties.FACING
+        val ORIENTATION: EnumProperty<JigsawOrientation> = Properties.ORIENTATION
         val UNSTABLE: BooleanProperty = Properties.UNSTABLE
 
         fun primeGunpowderBarrel(world: World, pos: BlockPos) {

@@ -24,18 +24,18 @@ open class GunpowderExplosionSmokeParticle(
     private val spriteProvider: SpriteProvider
 
     init {
-        this.gravityStrength = -0.1f
+//        this.gravityStrength = -0.1f
         this.velocityMultiplier = 0.9f
         this.spriteProvider = spriteProvider
-        this.velocityX = velocityX + (Math.random() * 2.0 - 1.0) * 0.05
-        this.velocityY = velocityY + (Math.random() * 2.0 - 1.0) * 0.05
-        this.velocityZ = velocityZ + (Math.random() * 2.0 - 1.0) * 0.05
-        val f = random.nextFloat() * 0.3f + 0.7f
-        this.colorRed = f
-        this.colorBlue = f
-        this.colorGreen = f
+//        this.velocityX = velocityX + (Math.random() * 2.0 - 1.0) * 0.05
+//        this.velocityY = velocityY + (Math.random() * 2.0 - 1.0) * 0.05
+//        this.velocityZ = velocityZ + (Math.random() * 2.0 - 1.0) * 0.05
+        val grayscaleColor = random.nextFloat() * 0.3f + 0.7f
+        this.colorRed = grayscaleColor
+        this.colorBlue = grayscaleColor
+        this.colorGreen = grayscaleColor
         this.scale = 0.1f * (random.nextFloat() * random.nextFloat() * 6.0f + 1.0f)
-        this.maxAge = (16.0 / (random.nextFloat().toDouble() * 0.8 + 0.2)).toInt() + 2
+        this.maxAge = ((random.nextFloat() * 80).toInt() + 60)
         this.setSpriteForAge(spriteProvider)
     }
 
@@ -53,14 +53,14 @@ open class GunpowderExplosionSmokeParticle(
         override fun createParticle(
             defaultParticleType: DefaultParticleType,
             world: ClientWorld,
-            d: Double,
-            e: Double,
-            f: Double,
-            g: Double,
-            h: Double,
-            i: Double,
+            posX: Double,
+            posY: Double,
+            posZ: Double,
+            velX: Double,
+            velY: Double,
+            velZ: Double,
         ): Particle {
-            return GunpowderExplosionSmokeParticle(world, d, e, f, g, h, i, this.spriteProvider)
+            return GunpowderExplosionSmokeParticle(world, posX, posY, posZ, velX, velY, velZ, this.spriteProvider)
         }
     }
 }

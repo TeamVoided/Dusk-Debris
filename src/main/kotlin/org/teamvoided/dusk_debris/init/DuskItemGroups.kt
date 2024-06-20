@@ -26,6 +26,7 @@ object DuskItemGroups {
                         ItemStack(DuskItems.STRONGHOLD_GUNPOWDER_BARREL),
                         ItemStack(DuskItems.ANCIENT_BLACK_POWDER_BARREL),
                         ItemStack(DuskItems.BLUNDERBOMB),
+                        ItemStack(DuskItems.FIREBOMB),
 
                         ItemStack(DuskItems.CYPRESS_LOG),
                         ItemStack(DuskItems.CYPRESS_WOOD),

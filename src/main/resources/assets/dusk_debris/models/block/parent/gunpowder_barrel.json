@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:block/block",
   "textures": {
-    "bottom": "#bottom",
-    "top": "#top",
+    "particle": "#front",
     "front": "#front",
     "side": "#side",
-    "particle": "#front"
+    "bottom": "#bottom",
+    "top": "#top"
   },
   "elements": [
     {

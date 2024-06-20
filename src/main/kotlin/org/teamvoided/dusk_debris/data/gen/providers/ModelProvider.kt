@@ -3,16 +3,15 @@ package org.teamvoided.dusk_debris.data.gen.providers
 
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider
-import net.minecraft.block.Block
 import net.minecraft.data.client.ItemModelGenerator
 import net.minecraft.data.client.model.*
 import net.minecraft.state.property.Properties
 import net.minecraft.util.Identifier
-import org.teamvoided.dusk_debris.DuskDebris.id
 import org.teamvoided.dusk_debris.block.DuskBlockFamilies
 import org.teamvoided.dusk_debris.init.DuskBlocks
 import org.teamvoided.dusk_debris.init.DuskItems
-import org.teamvoided.dusk_debris.util.sixDirectionalBlock
+import org.teamvoided.dusk_debris.util.gunpowderBarrelBlock
+import org.teamvoided.dusk_debris.util.throwableBlock
 
 class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
 
@@ -46,29 +45,11 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
             gen.registerCubeAllModelTexturePool(it.baseBlock).family(it)
         }
 
-        gen.sixDirectionalBlock(DuskBlocks.GUNPOWDER_BARREL)
-        gen.sixDirectionalBlock(DuskBlocks.STRONGHOLD_GUNPOWDER_BARREL)
-        gen.sixDirectionalBlock(DuskBlocks.ANCIENT_BLACK_POWDER_BARREL)
-        gen.registerItemModel(DuskItems.BLUNDERBOMB)
-        gen.blockStateCollector.accept(
-            VariantsBlockStateSupplier.create(DuskBlocks.BLUNDERBOMB_BLOCK).coordinate(
-                BlockStateModelGenerator.createBooleanModelMap(
-                    Properties.HANGING,
-                    Identifier.of("dusk_debris", "block/blunderbomb_hanging"),
-                    Identifier.of("dusk_debris", "block/blunderbomb")
-                )
-            )
-        )
-        gen.registerItemModel(DuskItems.FIREBOMB)
-        gen.blockStateCollector.accept(
-            VariantsBlockStateSupplier.create(DuskBlocks.FIREBOMB_BLOCK).coordinate(
-                BlockStateModelGenerator.createBooleanModelMap(
-                    Properties.HANGING,
-                    Identifier.of("dusk_debris", "block/firebomb_hanging"),
-                    Identifier.of("dusk_debris", "block/firebomb")
-                )
-            )
-        )
+        gen.gunpowderBarrelBlock(DuskBlocks.GUNPOWDER_BARREL)
+        gen.gunpowderBarrelBlock(DuskBlocks.STRONGHOLD_GUNPOWDER_BARREL)
+        gen.gunpowderBarrelBlock(DuskBlocks.ANCIENT_BLACK_POWDER_BARREL)
+        gen.throwableBlock( DuskItems.BLUNDERBOMB, DuskBlocks.BLUNDERBOMB_BLOCK)
+        gen.throwableBlock(DuskItems.FIREBOMB, DuskBlocks.FIREBOMB_BLOCK)
 
         gen.registerLog(DuskBlocks.CYPRESS_LOG)
             .log(DuskBlocks.CYPRESS_LOG)

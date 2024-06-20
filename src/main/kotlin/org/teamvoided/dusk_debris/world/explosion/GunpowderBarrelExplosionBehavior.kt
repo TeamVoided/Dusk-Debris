@@ -12,7 +12,7 @@ import net.minecraft.world.explosion.Explosion
 import net.minecraft.world.explosion.ExplosionBehavior
 import java.util.*
 
-open class SpecialExplosionBehavior(
+open class GunpowderBarrelExplosionBehavior(
     private val destroyCondition: TagKey<Block>,
     private val damageCondition: TagKey<EntityType<*>>,
     private val knockbackMultiplier: Float,

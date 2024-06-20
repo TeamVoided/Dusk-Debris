@@ -7,9 +7,9 @@ import net.minecraft.item.Item
 import net.minecraft.registry.HolderLookup
 import net.minecraft.registry.Registries
 import net.minecraft.util.Identifier
-import org.teamvoided.dusk_debris.init.DuskItems
 import org.teamvoided.dusk_debris.init.DuskItemGroups.DUSK_TAB
 import org.teamvoided.dusk_debris.init.DuskItemGroups.getKey
+import org.teamvoided.dusk_debris.init.DuskItems
 import java.util.concurrent.CompletableFuture
 
 @Suppress("MemberVisibilityCanBePrivate")
