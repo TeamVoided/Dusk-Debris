@@ -5,11 +5,12 @@ import net.minecraft.particle.DefaultParticleType
 import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
 import org.teamvoided.dusk_debris.DuskDebris.id
+import org.teamvoided.dusk_debris.particle.DuskParticleEffect
 
 
 object DuskParticles {
-    val GUNPOWDER_EXPLOSION_EMMITER: DefaultParticleType = FabricParticleTypes.simple()
     val GUNPOWDER_EXPLOSION_SMOKE: DefaultParticleType = FabricParticleTypes.simple()
+    val GUNPOWDER_EXPLOSION_EMMITER = FabricParticleTypes.complex(DuskParticleEffect.CODEC, DuskParticleEffect.PACKET_CODEC)
     val BLUNDERBOMB_EMMITER: DefaultParticleType = FabricParticleTypes.simple()
 
     fun init() {

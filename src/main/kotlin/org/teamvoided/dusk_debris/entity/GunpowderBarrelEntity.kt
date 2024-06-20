@@ -18,7 +18,7 @@ import org.teamvoided.dusk_autumn.init.DuskEntities
 import org.teamvoided.dusk_debris.data.DuskBlockTags
 import org.teamvoided.dusk_debris.data.DuskEntityTypeTags
 import org.teamvoided.dusk_debris.init.DuskBlocks
-import org.teamvoided.dusk_debris.init.DuskParticles
+import org.teamvoided.dusk_debris.particle.DuskParticleEffect
 import org.teamvoided.dusk_debris.world.explosion.GunpowderBarrelExplosionBehavior
 import kotlin.math.cos
 import kotlin.math.sin
@@ -33,12 +33,13 @@ class GunpowderBarrelEntity(entityType: EntityType<out GunpowderBarrelEntity>, w
         explosionKnockback,
         1f
     )
-    private val explosionBehaviorPostDimensionChange: GunpowderBarrelExplosionBehavior = GunpowderBarrelExplosionBehavior(
-        DuskBlockTags.BLUNDERBOMB_DESTROYS,
-        DuskEntityTypeTags.GUNPOWDER_BARREL_DOES_NOT_DAMAGE,
-        explosionKnockback,
-        1f
-    )
+    private val explosionBehaviorPostDimensionChange: GunpowderBarrelExplosionBehavior =
+        GunpowderBarrelExplosionBehavior(
+            DuskBlockTags.BLUNDERBOMB_DESTROYS,
+            DuskEntityTypeTags.GUNPOWDER_BARREL_DOES_NOT_DAMAGE,
+            explosionKnockback,
+            1f
+        )
 
     init {
         this.inanimate = false
@@ -130,7 +131,7 @@ class GunpowderBarrelEntity(entityType: EntityType<out GunpowderBarrelEntity>, w
             false,
             ExplosionSourceType.TNT,
             ParticleTypes.SMOKE,
-            DuskParticles.GUNPOWDER_EXPLOSION_EMMITER,
+            DuskParticleEffect(2.0f),
             SoundEvents.ENTITY_GENERIC_EXPLODE
         )
     }

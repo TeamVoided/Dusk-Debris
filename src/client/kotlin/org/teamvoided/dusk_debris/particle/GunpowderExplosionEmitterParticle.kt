@@ -6,7 +6,6 @@ import net.minecraft.client.particle.NoRenderParticle
 import net.minecraft.client.particle.Particle
 import net.minecraft.client.particle.ParticleFactory
 import net.minecraft.client.world.ClientWorld
-import net.minecraft.particle.DefaultParticleType
 import org.teamvoided.dusk_debris.init.DuskParticles
 import kotlin.math.sqrt
 
@@ -14,7 +13,6 @@ import kotlin.math.sqrt
 class GunpowderExplosionEmitterParticle(world: ClientWorld, x: Double, y: Double, z: Double, val radius: Float) :
     NoRenderParticle(world, x, y, z, 0.0, 0.0, 0.0) {
 
-    //        constructor(world: ClientWorld, x: Double, y: Double, z: Double): super(world, x, y, z, 8.0f)
     init {
         this.maxAge = 10
     }
@@ -44,9 +42,9 @@ class GunpowderExplosionEmitterParticle(world: ClientWorld, x: Double, y: Double
     }
 
     @Environment(EnvType.CLIENT)
-    class Factory : ParticleFactory<DefaultParticleType> {
+    class Factory : ParticleFactory<DuskParticleEffect> {
         override fun createParticle(
-            defaultParticleType: DefaultParticleType,
+            type: DuskParticleEffect,
             world: ClientWorld,
             x: Double,
             y: Double,
@@ -55,22 +53,11 @@ class GunpowderExplosionEmitterParticle(world: ClientWorld, x: Double, y: Double
             velocityY: Double,
             velocityZ: Double
         ): Particle {
-            return GunpowderExplosionEmitterParticle(world, x, y, z, defaultRadius)
+            return GunpowderExplosionEmitterParticle(world, x, y, z, type.radius)
         }
     }
 
     companion object {
         const val defaultRadius: Float = 4f
-//        private val RADIUS: Codec<Float> get() = Codec
-//        val CODEC: MapCodec<GunpowderExplosionEmitterParticle>
-
-        init {
-//            CODEC =
-//                RecordCodecBuilder.mapCodec { instance: RecordCodecBuilder.Instance<GunpowderExplosionEmitterParticle> ->
-//                    instance.group(
-//                        Codecs.POSITIVE_FLOAT.fieldOf("radius").forGetter{radius:GunpowderExplosionEmitterParticle -> radius.radius}
-//                    ).apply(instance, Function)
-//                }
-        }
     }
 }
