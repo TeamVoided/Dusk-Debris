@@ -6,6 +6,7 @@ import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider
 import net.minecraft.data.client.ItemModelGenerator
 import net.minecraft.data.client.model.*
 import org.teamvoided.dusk_debris.block.DuskBlockFamilies
+import org.teamvoided.dusk_debris.block.DuskBlockLists
 import org.teamvoided.dusk_debris.init.DuskBlocks
 import org.teamvoided.dusk_debris.init.DuskItems
 import org.teamvoided.dusk_debris.util.gunpowderBarrelBlock
@@ -40,7 +41,7 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
                 texture.put(TextureKey.SIDE, Texture.getId(DuskBlocks.CHISELED_VOLCANIC_SANDSTONE))
             }
         )
-        DuskBlocks.RIBBON_BLOCKS_LIST.forEach {
+        DuskBlockLists.RIBBON_BLOCKS_LIST.forEach {
             gen.ribbon(it)
         }
         blockFamily.forEach {

@@ -5,7 +5,6 @@ import net.minecraft.block.dispenser.DispenserBlock
 import net.minecraft.block.dispenser.ItemDispenserBehavior
 import net.minecraft.entity.Entity
 import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.TntEntity
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.*
 import net.minecraft.registry.Registries
@@ -18,8 +17,8 @@ import net.minecraft.world.event.GameEvent
 import org.teamvoided.dusk_debris.DuskDebris.id
 import org.teamvoided.dusk_debris.block.GunpowderBarrelBlock
 import org.teamvoided.dusk_debris.entity.GunpowderBarrelEntity
-import org.teamvoided.dusk_debris.item.BlunderbombItem
-import org.teamvoided.dusk_debris.item.FirebombItem
+import org.teamvoided.dusk_debris.item.throwable_bomb.BlunderbombItem
+import org.teamvoided.dusk_debris.item.throwable_bomb.FirebombItem
 
 
 @Suppress("unused", "MemberVisibilityCanBePrivate")

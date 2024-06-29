@@ -1,4 +1,4 @@
-package org.teamvoided.dusk_debris.block
+package org.teamvoided.dusk_debris.block.throwable_bomb
 
 import com.mojang.serialization.MapCodec
 import net.minecraft.block.*
@@ -10,9 +10,6 @@ import net.minecraft.entity.projectile.ProjectileEntity
 import net.minecraft.fluid.FluidState
 import net.minecraft.fluid.Fluids
 import net.minecraft.item.ItemPlacementContext
-import net.minecraft.particle.ParticleTypes
-import net.minecraft.sound.SoundCategory
-import net.minecraft.sound.SoundEvents
 import net.minecraft.state.StateManager
 import net.minecraft.state.property.BooleanProperty
 import net.minecraft.state.property.DirectionProperty
@@ -25,13 +22,8 @@ import net.minecraft.util.shape.VoxelShapes
 import net.minecraft.world.*
 import net.minecraft.world.explosion.Explosion
 import net.minecraft.world.explosion.ExplosionBehavior
-import org.teamvoided.dusk_autumn.init.DuskEntities
-import org.teamvoided.dusk_debris.data.DuskBlockTags
-import org.teamvoided.dusk_debris.data.DuskEntityTypeTags
-import org.teamvoided.dusk_debris.entity.BlunderbombEntity
-import org.teamvoided.dusk_debris.world.explosion.BlunderbombExplosionBehavior
 
-open class BlunderbombBlock(settings: Settings) : HorizontalFacingBlock(settings), Waterloggable {
+abstract class AbstractThrwowableBombBlock(settings: Settings) : HorizontalFacingBlock(settings), Waterloggable {
     public override fun getCodec(): MapCodec<BlunderbombBlock> {
         return CODEC
     }
@@ -44,19 +36,8 @@ open class BlunderbombBlock(settings: Settings) : HorizontalFacingBlock(settings
                 .with(WATERLOGGED, false)
     }
 
-    open val explosionBehavior: ExplosionBehavior = BlunderbombExplosionBehavior(
-        DuskBlockTags.BLUNDERBOMB_DESTROYS,
-        DuskEntityTypeTags.BLUNDERBOMB_DOES_NOT_DAMAGE,
-        1.1f,
-        12f
-    )
-
-    private val explosionBehaviorOnExploded: ExplosionBehavior = BlunderbombExplosionBehavior(
-        DuskBlockTags.BLUNDERBOMB_DESTROYS,
-        DuskEntityTypeTags.BLUNDERBOMB_DOES_NOT_DAMAGE,
-        Math.random().toFloat(),
-        Math.random().toFloat() * 3 + 4f
-    )
+    open val explosionBehavior: ExplosionBehavior = ExplosionBehavior()
+    open val explosionBehaviorOnExploded: ExplosionBehavior = ExplosionBehavior()
 
     override fun onSteppedOn(world: World, pos: BlockPos, state: BlockState, entity: Entity) {
         if (!entity.bypassesSteppingEffects()) {
@@ -106,15 +87,7 @@ open class BlunderbombBlock(settings: Settings) : HorizontalFacingBlock(settings
     }
 
     open fun explode(world: World, pos: BlockPos, explosionBehavior: ExplosionBehavior) {
-        world.breakBlock(pos, false)
-        val blunderbombEntity = BlunderbombEntity(
-            world,
-            pos.x.toDouble() + 0.5,
-            pos.y.toDouble() + Math.random() * 0.8,
-            pos.z.toDouble() + 0.5,
-            explosionBehavior
-        )
-        world.spawnEntity(blunderbombEntity)
+        println("this should not occur, please check that you override the explosion function")
     }
 
     override fun shouldDropItemsOnExplosion(explosion: Explosion): Boolean {

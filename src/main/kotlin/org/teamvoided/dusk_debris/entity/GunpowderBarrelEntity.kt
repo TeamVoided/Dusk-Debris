@@ -18,7 +18,7 @@ import org.teamvoided.dusk_autumn.init.DuskEntities
 import org.teamvoided.dusk_debris.data.DuskBlockTags
 import org.teamvoided.dusk_debris.data.DuskEntityTypeTags
 import org.teamvoided.dusk_debris.init.DuskBlocks
-import org.teamvoided.dusk_debris.particle.DuskParticleEffect
+import org.teamvoided.dusk_debris.particle.FloatInputParticleEffect
 import org.teamvoided.dusk_debris.world.explosion.GunpowderBarrelExplosionBehavior
 import kotlin.math.cos
 import kotlin.math.sin
@@ -131,7 +131,7 @@ class GunpowderBarrelEntity(entityType: EntityType<out GunpowderBarrelEntity>, w
             false,
             ExplosionSourceType.TNT,
             ParticleTypes.SMOKE,
-            DuskParticleEffect(explosionPower.toFloat()),
+            FloatInputParticleEffect(explosionPower.toFloat()),
             SoundEvents.ENTITY_GENERIC_EXPLODE
         )
     }

@@ -11,13 +11,11 @@ import net.minecraft.registry.Registry
 import net.minecraft.registry.RegistryKey
 import net.minecraft.text.Text
 import org.teamvoided.dusk_debris.DuskDebris.id
+import org.teamvoided.dusk_debris.block.DuskBlockLists
 import kotlin.jvm.optionals.getOrNull
 
 
 object DuskItemGroups {
-    val RIBBONS = DuskBlocks.RIBBON_BLOCKS_LIST.forEach {
-        ItemStack(it.asItem())
-    }
     val DUSK_TAB: ItemGroup = register("dusk_items",
         FabricItemGroup.builder()
             .icon { ItemStack(DuskItems.VOLCANIC_SAND) }

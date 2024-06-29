@@ -8,6 +8,7 @@ import net.minecraft.client.render.RenderLayer
 import net.minecraft.client.render.entity.FlyingItemEntityRenderer
 import org.teamvoided.dusk_autumn.init.DuskEntities
 import org.teamvoided.dusk_debris.DuskDebris.log
+import org.teamvoided.dusk_debris.block.DuskBlockLists
 import org.teamvoided.dusk_debris.entity.gunpowder_barrel.GunpowderBarrelEntityRenderer
 import org.teamvoided.dusk_debris.init.DuskBlocks
 import org.teamvoided.dusk_debris.init.DuskParticles
@@ -25,7 +26,7 @@ object DuskDebrisClient {
         DuskBlocks.CYPRESS_TRAPDOOR,
         DuskBlocks.CHARRED_DOOR,
         DuskBlocks.CHARRED_TRAPDOOR,
-    ) + DuskBlocks.RIBBON_BLOCKS_LIST
+    ) + DuskBlockLists.RIBBON_BLOCKS_LIST
 //    val translucentBlock = listOf()
 
     fun init() {

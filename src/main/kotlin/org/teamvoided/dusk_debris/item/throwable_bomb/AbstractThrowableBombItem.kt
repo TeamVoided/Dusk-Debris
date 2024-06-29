@@ -1,4 +1,4 @@
-package org.teamvoided.dusk_debris.item
+package org.teamvoided.dusk_debris.item.throwable_bomb
 
 import net.minecraft.block.Block
 import net.minecraft.entity.player.PlayerEntity
@@ -16,10 +16,10 @@ import net.minecraft.util.TypedActionResult
 import net.minecraft.util.math.Direction
 import net.minecraft.util.math.Position
 import net.minecraft.world.World
-import org.teamvoided.dusk_debris.entity.BlunderbombEntity
+import org.teamvoided.dusk_debris.entity.throwable_bomb.BlunderbombEntity
 
 
-open class BlunderbombItem(block: Block, settings: Settings) : BlockItem(block, settings), ProjectileItem {
+open class AbstractThrowableBombItem(block: Block, settings: Settings) : BlockItem(block, settings), ProjectileItem {
 
     override fun useOnBlock(context: ItemUsageContext): ActionResult {
         val user = context.player!!
@@ -48,15 +48,11 @@ open class BlunderbombItem(block: Block, settings: Settings) : BlockItem(block, 
     }
 
     open fun throwBomb(world: World, user: PlayerEntity, itemStack: ItemStack) {
-        if (!world.isClient) {
-            val bombItem = BlunderbombEntity(world, user)
-            bombItem.setItem(itemStack)
-            bombItem.setProperties(user, user.pitch, user.yaw, 0.0f, 1.5f, 1.0f)
-            world.spawnEntity(bombItem)
-        }
+        println("Ya forgot to override throwBomb function")
     }
 
     override fun createEntity(world: World, pos: Position, stack: ItemStack, direction: Direction): ProjectileEntity {
+        println("Ya forgot to override createEntity function")
         val blunderbombEntity = BlunderbombEntity(world, pos.x, pos.y, pos.z)
         blunderbombEntity.setItem(stack)
         return blunderbombEntity

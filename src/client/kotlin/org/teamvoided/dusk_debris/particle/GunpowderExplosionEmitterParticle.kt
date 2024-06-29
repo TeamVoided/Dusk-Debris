@@ -25,9 +25,9 @@ class GunpowderExplosionEmitterParticle(world: ClientWorld, x: Double, y: Double
             val a = sqrt(x * x + y * y + z * z)
             world.addParticle(
                 DuskParticles.GUNPOWDER_EXPLOSION_SMOKE,
-                this.x + (((random.nextDouble() * radius) * x) / a),
-                this.y + (((random.nextDouble() * radius) * y) / a),
-                this.z + (((random.nextDouble() * radius) * z) / a),
+                this.x + (((radius) * x) / a),
+                this.y + (((radius) * y) / a),
+                this.z + (((radius) * z) / a),
                 0.0,
                 0.0,
                 0.0
@@ -42,9 +42,9 @@ class GunpowderExplosionEmitterParticle(world: ClientWorld, x: Double, y: Double
     }
 
     @Environment(EnvType.CLIENT)
-    class Factory : ParticleFactory<DuskParticleEffect> {
+    class Factory : ParticleFactory<FloatInputParticleEffect> {
         override fun createParticle(
-            type: DuskParticleEffect,
+            type: FloatInputParticleEffect,
             world: ClientWorld,
             x: Double,
             y: Double,

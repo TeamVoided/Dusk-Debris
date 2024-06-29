@@ -13,6 +13,8 @@ import net.minecraft.util.Color
 import net.minecraft.util.math.Direction
 import org.teamvoided.dusk_debris.DuskDebris.id
 import org.teamvoided.dusk_debris.block.*
+import org.teamvoided.dusk_debris.block.throwable_bomb.BlunderbombBlock
+import org.teamvoided.dusk_debris.block.throwable_bomb.FirebombBlock
 import org.teamvoided.dusk_debris.block.voided.sign.VoidCeilingHangingSignBlock
 import org.teamvoided.dusk_debris.block.voided.sign.VoidSignBlock
 import org.teamvoided.dusk_debris.block.voided.sign.VoidWallHangingSignBlock
@@ -25,7 +27,6 @@ object DuskBlocks {
 
     val charredSignId = id("entity/signs/charred")
     val cypressSignId = id("entity/signs/cypress")
-
     val charredHangingSignId = id("entity/signs/hanging/charred")
     val cypressHangingSignId = id("entity/signs/hanging/cypress")
 
@@ -79,8 +80,11 @@ object DuskBlocks {
                 .sounds(BlockSoundGroup.WOOL).noCollision()
         )
     )
-    val RIBBON_BLOCKS_LIST = listOf(
-        LIGHT_BLUE_RIBBON
+    val PAPER_BLOCK = register(
+        "paper_block",
+        PaperBlock(
+            AbstractBlock.Settings.create().mapColor(Blocks.WHITE_WOOL.defaultMapColor).strength(0.25F)
+        )
     )
 
 

@@ -6,9 +6,9 @@ import net.minecraft.entity.SpawnGroup
 import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
 import org.teamvoided.dusk_debris.DuskDebris.id
-import org.teamvoided.dusk_debris.entity.BlunderbombEntity
-import org.teamvoided.dusk_debris.entity.FirebombEntity
 import org.teamvoided.dusk_debris.entity.GunpowderBarrelEntity
+import org.teamvoided.dusk_debris.entity.throwable_bomb.BlunderbombEntity
+import org.teamvoided.dusk_debris.entity.throwable_bomb.FirebombEntity
 
 object DuskEntities {
     //        val CRAB = register(
