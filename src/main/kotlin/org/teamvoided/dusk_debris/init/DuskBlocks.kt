@@ -5,6 +5,7 @@ import net.minecraft.block.*
 import net.minecraft.block.Blocks.legacyStairsOf
 import net.minecraft.block.enums.NoteBlockInstrument
 import net.minecraft.block.piston.PistonBehavior
+import net.minecraft.potion.Potions
 import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
 import net.minecraft.sound.BlockSoundGroup
@@ -29,6 +30,47 @@ object DuskBlocks {
     val cypressSignId = id("entity/signs/cypress")
     val charredHangingSignId = id("entity/signs/hanging/charred")
     val cypressHangingSignId = id("entity/signs/hanging/cypress")
+
+    val BLUE_NETHERSHROOM = register(
+        "blue_nethershroom",
+        NethershroomPlantBlock(
+            4,
+            Potions.POISON,
+            AbstractBlock.Settings.create().mapColor(MapColor.LIGHT_BLUE).strength(0.1F)
+                .sounds(BlockSoundGroup.FUNGUS).noCollision()
+        )
+    )
+    val BLUE_NETHERSHROOM_BLOCK = register(
+        "blue_nethershroom_block",
+        NethershroomBlock(
+            AbstractBlock.Settings.create().mapColor(MapColor.LIGHT_BLUE).instrument(NoteBlockInstrument.BASS)
+                .strength(0.2f).sounds(BlockSoundGroup.WOOD)
+        )
+    )
+    val PURPLE_NETHERSHROOM = register(
+        "purple_nethershroom",
+        NethershroomPlantBlock(
+            16,
+            Potions.POISON,
+            AbstractBlock.Settings.create().mapColor(MapColor.PURPLE).strength(0.1F)
+                .sounds(BlockSoundGroup.FUNGUS).noCollision()
+        )
+    )
+    val PURPLE_NETHERSHROOM_BLOCK = register(
+        "purple_nethershroom_block",
+        NethershroomBlock(
+            AbstractBlock.Settings.create().mapColor(MapColor.PURPLE).instrument(NoteBlockInstrument.BASS)
+                .strength(0.2f).sounds(BlockSoundGroup.WOOD)
+        )
+    )
+    val NETHERSHROOM_STEM = register(
+        "nethershroom_stem",
+        MushroomBlock(
+            AbstractBlock.Settings.create().mapColor(MapColor.WOOL).instrument(NoteBlockInstrument.BASS).strength(0.2f)
+                .sounds(BlockSoundGroup.WOOD)
+        )
+    )
+
 
     val GUNPOWDER_BARREL = register(
         "gunpowder_barrel",
@@ -73,13 +115,23 @@ object DuskBlocks {
                 .luminance { _: BlockState -> 8 }
         )
     )
-    val LIGHT_BLUE_RIBBON = register(
-        "light_blue_ribbon",
-        RibbonBlock(
-            AbstractBlock.Settings.create().mapColor(Blocks.LIGHT_BLUE_WOOL.defaultMapColor).strength(0.1F)
-                .sounds(BlockSoundGroup.WOOL).noCollision()
-        )
-    )
+    val RED_RIBBON = register("red_ribbon", registerRibbon(Blocks.RED_WOOL.defaultMapColor))
+    val ORANGE_RIBBON = register("orange_ribbon", registerRibbon(Blocks.ORANGE_WOOL.defaultMapColor))
+    val YELLOW_RIBBON = register("yellow_ribbon", registerRibbon(Blocks.YELLOW_WOOL.defaultMapColor))
+    val LIME_RIBBON = register("lime_ribbon", registerRibbon(Blocks.LIME_WOOL.defaultMapColor))
+    val GREEN_RIBBON = register("green_ribbon", registerRibbon(Blocks.GREEN_WOOL.defaultMapColor))
+    val CYAN_RIBBON = register("cyan_ribbon", registerRibbon(Blocks.CYAN_WOOL.defaultMapColor))
+    val BLUE_RIBBON = register("blue_ribbon", registerRibbon(Blocks.BLUE_WOOL.defaultMapColor))
+    val LIGHT_BLUE_RIBBON = register("light_blue_ribbon", registerRibbon(Blocks.LIGHT_BLUE_WOOL.defaultMapColor))
+    val PURPLE_RIBBON = register("purple_ribbon", registerRibbon(Blocks.PURPLE_WOOL.defaultMapColor))
+    val MAGENTA_RIBBON = register("magenta_ribbon", registerRibbon(Blocks.MAGENTA_WOOL.defaultMapColor))
+    val PINK_RIBBON = register("pink_ribbon", registerRibbon(Blocks.PINK_WOOL.defaultMapColor))
+    val BROWN_RIBBON = register("brown_ribbon", registerRibbon(Blocks.BROWN_WOOL.defaultMapColor))
+    val WHITE_RIBBON = register("white_ribbon", registerRibbon(Blocks.WHITE_WOOL.defaultMapColor))
+    val LIGHT_GRAY_RIBBON = register("light_gray_ribbon", registerRibbon(Blocks.LIGHT_GRAY_WOOL.defaultMapColor))
+    val GRAY_RIBBON = register("gray_ribbon", registerRibbon(Blocks.GRAY_WOOL.defaultMapColor))
+    val BLACK_RIBBON = register("black_ribbon", registerRibbon(Blocks.BLACK_WOOL.defaultMapColor))
+
     val PAPER_BLOCK = register(
         "paper_block",
         PaperBlock(
@@ -384,6 +436,13 @@ object DuskBlocks {
                 .pistonBehavior(PistonBehavior.DESTROY)
         )
     )
+
+    fun registerRibbon(mapColor: MapColor): Block {
+        return RibbonBlock(
+            AbstractBlock.Settings.create().mapColor(mapColor).strength(0.1F)
+                .sounds(BlockSoundGroup.WOOL).solidBlock(Blocks::nonSolid)
+        )
+    }
 
     fun charredLogOf(topColor: MapColor, sideColor: MapColor): Block {
         return PillarBlock(AbstractBlock.Settings.create().mapColor { state: BlockState ->

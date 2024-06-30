@@ -5,10 +5,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.teamvoided.dusk_autumn.init.DuskEntities
 import org.teamvoided.dusk_autumn.init.DuskWorldgen
-import org.teamvoided.dusk_debris.init.DuskBlocks
-import org.teamvoided.dusk_debris.init.DuskItemGroups
-import org.teamvoided.dusk_debris.init.DuskItems
-import org.teamvoided.dusk_debris.init.DuskParticles
+import org.teamvoided.dusk_debris.init.*
 
 @Suppress("unused")
 object DuskDebris {
@@ -25,6 +22,7 @@ object DuskDebris {
         DuskEntities.init()
         DuskWorldgen.init()
         DuskParticles.init()
+        DuskSoundEvents.init()
     }
 
     fun id(path: String) = Identifier.of(MODID, path)

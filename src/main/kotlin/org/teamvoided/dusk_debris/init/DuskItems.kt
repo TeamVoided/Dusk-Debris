@@ -15,6 +15,7 @@ import net.minecraft.util.math.BlockPointer
 import net.minecraft.world.World
 import net.minecraft.world.event.GameEvent
 import org.teamvoided.dusk_debris.DuskDebris.id
+import org.teamvoided.dusk_debris.block.DuskBlockLists
 import org.teamvoided.dusk_debris.block.GunpowderBarrelBlock
 import org.teamvoided.dusk_debris.entity.GunpowderBarrelEntity
 import org.teamvoided.dusk_debris.item.throwable_bomb.BlunderbombItem
@@ -24,19 +25,20 @@ import org.teamvoided.dusk_debris.item.throwable_bomb.FirebombItem
 @Suppress("unused", "MemberVisibilityCanBePrivate")
 object DuskItems {
 
+    val BLUE_NETHERSHROOM = register("blue_nethershroom", BlockItem(DuskBlocks.BLUE_NETHERSHROOM))
+    val BLUE_NETHERSHROOM_BLOCK = register("blue_nethershroom_block", BlockItem(DuskBlocks.BLUE_NETHERSHROOM_BLOCK))
+    val PURPLE_NETHERSHROOM = register("purple_nethershroom", BlockItem(DuskBlocks.PURPLE_NETHERSHROOM))
+    val PURPLE_NETHERSHROOM_BLOCK = register("purple_nethershroom_block", BlockItem(DuskBlocks.PURPLE_NETHERSHROOM_BLOCK))
+    val NETHERSHROOM_STEM = register("nethershroom_stem", BlockItem(DuskBlocks.NETHERSHROOM_STEM))
+
     val GUNPOWDER_BARREL = register("gunpowder_barrel", BlockItem(DuskBlocks.GUNPOWDER_BARREL))
-    val STRONGHOLD_GUNPOWDER_BARREL = register(
-        "stronghold_gunpowder_barrel",
-        BlockItem(DuskBlocks.STRONGHOLD_GUNPOWDER_BARREL, Item.Settings().maxCount(16))
-    )
-    val ANCIENT_BLACK_POWDER_BARREL = register(
-        "ancient_black_powder_barrel",
-        BlockItem(DuskBlocks.ANCIENT_BLACK_POWDER_BARREL, Item.Settings().maxCount(1))
-    )
-    val BLUNDERBOMB =
-        register("blunderbomb", BlunderbombItem(DuskBlocks.BLUNDERBOMB_BLOCK, Item.Settings().maxCount(16)))
+    val STRONGHOLD_GUNPOWDER_BARREL = register("stronghold_gunpowder_barrel", BlockItem(DuskBlocks.STRONGHOLD_GUNPOWDER_BARREL, Item.Settings().maxCount(16)))
+    val ANCIENT_BLACK_POWDER_BARREL = register("ancient_black_powder_barrel", BlockItem(DuskBlocks.ANCIENT_BLACK_POWDER_BARREL, Item.Settings().maxCount(1)))
+    val BLUNDERBOMB = register("blunderbomb", BlunderbombItem(DuskBlocks.BLUNDERBOMB_BLOCK, Item.Settings().maxCount(16)))
     val FIREBOMB = register("firebomb", FirebombItem(DuskBlocks.FIREBOMB_BLOCK, Item.Settings().maxCount(16)))
     val LIGHT_BLUE_RIBBON = register("light_blue_ribbon", BlockItem(DuskBlocks.LIGHT_BLUE_RIBBON, Item.Settings()))
+
+    val PAPER_BLOCK = register("paper_block", BlockItem(DuskBlocks.PAPER_BLOCK))
 
     val CYPRESS_LOG = register("cypress_log", BlockItem(DuskBlocks.CYPRESS_LOG))
     val CYPRESS_WOOD = register("cypress_wood", BlockItem(DuskBlocks.CYPRESS_WOOD))

@@ -1,0 +1,26 @@
+{
+  "dusk_debris.blocks.nethershroom.squished": {
+    "category": "block",
+    "sounds": [
+      {
+        "name": "blocks/nethershroom/squished",
+        "stream": true
+      }
+    ]
+  },
+  "dusk_debris.blocks.nethershroom.explode": {
+    "category": "block",
+    "sounds": [
+      {
+        "name": "blocks/nethershroom/explode_1",
+        "attenuation_distance": 32,
+        "stream": true
+      },
+      {
+        "name": "blocks/nethershroom/explode_2",
+        "attenuation_distance": 32,
+        "stream": true
+      }
+    ]
+  }
+}

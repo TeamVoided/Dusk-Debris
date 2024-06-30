@@ -5,3 +5,4 @@ accessible field net/minecraft/data/client/model/BlockStateModelGenerator sandst
 mutable field net/minecraft/data/client/model/BlockStateModelGenerator sandstoneModels Ljava/util/Map;
 accessible method net/minecraft/block/sign/SignType register (Lnet/minecraft/block/sign/SignType;)Lnet/minecraft/block/sign/SignType;
 accessible field net/minecraft/entity/Entity random Lnet/minecraft/util/random/RandomGenerator;
+accessible method net/minecraft/data/client/model/Models block (Ljava/lang/String;[Lnet/minecraft/data/client/model/TextureKey;)Lnet/minecraft/data/client/model/Model;

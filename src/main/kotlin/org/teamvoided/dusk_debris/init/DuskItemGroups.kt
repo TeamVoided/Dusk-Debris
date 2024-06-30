@@ -18,11 +18,17 @@ import kotlin.jvm.optionals.getOrNull
 object DuskItemGroups {
     val DUSK_TAB: ItemGroup = register("dusk_items",
         FabricItemGroup.builder()
-            .icon { ItemStack(DuskItems.VOLCANIC_SAND) }
+            .icon { ItemStack(DuskItems.GUNPOWDER_BARREL) }
             .name(Text.translatable("itemGroup.dusk_debris.dusk_items"))
             .entries { _, entries ->
                 entries.addStacks(
                     mutableSetOf(
+                        ItemStack(DuskItems.NETHERSHROOM_STEM),
+                        ItemStack(DuskItems.BLUE_NETHERSHROOM_BLOCK),
+                        ItemStack(DuskItems.PURPLE_NETHERSHROOM_BLOCK),
+                        ItemStack(DuskItems.BLUE_NETHERSHROOM),
+                        ItemStack(DuskItems.PURPLE_NETHERSHROOM),
+
                         ItemStack(DuskItems.GUNPOWDER_BARREL),
                         ItemStack(DuskItems.STRONGHOLD_GUNPOWDER_BARREL),
                         ItemStack(DuskItems.ANCIENT_BLACK_POWDER_BARREL),

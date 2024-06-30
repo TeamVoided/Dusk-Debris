@@ -4,11 +4,12 @@ import net.minecraft.block.Block
 import net.minecraft.block.Blocks
 import net.minecraft.block.enums.JigsawOrientation
 import net.minecraft.data.client.model.*
-import net.minecraft.item.Item
-import net.minecraft.item.Items
+import net.minecraft.data.client.model.VariantSettings.Rotation
 import net.minecraft.state.property.Properties
 import net.minecraft.util.Identifier
 import org.teamvoided.dusk_debris.DuskDebris
+import org.teamvoided.dusk_debris.DuskDebris.id
+import org.teamvoided.dusk_debris.block.NethershroomPlantBlock
 import java.util.*
 import java.util.stream.Collectors
 import java.util.stream.IntStream
@@ -87,10 +88,10 @@ fun BlockStateModelGenerator.gunpowderBarrelBlock(block: Block) {
     )
 }
 
-fun BlockStateModelGenerator.throwableBlock(item: Item, block: Block) {
-    this.registerItemModel(item)
+fun BlockStateModelGenerator.throwableBlock(block: Block) {
+    this.registerItemModel(block.asItem())
     val texture = Texture()
-        .put(TextureKey.PARTICLE, Texture.getId(item))
+        .put(TextureKey.PARTICLE, Texture.getId(block.asItem()))
         .put(TextureKey.ALL, Texture.getId(block))
     val model = block(
         "parent/throwable_block",
@@ -114,6 +115,99 @@ fun BlockStateModelGenerator.throwableBlock(item: Item, block: Block) {
     )
 }
 
+fun BlockStateModelGenerator.registerNethershroom(block: Block) {
+    this.excludeFromSimpleItemModelGeneration(block)
+    this.registerItemModel(block)
+    val texture = Texture()
+        .put(TextureKey.PARTICLE, Texture.getId(block))
+        .put(TextureKey.CROSS, Texture.getId(block))
+    val textureSquish = Texture()
+        .put(TextureKey.PARTICLE, Texture.getId(block))
+        .put(TextureKey.CROSS, Texture.getSubId(block, "_squished"))
+    val model = Models.CROSS.upload(
+        block,
+        texture,
+        this.modelCollector
+    )
+    val modelSquished = Models.CROSS.upload(
+        block,
+        "_squished",
+        textureSquish,
+        this.modelCollector
+    )
+    this.blockStateCollector.accept(
+        VariantsBlockStateSupplier.create(block).coordinate(
+            BlockStateModelGenerator.createBooleanModelMap(
+                NethershroomPlantBlock.SQUISHED,
+                modelSquished,
+                model
+            )
+        )
+    )
+}
+
+fun BlockStateModelGenerator.registerNethershroomBlock(nethershroomBlock: Block) {
+    val texture = Models.TEMPLATE_SINGLE_FACE.upload(
+        nethershroomBlock, Texture.texture(nethershroomBlock),
+        this.modelCollector
+    )
+    val insideTexture = id("block/nethershroom_block_inside")
+    this.blockStateCollector.accept(
+        MultipartBlockStateSupplier.create(nethershroomBlock).with(
+            When.create().set(Properties.NORTH, true),
+            BlockStateVariant.create().put(VariantSettings.MODEL, texture)
+        ).with(
+            When.create().set(Properties.EAST, true),
+            BlockStateVariant.create().put(VariantSettings.MODEL, texture).put(VariantSettings.Y, Rotation.R90)
+                .put(VariantSettings.UVLOCK, true)
+        ).with(
+            When.create().set(Properties.SOUTH, true),
+            BlockStateVariant.create().put(VariantSettings.MODEL, texture).put(VariantSettings.Y, Rotation.R180)
+                .put(VariantSettings.UVLOCK, true)
+        ).with(
+            When.create().set(Properties.WEST, true),
+            BlockStateVariant.create().put(VariantSettings.MODEL, texture).put(VariantSettings.Y, Rotation.R270)
+                .put(VariantSettings.UVLOCK, true)
+        ).with(
+            When.create().set(Properties.UP, true),
+            BlockStateVariant.create().put(VariantSettings.MODEL, texture).put(VariantSettings.X, Rotation.R270)
+                .put(VariantSettings.UVLOCK, true)
+        ).with(
+            When.create().set(Properties.DOWN, true),
+            BlockStateVariant.create().put(VariantSettings.MODEL, texture).put(VariantSettings.X, Rotation.R90)
+                .put(VariantSettings.UVLOCK, true)
+        ).with(
+            When.create().set(Properties.NORTH, false),
+            BlockStateVariant.create().put(VariantSettings.MODEL, insideTexture)
+        ).with(
+            When.create().set(Properties.EAST, false),
+            BlockStateVariant.create().put(VariantSettings.MODEL, insideTexture).put(VariantSettings.Y, Rotation.R90)
+                .put(VariantSettings.UVLOCK, false)
+        ).with(
+            When.create().set(Properties.SOUTH, false),
+            BlockStateVariant.create().put(VariantSettings.MODEL, insideTexture).put(VariantSettings.Y, Rotation.R180)
+                .put(VariantSettings.UVLOCK, false)
+        ).with(
+            When.create().set(Properties.WEST, false),
+            BlockStateVariant.create().put(VariantSettings.MODEL, insideTexture).put(VariantSettings.Y, Rotation.R270)
+                .put(VariantSettings.UVLOCK, false)
+        ).with(
+            When.create().set(Properties.UP, false),
+            BlockStateVariant.create().put(VariantSettings.MODEL, insideTexture).put(VariantSettings.X, Rotation.R270)
+                .put(VariantSettings.UVLOCK, false)
+        ).with(
+            When.create().set(Properties.DOWN, false),
+            BlockStateVariant.create().put(VariantSettings.MODEL, insideTexture).put(VariantSettings.X, Rotation.R90)
+                .put(VariantSettings.UVLOCK, false)
+        )
+    )
+    this.registerParentedItemModel(
+        nethershroomBlock, TexturedModel.CUBE_ALL.createWithSuffix(
+            nethershroomBlock, "_inventory",
+            this.modelCollector
+        )
+    )
+}
 
 fun BlockStateModelGenerator.ribbon(block: Block) {
     this.excludeFromSimpleItemModelGeneration(block)
@@ -152,33 +246,6 @@ fun getBambooBlockStateVariants(age: Int): List<BlockStateVariant> {
         )
     }.collect(Collectors.toList())
 }
-
-//fun BlockStateModelGenerator.temp(block: Block, texture: Texture) {
-//    val identifier = Models.ORIENTABLE.upload(
-//        block, texture.copyAndAdd(TextureKey.FRONT, Texture.getId(block)),
-//        this.modelCollector
-//    )
-//    this.blockStateCollector.accept(
-//        VariantsBlockStateSupplier.create(
-//            block,
-//            BlockStateVariant.create().put(VariantSettings.MODEL, identifier)
-//        ).coordinate(BlockStateModelGenerator.createNorthDefaultHorizontalRotationStates())
-//    )
-//}
-
-
-//fun BlockStateModelGenerator.throwableBlock2(item: Item, block: Block) {
-//    this.registerItemModel(item.asItem())
-//    this.blockStateCollector.accept(
-//        VariantsBlockStateSupplier.create(block).coordinate(
-//            BlockStateModelGenerator.createBooleanModelMap(
-//                Properties.HANGING,
-//                DuskDebris.id("block/blunderbomb"),
-//                DuskDebris.id("block/blunderbomb_hanging")
-//            )
-//        )
-//    )
-//}
 
 fun BlockStateModelGenerator.registerParentedItemModel(block: Block) =
     this.registerParentedItemModel(block, block.model())

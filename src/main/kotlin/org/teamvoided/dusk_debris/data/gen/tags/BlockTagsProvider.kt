@@ -17,7 +17,7 @@ class BlockTagsProvider(output: FabricDataOutput, registriesFuture: CompletableF
         conventionTags()
     }
 
-    fun duskTags() {
+    private fun duskTags() {
         getOrCreateTagBuilder(DuskBlockTags.FIREBOMB_DESTROYS)
             .add(Blocks.TNT)
             .add(DuskBlocks.GUNPOWDER_BARREL)
@@ -30,9 +30,15 @@ class BlockTagsProvider(output: FabricDataOutput, registriesFuture: CompletableF
         getOrCreateTagBuilder(DuskBlockTags.GUNPOWDER_BARREL_DESTROYS)
             .addOptionalTag(DuskBlockTags.BLUNDERBOMB_DESTROYS)
             .add(Blocks.NETHER_PORTAL)
+        getOrCreateTagBuilder(DuskBlockTags.NETHERSHROOM_PLACEABLE_ON)
+            .addOptionalTag(BlockTags.NYLIUM)
+            .addOptionalTag(BlockTags.SAND)
+            .addOptionalTag(BlockTags.DIRT)
+            .add(Blocks.FARMLAND)
+            .add(Blocks.SOUL_SOIL)
     }
 
-    fun vanillaTags() {
+    private fun vanillaTags() {
         getOrCreateTagBuilder(BlockTags.SAND)
             .add(DuskBlocks.VOLCANIC_SAND)
             .add(DuskBlocks.SUSPICIOUS_VOLCANIC_SAND)
@@ -68,5 +74,5 @@ class BlockTagsProvider(output: FabricDataOutput, registriesFuture: CompletableF
             .add(DuskBlocks.CHARRED_FENCE_GATE)
     }
 
-    fun conventionTags() {}
+    private fun conventionTags() {}
 }

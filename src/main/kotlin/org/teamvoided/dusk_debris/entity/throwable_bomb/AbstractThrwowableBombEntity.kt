@@ -35,21 +35,6 @@ open class AbstractThrwowableBombEntity : ThrownItemEntity {
     open val hitDamage = 0f
     open val trailingParticle: ParticleEffect = ParticleTypes.SMOKE
 
-    private fun particlesOnImpact() {
-        val particleEffect = (ItemStackParticleEffect(ParticleTypes.ITEM, defaultItem.defaultStack))
-        for (i in 0..7) {
-            world.addParticle(
-                particleEffect,
-                this.x,
-                this.y,
-                this.z,
-                random.nextDouble() * 4,
-                random.nextDouble() * 4,
-                random.nextDouble() * 4
-            )
-        }
-    }
-
     override fun onEntityHit(entityHitResult: EntityHitResult) {
         entityHitResult.entity.damage(this.damageSources.thrown(this, this.owner), hitDamage)
         super.onEntityHit(entityHitResult)
@@ -68,7 +53,7 @@ open class AbstractThrwowableBombEntity : ThrownItemEntity {
             world.addParticle(
                 trailingParticle,
                 this.x,
-                this.y,
+                this.y + 0.15,
                 this.z,
                 0.0,
                 0.0,
@@ -79,12 +64,24 @@ open class AbstractThrwowableBombEntity : ThrownItemEntity {
     }
 
     open fun explode() {
-        particlesOnImpact()
+        val particleEffect = (ItemStackParticleEffect(ParticleTypes.ITEM, defaultItem.defaultStack))
+        val velocityMultiplier = 4
+        for (i in 0..14) {
+            world.addParticle(
+                particleEffect,
+                this.x,
+                this.y,
+                this.z,
+                random.nextDouble() * velocityMultiplier,
+                random.nextDouble() * velocityMultiplier,
+                random.nextDouble() * velocityMultiplier
+            )
+        }
 //        println("this should not occur, please check that you override the explode function")
     }
 
     override fun getDefaultItem(): Item {
-        println("this should not occur, please check that you overide the default item")
+        println("this should not occur, please check that you override the getDefaultItem function")
         return DuskItems.BLUNDERBOMB
     }
 }

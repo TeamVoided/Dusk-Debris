@@ -7,6 +7,7 @@ import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
 import org.teamvoided.dusk_debris.DuskDebris.id
 import org.teamvoided.dusk_debris.entity.GunpowderBarrelEntity
+import org.teamvoided.dusk_debris.entity.BoxAreaEffectCloud
 import org.teamvoided.dusk_debris.entity.throwable_bomb.BlunderbombEntity
 import org.teamvoided.dusk_debris.entity.throwable_bomb.FirebombEntity
 
@@ -17,6 +18,10 @@ object DuskEntities {
 //            .setDimensions(0.5f, 0.5f)
 //            .maxTrackingRange(10)
 //    )
+    val BOX_AREA_EFFECT_CLOUD = register(
+        "box_area_effect_cloud",
+        EntityType.Builder.create(EntityType.EntityFactory(::BoxAreaEffectCloud), SpawnGroup.MISC)
+    )
     val GUNPOWDER_BARREL = register(
         "gunpowder_barrel",
         EntityType.Builder.create(EntityType.EntityFactory(::GunpowderBarrelEntity), SpawnGroup.MISC)

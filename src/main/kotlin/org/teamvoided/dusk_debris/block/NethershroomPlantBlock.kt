@@ -25,11 +25,11 @@ import org.teamvoided.dusk_debris.data.DuskEntityTypeTags
 import org.teamvoided.dusk_debris.init.DuskSoundEvents
 import kotlin.random.Random
 
-class NethershroomBlock(delay: Int, potion: Holder<Potion>, settings: Settings) : AbstractPlantBlock(settings) {
+class NethershroomPlantBlock(delay: Int, potion: Holder<Potion>, settings: Settings) : AbstractPlantBlock(settings) {
     val potion = potion
     val delay = delay
 
-    public override fun getCodec(): MapCodec<NethershroomBlock> {
+    public override fun getCodec(): MapCodec<NethershroomPlantBlock> {
         return CODEC
     }
 
@@ -129,8 +129,8 @@ class NethershroomBlock(delay: Int, potion: Holder<Potion>, settings: Settings) 
 //    }
 
     companion object {
-        val CODEC: MapCodec<NethershroomBlock> = createCodec { settings: Settings ->
-            NethershroomBlock(
+        val CODEC: MapCodec<NethershroomPlantBlock> = createCodec { settings: Settings ->
+            NethershroomPlantBlock(
                 20,
                 Potions.POISON,
                 settings

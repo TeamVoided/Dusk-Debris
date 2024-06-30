@@ -7,6 +7,7 @@ import org.teamvoided.dusk_debris.DuskDebris.id
 
 object DuskEntityTypeTags {
     val CRAB_ATTACKS = create("crab_attacks")
+    val IS_NOT_AFFECTED_BY_NETHERSHROOM = create("does_not_trigger_nethershroom")
     val FIREBOMB_DOES_NOT_DAMAGE = create("firebomb_does_not_damage")
     val BLUNDERBOMB_DOES_NOT_DAMAGE = create("blunderbomb_does_not_damage")
     val GUNPOWDER_BARREL_DOES_NOT_DAMAGE = create("gunpowder_barrel_does_not_damage")

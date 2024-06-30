@@ -11,7 +11,7 @@
 				"south": {"uv": [0, 0, 2, 4], "rotation": 90, "texture": "#all"},
 				"west": {"uv": [0, 0, 2, 4], "rotation": 90, "texture": "#all"},
 				"up": {"uv": [11, 11, 15, 15], "rotation": 270, "texture": "#all"},
-				"down": {"uv": [12, 0, 16, 4], "rotation": 90, "texture": "#all"}
+				"down": {"uv": [0, 0, 4, 0], "rotation": 90, "texture": "#all"}
 			}
 		},
 		{
@@ -40,6 +40,20 @@
 				"west": {"uv": [0, 0, 3, 0], "rotation": 90, "texture": "#all"},
 				"up": {"uv": [0, 0, 4, 0], "rotation": 180, "texture": "#all"},
 				"down": {"uv": [0, 0, 4, 0], "texture": "#all"}
+			}
+		},
+		{
+			"from": [8, 11, 6],
+			"to": [8, 16, 10],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 11, 8]},
+			"color": 7,
+			"faces": {
+				"north": {"uv": [0, 0, 3, 0], "rotation": 270, "texture": "#all"},
+				"east": {"uv": [11, 0, 16, 4], "rotation": 90, "texture": "#all"},
+				"south": {"uv": [0, 0, 3, 0], "rotation": 90, "texture": "#all"},
+				"west": {"uv": [11, 0, 16, 4], "rotation": 90, "texture": "#all"},
+				"up": {"uv": [0, 0, 4, 0], "rotation": 90, "texture": "#all"},
+				"down": {"uv": [0, 0, 4, 0], "rotation": 90, "texture": "#all"}
 			}
 		},
 		{
@@ -76,7 +90,7 @@
 			"name": "bone",
 			"origin": [8, 11, 8],
 			"color": 0,
-			"children": [0, 1, 2, 3, 4]
+			"children": [0, 1, 2, 3, 4, 5]
 		}
 	]
 }

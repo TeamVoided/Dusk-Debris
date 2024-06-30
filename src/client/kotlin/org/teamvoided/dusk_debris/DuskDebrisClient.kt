@@ -5,6 +5,7 @@ import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry
 import net.minecraft.client.particle.ParticleFactory
 import net.minecraft.client.render.RenderLayer
+import net.minecraft.client.render.entity.EmptyEntityRenderer
 import net.minecraft.client.render.entity.FlyingItemEntityRenderer
 import org.teamvoided.dusk_autumn.init.DuskEntities
 import org.teamvoided.dusk_debris.DuskDebris.log
@@ -20,13 +21,14 @@ import org.teamvoided.dusk_debris.particle.GunpowderExplosionSmokeParticle
 object DuskDebrisClient {
 
     val cutoutBlock = listOf(
-        DuskBlocks.BLUNDERBOMB_BLOCK,
-        DuskBlocks.FIREBOMB_BLOCK,
+        DuskBlocks.BLUE_NETHERSHROOM,
+        DuskBlocks.PURPLE_NETHERSHROOM,
         DuskBlocks.CYPRESS_DOOR,
         DuskBlocks.CYPRESS_TRAPDOOR,
         DuskBlocks.CHARRED_DOOR,
         DuskBlocks.CHARRED_TRAPDOOR,
-    ) + DuskBlockLists.RIBBON_BLOCKS_LIST
+    ) + DuskBlockLists.THROWABLE_BLOCK_LIST +
+            DuskBlockLists.RIBBON_BLOCKS_LIST
 //    val translucentBlock = listOf()
 
     fun init() {
@@ -45,6 +47,8 @@ object DuskDebrisClient {
                 ParticleFactory { _, world, x, y, z, _, _, _ -> BlunderbombEmitterParticle(world, x, y, z) }
             })
 
+
+        EntityRendererRegistry.register(DuskEntities.BOX_AREA_EFFECT_CLOUD, ::EmptyEntityRenderer)
         EntityRendererRegistry.register(DuskEntities.GUNPOWDER_BARREL, ::GunpowderBarrelEntityRenderer)
         EntityRendererRegistry.register(DuskEntities.BLUNDERBOMB, ::FlyingItemEntityRenderer)
         EntityRendererRegistry.register(DuskEntities.FIREBOMB, ::FlyingItemEntityRenderer)

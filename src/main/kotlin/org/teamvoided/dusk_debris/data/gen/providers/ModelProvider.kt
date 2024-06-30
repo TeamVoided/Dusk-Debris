@@ -3,26 +3,18 @@ package org.teamvoided.dusk_debris.data.gen.providers
 
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider
+import net.minecraft.block.Blocks
 import net.minecraft.data.client.ItemModelGenerator
 import net.minecraft.data.client.model.*
-import org.teamvoided.dusk_debris.block.DuskBlockFamilies
 import org.teamvoided.dusk_debris.block.DuskBlockLists
 import org.teamvoided.dusk_debris.init.DuskBlocks
 import org.teamvoided.dusk_debris.init.DuskItems
 import org.teamvoided.dusk_debris.util.gunpowderBarrelBlock
-import org.teamvoided.dusk_debris.util.ribbon
+import org.teamvoided.dusk_debris.util.registerNethershroom
+import org.teamvoided.dusk_debris.util.registerNethershroomBlock
 import org.teamvoided.dusk_debris.util.throwableBlock
 
 class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
-
-
-    val blockFamily = listOf(
-        DuskBlockFamilies.VOLCANIC_SANDSTONE_FAMILY,
-        DuskBlockFamilies.CUT_VOLCANIC_SANDSTONE_FAMILY,
-        DuskBlockFamilies.SMOOTH_VOLCANIC_SANDSTONE_FAMILY,
-        DuskBlockFamilies.CYPRESS_FAMILY,
-        DuskBlockFamilies.CHARRED_FAMILY
-    )
 
     override fun generateBlockStateModels(gen: BlockStateModelGenerator) {
         gen.sandstoneModels = mapOf(
@@ -42,18 +34,24 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
             }
         )
         DuskBlockLists.RIBBON_BLOCKS_LIST.forEach {
-            gen.ribbon(it)
+            gen.registerAxisRotated(it, ModelIds.getBlockModelId(it))
         }
-        blockFamily.forEach {
+        DuskBlockLists.THROWABLE_BLOCK_LIST.forEach {
+            gen.throwableBlock(it)
+        }
+        DuskBlockLists.blockFamily.forEach {
             gen.registerCubeAllModelTexturePool(it.baseBlock).family(it)
         }
+
+        gen.registerNethershroom(DuskBlocks.BLUE_NETHERSHROOM)
+        gen.registerNethershroomBlock(DuskBlocks.BLUE_NETHERSHROOM_BLOCK)
+        gen.registerNethershroom(DuskBlocks.PURPLE_NETHERSHROOM)
+        gen.registerNethershroomBlock(DuskBlocks.PURPLE_NETHERSHROOM_BLOCK)
+        gen.registerNethershroomBlock(DuskBlocks.NETHERSHROOM_STEM)
 
         gen.gunpowderBarrelBlock(DuskBlocks.GUNPOWDER_BARREL)
         gen.gunpowderBarrelBlock(DuskBlocks.STRONGHOLD_GUNPOWDER_BARREL)
         gen.gunpowderBarrelBlock(DuskBlocks.ANCIENT_BLACK_POWDER_BARREL)
-        gen.throwableBlock(DuskItems.BLUNDERBOMB, DuskBlocks.BLUNDERBOMB_BLOCK)
-        gen.throwableBlock(DuskItems.FIREBOMB, DuskBlocks.FIREBOMB_BLOCK)
-
         gen.registerLog(DuskBlocks.CYPRESS_LOG)
             .log(DuskBlocks.CYPRESS_LOG)
             .wood(DuskBlocks.CYPRESS_WOOD)
