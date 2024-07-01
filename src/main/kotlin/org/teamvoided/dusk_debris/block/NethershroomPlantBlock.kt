@@ -1,13 +1,18 @@
 package org.teamvoided.dusk_debris.block
 
 import com.mojang.serialization.MapCodec
-import net.minecraft.block.*
+import net.minecraft.block.AbstractPlantBlock
+import net.minecraft.block.Block
+import net.minecraft.block.BlockState
+import net.minecraft.block.ShapeContext
 import net.minecraft.component.type.PotionContentsComponent
 import net.minecraft.entity.Entity
+import net.minecraft.entity.effect.StatusEffect
+import net.minecraft.entity.effect.StatusEffectInstance
+import net.minecraft.entity.effect.StatusEffects
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.particle.ParticleTypes
 import net.minecraft.potion.Potion
-import net.minecraft.potion.Potions
 import net.minecraft.registry.Holder
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.sound.SoundCategory
@@ -19,15 +24,14 @@ import net.minecraft.util.shape.VoxelShape
 import net.minecraft.world.BlockView
 import net.minecraft.world.GameRules
 import net.minecraft.world.World
-import org.teamvoided.dusk_autumn.init.DuskEntities
+import org.teamvoided.dusk_debris.init.DuskEntities
 import org.teamvoided.dusk_debris.data.DuskBlockTags
 import org.teamvoided.dusk_debris.data.DuskEntityTypeTags
 import org.teamvoided.dusk_debris.init.DuskSoundEvents
 import kotlin.random.Random
 
-class NethershroomPlantBlock(delay: Int, potion: Holder<Potion>, settings: Settings) : AbstractPlantBlock(settings) {
-    val potion = potion
-    val delay = delay
+class NethershroomPlantBlock(val delay: Int, val statusEffect: Holder<StatusEffect>, settings: Settings) :
+    AbstractPlantBlock(settings) {
 
     public override fun getCodec(): MapCodec<NethershroomPlantBlock> {
         return CODEC
@@ -61,7 +65,7 @@ class NethershroomPlantBlock(delay: Int, potion: Holder<Potion>, settings: Setti
                 world.playSound(
                     null,
                     pos,
-                    DuskSoundEvents.BLOCK_NETHERSHROOM_SQUEEZE,
+                    DuskSoundEvents.BLOCK_NETHERSHROOM_SQUISHED,
                     SoundCategory.BLOCKS,
                     1f,
                     0.9f + world.random.nextFloat() * 0.2f
@@ -96,9 +100,24 @@ class NethershroomPlantBlock(delay: Int, potion: Holder<Potion>, settings: Setti
         )
         val poisonCloud = DuskEntities.BOX_AREA_EFFECT_CLOUD.create(world)
         if (poisonCloud != null) {
-//            poisonCloud.setPotionContents(PotionContentsComponent())
             poisonCloud.particleType = ParticleTypes.SOUL_FIRE_FLAME
-            poisonCloud.setPotionContents(PotionContentsComponent(Potions.POISON))
+            poisonCloud.setPotionContents(
+                PotionContentsComponent(
+                    Holder.createDirect(
+                        Potion(
+                            StatusEffectInstance(
+                                statusEffect,
+                                900
+                            ),
+                            StatusEffectInstance(
+                                statusEffect,
+                                40,
+                                1
+                            )
+                        )
+                    )
+                )
+            )
             poisonCloud.radius = 4.0f
             poisonCloud.duration = 700
             poisonCloud.waitTime = 10
@@ -132,7 +151,7 @@ class NethershroomPlantBlock(delay: Int, potion: Holder<Potion>, settings: Setti
         val CODEC: MapCodec<NethershroomPlantBlock> = createCodec { settings: Settings ->
             NethershroomPlantBlock(
                 20,
-                Potions.POISON,
+                StatusEffects.POISON,
                 settings
             )
         }

@@ -6,18 +6,18 @@ import net.minecraft.world.explosion.ExplosionBehavior
 import org.teamvoided.dusk_debris.data.DuskBlockTags
 import org.teamvoided.dusk_debris.data.DuskEntityTypeTags
 import org.teamvoided.dusk_debris.entity.throwable_bomb.BlunderbombEntity
-import org.teamvoided.dusk_debris.world.explosion.BlunderbombExplosionBehavior
+import org.teamvoided.dusk_debris.world.explosion.SpecialExplosionBehavior
 
 open class BlunderbombBlock(settings: Settings) : AbstractThrwowableBombBlock(settings) {
 
-    override val explosionBehavior: ExplosionBehavior = BlunderbombExplosionBehavior(
+    override val explosionBehavior: ExplosionBehavior = SpecialExplosionBehavior(
         DuskBlockTags.BLUNDERBOMB_DESTROYS,
         DuskEntityTypeTags.BLUNDERBOMB_DOES_NOT_DAMAGE,
         1.1f,
         12f
     )
 
-    override val explosionBehaviorOnExploded: ExplosionBehavior = BlunderbombExplosionBehavior(
+    override val explosionBehaviorOnExploded: ExplosionBehavior = SpecialExplosionBehavior(
         DuskBlockTags.BLUNDERBOMB_DESTROYS,
         DuskEntityTypeTags.BLUNDERBOMB_DOES_NOT_DAMAGE,
         Math.random().toFloat(),

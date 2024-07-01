@@ -6,6 +6,7 @@ import net.minecraft.client.particle.*
 import net.minecraft.client.world.ClientWorld
 import net.minecraft.particle.DefaultParticleType
 import net.minecraft.particle.ParticleTypes
+import kotlin.math.max
 
 @Environment(EnvType.CLIENT)
 class BlunderbombEmitterParticle internal constructor(
@@ -17,15 +18,15 @@ class BlunderbombEmitterParticle internal constructor(
     SpriteBillboardParticle(world, x, y, z, 0.0, 0.0, 0.0) {
 
     private val initialVelocity = 0.8
-    private val velocityChange = -(initialVelocity / maxAge) * age + initialVelocity
+    private val velocityChange = 0.9f
+    private val extraParticle = ParticleTypes.SMOKE
 
     init {
+        this.velocityX = (random.nextFloat() - random.nextFloat()).toDouble()
+        this.velocityY = (random.nextFloat() - random.nextFloat()).toDouble()
+        this.velocityZ = (random.nextFloat() - random.nextFloat()).toDouble()
+        this.velocityY += (random.nextFloat() * 0.4f).toDouble()
         this.gravityStrength = 0.75f
-        this.velocityMultiplier = 0.999f
-        this.velocityX *= initialVelocity
-        this.velocityY *= initialVelocity
-        this.velocityZ *= initialVelocity
-        this.velocityY = (random.nextFloat() * 0.4f + 0.05f).toDouble()
         this.scale *= random.nextFloat() * 2.0f + 0.2f
         this.maxAge = 20
     }
@@ -47,16 +48,18 @@ class BlunderbombEmitterParticle internal constructor(
     }
 
     override fun tick() {
+        this.gravityStrength *= velocityChange
+        this.velocityMultiplier *= velocityChange
         super.tick()
         if (!this.dead) {
             val f = age.toFloat() / maxAge.toFloat()
             if (random.nextFloat() > f) {
                 world.addParticle(
-                    ParticleTypes.SMOKE,
+                    extraParticle,
                     this.x,
                     this.y,
                     this.z,
-                    1.0,
+                    0.0,
                     0.0,
                     0.0
                 )

@@ -2,7 +2,6 @@ package org.teamvoided.dusk_debris.entity.throwable_bomb
 
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.Item
 import net.minecraft.particle.ParticleEffect
 import net.minecraft.particle.ParticleTypes
@@ -11,12 +10,13 @@ import net.minecraft.sound.SoundEvents
 import net.minecraft.world.World
 import net.minecraft.world.explosion.Explosion
 import net.minecraft.world.explosion.ExplosionBehavior
-import org.teamvoided.dusk_autumn.init.DuskEntities
+import org.teamvoided.dusk_debris.init.DuskEntities
 import org.teamvoided.dusk_debris.block.throwable_bomb.AbstractThrwowableBombBlock
 import org.teamvoided.dusk_debris.data.DuskBlockTags
 import org.teamvoided.dusk_debris.data.DuskEntityTypeTags
 import org.teamvoided.dusk_debris.init.DuskItems
-import org.teamvoided.dusk_debris.world.explosion.BlunderbombExplosionBehavior
+import org.teamvoided.dusk_debris.init.DuskParticles
+import org.teamvoided.dusk_debris.world.explosion.SpecialExplosionBehavior
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -44,7 +44,7 @@ open class BlunderbombEntity : AbstractThrwowableBombEntity {
     }
 
 
-    override var explosionBehavior: ExplosionBehavior = BlunderbombExplosionBehavior(
+    override var explosionBehavior: ExplosionBehavior = SpecialExplosionBehavior(
         DuskBlockTags.BLUNDERBOMB_DESTROYS,
         DuskEntityTypeTags.BLUNDERBOMB_DOES_NOT_DAMAGE,
         1.1f,
@@ -54,6 +54,17 @@ open class BlunderbombEntity : AbstractThrwowableBombEntity {
     override val trailingParticle: ParticleEffect = ParticleTypes.SMOKE
 
     override fun explode() {
+        for (i in 0..20) {
+            world.addParticle(
+                DuskParticles.BLUNDERBOMB_EMMITER,
+                this.pos.x,
+                this.pos.y,
+                this.pos.z,
+                0.0,
+                0.0,
+                0.0
+            )
+        }
         world.playSound(
             this,
             this.blockPos,
@@ -73,8 +84,8 @@ open class BlunderbombEntity : AbstractThrwowableBombEntity {
             DEFAULT_EXPLOSION_POWER,
             false,
             World.ExplosionSourceType.TNT,
-            ParticleTypes.BUBBLE,
-            ParticleTypes.BUBBLE,
+            DuskParticles.BLUNDERBOMB_EMMITER,
+            DuskParticles.BLUNDERBOMB_EMMITER,
             SoundEvents.BLOCK_RESPAWN_ANCHOR_DEPLETE
         )
         super.explode()

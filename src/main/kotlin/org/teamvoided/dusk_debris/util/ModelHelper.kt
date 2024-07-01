@@ -209,42 +209,33 @@ fun BlockStateModelGenerator.registerNethershroomBlock(nethershroomBlock: Block)
     )
 }
 
-fun BlockStateModelGenerator.ribbon(block: Block) {
+fun BlockStateModelGenerator.registerRibbon(block: Block) {
     this.excludeFromSimpleItemModelGeneration(block)
     this.registerItemModel(block.asItem())
     this.blockStateCollector.accept(
-        MultipartBlockStateSupplier.create(block).with(
-            getBlockStateVariants(block, 4)
-        )
+        VariantsBlockStateSupplier.create(block, *(getRibbonBlockStateVariants(block, 4).toTypedArray()))
+            .coordinate(BlockStateModelGenerator.createAxisRotatedVariantMap())
     )
 }
 
-fun getBlockStateVariants(block: Block, variants: Int): List<BlockStateVariant> {
-    return IntStream.range(1, variants + 1).mapToObj { i: Int ->
-        BlockStateVariant.create().put(
+fun BlockStateModelGenerator.getRibbonBlockStateVariants(block: Block, variants: Int): List<BlockStateVariant> {
+    return IntStream.range(1, variants + 1).mapToObj { variant ->
+            BlockStateVariant.create().put(
             VariantSettings.MODEL,
-            ModelIds.getBlockSubModelId(block, "_$i")
+            this.makeRibbonModel(block, variant)
         )
-    }.collect(Collectors.toList())
+    }.toList()
 }
 
-private fun BlockStateModelGenerator.registerBamboo() {
-    this.excludeFromSimpleItemModelGeneration(Blocks.BAMBOO)
-    this.blockStateCollector.accept(
-        MultipartBlockStateSupplier.create(Blocks.BAMBOO).with(
-            getBambooBlockStateVariants(0)
-        )
-    )
-}
-
-fun getBambooBlockStateVariants(age: Int): List<BlockStateVariant> {
-    val string = "_age$age"
-    return IntStream.range(1, 5).mapToObj { i: Int ->
-        BlockStateVariant.create().put(
-            VariantSettings.MODEL,
-            ModelIds.getBlockSubModelId(Blocks.BAMBOO, "" + i + string)
-        )
-    }.collect(Collectors.toList())
+fun BlockStateModelGenerator.makeRibbonModel(block: Block, variant: Int): Identifier {
+    val texture = Texture()
+        .put(TextureKey.PARTICLE, Texture.getId(block))
+        .put(TextureKey.ALL, Texture.getId(block))
+    return block(
+        "parent/ribbon_$variant",
+        TextureKey.PARTICLE,
+        TextureKey.ALL
+    ).upload(block.modelSuffix("_$variant"), texture, this.modelCollector)
 }
 
 fun BlockStateModelGenerator.registerParentedItemModel(block: Block) =

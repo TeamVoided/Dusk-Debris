@@ -5,6 +5,8 @@ import net.minecraft.block.*
 import net.minecraft.block.Blocks.legacyStairsOf
 import net.minecraft.block.enums.NoteBlockInstrument
 import net.minecraft.block.piston.PistonBehavior
+import net.minecraft.entity.effect.StatusEffect
+import net.minecraft.entity.effect.StatusEffects
 import net.minecraft.potion.Potions
 import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
@@ -35,7 +37,7 @@ object DuskBlocks {
         "blue_nethershroom",
         NethershroomPlantBlock(
             4,
-            Potions.POISON,
+            StatusEffects.POISON,
             AbstractBlock.Settings.create().mapColor(MapColor.LIGHT_BLUE).strength(0.1F)
                 .sounds(BlockSoundGroup.FUNGUS).noCollision()
         )
@@ -51,7 +53,7 @@ object DuskBlocks {
         "purple_nethershroom",
         NethershroomPlantBlock(
             16,
-            Potions.POISON,
+            StatusEffects.BLINDNESS,
             AbstractBlock.Settings.create().mapColor(MapColor.PURPLE).strength(0.1F)
                 .sounds(BlockSoundGroup.FUNGUS).noCollision()
         )
@@ -96,8 +98,8 @@ object DuskBlocks {
             12,
             4f,
             AbstractBlock.Settings.create().mapColor(Blocks.SOUL_FIRE.defaultMapColor)
-                .instrument(NoteBlockInstrument.BASS)
-                .strength(2f, 0.0f).sounds(BlockSoundGroup.WOOD).lavaIgnitable().solidBlock(Blocks::nonSolid)
+                .instrument(NoteBlockInstrument.BASS).strength(2f, 0.0f).sounds(BlockSoundGroup.WOOD).lavaIgnitable()
+                .solidBlock(Blocks::nonSolid)
         )
     )
     val BLUNDERBOMB_BLOCK = register(

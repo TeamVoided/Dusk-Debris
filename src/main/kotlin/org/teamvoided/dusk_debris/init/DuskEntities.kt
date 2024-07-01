@@ -1,4 +1,4 @@
-package org.teamvoided.dusk_autumn.init
+package org.teamvoided.dusk_debris.init
 
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityType
@@ -9,6 +9,7 @@ import org.teamvoided.dusk_debris.DuskDebris.id
 import org.teamvoided.dusk_debris.entity.GunpowderBarrelEntity
 import org.teamvoided.dusk_debris.entity.BoxAreaEffectCloud
 import org.teamvoided.dusk_debris.entity.throwable_bomb.BlunderbombEntity
+import org.teamvoided.dusk_debris.entity.throwable_bomb.BonecallerEntity
 import org.teamvoided.dusk_debris.entity.throwable_bomb.FirebombEntity
 
 object DuskEntities {
@@ -44,6 +45,17 @@ object DuskEntities {
             .maxTrackingRange(4)
             .trackingTickInterval(10)
     )
+    val BONECALLER = throwableBomb("bonecaller", ::BonecallerEntity)
+
+    fun <T : Entity> throwableBomb(id: String, factory: EntityType.EntityFactory<T>): EntityType<T> {
+        return register(
+            id,
+            EntityType.Builder.create(factory, SpawnGroup.MISC)
+                .setDimensions(0.33f, 0.33f)
+                .maxTrackingRange(4)
+                .trackingTickInterval(10)
+        )
+    }
 
     fun init() {
 //        FabricDefaultAttributeRegistry.register(CRAB, CrabEntity.createAttributes().build())

@@ -3,15 +3,17 @@ package org.teamvoided.dusk_debris
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap
 import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry
-import net.minecraft.client.particle.ParticleFactory
+import net.minecraft.client.particle.ParticleManager.SpriteAwareFactory
+import net.minecraft.client.particle.SpriteProvider
+import net.minecraft.client.particle.WaterSuspendParticle
 import net.minecraft.client.render.RenderLayer
 import net.minecraft.client.render.entity.EmptyEntityRenderer
 import net.minecraft.client.render.entity.FlyingItemEntityRenderer
-import org.teamvoided.dusk_autumn.init.DuskEntities
 import org.teamvoided.dusk_debris.DuskDebris.log
 import org.teamvoided.dusk_debris.block.DuskBlockLists
 import org.teamvoided.dusk_debris.entity.gunpowder_barrel.GunpowderBarrelEntityRenderer
 import org.teamvoided.dusk_debris.init.DuskBlocks
+import org.teamvoided.dusk_debris.init.DuskEntities
 import org.teamvoided.dusk_debris.init.DuskParticles
 import org.teamvoided.dusk_debris.particle.BlunderbombEmitterParticle
 import org.teamvoided.dusk_debris.particle.GunpowderExplosionEmitterParticle
@@ -34,24 +36,25 @@ object DuskDebrisClient {
     fun init() {
         log.info("Hello from Client")
 
-        ParticleFactoryRegistry.getInstance()
-            .register(DuskParticles.GUNPOWDER_EXPLOSION_SMOKE, ParticleFactoryRegistry.PendingParticleFactory {
-                ParticleFactory { _, world, x, y, z, _, _, _ -> GunpowderExplosionSmokeParticle(world, x, y, z, 0.0, 0.0, 0.0, it) }
-            })
-        ParticleFactoryRegistry.getInstance()
-            .register(DuskParticles.GUNPOWDER_EXPLOSION_EMMITER, ParticleFactoryRegistry.PendingParticleFactory {
-                ParticleFactory { _, world, x, y, z, _, _, _ -> GunpowderExplosionEmitterParticle(world, x, y, z, 4f) }
-            })
-        ParticleFactoryRegistry.getInstance()
-            .register(DuskParticles.BLUNDERBOMB_EMMITER, ParticleFactoryRegistry.PendingParticleFactory {
-                ParticleFactory { _, world, x, y, z, _, _, _ -> BlunderbombEmitterParticle(world, x, y, z) }
-            })
 
+//        ParticleFactoryRegistry.getInstance()
+//            .register(DuskParticles.BLUE_NETHERSHROOM_SPORE, WaterSuspendParticle::SporeBlossomAirFactory)
+//        ParticleFactoryRegistry.getInstance()
+//            .register(DuskParticles.PURPLE_NETHERSHROOM_SPORE, WaterSuspendParticle::NethershroomSporeAir)
+        ParticleFactoryRegistry.getInstance()
+            .register(DuskParticles.GUNPOWDER_EXPLOSION_SMOKE, GunpowderExplosionSmokeParticle::Factory)
+        ParticleFactoryRegistry.getInstance()
+            .register(DuskParticles.GUNPOWDER_EXPLOSION_EMMITER, GunpowderExplosionEmitterParticle.Factory())
+        ParticleFactoryRegistry.getInstance()
+            .register(DuskParticles.BLUNDERBOMB_EMMITER, BlunderbombEmitterParticle::Factory)
+        ParticleFactoryRegistry.getInstance()
+            .register(DuskParticles.BLUNDERBOMB_EMMITER, BlunderbombEmitterParticle::Factory)
 
         EntityRendererRegistry.register(DuskEntities.BOX_AREA_EFFECT_CLOUD, ::EmptyEntityRenderer)
         EntityRendererRegistry.register(DuskEntities.GUNPOWDER_BARREL, ::GunpowderBarrelEntityRenderer)
         EntityRendererRegistry.register(DuskEntities.BLUNDERBOMB, ::FlyingItemEntityRenderer)
         EntityRendererRegistry.register(DuskEntities.FIREBOMB, ::FlyingItemEntityRenderer)
+        EntityRendererRegistry.register(DuskEntities.BONECALLER, ::FlyingItemEntityRenderer)
 
         cutoutBlock.forEach {
             BlockRenderLayerMap.INSTANCE.putBlock(it, RenderLayer.getCutout())

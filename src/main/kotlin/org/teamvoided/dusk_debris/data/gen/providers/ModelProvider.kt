@@ -3,16 +3,11 @@ package org.teamvoided.dusk_debris.data.gen.providers
 
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider
-import net.minecraft.block.Blocks
 import net.minecraft.data.client.ItemModelGenerator
 import net.minecraft.data.client.model.*
 import org.teamvoided.dusk_debris.block.DuskBlockLists
 import org.teamvoided.dusk_debris.init.DuskBlocks
-import org.teamvoided.dusk_debris.init.DuskItems
-import org.teamvoided.dusk_debris.util.gunpowderBarrelBlock
-import org.teamvoided.dusk_debris.util.registerNethershroom
-import org.teamvoided.dusk_debris.util.registerNethershroomBlock
-import org.teamvoided.dusk_debris.util.throwableBlock
+import org.teamvoided.dusk_debris.util.*
 
 class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
 
@@ -34,7 +29,7 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
             }
         )
         DuskBlockLists.RIBBON_BLOCKS_LIST.forEach {
-            gen.registerAxisRotated(it, ModelIds.getBlockModelId(it))
+            gen.registerRibbon(it)
         }
         DuskBlockLists.THROWABLE_BLOCK_LIST.forEach {
             gen.throwableBlock(it)

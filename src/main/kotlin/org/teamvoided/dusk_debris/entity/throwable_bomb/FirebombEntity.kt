@@ -12,7 +12,7 @@ import net.minecraft.util.math.Vec3d
 import net.minecraft.world.World
 import net.minecraft.world.explosion.Explosion
 import net.minecraft.world.explosion.ExplosionBehavior
-import org.teamvoided.dusk_autumn.init.DuskEntities
+import org.teamvoided.dusk_debris.init.DuskEntities
 import org.teamvoided.dusk_debris.data.DuskBlockTags
 import org.teamvoided.dusk_debris.data.DuskEntityTypeTags
 import org.teamvoided.dusk_debris.init.DuskItems

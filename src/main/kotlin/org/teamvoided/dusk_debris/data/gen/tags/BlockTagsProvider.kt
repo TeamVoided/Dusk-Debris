@@ -36,6 +36,17 @@ class BlockTagsProvider(output: FabricDataOutput, registriesFuture: CompletableF
             .addOptionalTag(BlockTags.DIRT)
             .add(Blocks.FARMLAND)
             .add(Blocks.SOUL_SOIL)
+        getOrCreateTagBuilder(DuskBlockTags.NETHERSHROOM_REPLACEABLE)
+            .addOptionalTag(BlockTags.REPLACEABLE)
+            .addOptionalTag(BlockTags.REPLACEABLE_BY_TREES)
+            .addOptionalTag(BlockTags.WART_BLOCKS)
+            .add(Blocks.WEEPING_VINES_PLANT)
+            .add(Blocks.WEEPING_VINES)
+            .add(Blocks.TWISTING_VINES_PLANT)
+            .add(Blocks.TWISTING_VINES)
+        getOrCreateTagBuilder(DuskBlockTags.NETHERSHROOM_IGNORE)
+            .addOptionalTag(DuskBlockTags.NETHERSHROOM_PLACEABLE_ON)
+            .addOptionalTag(DuskBlockTags.NETHERSHROOM_REPLACEABLE)
     }
 
     private fun vanillaTags() {

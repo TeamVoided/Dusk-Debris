@@ -30,7 +30,7 @@
 //import net.minecraft.world.ServerWorldAccess
 //import net.minecraft.world.World
 //import org.teamvoided.dusk_autumn.data.DuskItemTags
-//import org.teamvoided.dusk_autumn.init.DuskEntities
+//import org.teamvoided.dusk_debris.init.DuskEntities
 //import software.bernie.geckolib.animatable.GeoEntity
 //import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache
 //import software.bernie.geckolib.animation.AnimatableManager

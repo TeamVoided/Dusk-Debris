@@ -14,12 +14,12 @@ import net.minecraft.unmapped.C_zbvyjshu
 import net.minecraft.world.World
 import net.minecraft.world.World.ExplosionSourceType
 import net.minecraft.world.explosion.Explosion
-import org.teamvoided.dusk_autumn.init.DuskEntities
+import org.teamvoided.dusk_debris.init.DuskEntities
 import org.teamvoided.dusk_debris.data.DuskBlockTags
 import org.teamvoided.dusk_debris.data.DuskEntityTypeTags
 import org.teamvoided.dusk_debris.init.DuskBlocks
 import org.teamvoided.dusk_debris.particle.FloatInputParticleEffect
-import org.teamvoided.dusk_debris.world.explosion.GunpowderBarrelExplosionBehavior
+import org.teamvoided.dusk_debris.world.explosion.SpecialExplosionBehavior
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -27,19 +27,18 @@ class GunpowderBarrelEntity(entityType: EntityType<out GunpowderBarrelEntity>, w
     Entity(entityType, world), Ownable {
     private var causingEntity: LivingEntity? = null
     private var passedThoughPortal = false
-    private val explosionBehavior: GunpowderBarrelExplosionBehavior = GunpowderBarrelExplosionBehavior(
+    private val explosionBehavior: SpecialExplosionBehavior = SpecialExplosionBehavior(
         DuskBlockTags.GUNPOWDER_BARREL_DESTROYS,
         DuskEntityTypeTags.GUNPOWDER_BARREL_DOES_NOT_DAMAGE,
         explosionKnockback,
-        1f
+        (explosionPower * 8).toFloat()
     )
-    private val explosionBehaviorPostDimensionChange: GunpowderBarrelExplosionBehavior =
-        GunpowderBarrelExplosionBehavior(
-            DuskBlockTags.BLUNDERBOMB_DESTROYS,
-            DuskEntityTypeTags.GUNPOWDER_BARREL_DOES_NOT_DAMAGE,
-            explosionKnockback,
-            1f
-        )
+    private val explosionBehaviorPostDimensionChange: SpecialExplosionBehavior = SpecialExplosionBehavior(
+        DuskBlockTags.BLUNDERBOMB_DESTROYS,
+        DuskEntityTypeTags.GUNPOWDER_BARREL_DOES_NOT_DAMAGE,
+        explosionKnockback,
+        (explosionPower * 8).toFloat()
+    )
 
     init {
         this.inanimate = false
@@ -53,8 +52,8 @@ class GunpowderBarrelEntity(entityType: EntityType<out GunpowderBarrelEntity>, w
         igniter: LivingEntity?
     ) : this(DuskEntities.GUNPOWDER_BARREL, world) {
         this.setPosition(x, y, z)
-        val d = world.random.nextDouble() * 6.2831854820251465
-        this.setVelocity(-sin(d) * 0.02, 0.20000000298023224, -cos(d) * 0.02)
+        val d = world.random.nextDouble() * 6.283
+        this.setVelocity(-sin(d) * 0.02, 0.2, -cos(d) * 0.02)
         this.fuse = DEFAULT_FUSE
         this.prevX = x
         this.prevY = y

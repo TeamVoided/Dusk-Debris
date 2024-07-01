@@ -6,3 +6,6 @@ mutable field net/minecraft/data/client/model/BlockStateModelGenerator sandstone
 accessible method net/minecraft/block/sign/SignType register (Lnet/minecraft/block/sign/SignType;)Lnet/minecraft/block/sign/SignType;
 accessible field net/minecraft/entity/Entity random Lnet/minecraft/util/random/RandomGenerator;
 accessible method net/minecraft/data/client/model/Models block (Ljava/lang/String;[Lnet/minecraft/data/client/model/TextureKey;)Lnet/minecraft/data/client/model/Model;
+accessible class net/minecraft/client/particle/ParticleManager$SpriteAwareFactory
+accessible method net/minecraft/client/particle/WaterSuspendParticle <init> (Lnet/minecraft/client/world/ClientWorld;Lnet/minecraft/client/particle/SpriteProvider;DDDDDD)V
+accessible field net/minecraft/client/particle/Particle gravityStrength F

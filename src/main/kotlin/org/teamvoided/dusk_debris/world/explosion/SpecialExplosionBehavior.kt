@@ -11,12 +11,13 @@ import net.minecraft.world.BlockView
 import net.minecraft.world.explosion.Explosion
 import net.minecraft.world.explosion.ExplosionBehavior
 import java.util.*
+import kotlin.math.sqrt
 
-open class GunpowderBarrelExplosionBehavior(
+open class SpecialExplosionBehavior(
     private val destroyCondition: TagKey<Block>,
     private val damageCondition: TagKey<EntityType<*>>,
     private val knockbackMultiplier: Float,
-    private val damageMultiplier: Float
+    private val maxDamage: Float
 ) : ExplosionBehavior() {
 
 //    fun SpecialExplosionBehavior(destroyTag: TagKey<Block>, damageTag: TagKey<EntityType<*>>) {
@@ -55,6 +56,15 @@ open class GunpowderBarrelExplosionBehavior(
     }
 
     override fun calculateDamage(explosion: Explosion, entity: Entity): Float {
-        return damageMultiplier * super.calculateDamage(explosion, entity)
+        val range = explosion.power * 2.0f
+        val sourcePosition = explosion.position
+        val distance = sqrt(entity.squaredDistanceTo(sourcePosition)) / range.toDouble()
+        val exposeDist = (1.0 - distance) * Explosion.getExposure(sourcePosition, entity).toDouble()
+        return ((exposeDist * exposeDist + exposeDist) / 2.0 * maxDamage).toFloat()
     }
+//    power is range
+
+
+//    this is a gradual before steep drop off, instead of steep then gradual
+//    return (-(exposedDistance * exposedDistance - (2 * exposedDistance)) * maxDamage).toFloat()
 }

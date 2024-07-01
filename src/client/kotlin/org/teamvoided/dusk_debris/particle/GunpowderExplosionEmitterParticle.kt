@@ -6,6 +6,7 @@ import net.minecraft.client.particle.NoRenderParticle
 import net.minecraft.client.particle.Particle
 import net.minecraft.client.particle.ParticleFactory
 import net.minecraft.client.world.ClientWorld
+import net.minecraft.util.math.MathHelper
 import org.teamvoided.dusk_debris.init.DuskParticles
 import kotlin.math.sqrt
 
@@ -14,20 +15,24 @@ class GunpowderExplosionEmitterParticle(world: ClientWorld, x: Double, y: Double
     NoRenderParticle(world, x, y, z, 0.0, 0.0, 0.0) {
 
     init {
-        this.maxAge = 10
+        this.maxAge = 20
     }
 
     override fun tick() {
-        for (i in 0..radius.toInt()) {
-            val x = (random.nextDouble() - random.nextDouble())
-            val y = (random.nextDouble() - random.nextDouble())
-            val z = (random.nextDouble() - random.nextDouble())
+        for (i in 0..(radius.toInt() * radius.toInt()) / 2) {
+            val randInRadius = MathHelper.sqrt(random.nextFloat()) * radius
+            var x = (random.nextDouble() - random.nextDouble())
+            var y = (random.nextDouble() - random.nextDouble())
+            var z = (random.nextDouble() - random.nextDouble())
             val a = sqrt(x * x + y * y + z * z)
+            x = this.x + (randInRadius * x) / a
+            y = this.y + (randInRadius * y) / a
+            z = this.z + (randInRadius * z) / a
             world.addParticle(
                 DuskParticles.GUNPOWDER_EXPLOSION_SMOKE,
-                this.x + (((radius) * x) / a),
-                this.y + (((radius) * y) / a),
-                this.z + (((radius) * z) / a),
+                x,
+                y,
+                z,
                 0.0,
                 0.0,
                 0.0
