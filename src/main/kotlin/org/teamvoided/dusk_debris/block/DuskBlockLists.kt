@@ -12,7 +12,10 @@ object DuskBlockLists {
     )
     val THROWABLE_BLOCK_LIST = listOf(
         DuskBlocks.BLUNDERBOMB_BLOCK,
-        DuskBlocks.FIREBOMB_BLOCK
+        DuskBlocks.FIREBOMB_BLOCK,
+        DuskBlocks.POCKETPOISON_BLOCK,
+        DuskBlocks.BLINDBOMB_BLOCK,
+        DuskBlocks.SMOKEBOMB_BLOCK
     )
     val RIBBON_BLOCKS_LIST = listOf(
         DuskBlocks.LIGHT_BLUE_RIBBON

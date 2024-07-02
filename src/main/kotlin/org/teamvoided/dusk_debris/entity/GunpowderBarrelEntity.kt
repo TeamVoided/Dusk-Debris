@@ -9,7 +9,6 @@ import net.minecraft.nbt.NbtCompound
 import net.minecraft.nbt.NbtHelper
 import net.minecraft.particle.ParticleTypes
 import net.minecraft.registry.RegistryKeys
-import net.minecraft.sound.SoundEvents
 import net.minecraft.unmapped.C_zbvyjshu
 import net.minecraft.world.World
 import net.minecraft.world.World.ExplosionSourceType
@@ -18,7 +17,8 @@ import org.teamvoided.dusk_debris.init.DuskEntities
 import org.teamvoided.dusk_debris.data.DuskBlockTags
 import org.teamvoided.dusk_debris.data.DuskEntityTypeTags
 import org.teamvoided.dusk_debris.init.DuskBlocks
-import org.teamvoided.dusk_debris.particle.FloatInputParticleEffect
+import org.teamvoided.dusk_debris.init.DuskSoundEvents
+import org.teamvoided.dusk_debris.particle.GunpowderExplosionEmitterParticleEffect
 import org.teamvoided.dusk_debris.world.explosion.SpecialExplosionBehavior
 import kotlin.math.cos
 import kotlin.math.sin
@@ -66,6 +66,7 @@ class GunpowderBarrelEntity(entityType: EntityType<out GunpowderBarrelEntity>, w
         builder.add(EXPLOSION_POWER, DEFAULT_EXPLOSION_POWER)
         builder.add(EXPLOSION_KNOCKBACK, DEFAULT_EXPLOSION_KNOCKBACK)
         builder.add(BLOCK_STATE, DuskBlocks.GUNPOWDER_BARREL.defaultState)
+        builder.add(PARTICLE_COLOR, DEFAULT_PARTICLE_COLOR)
     }
 
     override fun getMoveEffect(): MoveEffect {
@@ -130,8 +131,8 @@ class GunpowderBarrelEntity(entityType: EntityType<out GunpowderBarrelEntity>, w
             false,
             ExplosionSourceType.TNT,
             ParticleTypes.SMOKE,
-            FloatInputParticleEffect(explosionPower.toFloat()),
-            SoundEvents.ENTITY_GENERIC_EXPLODE
+            GunpowderExplosionEmitterParticleEffect(explosionPower.toFloat(), color),
+            DuskSoundEvents.BLOCK_GUNPOWDER_BARREL_EXPLODE
         )
     }
 
@@ -152,10 +153,11 @@ class GunpowderBarrelEntity(entityType: EntityType<out GunpowderBarrelEntity>, w
         }
     }
 
-    fun setProperties(power: Int, knockback: Float, blockState: BlockState) {
+    fun setProperties(power: Int, knockback: Float, blockState: BlockState, color: Int) {
         this.explosionPower = power
         this.explosionKnockback = knockback
         this.blockState = blockState
+        this.color = color
     }
 
     override fun getOwner(): LivingEntity? {
@@ -189,6 +191,11 @@ class GunpowderBarrelEntity(entityType: EntityType<out GunpowderBarrelEntity>, w
         set(state) {
             dataTracker.set(BLOCK_STATE, state)
         }
+    var color: Int
+        get() = dataTracker.get(PARTICLE_COLOR)
+        set(color) {
+            dataTracker.set(PARTICLE_COLOR, color)
+        }
 
     private fun hasTraveledDimensions(bl: Boolean) {
         this.passedThoughPortal = bl
@@ -211,9 +218,12 @@ class GunpowderBarrelEntity(entityType: EntityType<out GunpowderBarrelEntity>, w
             DataTracker.registerData(GunpowderBarrelEntity::class.java, TrackedDataHandlerRegistry.FLOAT)
         private val BLOCK_STATE: TrackedData<BlockState> =
             DataTracker.registerData(GunpowderBarrelEntity::class.java, TrackedDataHandlerRegistry.BLOCK_STATE)
+        private val PARTICLE_COLOR: TrackedData<Int> =
+            DataTracker.registerData(GunpowderBarrelEntity::class.java, TrackedDataHandlerRegistry.INTEGER)
         private const val DEFAULT_FUSE = 100
         private const val DEFAULT_EXPLOSION_POWER = 4
         private const val DEFAULT_EXPLOSION_KNOCKBACK = 1f
+        private const val DEFAULT_PARTICLE_COLOR = 0xffffff
         private const val BLOCK_STATE_KEY = "block_state"
         const val FUSE_KEY: String = "fuse"
         const val EXPLOSION_KNOCKBACK_KEY: String = "explosion_knockback_multiplier"

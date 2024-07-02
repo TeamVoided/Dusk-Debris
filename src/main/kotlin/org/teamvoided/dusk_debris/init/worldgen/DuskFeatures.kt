@@ -9,12 +9,12 @@ import net.minecraft.world.gen.feature.HugeMushroomFeatureConfig
 import net.minecraft.world.gen.feature.HugeRedMushroomFeature
 import org.teamvoided.dusk_debris.world.gen.configured_feature.config.HugeNethershroomFeatureConfig
 import org.teamvoided.dusk_debris.world.gen.configured_feature.HugeBlueNethershroomFeature
+import org.teamvoided.dusk_debris.world.gen.configured_feature.HugePurpleNethershroomFeature
 
 object DuskFeatures {
 
-    val HUGE_BLUE_NETHERSHROOM = register("huge_blue_nethershroom", HugeBlueNethershroomFeature(
-        HugeNethershroomFeatureConfig.CODEC))
-    val HUGE_RED_MUSHROOM = register("huge_red_mushroom", HugeRedMushroomFeature(HugeMushroomFeatureConfig.CODEC))
+    val HUGE_BLUE_NETHERSHROOM = register("huge_blue_nethershroom", HugeBlueNethershroomFeature(HugeNethershroomFeatureConfig.CODEC))
+    val HUGE_PURPLE_NETHERSHROOM = register("huge_purple_nethershroom", HugePurpleNethershroomFeature(HugeNethershroomFeatureConfig.CODEC))
 
 
     fun init() {}

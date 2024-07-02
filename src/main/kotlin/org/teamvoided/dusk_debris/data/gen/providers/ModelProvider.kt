@@ -37,6 +37,7 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
         DuskBlockLists.blockFamily.forEach {
             gen.registerCubeAllModelTexturePool(it.baseBlock).family(it)
         }
+        gen.registerSimpleCubeAll(DuskBlocks.PAPER_BLOCK)
 
         gen.registerNethershroom(DuskBlocks.BLUE_NETHERSHROOM)
         gen.registerNethershroomBlock(DuskBlocks.BLUE_NETHERSHROOM_BLOCK)
@@ -53,6 +54,7 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
         gen.registerLog(DuskBlocks.STRIPPED_CYPRESS_LOG)
             .log(DuskBlocks.STRIPPED_CYPRESS_LOG)
             .wood(DuskBlocks.STRIPPED_CYPRESS_WOOD)
+
 
         gen.registerSimpleCubeAll(DuskBlocks.VOLCANIC_SAND)
         gen.registerDustable(DuskBlocks.SUSPICIOUS_VOLCANIC_SAND)

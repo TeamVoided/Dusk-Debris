@@ -11,6 +11,7 @@ import org.teamvoided.dusk_debris.entity.BoxAreaEffectCloud
 import org.teamvoided.dusk_debris.entity.throwable_bomb.BlunderbombEntity
 import org.teamvoided.dusk_debris.entity.throwable_bomb.BonecallerEntity
 import org.teamvoided.dusk_debris.entity.throwable_bomb.FirebombEntity
+import org.teamvoided.dusk_debris.entity.throwable_bomb.NethershroomThrowableEntity
 
 object DuskEntities {
     //        val CRAB = register(
@@ -31,21 +32,12 @@ object DuskEntities {
 //            .maxTrackingRange(4)
 //            .trackingTickInterval(10)
     )
-    val BLUNDERBOMB = register(
-        "blunderbomb",
-        EntityType.Builder.create(EntityType.EntityFactory(::BlunderbombEntity), SpawnGroup.MISC)
-            .setDimensions(0.33f, 0.33f)
-            .maxTrackingRange(4)
-            .trackingTickInterval(10)
-    )
-    val FIREBOMB = register(
-        "firebomb",
-        EntityType.Builder.create(EntityType.EntityFactory(::FirebombEntity), SpawnGroup.MISC)
-            .setDimensions(0.33f, 0.33f)
-            .maxTrackingRange(4)
-            .trackingTickInterval(10)
-    )
+    val BLUNDERBOMB = throwableBomb("blunderbomb", ::BlunderbombEntity)
+    val FIREBOMB = throwableBomb("firebomb", ::FirebombEntity)
     val BONECALLER = throwableBomb("bonecaller", ::BonecallerEntity)
+    val POCKETPOISON = throwableBomb("pocketpoison", ::NethershroomThrowableEntity)
+    val BLINDBOMB = throwableBomb("blindbomb", ::NethershroomThrowableEntity)
+    val SMOKEBOMB = throwableBomb("smokebomb", ::NethershroomThrowableEntity)
 
     fun <T : Entity> throwableBomb(id: String, factory: EntityType.EntityFactory<T>): EntityType<T> {
         return register(

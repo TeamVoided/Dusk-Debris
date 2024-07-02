@@ -6,10 +6,9 @@ import net.minecraft.client.particle.*
 import net.minecraft.client.world.ClientWorld
 import net.minecraft.particle.DefaultParticleType
 import net.minecraft.particle.ParticleTypes
-import kotlin.math.max
 
 @Environment(EnvType.CLIENT)
-class BlunderbombEmitterParticle internal constructor(
+class BlunderbombParticle internal constructor(
     world: ClientWorld,
     x: Double,
     y: Double,
@@ -79,7 +78,7 @@ class BlunderbombEmitterParticle internal constructor(
             h: Double,
             i: Double
         ): Particle {
-            val blunderbombParticle = BlunderbombEmitterParticle(world, d, e, f)
+            val blunderbombParticle = BlunderbombParticle(world, d, e, f)
             blunderbombParticle.setSprite(this.spriteProvider)
             return blunderbombParticle
         }

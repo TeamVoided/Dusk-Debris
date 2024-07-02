@@ -76,7 +76,7 @@ class FirebombEntity : AbstractThrwowableBombEntity {
     }
 
     override fun getDefaultItem(): Item {
-        return DuskItems.FIREBOMB
+        return DuskItems.FIREBOMB_ITEM
     }
 
     companion object {

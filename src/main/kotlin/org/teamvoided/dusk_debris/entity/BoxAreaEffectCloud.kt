@@ -33,7 +33,7 @@ class BoxAreaEffectCloud(entityType: EntityType<out BoxAreaEffectCloud>, world: 
                 i = 2
                 radius = 0.2f
             } else {
-                i = MathHelper.ceil((3.1415927f * setRadius * setRadius) / 2)
+                i = MathHelper.ceil((3.1415927f * setRadius * setRadius) / 5)
                 radius = setRadius
             }
 

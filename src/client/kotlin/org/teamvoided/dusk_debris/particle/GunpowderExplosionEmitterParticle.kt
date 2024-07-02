@@ -7,15 +7,15 @@ import net.minecraft.client.particle.Particle
 import net.minecraft.client.particle.ParticleFactory
 import net.minecraft.client.world.ClientWorld
 import net.minecraft.util.math.MathHelper
-import org.teamvoided.dusk_debris.init.DuskParticles
+import java.awt.Color
 import kotlin.math.sqrt
 
 @Environment(EnvType.CLIENT)
-class GunpowderExplosionEmitterParticle(world: ClientWorld, x: Double, y: Double, z: Double, val radius: Float) :
+class GunpowderExplosionEmitterParticle(world: ClientWorld, x: Double, y: Double, z: Double, val radius: Float, val color: Color) :
     NoRenderParticle(world, x, y, z, 0.0, 0.0, 0.0) {
 
     init {
-        this.maxAge = 20
+        this.maxAge = 10
     }
 
     override fun tick() {
@@ -29,7 +29,7 @@ class GunpowderExplosionEmitterParticle(world: ClientWorld, x: Double, y: Double
             y = this.y + (randInRadius * y) / a
             z = this.z + (randInRadius * z) / a
             world.addParticle(
-                DuskParticles.GUNPOWDER_EXPLOSION_SMOKE,
+                GunpowderExplosionSmokeParticleEffect(color),
                 x,
                 y,
                 z,
@@ -47,9 +47,9 @@ class GunpowderExplosionEmitterParticle(world: ClientWorld, x: Double, y: Double
     }
 
     @Environment(EnvType.CLIENT)
-    class Factory : ParticleFactory<FloatInputParticleEffect> {
+    class Factory : ParticleFactory<GunpowderExplosionEmitterParticleEffect> {
         override fun createParticle(
-            type: FloatInputParticleEffect,
+            type: GunpowderExplosionEmitterParticleEffect,
             world: ClientWorld,
             x: Double,
             y: Double,
@@ -58,7 +58,7 @@ class GunpowderExplosionEmitterParticle(world: ClientWorld, x: Double, y: Double
             velocityY: Double,
             velocityZ: Double
         ): Particle {
-            return GunpowderExplosionEmitterParticle(world, x, y, z, type.radius)
+            return GunpowderExplosionEmitterParticle(world, x, y, z, type.radius, type.color)
         }
     }
 

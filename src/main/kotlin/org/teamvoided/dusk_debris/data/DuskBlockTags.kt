@@ -7,6 +7,7 @@ import org.teamvoided.dusk_debris.DuskDebris.id
 
 object DuskBlockTags {
     val TEST = create("test")
+    val THROWABLE_BLOCK = create("throwable_block")
     val FIREBOMB_DESTROYS = create("firebomb_destroys")
     val BLUNDERBOMB_DESTROYS = create("blunderbomb_destroys")
     val GUNPOWDER_BARREL_DESTROYS = create("gunpowder_barrel_destroys")

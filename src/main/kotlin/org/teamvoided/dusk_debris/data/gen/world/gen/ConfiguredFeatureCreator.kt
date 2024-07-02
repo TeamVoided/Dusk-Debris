@@ -31,12 +31,36 @@ object ConfiguredFeatureCreator {
                 UniformIntProvider.create(5, 10),
                 BlockStateProvider.of(
                     DuskBlocks.BLUE_NETHERSHROOM_BLOCK.defaultState
-                        .with(MushroomBlock.UP,true)
+                        .with(MushroomBlock.UP, true)
                         .with(MushroomBlock.DOWN, false)
                 ),
                 UniformIntProvider.create(2, 4),
                 UniformIntProvider.create(2, 5),
-                UniformIntProvider.create(0, 2)
+                UniformIntProvider.create(1, 3),
+                UniformIntProvider.create(1, 4)
+            )
+        )
+        c.registerConfiguredFeature(
+            DuskConfiguredFeatures.HUGE_PURPLE_NETHERSHROOM,
+            DuskFeatures.HUGE_PURPLE_NETHERSHROOM,
+            HugeNethershroomFeatureConfig(
+                DuskBlockTags.NETHERSHROOM_REPLACEABLE,
+                DuskBlockTags.NETHERSHROOM_IGNORE,
+                BlockStateProvider.of(
+                    DuskBlocks.NETHERSHROOM_STEM.defaultState
+                        .with(MushroomBlock.UP, false)
+                        .with(MushroomBlock.DOWN, false)
+                ),
+                UniformIntProvider.create(5, 10),
+                BlockStateProvider.of(
+                    DuskBlocks.PURPLE_NETHERSHROOM_BLOCK.defaultState
+                        .with(MushroomBlock.UP, true)
+                        .with(MushroomBlock.DOWN, false)
+                ),
+                UniformIntProvider.create(2, 4),
+                UniformIntProvider.create(2, 5),
+                UniformIntProvider.create(1, 3),
+                UniformIntProvider.create(1, 3)
             )
         )
 //        c.registerConfiguredFeature(

@@ -64,8 +64,4 @@ open class BonecallerEntity : AbstractThrwowableBombEntity {
             }
         }
     }
-
-    override fun getDefaultItem(): Item {
-        return DuskItems.BLUNDERBOMB
-    }
 }

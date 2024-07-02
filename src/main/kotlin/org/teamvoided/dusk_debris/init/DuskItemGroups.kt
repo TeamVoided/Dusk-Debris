@@ -11,7 +11,6 @@ import net.minecraft.registry.Registry
 import net.minecraft.registry.RegistryKey
 import net.minecraft.text.Text
 import org.teamvoided.dusk_debris.DuskDebris.id
-import org.teamvoided.dusk_debris.block.DuskBlockLists
 import kotlin.jvm.optionals.getOrNull
 
 
@@ -32,8 +31,12 @@ object DuskItemGroups {
                         ItemStack(DuskItems.GUNPOWDER_BARREL),
                         ItemStack(DuskItems.STRONGHOLD_GUNPOWDER_BARREL),
                         ItemStack(DuskItems.ANCIENT_BLACK_POWDER_BARREL),
-                        ItemStack(DuskItems.BLUNDERBOMB),
-                        ItemStack(DuskItems.FIREBOMB),
+                        ItemStack(DuskItems.BLUNDERBOMB_ITEM),
+                        ItemStack(DuskItems.FIREBOMB_ITEM),
+                        ItemStack(DuskItems.POCKETPOISON_ITEM),
+                        ItemStack(DuskItems.BLINDBOMB_ITEM),
+                        ItemStack(DuskItems.SMOKEBOMB_ITEM),
+
                         ItemStack(DuskItems.LIGHT_BLUE_RIBBON),
 
                         ItemStack(DuskItems.CYPRESS_LOG),

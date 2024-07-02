@@ -4,7 +4,19 @@
     "sounds": [
       {
         "name": "dusk_debris:blocks/nethershroom/squished",
-        "stream": true
+        "stream": true,
+        "volume": 0.5
+      }
+    ]
+  },
+  "block.nethershroom_block.squished": {
+    "category": "block",
+    "sounds": [
+      {
+        "name": "dusk_debris:blocks/nethershroom/squished",
+        "stream": true,
+        "volume": 0.5,
+        "pitch": 0.5
       }
     ]
   },
@@ -14,10 +26,37 @@
       {
         "name": "dusk_debris:blocks/nethershroom/explode_1",
         "attenuation_distance": 32,
-        "stream": true
+        "stream": true,
+        "volume": 0.3
       },
       {
         "name": "dusk_debris:blocks/nethershroom/explode_2",
+        "attenuation_distance": 32,
+        "stream": true,
+        "volume": 0.3
+      }
+    ]
+  },
+  "block.gunpowder_barrel.explode": {
+    "category": "block",
+    "sounds": [
+      {
+        "name": "dusk_debris:blocks/gunpowder_barrel/explode_1",
+        "attenuation_distance": 32,
+        "stream": true
+      },
+      {
+        "name": "dusk_debris:blocks/gunpowder_barrel/explode_2",
+        "attenuation_distance": 32,
+        "stream": true
+      },
+      {
+        "name": "dusk_debris:blocks/gunpowder_barrel/explode_3",
+        "attenuation_distance": 32,
+        "stream": true
+      },
+      {
+        "name": "dusk_debris:blocks/gunpowder_barrel/explode_4",
         "attenuation_distance": 32,
         "stream": true
       }

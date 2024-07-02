@@ -17,7 +17,8 @@ data class HugeNethershroomFeatureConfig(
     val capBlock: BlockStateProvider,
     val capRadius: IntProvider,
     val capHeight: IntProvider,
-    val capEdgeInletOffset: IntProvider
+    val capXZInletOffset: IntProvider,
+    val capYInletOffset: IntProvider
 ) : FeatureConfig {
     companion object {
         val CODEC: Codec<HugeNethershroomFeatureConfig> =
@@ -30,7 +31,8 @@ data class HugeNethershroomFeatureConfig(
                     BlockStateProvider.TYPE_CODEC.fieldOf("cap_block").forGetter { it.capBlock },
                     IntProvider.method_35004(1, 8).fieldOf("cap_radius").forGetter { it.capRadius },
                     IntProvider.method_35004(1, 16).fieldOf("cap_height").forGetter { it.capHeight },
-                    IntProvider.method_35004(0, 8).fieldOf("cap_edge_inlet_offset").forGetter { it.capEdgeInletOffset },
+                    IntProvider.method_35004(0, 8).fieldOf("cap_xz_inlet_offset").forGetter { it.capXZInletOffset },
+                    IntProvider.method_35004(0, 8).fieldOf("cap_y_inlet_offset").forGetter { it.capYInletOffset }
                 ).apply(instance, ::HugeNethershroomFeatureConfig)
             }
     }

@@ -18,10 +18,13 @@ import org.teamvoided.dusk_debris.DuskDebris.id
 import org.teamvoided.dusk_debris.block.*
 import org.teamvoided.dusk_debris.block.throwable_bomb.BlunderbombBlock
 import org.teamvoided.dusk_debris.block.throwable_bomb.FirebombBlock
+import org.teamvoided.dusk_debris.block.throwable_bomb.NethershroomThrowableBlock
 import org.teamvoided.dusk_debris.block.voided.sign.VoidCeilingHangingSignBlock
 import org.teamvoided.dusk_debris.block.voided.sign.VoidSignBlock
 import org.teamvoided.dusk_debris.block.voided.sign.VoidWallHangingSignBlock
 import org.teamvoided.dusk_debris.block.voided.sign.VoidWallSignBlock
+import org.teamvoided.dusk_debris.init.worldgen.DuskConfiguredFeatures
+import org.teamvoided.dusk_debris.particle.NethershroomSporeParticleEffect
 
 @Suppress("HasPlatformType", "MemberVisibilityCanBePrivate", "unused", "DEPRECATION")
 object DuskBlocks {
@@ -33,11 +36,20 @@ object DuskBlocks {
     val charredHangingSignId = id("entity/signs/hanging/charred")
     val cypressHangingSignId = id("entity/signs/hanging/cypress")
 
+    val blueNethershroomSmoke = NethershroomSporeParticleEffect(0x39A2DB)
+    val purpleNethershroomSmoke = NethershroomSporeParticleEffect(0x573AD8)
+    val smokebombSmoke = NethershroomSporeParticleEffect(0x7F7F7F)
+    val gunpowderBarrelColor = 0xF7C53B
+    val gunpowderBarrelBlueColor = 0x7FD4FF
+
     val BLUE_NETHERSHROOM = register(
         "blue_nethershroom",
         NethershroomPlantBlock(
             4,
+            DuskConfiguredFeatures.HUGE_BLUE_NETHERSHROOM,
+            blueNethershroomSmoke,
             StatusEffects.POISON,
+            true,
             AbstractBlock.Settings.create().mapColor(MapColor.LIGHT_BLUE).strength(0.1F)
                 .sounds(BlockSoundGroup.FUNGUS).noCollision()
         )
@@ -45,15 +57,22 @@ object DuskBlocks {
     val BLUE_NETHERSHROOM_BLOCK = register(
         "blue_nethershroom_block",
         NethershroomBlock(
+            4,
+            blueNethershroomSmoke,
+            StatusEffects.POISON,
+            true,
             AbstractBlock.Settings.create().mapColor(MapColor.LIGHT_BLUE).instrument(NoteBlockInstrument.BASS)
-                .strength(0.2f).sounds(BlockSoundGroup.WOOD)
+                .strength(0.2f).sounds(BlockSoundGroup.NETHER_WOOD)
         )
     )
     val PURPLE_NETHERSHROOM = register(
         "purple_nethershroom",
         NethershroomPlantBlock(
             16,
+            DuskConfiguredFeatures.HUGE_PURPLE_NETHERSHROOM,
+            purpleNethershroomSmoke,
             StatusEffects.BLINDNESS,
+            false,
             AbstractBlock.Settings.create().mapColor(MapColor.PURPLE).strength(0.1F)
                 .sounds(BlockSoundGroup.FUNGUS).noCollision()
         )
@@ -61,15 +80,19 @@ object DuskBlocks {
     val PURPLE_NETHERSHROOM_BLOCK = register(
         "purple_nethershroom_block",
         NethershroomBlock(
+            16,
+            purpleNethershroomSmoke,
+            StatusEffects.BLINDNESS,
+            false,
             AbstractBlock.Settings.create().mapColor(MapColor.PURPLE).instrument(NoteBlockInstrument.BASS)
-                .strength(0.2f).sounds(BlockSoundGroup.WOOD)
+                .strength(0.2f).sounds(BlockSoundGroup.NETHER_WOOD)
         )
     )
     val NETHERSHROOM_STEM = register(
         "nethershroom_stem",
         MushroomBlock(
             AbstractBlock.Settings.create().mapColor(MapColor.WOOL).instrument(NoteBlockInstrument.BASS).strength(0.2f)
-                .sounds(BlockSoundGroup.WOOD)
+                .sounds(BlockSoundGroup.NETHER_WOOD)
         )
     )
 
@@ -79,6 +102,7 @@ object DuskBlocks {
         GunpowderBarrelBlock(
             4,
             1f,
+            gunpowderBarrelColor,
             AbstractBlock.Settings.create().mapColor(Blocks.FIRE.defaultMapColor).instrument(NoteBlockInstrument.BASS)
                 .strength(1f, 0.0f).sounds(BlockSoundGroup.WOOD).lavaIgnitable().solidBlock(Blocks::nonSolid)
         )
@@ -88,6 +112,7 @@ object DuskBlocks {
         GunpowderBarrelBlock(
             8,
             2f,
+            gunpowderBarrelColor,
             AbstractBlock.Settings.create().mapColor(Blocks.FIRE.defaultMapColor).instrument(NoteBlockInstrument.BASS)
                 .strength(1.5f, 0.0f).sounds(BlockSoundGroup.WOOD).lavaIgnitable().solidBlock(Blocks::nonSolid)
         )
@@ -97,6 +122,7 @@ object DuskBlocks {
         GunpowderBarrelBlock(
             12,
             4f,
+            gunpowderBarrelBlueColor,
             AbstractBlock.Settings.create().mapColor(Blocks.SOUL_FIRE.defaultMapColor)
                 .instrument(NoteBlockInstrument.BASS).strength(2f, 0.0f).sounds(BlockSoundGroup.WOOD).lavaIgnitable()
                 .solidBlock(Blocks::nonSolid)
@@ -115,6 +141,39 @@ object DuskBlocks {
             AbstractBlock.Settings.create().mapColor(MapColor.FIRE).instrument(NoteBlockInstrument.HAT)
                 .strength(1f, 0.0f).sounds(BlockSoundGroup.GLASS).solidBlock(Blocks::nonSolid)
                 .luminance { _: BlockState -> 8 }
+        )
+    )
+    val POCKETPOISON_BLOCK = register(
+        "pocketpoison",
+        NethershroomThrowableBlock(
+            DuskEntities.POCKETPOISON,
+            blueNethershroomSmoke,
+            StatusEffects.POISON,
+            true,
+            AbstractBlock.Settings.create().mapColor(BLUE_NETHERSHROOM.defaultMapColor).instrument(NoteBlockInstrument.HAT)
+                .strength(1f, 0.0f).sounds(BlockSoundGroup.GLASS).solidBlock(Blocks::nonSolid)
+        )
+    )
+    val BLINDBOMB_BLOCK = register(
+        "blindbomb",
+        NethershroomThrowableBlock(
+            DuskEntities.BLINDBOMB,
+            purpleNethershroomSmoke,
+            StatusEffects.BLINDNESS,
+            false,
+            AbstractBlock.Settings.create().mapColor(BLUE_NETHERSHROOM.defaultMapColor).instrument(NoteBlockInstrument.HAT)
+                .strength(1f, 0.0f).sounds(BlockSoundGroup.GLASS).solidBlock(Blocks::nonSolid)
+        )
+    )
+    val SMOKEBOMB_BLOCK = register(
+        "smokebomb",
+        NethershroomThrowableBlock(
+            DuskEntities.SMOKEBOMB,
+            smokebombSmoke,
+            null,
+            false,
+            AbstractBlock.Settings.create().mapColor(BLUE_NETHERSHROOM.defaultMapColor).instrument(NoteBlockInstrument.HAT)
+                .strength(1f, 0.0f).sounds(BlockSoundGroup.GLASS).solidBlock(Blocks::nonSolid)
         )
     )
     val RED_RIBBON = register("red_ribbon", registerRibbon(Blocks.RED_WOOL.defaultMapColor))

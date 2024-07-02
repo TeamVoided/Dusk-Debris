@@ -7,6 +7,7 @@ import net.minecraft.item.Item
 import net.minecraft.particle.ItemStackParticleEffect
 import net.minecraft.particle.ParticleEffect
 import net.minecraft.particle.ParticleTypes
+import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.hit.EntityHitResult
 import net.minecraft.util.hit.HitResult
 import net.minecraft.world.World
@@ -65,23 +66,25 @@ open class AbstractThrwowableBombEntity : ThrownItemEntity {
 
     open fun explode() {
         val particleEffect = (ItemStackParticleEffect(ParticleTypes.ITEM, defaultItem.defaultStack))
-        val velocityMultiplier = 4
-        for (i in 0..14) {
-            world.addParticle(
-                particleEffect,
-                this.x,
-                this.y,
-                this.z,
-                random.nextDouble() * velocityMultiplier,
-                random.nextDouble() * velocityMultiplier,
-                random.nextDouble() * velocityMultiplier
-            )
-        }
+        val velocityMultiplier = 0.33
+        val serverWorld = this.world as ServerWorld
+        serverWorld.spawnParticles(
+            particleEffect,
+            this.x,
+            this.y,
+            this.z,
+            14,
+            0.0,
+            0.0,
+            0.0,
+            velocityMultiplier
+        )
+
 //        println("this should not occur, please check that you override the explode function")
     }
 
     override fun getDefaultItem(): Item {
         println("this should not occur, please check that you override the getDefaultItem function")
-        return DuskItems.BLUNDERBOMB
+        return DuskItems.BLUNDERBOMB_ITEM
     }
 }

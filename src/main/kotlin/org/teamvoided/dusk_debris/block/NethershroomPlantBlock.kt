@@ -1,19 +1,16 @@
 package org.teamvoided.dusk_debris.block
 
 import com.mojang.serialization.MapCodec
-import net.minecraft.block.AbstractPlantBlock
-import net.minecraft.block.Block
-import net.minecraft.block.BlockState
-import net.minecraft.block.ShapeContext
-import net.minecraft.component.type.PotionContentsComponent
+import net.minecraft.block.*
 import net.minecraft.entity.Entity
 import net.minecraft.entity.effect.StatusEffect
 import net.minecraft.entity.effect.StatusEffectInstance
 import net.minecraft.entity.effect.StatusEffects
 import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.particle.ParticleTypes
-import net.minecraft.potion.Potion
+import net.minecraft.particle.ParticleEffect
 import net.minecraft.registry.Holder
+import net.minecraft.registry.RegistryKey
+import net.minecraft.registry.RegistryKeys
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.sound.SoundCategory
 import net.minecraft.state.StateManager
@@ -24,14 +21,26 @@ import net.minecraft.util.shape.VoxelShape
 import net.minecraft.world.BlockView
 import net.minecraft.world.GameRules
 import net.minecraft.world.World
-import org.teamvoided.dusk_debris.init.DuskEntities
+import net.minecraft.world.WorldView
+import net.minecraft.world.gen.feature.ConfiguredFeature
 import org.teamvoided.dusk_debris.data.DuskBlockTags
 import org.teamvoided.dusk_debris.data.DuskEntityTypeTags
+import org.teamvoided.dusk_debris.init.DuskEntities
 import org.teamvoided.dusk_debris.init.DuskSoundEvents
+import org.teamvoided.dusk_debris.init.worldgen.DuskConfiguredFeatures
+import org.teamvoided.dusk_debris.particle.NethershroomSporeParticleEffect
+import java.util.*
 import kotlin.random.Random
 
-class NethershroomPlantBlock(val delay: Int, val statusEffect: Holder<StatusEffect>, settings: Settings) :
-    AbstractPlantBlock(settings) {
+class NethershroomPlantBlock(
+    val delay: Int,
+    val feature: RegistryKey<ConfiguredFeature<*, *>>,
+    val particle: ParticleEffect,
+    val statusEffect: Holder<StatusEffect>,
+    val hasDoubleEffect: Boolean,
+    settings: Settings
+) :
+    AbstractPlantBlock(settings), Fertilizable {
 
     public override fun getCodec(): MapCodec<NethershroomPlantBlock> {
         return CODEC
@@ -55,7 +64,7 @@ class NethershroomPlantBlock(val delay: Int, val statusEffect: Holder<StatusEffe
     }
 
     override fun onEntityCollision(state: BlockState, world: World, pos: BlockPos, entity: Entity) {
-        if (!entity.isSneaking || entity.type.isIn(DuskEntityTypeTags.IS_NOT_AFFECTED_BY_NETHERSHROOM)) {
+        if (!state.get(SQUISHED) && !entity.isSneaking || entity.type.isIn(DuskEntityTypeTags.IS_NOT_AFFECTED_BY_NETHERSHROOM)) {
             if ((entity is PlayerEntity || world.gameRules.getBooleanValue(GameRules.DO_MOB_GRIEFING))) {
                 world.setBlockState(
                     pos,
@@ -70,7 +79,6 @@ class NethershroomPlantBlock(val delay: Int, val statusEffect: Holder<StatusEffe
                     1f,
                     0.9f + world.random.nextFloat() * 0.2f
                 )
-                //KEEP THIS VALUE THE SAME AS THE BLOCK FRAMERATE
                 world.scheduleBlockTick(pos, this, delay)
             }
         }
@@ -83,55 +91,53 @@ class NethershroomPlantBlock(val delay: Int, val statusEffect: Holder<StatusEffe
 
     override fun scheduledTick(state: BlockState, world: ServerWorld, pos: BlockPos, random: RandomGenerator) {
         if (state.get(SQUISHED)) {
-            explode(world, pos)
+            val dropChance = 0.2
+            world.breakBlock(pos, Random.nextDouble() <= dropChance)
+            explode(world, pos, particle, statusEffect, hasDoubleEffect)
         }
     }
 
-    private fun explode(world: World, pos: BlockPos) {
-        val dropChance = 0.2
-        world.breakBlock(pos, Random.nextDouble() <= dropChance)
-        world.playSound(
-            null,
-            pos,
-            DuskSoundEvents.BLOCK_NETHERSHROOM_EXPLODE,
-            SoundCategory.BLOCKS,
-            1f,
-            0.9f + world.random.nextFloat() * 0.2f
-        )
-        val poisonCloud = DuskEntities.BOX_AREA_EFFECT_CLOUD.create(world)
-        if (poisonCloud != null) {
-            poisonCloud.particleType = ParticleTypes.SOUL_FIRE_FLAME
-            poisonCloud.setPotionContents(
-                PotionContentsComponent(
-                    Holder.createDirect(
-                        Potion(
-                            StatusEffectInstance(
-                                statusEffect,
-                                900
-                            ),
-                            StatusEffectInstance(
-                                statusEffect,
-                                40,
-                                1
-                            )
-                        )
-                    )
+    override fun isFertilizable(world: WorldView, pos: BlockPos, state: BlockState): Boolean {
+        return true
+    }
+
+    override fun canFertilize(world: World, random: RandomGenerator, pos: BlockPos, state: BlockState): Boolean {
+        return random.nextFloat().toDouble() < 0.4
+    }
+
+    override fun fertilize(world: ServerWorld, random: RandomGenerator, pos: BlockPos, state: BlockState) {
+        this.trySpawningBigNethershroom(world, pos, state, random)
+    }
+
+    fun trySpawningBigNethershroom(
+        world: ServerWorld,
+        pos: BlockPos,
+        state: BlockState,
+        random: RandomGenerator
+    ): Boolean {
+        val optional: Optional<out Holder<ConfiguredFeature<*, *>>> =
+            world.registryManager.get(RegistryKeys.CONFIGURED_FEATURE).getHolder(
+                this.feature
+            )
+        if (optional.isEmpty) {
+            return false
+        } else {
+            world.removeBlock(pos, false)
+            if (((optional.get() as Holder<*>).value() as ConfiguredFeature<*, *>).generate(
+                    world,
+                    world.chunkManager.chunkGenerator,
+                    random,
+                    pos
                 )
-            )
-            poisonCloud.radius = 4.0f
-            poisonCloud.duration = 700
-            poisonCloud.waitTime = 10
-            poisonCloud.radiusGrowth = -poisonCloud.radius / (poisonCloud.duration.toFloat() * 2)
-            poisonCloud.refreshPositionAndAngles(
-                pos.x.toDouble() + 0.5,
-                pos.y.toDouble() + 1 - ((3 * poisonCloud.radius) / 4),
-                pos.z.toDouble() + 0.5,
-                0.0f,
-                0.0f
-            )
-            world.spawnEntity(poisonCloud)
+            ) {
+                return true
+            } else {
+                world.setBlockState(pos, state, 3)
+                return false
+            }
         }
     }
+
 //    private fun applyLingeringPotion(potionContents: PotionContentsComponent) {
 //        val areaEffectCloudEntity = AreaEffectCloudEntity(this.getWorld(), this.getX(), this.getY(), this.getZ())
 //        val var4: Entity = this.getOwner()
@@ -151,10 +157,80 @@ class NethershroomPlantBlock(val delay: Int, val statusEffect: Holder<StatusEffe
         val CODEC: MapCodec<NethershroomPlantBlock> = createCodec { settings: Settings ->
             NethershroomPlantBlock(
                 20,
+                DuskConfiguredFeatures.HUGE_BLUE_NETHERSHROOM,
+                NethershroomSporeParticleEffect(0xffffff),
                 StatusEffects.POISON,
+                false,
                 settings
             )
         }
+
+        fun explode(world: World, pos: BlockPos, particle: ParticleEffect, statusEffect: Holder<StatusEffect>, hasDoubleEffect: Boolean) {
+            world.playSound(
+                null,
+                pos,
+                DuskSoundEvents.BLOCK_NETHERSHROOM_EXPLODE,
+                SoundCategory.BLOCKS,
+                1f,
+                0.9f + world.random.nextFloat() * 0.2f
+            )
+            val poisonCloud = DuskEntities.BOX_AREA_EFFECT_CLOUD.create(world)
+            if (poisonCloud != null) {
+                poisonCloud.particleType = particle
+                poisonCloud.addEffect(
+                    StatusEffectInstance(
+                        statusEffect,
+                        700
+                    )
+                )
+                if (hasDoubleEffect) poisonCloud.addEffect(
+                    StatusEffectInstance(
+                        statusEffect,
+                        50,
+                        1
+                    )
+                )
+                poisonCloud.radius = 4.0f
+                poisonCloud.duration = 700
+                poisonCloud.waitTime = 10
+                poisonCloud.radiusGrowth = -poisonCloud.radius / (poisonCloud.duration.toFloat() * 2)
+                poisonCloud.refreshPositionAndAngles(
+                    pos.x.toDouble() + 0.5,
+                    pos.y.toDouble() + 1 - ((3 * poisonCloud.radius) / 4),
+                    pos.z.toDouble() + 0.5,
+                    0.0f,
+                    0.0f
+                )
+                world.spawnEntity(poisonCloud)
+            }
+        }
+        fun explode(world: World, pos: BlockPos, particle: ParticleEffect, hasDoubleEffect: Boolean) {
+            world.playSound(
+                null,
+                pos,
+                DuskSoundEvents.BLOCK_NETHERSHROOM_EXPLODE,
+                SoundCategory.BLOCKS,
+                1f,
+                0.9f + world.random.nextFloat() * 0.2f
+            )
+            val poisonCloud = DuskEntities.BOX_AREA_EFFECT_CLOUD.create(world)
+            if (poisonCloud != null) {
+                poisonCloud.particleType = particle
+                poisonCloud.radius = 4.0f
+                poisonCloud.duration = 700
+                poisonCloud.waitTime = 10
+                poisonCloud.radiusGrowth = -poisonCloud.radius / (poisonCloud.duration.toFloat() * 2)
+                poisonCloud.refreshPositionAndAngles(
+                    pos.x.toDouble() + 0.5,
+                    pos.y.toDouble() + 1 - ((3 * poisonCloud.radius) / 4),
+                    pos.z.toDouble() + 0.5,
+                    0.0f,
+                    0.0f
+                )
+                world.spawnEntity(poisonCloud)
+            }
+        }
+
         private val SHAPE: VoxelShape = createCuboidShape(5.0, 0.0, 5.0, 11.0, 6.0, 11.0)
         var SQUISHED: BooleanProperty = BooleanProperty.of("squished")
     }

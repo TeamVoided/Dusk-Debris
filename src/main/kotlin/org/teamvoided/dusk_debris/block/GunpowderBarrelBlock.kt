@@ -29,7 +29,7 @@ import net.minecraft.world.event.GameEvent
 import net.minecraft.world.explosion.Explosion
 import org.teamvoided.dusk_debris.entity.GunpowderBarrelEntity
 
-class GunpowderBarrelBlock(val power: Int = 5, val knockbackMultiplier: Float = 1f, settings: Settings) :
+class GunpowderBarrelBlock(val power: Int = 5, val knockbackMultiplier: Float = 1f, val color: Int = 0xffffff, settings: Settings) :
     Block(settings) {
 
     public override fun getCodec(): MapCodec<GunpowderBarrelBlock> {
@@ -79,7 +79,8 @@ class GunpowderBarrelBlock(val power: Int = 5, val knockbackMultiplier: Float = 
             gunpowderBarrelEntity.setProperties(
                 this.power,
                 this.knockbackMultiplier,
-                this.defaultState
+                this.defaultState,
+                this.color
             )
             val fuse = gunpowderBarrelEntity.fuse
             gunpowderBarrelEntity.fuse = (world.random.nextInt(fuse / 5) + fuse / 10).toShort().toInt()
@@ -157,6 +158,7 @@ class GunpowderBarrelBlock(val power: Int = 5, val knockbackMultiplier: Float = 
             GunpowderBarrelBlock(
                 5,
                 1f,
+                0xffffff,
                 settings
             )
         }
@@ -181,7 +183,8 @@ class GunpowderBarrelBlock(val power: Int = 5, val knockbackMultiplier: Float = 
                 gunpowderBarrelEntity.setProperties(
                     (world.getBlockState(pos).block as GunpowderBarrelBlock).power,
                     (world.getBlockState(pos).block as GunpowderBarrelBlock).knockbackMultiplier,
-                    world.getBlockState(pos)
+                    world.getBlockState(pos),
+                    (world.getBlockState(pos).block as GunpowderBarrelBlock).color,
                 )
                 world.spawnEntity(gunpowderBarrelEntity)
                 world.playSound(

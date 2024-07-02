@@ -5,6 +5,7 @@ import net.minecraft.block.dispenser.DispenserBlock
 import net.minecraft.block.dispenser.ItemDispenserBehavior
 import net.minecraft.entity.Entity
 import net.minecraft.entity.LivingEntity
+import net.minecraft.entity.effect.StatusEffects
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.*
 import net.minecraft.registry.Registries
@@ -15,11 +16,11 @@ import net.minecraft.util.math.BlockPointer
 import net.minecraft.world.World
 import net.minecraft.world.event.GameEvent
 import org.teamvoided.dusk_debris.DuskDebris.id
-import org.teamvoided.dusk_debris.block.DuskBlockLists
 import org.teamvoided.dusk_debris.block.GunpowderBarrelBlock
 import org.teamvoided.dusk_debris.entity.GunpowderBarrelEntity
 import org.teamvoided.dusk_debris.item.throwable_bomb.BlunderbombItem
 import org.teamvoided.dusk_debris.item.throwable_bomb.FirebombItem
+import org.teamvoided.dusk_debris.item.throwable_bomb.NethershroomThrowableItem
 
 
 @Suppress("unused", "MemberVisibilityCanBePrivate")
@@ -28,14 +29,56 @@ object DuskItems {
     val BLUE_NETHERSHROOM = register("blue_nethershroom", BlockItem(DuskBlocks.BLUE_NETHERSHROOM))
     val BLUE_NETHERSHROOM_BLOCK = register("blue_nethershroom_block", BlockItem(DuskBlocks.BLUE_NETHERSHROOM_BLOCK))
     val PURPLE_NETHERSHROOM = register("purple_nethershroom", BlockItem(DuskBlocks.PURPLE_NETHERSHROOM))
-    val PURPLE_NETHERSHROOM_BLOCK = register("purple_nethershroom_block", BlockItem(DuskBlocks.PURPLE_NETHERSHROOM_BLOCK))
+    val PURPLE_NETHERSHROOM_BLOCK =
+        register("purple_nethershroom_block", BlockItem(DuskBlocks.PURPLE_NETHERSHROOM_BLOCK))
     val NETHERSHROOM_STEM = register("nethershroom_stem", BlockItem(DuskBlocks.NETHERSHROOM_STEM))
 
     val GUNPOWDER_BARREL = register("gunpowder_barrel", BlockItem(DuskBlocks.GUNPOWDER_BARREL))
-    val STRONGHOLD_GUNPOWDER_BARREL = register("stronghold_gunpowder_barrel", BlockItem(DuskBlocks.STRONGHOLD_GUNPOWDER_BARREL, Item.Settings().maxCount(16)))
-    val ANCIENT_BLACK_POWDER_BARREL = register("ancient_black_powder_barrel", BlockItem(DuskBlocks.ANCIENT_BLACK_POWDER_BARREL, Item.Settings().maxCount(1)))
-    val BLUNDERBOMB = register("blunderbomb", BlunderbombItem(DuskBlocks.BLUNDERBOMB_BLOCK, Item.Settings().maxCount(16)))
-    val FIREBOMB = register("firebomb", FirebombItem(DuskBlocks.FIREBOMB_BLOCK, Item.Settings().maxCount(16)))
+    val STRONGHOLD_GUNPOWDER_BARREL = register(
+        "stronghold_gunpowder_barrel",
+        BlockItem(DuskBlocks.STRONGHOLD_GUNPOWDER_BARREL, Item.Settings().maxCount(16))
+    )
+    val ANCIENT_BLACK_POWDER_BARREL = register(
+        "ancient_black_powder_barrel",
+        BlockItem(DuskBlocks.ANCIENT_BLACK_POWDER_BARREL, Item.Settings().maxCount(1))
+    )
+    val BLUNDERBOMB_ITEM =
+        register("blunderbomb", BlunderbombItem(DuskBlocks.BLUNDERBOMB_BLOCK, Item.Settings().maxCount(16)))
+    val FIREBOMB_ITEM = register("firebomb", FirebombItem(DuskBlocks.FIREBOMB_BLOCK, Item.Settings().maxCount(16)))
+    val POCKETPOISON_ITEM = register(
+        "pocketpoison",
+        NethershroomThrowableItem(
+            DuskBlocks.POCKETPOISON_BLOCK,
+            DuskEntities.POCKETPOISON,
+            DuskBlocks.blueNethershroomSmoke,
+            StatusEffects.POISON,
+            true,
+            Item.Settings().maxCount(1)
+        )
+    )
+    val BLINDBOMB_ITEM = register(
+        "blindbomb",
+        NethershroomThrowableItem(
+            DuskBlocks.BLINDBOMB_BLOCK,
+            DuskEntities.BLINDBOMB,
+            DuskBlocks.purpleNethershroomSmoke,
+            StatusEffects.BLINDNESS,
+            false,
+            Item.Settings().maxCount(1)
+        )
+    )
+    val SMOKEBOMB_ITEM = register(
+        "smokebomb",
+        NethershroomThrowableItem(
+            DuskBlocks.SMOKEBOMB_BLOCK,
+            DuskEntities.SMOKEBOMB,
+            DuskBlocks.smokebombSmoke,
+            null,
+            false,
+            Item.Settings().maxCount(1)
+        )
+    )
+
     val LIGHT_BLUE_RIBBON = register("light_blue_ribbon", BlockItem(DuskBlocks.LIGHT_BLUE_RIBBON, Item.Settings()))
 
     val PAPER_BLOCK = register("paper_block", BlockItem(DuskBlocks.PAPER_BLOCK))
@@ -116,46 +159,49 @@ object DuskItems {
 
 
     fun init() {
-        DispenserBlock.registerBehavior(BLUNDERBOMB)
-        DispenserBlock.registerBehavior(FIREBOMB)
+        DispenserBlock.registerBehavior(BLUNDERBOMB_ITEM)
+        DispenserBlock.registerBehavior(FIREBOMB_ITEM)
         registerGunpowderDispensedBehavior(DuskBlocks.GUNPOWDER_BARREL)
         registerGunpowderDispensedBehavior(DuskBlocks.STRONGHOLD_GUNPOWDER_BARREL)
         registerGunpowderDispensedBehavior(DuskBlocks.ANCIENT_BLACK_POWDER_BARREL)
     }
 
-    fun registerGunpowderDispensedBehavior(block: Block) = DispenserBlock.registerBehavior(block, object : ItemDispenserBehavior() {
-        override fun dispenseSilently(pointer: BlockPointer, stack: ItemStack): ItemStack {
-            val world: World = pointer.world()
-            val blockPos = pointer.pos().offset(pointer.state().get(DispenserBlock.FACING))
-            val explosiveEntity = GunpowderBarrelEntity(
-                world,
-                blockPos.x.toDouble() + 0.5,
-                blockPos.y.toDouble(),
-                blockPos.z.toDouble() + 0.5,
-                null as LivingEntity?
-            )
-            explosiveEntity.setProperties(
-                (block as GunpowderBarrelBlock).power,
-                (block).knockbackMultiplier,
-                block.defaultState
+    fun registerGunpowderDispensedBehavior(block: Block) =
+        DispenserBlock.registerBehavior(block, object : ItemDispenserBehavior() {
+            override fun dispenseSilently(pointer: BlockPointer, stack: ItemStack): ItemStack {
+                val world: World = pointer.world()
+                val blockPos = pointer.pos().offset(pointer.state().get(DispenserBlock.FACING))
+                val explosiveEntity = GunpowderBarrelEntity(
+                    world,
+                    blockPos.x.toDouble() + 0.5,
+                    blockPos.y.toDouble(),
+                    blockPos.z.toDouble() + 0.5,
+                    null as LivingEntity?
+                )
+                explosiveEntity.setProperties(
+                    (block as GunpowderBarrelBlock).power,
+                    (block).knockbackMultiplier,
+                    block.defaultState,
 //                world.getBlockState(blockPos) LMAO
-            )
-            world.spawnEntity(explosiveEntity)
-            world.playSound(
-                null as PlayerEntity?,
-                explosiveEntity.x,
-                explosiveEntity.y,
-                explosiveEntity.z,
-                SoundEvents.ENTITY_TNT_PRIMED,
-                SoundCategory.BLOCKS,
-                1.0f,
-                1.0f
-            )
-            world.emitGameEvent(null as Entity?, GameEvent.ENTITY_PLACE, blockPos)
-            stack.decrement(1)
-            return stack
-        }
-    })
+                    block.color
+                )
+                world.spawnEntity(explosiveEntity)
+                world.playSound(
+                    null as PlayerEntity?,
+                    explosiveEntity.x,
+                    explosiveEntity.y,
+                    explosiveEntity.z,
+                    SoundEvents.ENTITY_TNT_PRIMED,
+                    SoundCategory.BLOCKS,
+                    1.0f,
+                    1.0f
+                )
+                world.emitGameEvent(null as Entity?, GameEvent.ENTITY_PLACE, blockPos)
+                stack.decrement(1)
+                return stack
+            }
+        })
+
     fun register(id: String, item: Item): Item = Registry.register(Registries.ITEM, id(id), item)
 
     fun BlockItem(block: Block) = BlockItem(block, Item.Settings())

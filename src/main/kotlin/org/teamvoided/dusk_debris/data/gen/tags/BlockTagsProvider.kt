@@ -5,6 +5,7 @@ import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider
 import net.minecraft.block.Blocks
 import net.minecraft.registry.HolderLookup
 import net.minecraft.registry.tag.BlockTags
+import org.teamvoided.dusk_debris.block.DuskBlockLists.THROWABLE_BLOCK_LIST
 import org.teamvoided.dusk_debris.data.DuskBlockTags
 import org.teamvoided.dusk_debris.init.DuskBlocks
 import java.util.concurrent.CompletableFuture
@@ -18,6 +19,12 @@ class BlockTagsProvider(output: FabricDataOutput, registriesFuture: CompletableF
     }
 
     private fun duskTags() {
+        getOrCreateTagBuilder(DuskBlockTags.THROWABLE_BLOCK)
+            .add(DuskBlocks.BLUNDERBOMB_BLOCK)
+            .add(DuskBlocks.FIREBOMB_BLOCK)
+            .add(DuskBlocks.POCKETPOISON_BLOCK)
+            .add(DuskBlocks.BLINDBOMB_BLOCK)
+            .add(DuskBlocks.SMOKEBOMB_BLOCK)
         getOrCreateTagBuilder(DuskBlockTags.FIREBOMB_DESTROYS)
             .add(Blocks.TNT)
             .add(DuskBlocks.GUNPOWDER_BARREL)
@@ -25,8 +32,7 @@ class BlockTagsProvider(output: FabricDataOutput, registriesFuture: CompletableF
             .add(DuskBlocks.ANCIENT_BLACK_POWDER_BARREL)
         getOrCreateTagBuilder(DuskBlockTags.BLUNDERBOMB_DESTROYS)
             .addOptionalTag(DuskBlockTags.FIREBOMB_DESTROYS)
-            .add(DuskBlocks.BLUNDERBOMB_BLOCK)
-            .add(DuskBlocks.FIREBOMB_BLOCK)
+            .addOptionalTag(DuskBlockTags.THROWABLE_BLOCK)
         getOrCreateTagBuilder(DuskBlockTags.GUNPOWDER_BARREL_DESTROYS)
             .addOptionalTag(DuskBlockTags.BLUNDERBOMB_DESTROYS)
             .add(Blocks.NETHER_PORTAL)
@@ -40,6 +46,8 @@ class BlockTagsProvider(output: FabricDataOutput, registriesFuture: CompletableF
             .addOptionalTag(BlockTags.REPLACEABLE)
             .addOptionalTag(BlockTags.REPLACEABLE_BY_TREES)
             .addOptionalTag(BlockTags.WART_BLOCKS)
+            .add(DuskBlocks.BLUE_NETHERSHROOM_BLOCK)
+            .add(DuskBlocks.PURPLE_NETHERSHROOM_BLOCK)
             .add(Blocks.WEEPING_VINES_PLANT)
             .add(Blocks.WEEPING_VINES)
             .add(Blocks.TWISTING_VINES_PLANT)
@@ -50,6 +58,10 @@ class BlockTagsProvider(output: FabricDataOutput, registriesFuture: CompletableF
     }
 
     private fun vanillaTags() {
+        getOrCreateTagBuilder(BlockTags.REPLACEABLE_BY_TREES)
+            .add(DuskBlocks.BLUE_NETHERSHROOM)
+            .add(DuskBlocks.PURPLE_NETHERSHROOM)
+
         getOrCreateTagBuilder(BlockTags.SAND)
             .add(DuskBlocks.VOLCANIC_SAND)
             .add(DuskBlocks.SUSPICIOUS_VOLCANIC_SAND)

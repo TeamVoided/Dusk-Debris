@@ -5,6 +5,7 @@ import net.minecraft.entity.LivingEntity
 import net.minecraft.item.Item
 import net.minecraft.particle.ParticleEffect
 import net.minecraft.particle.ParticleTypes
+import net.minecraft.server.world.ServerWorld
 import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvents
 import net.minecraft.world.World
@@ -54,17 +55,18 @@ open class BlunderbombEntity : AbstractThrwowableBombEntity {
     override val trailingParticle: ParticleEffect = ParticleTypes.SMOKE
 
     override fun explode() {
-        for (i in 0..20) {
-            world.addParticle(
-                DuskParticles.BLUNDERBOMB_EMMITER,
-                this.pos.x,
-                this.pos.y,
-                this.pos.z,
-                0.0,
-                0.0,
-                0.0
-            )
-        }
+        val serverWorld = this.world as ServerWorld
+        serverWorld.spawnParticles(
+            DuskParticles.BLUNDERBOMB,
+            this.x,
+            this.y,
+            this.z,
+            20,
+            0.0,
+            0.0,
+            0.0,
+            1.0
+        )
         world.playSound(
             this,
             this.blockPos,
@@ -84,15 +86,15 @@ open class BlunderbombEntity : AbstractThrwowableBombEntity {
             DEFAULT_EXPLOSION_POWER,
             false,
             World.ExplosionSourceType.TNT,
-            DuskParticles.BLUNDERBOMB_EMMITER,
-            DuskParticles.BLUNDERBOMB_EMMITER,
+            DuskParticles.BLUNDERBOMB,
+            DuskParticles.BLUNDERBOMB,
             SoundEvents.BLOCK_RESPAWN_ANCHOR_DEPLETE
         )
         super.explode()
     }
 
     override fun getDefaultItem(): Item {
-        return DuskItems.BLUNDERBOMB
+        return DuskItems.BLUNDERBOMB_ITEM
     }
 
 

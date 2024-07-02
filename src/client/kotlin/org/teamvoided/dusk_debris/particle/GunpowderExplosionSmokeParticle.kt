@@ -4,7 +4,7 @@ import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import net.minecraft.client.particle.*
 import net.minecraft.client.world.ClientWorld
-import net.minecraft.particle.DefaultParticleType
+import java.awt.Color
 
 @Environment(EnvType.CLIENT)
 open class GunpowderExplosionSmokeParticle(
@@ -15,47 +15,51 @@ open class GunpowderExplosionSmokeParticle(
     velocityX: Double,
     velocityY: Double,
     velocityZ: Double,
-    spriteProvider: SpriteProvider,
-//    colorRed: Float,
-//    colorBlue: Float,
-//    colorGreen: Float
+    val color: Color
 ) :
     SpriteBillboardParticle(world, x, y, z) {
-    private val spriteProvider: SpriteProvider
 
     init {
         this.velocityY += Math.random() * 0.05
+        this.velocityX += (Math.random() - Math.random()) / 3
+        this.velocityZ += (Math.random() - Math.random()) / 3
         this.gravityStrength = 0f
-        this.spriteProvider = spriteProvider
-        val grayscaleColor = random.nextFloat() * 0.5f + 0.5f
-        this.colorRed = grayscaleColor
-        this.colorBlue = grayscaleColor
-        this.colorGreen = grayscaleColor
-        this.colorAlpha = 1f
+        this.colorRed = color.red / 255f
+        this.colorGreen = color.green / 255f
+        this.colorBlue = color.blue / 255f
         this.scale = 0.33f * (random.nextFloat() * random.nextFloat() * 6.0f + 1.0f)
-        this.maxAge = 60
-//        this.maxAge = ((random.nextFloat() * 80).toInt() + 60)
-        this.setSpriteForAge(spriteProvider)
+//        this.maxAge = 80
+        this.maxAge = ((random.nextFloat() * 80).toInt() + 60)
     }
 
     override fun getType(): ParticleTextureSheet {
-        return ParticleTextureSheet.PARTICLE_SHEET_OPAQUE
+        return ParticleTextureSheet.PARTICLE_SHEET_TRANSLUCENT
     }
 
     override fun tick() {
-        val multiplier = (maxAge - age) / maxAge.toFloat()
-        this.colorRed *= multiplier
-        this.colorBlue *= multiplier
-        this.colorGreen *= multiplier
-        this.colorAlpha *= multiplier
-        super.tick()
-        this.setSpriteForAge(this.spriteProvider)
+        val multiplier = -((this.age / this.maxAge.toFloat()) * (this.age / this.maxAge.toFloat())) * 0.8f + 1f
+        if (this.colorRed > 0.2) this.colorRed *= multiplier
+        if (this.colorGreen > 0.2) this.colorGreen *= multiplier
+        if (this.colorBlue > 0.2) this.colorBlue *= multiplier
+        this.colorAlpha *=
+            -((this.age / this.maxAge.toFloat()) * (this.age / this.maxAge.toFloat() * (this.age / this.maxAge.toFloat()))) + 1f
+        this.prevPosX = this.x
+        this.prevPosY = this.y
+        this.prevPosZ = this.z
+        if (age++ >= this.maxAge) {
+            this.markDead()
+        } else {
+            this.velocityX *= 0.75
+            this.velocityY *= 0.95
+            this.velocityZ *= 0.75
+            this.move(this.velocityX, this.velocityY, this.velocityZ)
+        }
     }
 
     @Environment(EnvType.CLIENT)
-    class Factory(private val spriteProvider: SpriteProvider) : ParticleFactory<DefaultParticleType> {
+    class Factory(private val spriteProvider: SpriteProvider) : ParticleFactory<GunpowderExplosionSmokeParticleEffect> {
         override fun createParticle(
-            defaultParticleType: DefaultParticleType,
+            type: GunpowderExplosionSmokeParticleEffect,
             world: ClientWorld,
             posX: Double,
             posY: Double,
@@ -64,7 +68,9 @@ open class GunpowderExplosionSmokeParticle(
             velY: Double,
             velZ: Double,
         ): Particle {
-            return GunpowderExplosionSmokeParticle(world, posX, posY, posZ, velX, velY, velZ, this.spriteProvider)
+            val particle = GunpowderExplosionSmokeParticle(world, posX, posY, posZ, velX, velY, velZ, type.color)
+            particle.setSprite(spriteProvider)
+            return particle
         }
     }
 }

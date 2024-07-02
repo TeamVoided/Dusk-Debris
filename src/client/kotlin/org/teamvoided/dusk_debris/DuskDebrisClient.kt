@@ -3,9 +3,6 @@ package org.teamvoided.dusk_debris
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap
 import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry
-import net.minecraft.client.particle.ParticleManager.SpriteAwareFactory
-import net.minecraft.client.particle.SpriteProvider
-import net.minecraft.client.particle.WaterSuspendParticle
 import net.minecraft.client.render.RenderLayer
 import net.minecraft.client.render.entity.EmptyEntityRenderer
 import net.minecraft.client.render.entity.FlyingItemEntityRenderer
@@ -15,9 +12,7 @@ import org.teamvoided.dusk_debris.entity.gunpowder_barrel.GunpowderBarrelEntityR
 import org.teamvoided.dusk_debris.init.DuskBlocks
 import org.teamvoided.dusk_debris.init.DuskEntities
 import org.teamvoided.dusk_debris.init.DuskParticles
-import org.teamvoided.dusk_debris.particle.BlunderbombEmitterParticle
-import org.teamvoided.dusk_debris.particle.GunpowderExplosionEmitterParticle
-import org.teamvoided.dusk_debris.particle.GunpowderExplosionSmokeParticle
+import org.teamvoided.dusk_debris.particle.*
 
 @Suppress("unused")
 object DuskDebrisClient {
@@ -37,24 +32,23 @@ object DuskDebrisClient {
         log.info("Hello from Client")
 
 
-//        ParticleFactoryRegistry.getInstance()
-//            .register(DuskParticles.BLUE_NETHERSHROOM_SPORE, WaterSuspendParticle::SporeBlossomAirFactory)
-//        ParticleFactoryRegistry.getInstance()
-//            .register(DuskParticles.PURPLE_NETHERSHROOM_SPORE, WaterSuspendParticle::NethershroomSporeAir)
+        ParticleFactoryRegistry.getInstance()
+            .register(DuskParticles.TOXIC_SMOKE_PARTICLE, ToxicSmokeParticle::Factory)
         ParticleFactoryRegistry.getInstance()
             .register(DuskParticles.GUNPOWDER_EXPLOSION_SMOKE, GunpowderExplosionSmokeParticle::Factory)
         ParticleFactoryRegistry.getInstance()
             .register(DuskParticles.GUNPOWDER_EXPLOSION_EMMITER, GunpowderExplosionEmitterParticle.Factory())
         ParticleFactoryRegistry.getInstance()
-            .register(DuskParticles.BLUNDERBOMB_EMMITER, BlunderbombEmitterParticle::Factory)
-        ParticleFactoryRegistry.getInstance()
-            .register(DuskParticles.BLUNDERBOMB_EMMITER, BlunderbombEmitterParticle::Factory)
+            .register(DuskParticles.BLUNDERBOMB, BlunderbombParticle::Factory)
 
         EntityRendererRegistry.register(DuskEntities.BOX_AREA_EFFECT_CLOUD, ::EmptyEntityRenderer)
         EntityRendererRegistry.register(DuskEntities.GUNPOWDER_BARREL, ::GunpowderBarrelEntityRenderer)
         EntityRendererRegistry.register(DuskEntities.BLUNDERBOMB, ::FlyingItemEntityRenderer)
         EntityRendererRegistry.register(DuskEntities.FIREBOMB, ::FlyingItemEntityRenderer)
         EntityRendererRegistry.register(DuskEntities.BONECALLER, ::FlyingItemEntityRenderer)
+        EntityRendererRegistry.register(DuskEntities.POCKETPOISON, ::FlyingItemEntityRenderer)
+        EntityRendererRegistry.register(DuskEntities.BLINDBOMB, ::FlyingItemEntityRenderer)
+        EntityRendererRegistry.register(DuskEntities.SMOKEBOMB, ::FlyingItemEntityRenderer)
 
         cutoutBlock.forEach {
             BlockRenderLayerMap.INSTANCE.putBlock(it, RenderLayer.getCutout())
