@@ -105,10 +105,10 @@ open class NethershroomThrowableEntity : AbstractThrwowableBombEntity {
             SoundEvents.BLOCK_GLASS_BREAK,
             SoundCategory.BLOCKS,
             0.7f,
-            0.9f + world.random.nextFloat() * 0.2f
+            0.7f + world.random.nextFloat() * 0.2f
         )
         if (statusEffect == null) {
-            NethershroomPlantBlock.explode(world, this.blockPos, this.particle, this.hasDoubleEffect)
+            NethershroomPlantBlock.explode(world, this.blockPos, this.particle)
         } else {
             NethershroomPlantBlock.explode(
                 world,
@@ -125,5 +125,4 @@ open class NethershroomThrowableEntity : AbstractThrwowableBombEntity {
         println(this.replaceItem)
         return Items.SOUL_LANTERN
     }
-
 }

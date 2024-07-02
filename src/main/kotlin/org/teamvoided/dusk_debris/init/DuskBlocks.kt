@@ -133,6 +133,7 @@ object DuskBlocks {
         BlunderbombBlock(
             AbstractBlock.Settings.create().mapColor(MapColor.FIRE).instrument(NoteBlockInstrument.HAT)
                 .strength(1f, 0.0f).sounds(BlockSoundGroup.GLASS).solidBlock(Blocks::nonSolid)
+                .pistonBehavior(PistonBehavior.DESTROY)
         )
     )
     val FIREBOMB_BLOCK = register(
@@ -140,7 +141,7 @@ object DuskBlocks {
         FirebombBlock(
             AbstractBlock.Settings.create().mapColor(MapColor.FIRE).instrument(NoteBlockInstrument.HAT)
                 .strength(1f, 0.0f).sounds(BlockSoundGroup.GLASS).solidBlock(Blocks::nonSolid)
-                .luminance { _: BlockState -> 8 }
+                .pistonBehavior(PistonBehavior.DESTROY).luminance { _: BlockState -> 8 }
         )
     )
     val POCKETPOISON_BLOCK = register(
@@ -150,8 +151,9 @@ object DuskBlocks {
             blueNethershroomSmoke,
             StatusEffects.POISON,
             true,
-            AbstractBlock.Settings.create().mapColor(BLUE_NETHERSHROOM.defaultMapColor).instrument(NoteBlockInstrument.HAT)
-                .strength(1f, 0.0f).sounds(BlockSoundGroup.GLASS).solidBlock(Blocks::nonSolid)
+            AbstractBlock.Settings.create().mapColor(BLUE_NETHERSHROOM.defaultMapColor).sounds(BlockSoundGroup.GLASS)
+                .instrument(NoteBlockInstrument.HAT).strength(1f, 0.0f).solidBlock(Blocks::nonSolid)
+                .pistonBehavior(PistonBehavior.DESTROY)
         )
     )
     val BLINDBOMB_BLOCK = register(
@@ -161,8 +163,9 @@ object DuskBlocks {
             purpleNethershroomSmoke,
             StatusEffects.BLINDNESS,
             false,
-            AbstractBlock.Settings.create().mapColor(BLUE_NETHERSHROOM.defaultMapColor).instrument(NoteBlockInstrument.HAT)
-                .strength(1f, 0.0f).sounds(BlockSoundGroup.GLASS).solidBlock(Blocks::nonSolid)
+            AbstractBlock.Settings.create().mapColor(BLUE_NETHERSHROOM.defaultMapColor).sounds(BlockSoundGroup.GLASS)
+                .instrument(NoteBlockInstrument.HAT).strength(1f, 0.0f).solidBlock(Blocks::nonSolid)
+                .pistonBehavior(PistonBehavior.DESTROY)
         )
     )
     val SMOKEBOMB_BLOCK = register(
@@ -172,7 +175,8 @@ object DuskBlocks {
             smokebombSmoke,
             null,
             false,
-            AbstractBlock.Settings.create().mapColor(BLUE_NETHERSHROOM.defaultMapColor).instrument(NoteBlockInstrument.HAT)
+            AbstractBlock.Settings.create().mapColor(BLUE_NETHERSHROOM.defaultMapColor)
+                .instrument(NoteBlockInstrument.HAT)
                 .strength(1f, 0.0f).sounds(BlockSoundGroup.GLASS).solidBlock(Blocks::nonSolid)
         )
     )

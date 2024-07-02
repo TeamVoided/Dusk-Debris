@@ -5,7 +5,7 @@
       {
         "name": "dusk_debris:blocks/nethershroom/squished",
         "stream": true,
-        "volume": 0.5
+        "volume": 0.75
       }
     ]
   },
@@ -15,8 +15,8 @@
       {
         "name": "dusk_debris:blocks/nethershroom/squished",
         "stream": true,
-        "volume": 0.5,
-        "pitch": 0.5
+        "volume": 0.75,
+        "pitch": 0.75
       }
     ]
   },
@@ -27,13 +27,13 @@
         "name": "dusk_debris:blocks/nethershroom/explode_1",
         "attenuation_distance": 32,
         "stream": true,
-        "volume": 0.3
+        "volume": 0.5
       },
       {
         "name": "dusk_debris:blocks/nethershroom/explode_2",
         "attenuation_distance": 32,
         "stream": true,
-        "volume": 0.3
+        "volume": 0.5
       }
     ]
   },

@@ -12,7 +12,7 @@ object DuskSoundEvents {
 //    val ENTITY_GENERIC_EXPLODE = registerHolder("entity.generic.explode")
 
     val BLOCK_NETHERSHROOM_EXPLODE = register("block.nethershroom.explode")
-    val BLOCK_NETHERSHROOM_SQUISHED = register("block.nethershroom.explode")
+    val BLOCK_NETHERSHROOM_SQUISHED = register("block.nethershroom.squished")
     val BLOCK_NETHERSHROOM_BLOCK_SQUISHED = register("block.nethershroom_block.squished")
     val BLOCK_GUNPOWDER_BARREL_EXPLODE = registerHolder("block.gunpowder_barrel.explode")
 

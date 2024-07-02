@@ -172,7 +172,7 @@ class NethershroomPlantBlock(
                 DuskSoundEvents.BLOCK_NETHERSHROOM_EXPLODE,
                 SoundCategory.BLOCKS,
                 1f,
-                0.9f + world.random.nextFloat() * 0.2f
+                0.8f + world.random.nextFloat() * 0.4f
             )
             val poisonCloud = DuskEntities.BOX_AREA_EFFECT_CLOUD.create(world)
             if (poisonCloud != null) {
@@ -204,7 +204,7 @@ class NethershroomPlantBlock(
                 world.spawnEntity(poisonCloud)
             }
         }
-        fun explode(world: World, pos: BlockPos, particle: ParticleEffect, hasDoubleEffect: Boolean) {
+        fun explode(world: World, pos: BlockPos, particle: ParticleEffect) {
             world.playSound(
                 null,
                 pos,
