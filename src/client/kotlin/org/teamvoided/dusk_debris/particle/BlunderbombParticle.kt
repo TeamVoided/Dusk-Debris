@@ -16,8 +16,7 @@ class BlunderbombParticle internal constructor(
 ) :
     SpriteBillboardParticle(world, x, y, z, 0.0, 0.0, 0.0) {
 
-    private val initialVelocity = 0.8
-    private val velocityChange = 0.9f
+    private val velocityChange = 0.99f
     private val extraParticle = ParticleTypes.SMOKE
 
     init {
@@ -25,13 +24,13 @@ class BlunderbombParticle internal constructor(
         this.velocityY = (random.nextFloat() - random.nextFloat()).toDouble()
         this.velocityZ = (random.nextFloat() - random.nextFloat()).toDouble()
         this.velocityY += (random.nextFloat() * 0.4f).toDouble()
-        this.gravityStrength = 0.75f
-        this.scale *= random.nextFloat() * 2.0f + 0.2f
+        this.gravityStrength = 1f
+//        this.scale *= random.nextFloat() * 0.6f + 0.5f
         this.maxAge = 20
     }
 
     override fun getType(): ParticleTextureSheet {
-        return ParticleTextureSheet.PARTICLE_SHEET_OPAQUE
+        return ParticleTextureSheet.NO_RENDER
     }
 
     public override fun getBrightness(tint: Float): Int {
@@ -41,14 +40,14 @@ class BlunderbombParticle internal constructor(
         return 240 or (k shl 16)
     }
 
-    override fun getSize(tickDelta: Float): Float {
-        val f = (age.toFloat() + tickDelta) / maxAge.toFloat()
-        return this.scale * (1.0f - f * f)
-    }
+//    override fun getSize(tickDelta: Float): Float {
+//        val f = (age.toFloat() + tickDelta) / maxAge.toFloat()
+//        return this.scale * (1.0f - f * f)
+//    }
 
     override fun tick() {
-        this.gravityStrength *= velocityChange
-        this.velocityMultiplier *= velocityChange
+        this.gravityStrength *= 0.9f
+        this.velocityMultiplier *= 0.975f
         super.tick()
         if (!this.dead) {
             val f = age.toFloat() / maxAge.toFloat()

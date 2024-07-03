@@ -7,6 +7,8 @@ import org.teamvoided.dusk_debris.DuskDebris.id
 
 object DuskBiomeTags {
     val TEST = create("test")
+    val CRIMSON = create("crimson")
+    val WARPED = create("warped")
 
     fun create(id: String): TagKey<Biome> = TagKey.of(RegistryKeys.BIOME, id(id))
 }

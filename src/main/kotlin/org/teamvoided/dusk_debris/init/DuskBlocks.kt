@@ -5,9 +5,7 @@ import net.minecraft.block.*
 import net.minecraft.block.Blocks.legacyStairsOf
 import net.minecraft.block.enums.NoteBlockInstrument
 import net.minecraft.block.piston.PistonBehavior
-import net.minecraft.entity.effect.StatusEffect
 import net.minecraft.entity.effect.StatusEffects
-import net.minecraft.potion.Potions
 import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
 import net.minecraft.sound.BlockSoundGroup
@@ -23,7 +21,7 @@ import org.teamvoided.dusk_debris.block.voided.sign.VoidCeilingHangingSignBlock
 import org.teamvoided.dusk_debris.block.voided.sign.VoidSignBlock
 import org.teamvoided.dusk_debris.block.voided.sign.VoidWallHangingSignBlock
 import org.teamvoided.dusk_debris.block.voided.sign.VoidWallSignBlock
-import org.teamvoided.dusk_debris.init.worldgen.DuskConfiguredFeatures
+import org.teamvoided.dusk_debris.data.DuskConfiguredFeatures
 import org.teamvoided.dusk_debris.particle.NethershroomSporeParticleEffect
 
 @Suppress("HasPlatformType", "MemberVisibilityCanBePrivate", "unused", "DEPRECATION")
@@ -97,6 +95,13 @@ object DuskBlocks {
     )
 
 
+    val GUNPOWDER = register(
+        "gunpowder",
+        GunpowderBlock(
+            AbstractBlock.Settings.create().mapColor(Blocks.FIRE.defaultMapColor).sounds(BlockSoundGroup.SAND)
+                .lavaIgnitable().noCollision().breakInstantly().pistonBehavior(PistonBehavior.DESTROY)
+        )
+    )
     val GUNPOWDER_BARREL = register(
         "gunpowder_barrel",
         GunpowderBarrelBlock(
@@ -110,7 +115,7 @@ object DuskBlocks {
     val STRONGHOLD_GUNPOWDER_BARREL = register(
         "stronghold_gunpowder_barrel",
         GunpowderBarrelBlock(
-            8,
+            10,
             2f,
             gunpowderBarrelColor,
             AbstractBlock.Settings.create().mapColor(Blocks.FIRE.defaultMapColor).instrument(NoteBlockInstrument.BASS)
@@ -120,7 +125,7 @@ object DuskBlocks {
     val ANCIENT_BLACK_POWDER_BARREL = register(
         "ancient_black_powder_barrel",
         GunpowderBarrelBlock(
-            12,
+            16,
             4f,
             gunpowderBarrelBlueColor,
             AbstractBlock.Settings.create().mapColor(Blocks.SOUL_FIRE.defaultMapColor)

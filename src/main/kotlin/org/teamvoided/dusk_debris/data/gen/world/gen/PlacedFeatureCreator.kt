@@ -11,9 +11,8 @@ import net.minecraft.world.gen.YOffset
 import net.minecraft.world.gen.blockpredicate.BlockPredicate
 import net.minecraft.world.gen.decorator.*
 import net.minecraft.world.gen.feature.*
-import org.teamvoided.dusk_debris.data.gen.world.gen.PlacedFeatureCreator.register
-import org.teamvoided.dusk_debris.init.worldgen.DuskConfiguredFeatures
-import org.teamvoided.dusk_debris.init.worldgen.DuskPlacedFeatures
+import org.teamvoided.dusk_debris.data.DuskConfiguredFeatures
+import org.teamvoided.dusk_debris.data.DuskPlacedFeatures
 
 @Suppress("MagicNumber")
 object PlacedFeatureCreator {
@@ -24,37 +23,37 @@ object PlacedFeatureCreator {
         c.registerNethershroomPlacement(
             DuskPlacedFeatures.BLUE_NETHERSHROOM_PATCH,
             configuredFeatureProvider.getHolderOrThrow(DuskConfiguredFeatures.BLUE_NETHERSHROOM_PATCH),
-            CountPlacementModifier.create(25),
+            10,
         )
         c.registerNethershroomPlacement(
             DuskPlacedFeatures.WARPED_BLUE_NETHERSHROOM_PATCH,
             configuredFeatureProvider.getHolderOrThrow(DuskConfiguredFeatures.LARGE_BLUE_NETHERSHROOM_PATCH),
-            CountPlacementModifier.create(50),
+            5,
         )
         c.registerNethershroomPlacement(
             DuskPlacedFeatures.PURPLE_NETHERSHROOM_PATCH,
             configuredFeatureProvider.getHolderOrThrow(DuskConfiguredFeatures.PURPLE_NETHERSHROOM_PATCH),
-            CountPlacementModifier.create(25),
+            10,
         )
         c.registerNethershroomPlacement(
             DuskPlacedFeatures.CRIMSON_PURPLE_NETHERSHROOM_PATCH,
             configuredFeatureProvider.getHolderOrThrow(DuskConfiguredFeatures.LARGE_PURPLE_NETHERSHROOM_PATCH),
-            CountPlacementModifier.create(50),
+            5,
         )
     }
 
     private fun BootstrapContext<PlacedFeature>.registerNethershroomPlacement(
         registryKey: RegistryKey<PlacedFeature>,
         configuredFeature: Holder<ConfiguredFeature<*, *>>,
-        placementModifiers: PlacementModifier
+        count: Int
     ) {
         this.register(
             registryKey,
             configuredFeature,
             listOf(
-                placementModifiers,
+                CountPlacementModifier.create(count),
                 InSquarePlacementModifier.getInstance(),
-                HeightRangePlacementModifier.createUniform(YOffset.getBottom(), YOffset.belowTop(128)),
+                HeightRangePlacementModifier.createUniform(YOffset.getBottom(), YOffset.fixed(128)),
                 EnvironmentScanPlacementModifier.create(
                     Direction.DOWN,
                     BlockPredicate.solid(),

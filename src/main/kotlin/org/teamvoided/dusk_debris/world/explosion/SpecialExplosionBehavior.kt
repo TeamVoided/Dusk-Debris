@@ -16,6 +16,7 @@ import kotlin.math.sqrt
 open class SpecialExplosionBehavior(
     private val destroyCondition: TagKey<Block>,
     private val damageCondition: TagKey<EntityType<*>>,
+    private val range: Float,
     private val knockbackMultiplier: Float,
     private val maxDamage: Float
 ) : ExplosionBehavior() {
@@ -56,15 +57,10 @@ open class SpecialExplosionBehavior(
     }
 
     override fun calculateDamage(explosion: Explosion, entity: Entity): Float {
-        val range = explosion.power * 2.0f
         val sourcePosition = explosion.position
-        val distance = sqrt(entity.squaredDistanceTo(sourcePosition)) / range.toDouble()
+        val distance = sqrt(entity.squaredDistanceTo(sourcePosition)) / range
         val exposeDist = (1.0 - distance) * Explosion.getExposure(sourcePosition, entity).toDouble()
-        return ((exposeDist * exposeDist + exposeDist) / 2.0 * maxDamage).toFloat()
+        return (-(exposeDist * exposeDist - (2 * exposeDist)) * maxDamage).toFloat()
     }
 //    power is range
-
-
-//    this is a gradual before steep drop off, instead of steep then gradual
-//    return (-(exposedDistance * exposedDistance - (2 * exposedDistance)) * maxDamage).toFloat()
 }

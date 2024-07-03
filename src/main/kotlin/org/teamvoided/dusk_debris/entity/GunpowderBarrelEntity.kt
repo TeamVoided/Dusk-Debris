@@ -27,22 +27,21 @@ class GunpowderBarrelEntity(entityType: EntityType<out GunpowderBarrelEntity>, w
     Entity(entityType, world), Ownable {
     private var causingEntity: LivingEntity? = null
     private var passedThoughPortal = false
+    private val range = (explosionPower * 0.8f + 4)
     private val explosionBehavior: SpecialExplosionBehavior = SpecialExplosionBehavior(
         DuskBlockTags.GUNPOWDER_BARREL_DESTROYS,
         DuskEntityTypeTags.GUNPOWDER_BARREL_DOES_NOT_DAMAGE,
+        range,
         explosionKnockback,
-        (explosionPower * 8).toFloat()
+        (explosionPower * 6f)
     )
     private val explosionBehaviorPostDimensionChange: SpecialExplosionBehavior = SpecialExplosionBehavior(
         DuskBlockTags.BLUNDERBOMB_DESTROYS,
         DuskEntityTypeTags.GUNPOWDER_BARREL_DOES_NOT_DAMAGE,
+        range,
         explosionKnockback,
-        (explosionPower * 8).toFloat()
+        (explosionPower * 6f)
     )
-
-    init {
-        this.inanimate = false
-    }
 
     constructor(
         world: World,
@@ -59,6 +58,10 @@ class GunpowderBarrelEntity(entityType: EntityType<out GunpowderBarrelEntity>, w
         this.prevY = y
         this.prevZ = z
         this.causingEntity = igniter
+    }
+
+    init {
+        this.inanimate = false
     }
 
     override fun initDataTracker(builder: DataTracker.Builder) {
@@ -131,7 +134,7 @@ class GunpowderBarrelEntity(entityType: EntityType<out GunpowderBarrelEntity>, w
             false,
             ExplosionSourceType.TNT,
             ParticleTypes.SMOKE,
-            GunpowderExplosionEmitterParticleEffect(explosionPower.toFloat(), color),
+            GunpowderExplosionEmitterParticleEffect(explosionPower * 2f, color),
             DuskSoundEvents.BLOCK_GUNPOWDER_BARREL_EXPLODE
         )
     }

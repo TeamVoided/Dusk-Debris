@@ -33,6 +33,7 @@ object DuskItems {
         register("purple_nethershroom_block", BlockItem(DuskBlocks.PURPLE_NETHERSHROOM_BLOCK))
     val NETHERSHROOM_STEM = register("nethershroom_stem", BlockItem(DuskBlocks.NETHERSHROOM_STEM))
 
+    val DEVELOPER_GUNPOWDER_ITEM = register("developer_gunpowder_item", BlockItem(DuskBlocks.GUNPOWDER))
     val GUNPOWDER_BARREL = register("gunpowder_barrel", BlockItem(DuskBlocks.GUNPOWDER_BARREL))
     val STRONGHOLD_GUNPOWDER_BARREL = register(
         "stronghold_gunpowder_barrel",

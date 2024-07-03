@@ -48,6 +48,7 @@ open class BlunderbombEntity : AbstractThrwowableBombEntity {
     override var explosionBehavior: ExplosionBehavior = SpecialExplosionBehavior(
         DuskBlockTags.BLUNDERBOMB_DESTROYS,
         DuskEntityTypeTags.BLUNDERBOMB_DOES_NOT_DAMAGE,
+        7f,
         1.1f,
         12f
     )
@@ -87,7 +88,7 @@ open class BlunderbombEntity : AbstractThrwowableBombEntity {
             false,
             World.ExplosionSourceType.TNT,
             DuskParticles.BLUNDERBOMB,
-            DuskParticles.BLUNDERBOMB,
+            ParticleTypes.FLASH,
             SoundEvents.BLOCK_RESPAWN_ANCHOR_DEPLETE
         )
         super.explode()

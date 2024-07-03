@@ -1,4 +1,4 @@
-package org.teamvoided.dusk_debris.init.worldgen
+package org.teamvoided.dusk_debris.data
 
 import net.minecraft.registry.RegistryKey
 import net.minecraft.registry.RegistryKeys
@@ -15,9 +15,6 @@ object DuskConfiguredFeatures {
     val HUGE_PURPLE_NETHERSHROOM = create("huge_purple_nethershroom")
     val LARGE_PURPLE_NETHERSHROOM_PATCH = create("large_purple_nethershroom_patch")
     val PURPLE_NETHERSHROOM_PATCH = create("purple_nethershroom_patch")
-
-
-    fun init() {}
 
     fun create(id: String): RegistryKey<ConfiguredFeature<*, *>> =
         RegistryKey.of(RegistryKeys.CONFIGURED_FEATURE, id(id))

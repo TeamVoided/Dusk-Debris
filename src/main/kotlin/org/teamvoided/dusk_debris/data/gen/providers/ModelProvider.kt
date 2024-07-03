@@ -5,8 +5,10 @@ import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider
 import net.minecraft.data.client.ItemModelGenerator
 import net.minecraft.data.client.model.*
+import net.minecraft.item.Items
 import org.teamvoided.dusk_debris.block.DuskBlockLists
 import org.teamvoided.dusk_debris.init.DuskBlocks
+import org.teamvoided.dusk_debris.init.DuskItems
 import org.teamvoided.dusk_debris.util.*
 
 class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
@@ -28,33 +30,35 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
                 texture.put(TextureKey.SIDE, Texture.getId(DuskBlocks.CHISELED_VOLCANIC_SANDSTONE))
             }
         )
+        DuskBlockLists.blockFamily.forEach {
+            gen.registerCubeAllModelTexturePool(it.baseBlock).family(it)
+        }
+
         DuskBlockLists.RIBBON_BLOCKS_LIST.forEach {
             gen.registerRibbon(it)
         }
         DuskBlockLists.THROWABLE_BLOCK_LIST.forEach {
             gen.throwableBlock(it)
         }
-        DuskBlockLists.blockFamily.forEach {
-            gen.registerCubeAllModelTexturePool(it.baseBlock).family(it)
+        DuskBlockLists.GUNPOWDER_BARREL_BLOCK_LIST.forEach {
+            gen.gunpowderBarrelBlock(it)
         }
-        gen.registerSimpleCubeAll(DuskBlocks.PAPER_BLOCK)
-
+        gen.registerDustBlock(DuskBlocks.GUNPOWDER)
+        gen.registerItemModel(DuskItems.DEVELOPER_GUNPOWDER_ITEM)
         gen.registerNethershroom(DuskBlocks.BLUE_NETHERSHROOM)
         gen.registerNethershroomBlock(DuskBlocks.BLUE_NETHERSHROOM_BLOCK)
         gen.registerNethershroom(DuskBlocks.PURPLE_NETHERSHROOM)
         gen.registerNethershroomBlock(DuskBlocks.PURPLE_NETHERSHROOM_BLOCK)
         gen.registerNethershroomBlock(DuskBlocks.NETHERSHROOM_STEM)
 
-        gen.gunpowderBarrelBlock(DuskBlocks.GUNPOWDER_BARREL)
-        gen.gunpowderBarrelBlock(DuskBlocks.STRONGHOLD_GUNPOWDER_BARREL)
-        gen.gunpowderBarrelBlock(DuskBlocks.ANCIENT_BLACK_POWDER_BARREL)
+        gen.registerSimpleCubeAll(DuskBlocks.PAPER_BLOCK)
+
         gen.registerLog(DuskBlocks.CYPRESS_LOG)
             .log(DuskBlocks.CYPRESS_LOG)
             .wood(DuskBlocks.CYPRESS_WOOD)
         gen.registerLog(DuskBlocks.STRIPPED_CYPRESS_LOG)
             .log(DuskBlocks.STRIPPED_CYPRESS_LOG)
             .wood(DuskBlocks.STRIPPED_CYPRESS_WOOD)
-
 
         gen.registerSimpleCubeAll(DuskBlocks.VOLCANIC_SAND)
         gen.registerDustable(DuskBlocks.SUSPICIOUS_VOLCANIC_SAND)

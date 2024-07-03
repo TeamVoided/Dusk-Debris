@@ -22,7 +22,7 @@ object DuskEntities {
 //    )
     val BOX_AREA_EFFECT_CLOUD = register(
         "box_area_effect_cloud",
-        EntityType.Builder.create(EntityType.EntityFactory(::BoxAreaEffectCloud), SpawnGroup.MISC)
+        EntityType.Builder.create(EntityType.EntityFactory(::BoxAreaEffectCloud), SpawnGroup.MISC).makeFireImmune()
     )
     val GUNPOWDER_BARREL = register(
         "gunpowder_barrel",
@@ -46,6 +46,7 @@ object DuskEntities {
                 .setDimensions(0.33f, 0.33f)
                 .maxTrackingRange(4)
                 .trackingTickInterval(10)
+                .makeFireImmune()
         )
     }
 

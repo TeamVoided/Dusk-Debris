@@ -5,7 +5,6 @@ import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider
 import net.minecraft.block.Blocks
 import net.minecraft.registry.HolderLookup
 import net.minecraft.registry.tag.BlockTags
-import org.teamvoided.dusk_debris.block.DuskBlockLists
 import org.teamvoided.dusk_debris.block.DuskBlockLists.RIBBON_BLOCKS_LIST
 import org.teamvoided.dusk_debris.block.DuskBlockLists.THROWABLE_BLOCK_LIST
 import org.teamvoided.dusk_debris.data.DuskBlockTags
@@ -25,22 +24,20 @@ class BlockTagsProvider(output: FabricDataOutput, registriesFuture: CompletableF
             .add(*RIBBON_BLOCKS_LIST.toTypedArray())
         getOrCreateTagBuilder(DuskBlockTags.THROWABLE_BLOCK)
             .add(*THROWABLE_BLOCK_LIST.toTypedArray())
+        getOrCreateTagBuilder(DuskBlockTags.GUNPOWDER_BARRELS)
+            .add(*THROWABLE_BLOCK_LIST.toTypedArray())
         getOrCreateTagBuilder(DuskBlockTags.FIREBOMB_DESTROYS)
+            .addOptionalTag(DuskBlockTags.GUNPOWDER_BARRELS)
             .add(Blocks.TNT)
-            .add(DuskBlocks.GUNPOWDER_BARREL)
-            .add(DuskBlocks.STRONGHOLD_GUNPOWDER_BARREL)
-            .add(DuskBlocks.ANCIENT_BLACK_POWDER_BARREL)
         getOrCreateTagBuilder(DuskBlockTags.BLUNDERBOMB_DESTROYS)
             .addOptionalTag(DuskBlockTags.FIREBOMB_DESTROYS)
             .addOptionalTag(DuskBlockTags.THROWABLE_BLOCK)
         getOrCreateTagBuilder(DuskBlockTags.GUNPOWDER_BARREL_DESTROYS)
             .addOptionalTag(DuskBlockTags.BLUNDERBOMB_DESTROYS)
             .add(Blocks.NETHER_PORTAL)
-        getOrCreateTagBuilder(DuskBlockTags.NETHERSHROOM_PLACEABLE_ON)
+        getOrCreateTagBuilder(DuskBlockTags.NETHERSHROOM_GROWABLE_ON)
+            .addOptionalTag(BlockTags.MUSHROOM_GROW_BLOCK)
             .addOptionalTag(BlockTags.NYLIUM)
-            .addOptionalTag(BlockTags.SAND)
-            .addOptionalTag(BlockTags.DIRT)
-            .add(Blocks.FARMLAND)
             .add(Blocks.SOUL_SOIL)
         getOrCreateTagBuilder(DuskBlockTags.NETHERSHROOM_REPLACEABLE)
             .addOptionalTag(BlockTags.REPLACEABLE)
@@ -53,8 +50,11 @@ class BlockTagsProvider(output: FabricDataOutput, registriesFuture: CompletableF
             .add(Blocks.TWISTING_VINES_PLANT)
             .add(Blocks.TWISTING_VINES)
         getOrCreateTagBuilder(DuskBlockTags.NETHERSHROOM_IGNORE)
-            .addOptionalTag(DuskBlockTags.NETHERSHROOM_PLACEABLE_ON)
+            .addOptionalTag(DuskBlockTags.NETHERSHROOM_GROWABLE_ON)
             .addOptionalTag(DuskBlockTags.NETHERSHROOM_REPLACEABLE)
+        getOrCreateTagBuilder(DuskBlockTags.GUNPOWDER_CONNECTS_TO)
+            .addOptionalTag(DuskBlockTags.GUNPOWDER_BARRELS)
+            .add(Blocks.TNT)
     }
 
     private fun vanillaTags() {

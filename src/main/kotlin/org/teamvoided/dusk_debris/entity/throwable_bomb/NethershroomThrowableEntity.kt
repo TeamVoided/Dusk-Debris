@@ -20,6 +20,7 @@ import kotlin.math.sin
 
 open class NethershroomThrowableEntity : AbstractThrwowableBombEntity {
 
+//    val replaceItem: Item by lazy {  DuskItems.ANCIENT_BLACK_POWDER_BARREL}
     var replaceItem: Item = DuskItems.ANCIENT_BLACK_POWDER_BARREL
     var particle: ParticleEffect = ParticleTypes.SMOKE
     var statusEffect: Holder<StatusEffect>? = null

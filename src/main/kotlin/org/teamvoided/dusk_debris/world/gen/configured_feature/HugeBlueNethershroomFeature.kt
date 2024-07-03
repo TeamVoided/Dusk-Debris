@@ -22,7 +22,6 @@ open class HugeBlueNethershroomFeature(codec: Codec<HugeNethershroomFeatureConfi
         val height = config.capHeight[random]
         val offsetXZ = config.capXZInletOffset[random]
         val offsetY = config.capYInletOffset[random]
-        println(offsetXZ)
         val heightUpper = 0
         val heightLower = -height
         for (x in -radius..radius) {
@@ -32,13 +31,13 @@ open class HugeBlueNethershroomFeature(codec: Codec<HugeNethershroomFeatureConfi
                     val edgePosX = x == radius
                     val edgeNegZ = z == -radius
                     val edgePosZ = z == radius
-                    val edgeNegY = y <= heightLower + offsetY
+                    val edgeNegY = y < heightLower + offsetY
                     val edgePosY = y == heightUpper
                     val edgeX = edgeNegX || edgePosX
                     val edgeZ = edgeNegZ || edgePosZ
                     val isNotBottomInlet: Boolean =
                         if (offsetXZ == 0)
-                        !(edgeNegY && !edgePosY)
+                            !(edgeNegY && !edgePosY)
                         else if (offsetXZ == 1)
                             !(edgeNegY && !edgePosY && !(edgeX || edgeZ))
                         else if (offsetXZ >= (radius - 1))

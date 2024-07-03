@@ -13,6 +13,7 @@ open class BlunderbombBlock(settings: Settings) : AbstractThrwowableBombBlock(se
     override val explosionBehavior: ExplosionBehavior = SpecialExplosionBehavior(
         DuskBlockTags.BLUNDERBOMB_DESTROYS,
         DuskEntityTypeTags.BLUNDERBOMB_DOES_NOT_DAMAGE,
+        7f,
         1.1f,
         12f
     )
@@ -20,8 +21,9 @@ open class BlunderbombBlock(settings: Settings) : AbstractThrwowableBombBlock(se
     override val explosionBehaviorOnExploded: ExplosionBehavior = SpecialExplosionBehavior(
         DuskBlockTags.BLUNDERBOMB_DESTROYS,
         DuskEntityTypeTags.BLUNDERBOMB_DOES_NOT_DAMAGE,
+        Math.random().toFloat() * 3f + 4,
         Math.random().toFloat(),
-        Math.random().toFloat() * 3 + 4f
+        Math.random().toFloat() * 3f + 4
     )
     override fun explode(world: World, pos: BlockPos, explosionBehavior: ExplosionBehavior) {
         world.breakBlock(pos, false)

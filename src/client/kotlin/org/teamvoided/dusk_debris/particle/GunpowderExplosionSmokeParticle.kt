@@ -33,7 +33,7 @@ open class GunpowderExplosionSmokeParticle(
     }
 
     override fun getType(): ParticleTextureSheet {
-        return ParticleTextureSheet.PARTICLE_SHEET_TRANSLUCENT
+        return ParticleTextureSheet.PARTICLE_SHEET_LIT
     }
 
     override fun tick() {

@@ -18,12 +18,6 @@ class EntityTypeTagsProvider(output: FabricDataOutput, registriesFuture: Complet
     }
 
     private fun duskTags() {
-        getOrCreateTagBuilder(DuskEntityTypeTags.THROWABLE_BOMB)
-            .add(DuskEntities.FIREBOMB)
-            .add(DuskEntities.BLUNDERBOMB)
-            .add(DuskEntities.SMOKEBOMB)
-            .add(DuskEntities.POCKETPOISON)
-            .add(DuskEntities.BLINDBOMB)
         getOrCreateTagBuilder(DuskEntityTypeTags.CRAB_ATTACKS)
             .add(EntityType.AXOLOTL)
             .add(EntityType.COD)
@@ -32,7 +26,14 @@ class EntityTypeTagsProvider(output: FabricDataOutput, registriesFuture: Complet
             .add(EntityType.TROPICAL_FISH)
             .add(EntityType.TADPOLE)
             .add(EntityType.DROWNED)
+        getOrCreateTagBuilder(DuskEntityTypeTags.THROWABLE_BOMB)
+            .add(DuskEntities.FIREBOMB)
+            .add(DuskEntities.BLUNDERBOMB)
+            .add(DuskEntities.SMOKEBOMB)
+            .add(DuskEntities.POCKETPOISON)
+            .add(DuskEntities.BLINDBOMB)
         getOrCreateTagBuilder(DuskEntityTypeTags.IS_NOT_AFFECTED_BY_NETHERSHROOM)
+            .addOptionalTag(EntityTypeTags.IGNORES_POISON_AND_REGEN)
             .add(EntityType.PIGLIN)
             .add(EntityType.PIGLIN_BRUTE)
             .add(EntityType.HOGLIN)
@@ -54,6 +55,7 @@ class EntityTypeTagsProvider(output: FabricDataOutput, registriesFuture: Complet
     private fun vanillaTags() {
         getOrCreateTagBuilder(EntityTypeTags.IMPACT_PROJECTILES)
             .addOptionalTag(DuskEntityTypeTags.THROWABLE_BOMB)
+        getOrCreateTagBuilder(EntityTypeTags.REDIRECTABLE_PROJECTILE)
 //        getOrCreateTagBuilder(EntityTypeTags.AQUATIC)
 //            .add(DuskEntities.CRAB)
 //        getOrCreateTagBuilder(EntityTypeTags.ARTHROPOD)

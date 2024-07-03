@@ -54,7 +54,7 @@ open class AbstractHugeNethershroomFeature(codec: Codec<HugeNethershroomFeatureC
         val y = pos.y
         if (y >= world.bottomY + 1 && y + height + 1 < world.topY) {
             for (j in 0..height) {
-                val blockState2 = world.getBlockState(mutableBlockPos.set(pos, pos.x, j, pos.z))
+                val blockState2 = world.getBlockState(mutableBlockPos.set(pos, 0, j, 0))
                 if (!blockState2.isIn(config.ignores)) {
                     return false
                 }

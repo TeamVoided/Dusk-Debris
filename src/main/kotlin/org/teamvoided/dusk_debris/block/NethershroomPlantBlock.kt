@@ -27,7 +27,7 @@ import org.teamvoided.dusk_debris.data.DuskBlockTags
 import org.teamvoided.dusk_debris.data.DuskEntityTypeTags
 import org.teamvoided.dusk_debris.init.DuskEntities
 import org.teamvoided.dusk_debris.init.DuskSoundEvents
-import org.teamvoided.dusk_debris.init.worldgen.DuskConfiguredFeatures
+import org.teamvoided.dusk_debris.data.DuskConfiguredFeatures
 import org.teamvoided.dusk_debris.particle.NethershroomSporeParticleEffect
 import java.util.*
 import kotlin.random.Random
@@ -60,11 +60,11 @@ class NethershroomPlantBlock(
     }
 
     override fun canPlantOnTop(floor: BlockState, world: BlockView, pos: BlockPos): Boolean {
-        return floor.isIn(DuskBlockTags.NETHERSHROOM_PLACEABLE_ON)
+        return floor.isOpaqueFullCube(world, pos)
     }
 
     override fun onEntityCollision(state: BlockState, world: World, pos: BlockPos, entity: Entity) {
-        if (!state.get(SQUISHED) && !entity.isSneaking || entity.type.isIn(DuskEntityTypeTags.IS_NOT_AFFECTED_BY_NETHERSHROOM)) {
+        if (!state.get(SQUISHED) && !entity.isSneaking && !entity.type.isIn(DuskEntityTypeTags.IS_NOT_AFFECTED_BY_NETHERSHROOM)) {
             if ((entity is PlayerEntity || world.gameRules.getBooleanValue(GameRules.DO_MOB_GRIEFING))) {
                 world.setBlockState(
                     pos,
@@ -98,7 +98,8 @@ class NethershroomPlantBlock(
     }
 
     override fun isFertilizable(world: WorldView, pos: BlockPos, state: BlockState): Boolean {
-        return true
+        val belowBlock = world.getBlockState(pos.down())
+        return belowBlock.isIn(DuskBlockTags.NETHERSHROOM_GROWABLE_ON)
     }
 
     override fun canFertilize(world: World, random: RandomGenerator, pos: BlockPos, state: BlockState): Boolean {

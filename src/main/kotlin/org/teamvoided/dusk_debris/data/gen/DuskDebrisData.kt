@@ -14,7 +14,6 @@ import org.teamvoided.dusk_debris.data.gen.providers.EntityLootTableProvider
 import org.teamvoided.dusk_debris.data.gen.tags.ItemTagsProvider
 import org.teamvoided.dusk_debris.data.gen.world.gen.ConfiguredFeatureCreator
 import org.teamvoided.dusk_debris.data.gen.world.gen.PlacedFeatureCreator
-import org.teamvoided.dusk_debris.init.worldgen.DuskConfiguredFeatures
 
 @Suppress("unused")
 class DuskDebrisData : DataGeneratorEntrypoint {

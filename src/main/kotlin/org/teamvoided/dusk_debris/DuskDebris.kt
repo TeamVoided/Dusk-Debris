@@ -21,9 +21,11 @@ object DuskDebris {
         DuskItemGroups.init()
         DuskEntities.init()
         DuskWorldgen.init()
+        DuskBiomeModifications.init()
         DuskParticles.init()
         DuskSoundEvents.init()
     }
 
     fun id(path: String) = Identifier.of(MODID, path)
+    fun id(modId: String, path: String) = Identifier.of(modId, path)
 }

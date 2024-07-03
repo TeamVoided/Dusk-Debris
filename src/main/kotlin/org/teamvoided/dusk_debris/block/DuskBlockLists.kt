@@ -17,6 +17,11 @@ object DuskBlockLists {
         DuskBlocks.BLINDBOMB_BLOCK,
         DuskBlocks.SMOKEBOMB_BLOCK
     )
+    val GUNPOWDER_BARREL_BLOCK_LIST = listOf(
+        DuskBlocks.GUNPOWDER_BARREL,
+        DuskBlocks.STRONGHOLD_GUNPOWDER_BARREL,
+        DuskBlocks.ANCIENT_BLACK_POWDER_BARREL
+    )
     val RIBBON_BLOCKS_LIST = listOf(
         DuskBlocks.LIGHT_BLUE_RIBBON
     )
