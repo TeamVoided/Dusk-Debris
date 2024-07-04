@@ -16,6 +16,8 @@ import net.minecraft.util.math.BlockPointer
 import net.minecraft.world.World
 import net.minecraft.world.event.GameEvent
 import org.teamvoided.dusk_debris.DuskDebris.id
+import org.teamvoided.dusk_debris.block.DuskBlockLists.GUNPOWDER_BARREL_BLOCK_LIST
+import org.teamvoided.dusk_debris.block.DuskBlockLists.THROWABLE_BLOCK_LIST
 import org.teamvoided.dusk_debris.block.GunpowderBarrelBlock
 import org.teamvoided.dusk_debris.entity.GunpowderBarrelEntity
 import org.teamvoided.dusk_debris.item.throwable_bomb.BlunderbombItem
@@ -160,11 +162,12 @@ object DuskItems {
 
 
     fun init() {
-        DispenserBlock.registerBehavior(BLUNDERBOMB_ITEM)
-        DispenserBlock.registerBehavior(FIREBOMB_ITEM)
-        registerGunpowderDispensedBehavior(DuskBlocks.GUNPOWDER_BARREL)
-        registerGunpowderDispensedBehavior(DuskBlocks.STRONGHOLD_GUNPOWDER_BARREL)
-        registerGunpowderDispensedBehavior(DuskBlocks.ANCIENT_BLACK_POWDER_BARREL)
+        THROWABLE_BLOCK_LIST.forEach {
+            DispenserBlock.registerBehavior(it.asItem())
+        }
+        GUNPOWDER_BARREL_BLOCK_LIST.forEach {
+            registerGunpowderDispensedBehavior(it)
+        }
     }
 
     fun registerGunpowderDispensedBehavior(block: Block) =
@@ -181,7 +184,7 @@ object DuskItems {
                 )
                 explosiveEntity.setProperties(
                     (block as GunpowderBarrelBlock).power,
-                    (block).knockbackMultiplier,
+                    (block).range,
                     block.defaultState,
 //                world.getBlockState(blockPos) LMAO
                     block.color

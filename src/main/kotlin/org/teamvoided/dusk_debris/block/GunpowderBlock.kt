@@ -4,19 +4,23 @@ import com.google.common.collect.ImmutableMap
 import com.google.common.collect.Maps.newEnumMap
 import com.google.common.collect.Maps.newHashMap
 import com.google.common.collect.Sets
-import com.google.common.collect.UnmodifiableIterator
 import com.mojang.serialization.MapCodec
 import net.minecraft.block.*
 import net.minecraft.block.enums.WireConnection
+import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.ItemPlacementContext
+import net.minecraft.item.ItemStack
+import net.minecraft.item.Items
 import net.minecraft.particle.ParticleTypes
+import net.minecraft.server.world.ServerWorld
+import net.minecraft.stat.Stats
 import net.minecraft.state.StateManager
 import net.minecraft.state.property.BooleanProperty
-import net.minecraft.state.property.EnumProperty
 import net.minecraft.state.property.Properties
 import net.minecraft.state.property.Property
-import net.minecraft.util.ActionResult
+import net.minecraft.util.Hand
+import net.minecraft.util.ItemInteractionResult
 import net.minecraft.util.hit.BlockHitResult
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
@@ -24,30 +28,34 @@ import net.minecraft.util.math.Direction.Type
 import net.minecraft.util.random.RandomGenerator
 import net.minecraft.util.shape.VoxelShape
 import net.minecraft.util.shape.VoxelShapes
-import net.minecraft.world.*
+import net.minecraft.world.BlockView
+import net.minecraft.world.World
+import net.minecraft.world.WorldAccess
+import net.minecraft.world.WorldView
 import org.teamvoided.dusk_debris.data.DuskBlockTags
+import kotlin.random.Random
 
 
 class GunpowderBlock(settings: Settings) : Block(settings) {
     private val dotState: BlockState
     private var powderIgnites = true
+    val delay = 16
+    val delayDestroy = 60
 
     init {
-        this.defaultState = defaultState
-            .with(IGNITED, false)
+        this.defaultState = stateManager.defaultState
             .with(WIRE_CONNECTION_NORTH, WireConnection.NONE)
             .with(WIRE_CONNECTION_SOUTH, WireConnection.NONE)
             .with(WIRE_CONNECTION_EAST, WireConnection.NONE)
             .with(WIRE_CONNECTION_WEST, WireConnection.NONE)
-        this.dotState = stateManager.defaultState
+            .with(IGNITED, false)
+        this.dotState = defaultState
             .with(WIRE_CONNECTION_NORTH, WireConnection.SIDE)
             .with(WIRE_CONNECTION_SOUTH, WireConnection.SIDE)
             .with(WIRE_CONNECTION_EAST, WireConnection.SIDE)
             .with(WIRE_CONNECTION_WEST, WireConnection.SIDE)
 
-        val var2: UnmodifiableIterator<*> = getStateManager().states.iterator()
-        while (var2.hasNext()) {
-            val blockState = var2.next() as BlockState
+        for (blockState in getStateManager().states) {
             if (blockState.get(IGNITED) == false) {
                 SHAPES[blockState] = getShapeForState(blockState)
             }
@@ -64,12 +72,74 @@ class GunpowderBlock(settings: Settings) : Block(settings) {
         )
     }
 
+    override fun getPlacementState(ctx: ItemPlacementContext): BlockState? {
+        var state = super.getPlacementState(ctx) ?: return null
+        val world = ctx.world
+        for (direction in Type.HORIZONTAL) {
+            val pos = ctx.blockPos.offset(direction)
+            val levelState = world.getBlockState(pos)
+            if (levelState.isSolidBlock(world, pos)) {
+                val upState = world.getBlockState(pos.up())
+                if (connectsTo(upState)) {
+                    state = state.with(DIRECTION_TO_WIRE_CONNECTION_PROPERTY[direction], WireConnection.UP)
+                }
+            } else {
+                val downState = world.getBlockState(pos.down())
+                if (connectsTo(downState) || connectsTo(levelState)) {
+                    state = state.with(DIRECTION_TO_WIRE_CONNECTION_PROPERTY[direction], WireConnection.SIDE)
+                }
+            }
+        }
+
+        return state
+    }
+
+    override fun onInteract(
+        stack: ItemStack,
+        state: BlockState,
+        world: World,
+        pos: BlockPos,
+        entity: PlayerEntity,
+        hand: Hand,
+        hitResult: BlockHitResult
+    ): ItemInteractionResult {
+        if (!stack.isOf(Items.FLINT_AND_STEEL) && !stack.isOf(Items.FIRE_CHARGE)) {
+            return super.onInteract(stack, state, world, pos, entity, hand, hitResult)
+        } else {
+            world.scheduleBlockTick(pos, this, 0)
+            val item = stack.item
+            if (stack.isOf(Items.FLINT_AND_STEEL)) {
+                stack.damageEquipment(1, entity, LivingEntity.getHand(hand))
+            } else {
+                stack.consume(1, entity)
+            }
+
+            entity.incrementStat(Stats.USED.getOrCreateStat(item))
+            return ItemInteractionResult.success(world.isClient)
+        }
+    }
+
+    override fun scheduledTick(state: BlockState, world: ServerWorld, pos: BlockPos, random: RandomGenerator) {
+        if (state.get(IGNITED)) {
+            for (direction in Type.HORIZONTAL) {
+                val offsetPos = pos.offset(direction)
+                val tntState = world.getBlockState(offsetPos)
+                if (tntState.block is TntBlock) {
+                    TntBlock.primeTnt(world, offsetPos)
+                    world.removeBlock(offsetPos, false)
+                }
+            }
+            world.breakBlock(pos, false)
+        } else {
+            world.setBlockState(pos, state.with(IGNITED, true))
+            world.scheduleBlockTick(pos, this, delayDestroy)
+        }
+    }
+
     private fun getShapeForState(state: BlockState): VoxelShape {
         var voxelShape = DOT_SHAPE
-        val var3: Iterator<*> = Type.HORIZONTAL.iterator()
 
-        while (var3.hasNext()) {
-            val direction = var3.next()
+        for (direction in Type.HORIZONTAL) {
             val wireConnection = state.get(DIRECTION_TO_WIRE_CONNECTION_PROPERTY[direction])
             if (wireConnection == WireConnection.SIDE) {
                 voxelShape = VoxelShapes.union(voxelShape, SHAPES_FLOOR[direction])
@@ -90,41 +160,10 @@ class GunpowderBlock(settings: Settings) : Block(settings) {
         return SHAPES[state.with(IGNITED, false)] as VoxelShape
     }
 
-    override fun getPlacementState(ctx: ItemPlacementContext): BlockState {
-        return this.getPlacementState(ctx.world, this.dotState, ctx.blockPos)
-    }
-
     override fun canPlaceAt(state: BlockState, world: WorldView, pos: BlockPos): Boolean {
         val blockPos = pos.down()
         val blockState = world.getBlockState(blockPos)
         return this.canRunOnTop(world, blockPos, blockState)
-    }
-
-
-    override fun onUse(
-        state: BlockState,
-        world: World,
-        pos: BlockPos,
-        entity: PlayerEntity,
-        hitResult: BlockHitResult
-    ): ActionResult {
-        if (!entity.abilities.allowModifyWorld) {
-            return ActionResult.PASS
-        } else {
-            if (isFullyConnected(state) || isNotConnected(state)) {
-                var blockState: BlockState =
-                    if (isFullyConnected(state)) this.defaultState else this.dotState
-                blockState = blockState.with(IGNITED, state.get(IGNITED))
-                blockState = this.getPlacementState(world, blockState, pos)
-                if (blockState !== state) {
-                    world.setBlockState(pos, blockState, 3)
-                    this.updateForNewState(world, pos, state, blockState)
-                    return ActionResult.SUCCESS
-                }
-            }
-
-            return ActionResult.PASS
-        }
     }
 
     override fun getStateForNeighborUpdate(
@@ -132,74 +171,120 @@ class GunpowderBlock(settings: Settings) : Block(settings) {
         direction: Direction,
         neighborState: BlockState,
         world: WorldAccess,
-        pos: BlockPos,
+        blockPos: BlockPos,
         neighborPos: BlockPos
     ): BlockState {
-        if (direction == Direction.DOWN) {
-            return if (!this.canRunOnTop(world, neighborPos, neighborState)) Blocks.AIR.defaultState else state
-        } else if (direction == Direction.UP) {
-            return this.getPlacementState(world, state, pos)
-        } else {
-            val wireConnection = this.getRenderConnectionType(world, pos, direction)
-            return if (wireConnection.isConnected ==
-                state.get(DIRECTION_TO_WIRE_CONNECTION_PROPERTY[direction]).isConnected &&
-                !isFullyConnected(state)
-            ) state.with(DIRECTION_TO_WIRE_CONNECTION_PROPERTY[direction], wireConnection)
-            else this.getPlacementState(
-                world,
-                dotState.with(IGNITED, state.get(IGNITED))
-                    .with(DIRECTION_TO_WIRE_CONNECTION_PROPERTY[direction], wireConnection), pos
-            )
-        }
-    }
 
-    override fun prepare(state: BlockState, world: WorldAccess, pos: BlockPos, flags: Int, maxUpdateDepth: Int) {
-        val mutable = BlockPos.Mutable()
-        val var7: Iterator<*> = Type.HORIZONTAL.iterator()
-
-        while (var7.hasNext()) {
-            val direction = var7.next() as Direction
-            val wireConnection =
-                state.get(DIRECTION_TO_WIRE_CONNECTION_PROPERTY[direction])
-            if (wireConnection != WireConnection.NONE && !world.getBlockState(mutable.set(pos, direction)).isOf(this)) {
-                mutable.move(Direction.DOWN)
-                val blockState = world.getBlockState(mutable)
-                if (blockState.isOf(this)) {
-                    val blockPos = mutable.offset(direction.opposite)
-                    world.updateNeighbor(
-                        direction.opposite,
-                        world.getBlockState(blockPos),
-                        mutable,
-                        blockPos,
-                        flags,
-                        maxUpdateDepth
-                    )
+        if (direction == Direction.DOWN || direction == Direction.UP) return state
+        var outputState = state
+        for (dir in Type.HORIZONTAL) {
+            val pos = blockPos.offset(direction)
+            val levelState = world.getBlockState(pos)
+            if (levelState.isSolidBlock(world, pos)) {
+                val upState = world.getBlockState(pos.up())
+                if (connectsTo(upState)) {
+                    outputState = state.with(DIRECTION_TO_WIRE_CONNECTION_PROPERTY[direction], WireConnection.UP)
+                    if (ignite(upState)) {
+                        world.scheduleBlockTick(blockPos, this, delay)
+                        println("ignite1, ${pos.up()}")
+                    }
                 }
-
-                mutable.set(pos, direction).move(Direction.UP)
-                val blockState2 = world.getBlockState(mutable)
-                if (blockState2.isOf(this)) {
-                    val blockPos2 = mutable.offset(direction.opposite)
-                    world.updateNeighbor(
-                        direction.opposite,
-                        world.getBlockState(blockPos2),
-                        mutable,
-                        blockPos2,
-                        flags,
-                        maxUpdateDepth
-                    )
+            } else {
+                val downState = world.getBlockState(pos.down())
+                if (connectsTo(downState) || connectsTo(levelState)) {
+                    outputState = state.with(DIRECTION_TO_WIRE_CONNECTION_PROPERTY[direction], WireConnection.SIDE)
+                    if (ignite(downState)) {
+                        world.scheduleBlockTick(blockPos, this, delay)
+                        println("ignite2, ${pos.down()}")
+                    }
+                    if (ignite(levelState)) {
+                        world.scheduleBlockTick(blockPos, this, delay)
+                        println("ignite3, $pos")
+                    }
+                } else {
+                    outputState = state.with(DIRECTION_TO_WIRE_CONNECTION_PROPERTY[direction], WireConnection.NONE)
                 }
             }
         }
+        return outputState
+//        if (direction == Direction.DOWN) {
+//            return if (!this.canRunOnTop(world, neighborPos, neighborState)) Blocks.AIR.defaultState else state
+//        } else if (direction == Direction.UP) {
+//            return this.getPlacementState(world, state, pos)
+//        } else {
+//            val wireConnection = this.getRenderConnectionType(world, pos, direction)
+//            return if (wireConnection.isConnected ==
+//                state.get(DIRECTION_TO_WIRE_CONNECTION_PROPERTY[direction]).isConnected &&
+//                !isFullyConnected(state)
+//            ) state.with(DIRECTION_TO_WIRE_CONNECTION_PROPERTY[direction], wireConnection)
+//            else this.getPlacementState(
+//                world,
+//                dotState.with(IGNITED, state.get(IGNITED))
+//                    .with(DIRECTION_TO_WIRE_CONNECTION_PROPERTY[direction], wireConnection), pos
+//            )
+//        }
+    }
+
+//    override fun neighborUpdate(
+//        state: BlockState,
+//        world: World,
+//        pos: BlockPos,
+//        block: Block,
+//        fromPos: BlockPos,
+//        notify: Boolean
+//    ) {
+//        if (!world.isClient) {
+//            if (state.canPlaceAt(world, pos)) {
+//                this.update(world, pos, state)
+//            } else {
+//                dropStacks(state, world, pos)
+//                world.removeBlock(pos, false)
+//            }
+//        }
+//    }
+
+    override fun prepare(state: BlockState, world: WorldAccess, pos: BlockPos, flags: Int, maxUpdateDepth: Int) {
+//        val mutable = BlockPos.Mutable()
+//
+//        for (direction in Type.HORIZONTAL) {
+//            val wireConnection =
+//                state.get(DIRECTION_TO_WIRE_CONNECTION_PROPERTY[direction])
+//            if (wireConnection != WireConnection.NONE && !world.getBlockState(mutable.set(pos, direction)).isOf(this)) {
+//                mutable.move(Direction.DOWN)
+//                val blockState = world.getBlockState(mutable)
+//                if (blockState.isOf(this)) {
+//                    val blockPos = mutable.offset(direction.opposite)
+//                    world.updateNeighbor(
+//                        direction.opposite,
+//                        world.getBlockState(blockPos),
+//                        mutable,
+//                        blockPos,
+//                        flags,
+//                        maxUpdateDepth
+//                    )
+//                }
+//
+//                mutable.set(pos, direction).move(Direction.UP)
+//                val blockState2 = world.getBlockState(mutable)
+//                if (blockState2.isOf(this)) {
+//                    val blockPos2 = mutable.offset(direction.opposite)
+//                    world.updateNeighbor(
+//                        direction.opposite,
+//                        world.getBlockState(blockPos2),
+//                        mutable,
+//                        blockPos2,
+//                        flags,
+//                        maxUpdateDepth
+//                    )
+//                }
+//            }
+//        }
     }
 
     override fun onBlockAdded(state: BlockState, world: World, pos: BlockPos, oldState: BlockState, notify: Boolean) {
         if (!oldState.isOf(state.block) && !world.isClient) {
             this.update(world, pos, state)
-            val var6: Iterator<*> = Type.VERTICAL.iterator()
-
-            while (var6.hasNext()) {
-                val direction = var6.next() as Direction
+            for (direction in Type.VERTICAL) {
                 world.updateNeighborsAlways(pos.offset(direction), this)
             }
             this.updateOffsetNeighbors(world, pos)
@@ -223,31 +308,9 @@ class GunpowderBlock(settings: Settings) : Block(settings) {
         }
     }
 
-    override fun neighborUpdate(
-        state: BlockState,
-        world: World,
-        pos: BlockPos,
-        block: Block,
-        fromPos: BlockPos,
-        notify: Boolean
-    ) {
-        if (!world.isClient) {
-            if (state.canPlaceAt(world, pos)) {
-                this.update(world, pos, state)
-            } else {
-                dropStacks(state, world, pos)
-                world.removeBlock(pos, false)
-            }
-        }
-    }
-
     override fun randomDisplayTick(state: BlockState, world: World, pos: BlockPos, random: RandomGenerator) {
-        val i = state.get(IGNITED)
-        if (i) {
-            val var6: Iterator<*> = Type.HORIZONTAL.iterator()
-
-            while (var6.hasNext()) {
-                val direction = var6.next() as Direction
+        if (state.get(IGNITED)) {
+            for (direction in Type.HORIZONTAL) {
                 val wireConnection =
                     state.get(DIRECTION_TO_WIRE_CONNECTION_PROPERTY[direction] as Property<*>)
                 when (wireConnection) {
@@ -287,98 +350,96 @@ class GunpowderBlock(settings: Settings) : Block(settings) {
 //
 //
 
-    private fun getPlacementState(world: BlockView, state: BlockState, pos: BlockPos): BlockState {
-        var state = state
-        val bl = isNotConnected(state)
-        state = this.getMissingConnections(world, defaultState.with(IGNITED, state.get(IGNITED)), pos)
-        if (bl && isNotConnected(state)) {
-            return state
-        } else {
-            val bl2 = state.get(WIRE_CONNECTION_NORTH).isConnected
-            val bl3 = state.get(WIRE_CONNECTION_SOUTH).isConnected
-            val bl4 = state.get(WIRE_CONNECTION_EAST).isConnected
-            val bl5 = state.get(WIRE_CONNECTION_WEST).isConnected
-            val bl6 = !bl2 && !bl3
-            val bl7 = !bl4 && !bl5
-            if (!bl5 && bl6) {
-                state = state.with(WIRE_CONNECTION_WEST, WireConnection.SIDE)
-            }
-            if (!bl4 && bl6) {
-                state = state.with(WIRE_CONNECTION_EAST, WireConnection.SIDE)
-            }
-            if (!bl2 && bl7) {
-                state = state.with(WIRE_CONNECTION_NORTH, WireConnection.SIDE)
-            }
-            if (!bl3 && bl7) {
-                state = state.with(WIRE_CONNECTION_SOUTH, WireConnection.SIDE)
-            }
-            return state
-        }
-    }
+//    private fun getPlacementState(world: BlockView, state: BlockState, pos: BlockPos): BlockState {
+//        var state = state
+//        val ifIsNotConnected = isNotConnected(state)
+//        state = this.getMissingConnections(world, defaultState, pos)
+//        if (ifIsNotConnected || isNotConnected(state)) {
+//            return state
+//        } else {
+//            val north = state.get(WIRE_CONNECTION_NORTH).isConnected
+//            val south = state.get(WIRE_CONNECTION_SOUTH).isConnected
+//            val east = state.get(WIRE_CONNECTION_EAST).isConnected
+//            val west = state.get(WIRE_CONNECTION_WEST).isConnected
+//            val notNorthSouth = !north && !south
+//            val notEastWest = !east && !west
+//            if (!west && notNorthSouth) {
+//                state = state.with(WIRE_CONNECTION_WEST, WireConnection.SIDE)
+//            }
+//            if (!east && notNorthSouth) {
+//                state = state.with(WIRE_CONNECTION_EAST, WireConnection.SIDE)
+//            }
+//            if (!north && notEastWest) {
+//                state = state.with(WIRE_CONNECTION_NORTH, WireConnection.SIDE)
+//            }
+//            if (!south && notEastWest) {
+//                state = state.with(WIRE_CONNECTION_SOUTH, WireConnection.SIDE)
+//            }
+//            return state
+//        }
+//    }
 
-    private fun isFullyConnected(state: BlockState): Boolean {
-        return state.get(WIRE_CONNECTION_NORTH).isConnected &&
-                state.get(WIRE_CONNECTION_SOUTH).isConnected &&
-                state.get(WIRE_CONNECTION_EAST).isConnected &&
-                state.get(WIRE_CONNECTION_WEST).isConnected
-    }
+//    private fun isFullyConnected(state: BlockState): Boolean {
+//        return state.get(WIRE_CONNECTION_NORTH).isConnected &&
+//                state.get(WIRE_CONNECTION_SOUTH).isConnected &&
+//                state.get(WIRE_CONNECTION_EAST).isConnected &&
+//                state.get(WIRE_CONNECTION_WEST).isConnected
+//    }
+//
+//    private fun isNotConnected(state: BlockState): Boolean {
+//        return !state.get(WIRE_CONNECTION_NORTH).isConnected &&
+//                !state.get(WIRE_CONNECTION_SOUTH).isConnected &&
+//                !state.get(WIRE_CONNECTION_EAST).isConnected &&
+//                !state.get(WIRE_CONNECTION_WEST).isConnected
+//    }
+//
+//    private fun getMissingConnections(world: BlockView, state: BlockState, pos: BlockPos): BlockState {
+//        var state = state
+//        val bl = !world.getBlockState(pos.up()).isSolidBlock(world, pos)
+//
+//        for (direction in Type.HORIZONTAL) {
+//            if (!(state.get(DIRECTION_TO_WIRE_CONNECTION_PROPERTY[direction]) as WireConnection).isConnected) {
+//                val wireConnection: WireConnection = this.getRenderConnectionType(world, pos, direction, bl)
+//                state = state.with(DIRECTION_TO_WIRE_CONNECTION_PROPERTY[direction], wireConnection)
+//            }
+//        }
+//
+//        return state
+//    }
+//
+//    private fun getRenderConnectionType(world: BlockView, pos: BlockPos, direction: Direction): WireConnection {
+//        return this.getRenderConnectionType(
+//            world,
+//            pos,
+//            direction,
+//            !world.getBlockState(pos.up()).isSolidBlock(world, pos)
+//        )
+//    }
 
-    private fun isNotConnected(state: BlockState): Boolean {
-        return !state.get(WIRE_CONNECTION_NORTH).isConnected &&
-                !state.get(WIRE_CONNECTION_SOUTH).isConnected &&
-                !state.get(WIRE_CONNECTION_EAST).isConnected &&
-                !state.get(WIRE_CONNECTION_WEST).isConnected
-    }
-
-    private fun getMissingConnections(world: BlockView, state: BlockState, pos: BlockPos): BlockState {
-        var state = state
-        val bl = !world.getBlockState(pos.up()).isSolidBlock(world, pos)
-        val var5: Iterator<*> = Type.HORIZONTAL.iterator()
-
-        while (var5.hasNext()) {
-            val direction = var5.next() as Direction
-            if (!(state.get(DIRECTION_TO_WIRE_CONNECTION_PROPERTY[direction]) as WireConnection).isConnected) {
-                val wireConnection: WireConnection = this.getRenderConnectionType(world, pos, direction, bl)
-                state = state.with(DIRECTION_TO_WIRE_CONNECTION_PROPERTY[direction], wireConnection)
-            }
-        }
-
-        return state
-    }
-
-    private fun getRenderConnectionType(world: BlockView, pos: BlockPos, direction: Direction): WireConnection {
-        return this.getRenderConnectionType(
-            world,
-            pos,
-            direction,
-            !world.getBlockState(pos.up()).isSolidBlock(world, pos)
-        )
-    }
-
-    private fun getRenderConnectionType(
-        world: BlockView,
-        pos: BlockPos,
-        direction: Direction,
-        isNotSolidBlock: Boolean
-    ): WireConnection {
-        val blockPos = pos.offset(direction)
-        val blockState = world.getBlockState(blockPos)
-        if (isNotSolidBlock) {
-            val bl = blockState.block is TrapdoorBlock || this.canRunOnTop(world, blockPos, blockState)
-            if (bl && connectsTo(world.getBlockState(blockPos.up()))) {
-                if (blockState.isSideSolidFullSquare(world, blockPos, direction.opposite)) {
-                    return WireConnection.UP
-                }
-
-                return WireConnection.SIDE
-            }
-        }
-        return if (!connectsTo(blockState) && (blockState.isSolidBlock(
-                world,
-                blockPos
-            ) || !connectsTo(world.getBlockState(blockPos.down())))
-        ) WireConnection.NONE else WireConnection.SIDE
-    }
+//    private fun getRenderConnectionType(
+//        world: BlockView,
+//        pos: BlockPos,
+//        direction: Direction,
+//        isNotSolidBlock: Boolean
+//    ): WireConnection {
+//        val blockPos = pos.offset(direction)
+//        val blockState = world.getBlockState(blockPos)
+//        if (isNotSolidBlock) {
+//            val bl = blockState.block is TrapdoorBlock || this.canRunOnTop(world, blockPos, blockState)
+//            if (bl && connectsTo(world.getBlockState(blockPos.up()))) {
+//                if (blockState.isSideSolidFullSquare(world, blockPos, direction.opposite)) {
+//                    return WireConnection.UP
+//                }
+//
+//                return WireConnection.SIDE
+//            }
+//        }
+//        return if (!connectsTo(blockState) && (blockState.isSolidBlock(
+//                world,
+//                blockPos
+//            ) || !connectsTo(world.getBlockState(blockPos.down())))
+//        ) WireConnection.NONE else WireConnection.SIDE
+//    }
 
     private fun canRunOnTop(world: BlockView, pos: BlockPos, floor: BlockState): Boolean {
         return floor.isSideSolidFullSquare(world, pos, Direction.UP) || floor.isOf(Blocks.HOPPER)
@@ -399,52 +460,33 @@ class GunpowderBlock(settings: Settings) : Block(settings) {
                 set.add(pos.offset(direction))
             }
 
-            val var10: Iterator<*> = set.iterator()
-
-            while (var10.hasNext()) {
-                val blockPos = var10.next() as BlockPos
+            for (blockPos in set) {
                 world.updateNeighborsAlways(blockPos, this)
-            }
-        }
-    }
-
-    private fun updateForNewState(world: World, pos: BlockPos, oldState: BlockState, newState: BlockState) {
-        val var5: Iterator<*> = Type.HORIZONTAL.iterator()
-        while (var5.hasNext()) {
-            val direction = var5.next() as Direction
-            val blockPos = pos.offset(direction)
-            if (oldState.get(DIRECTION_TO_WIRE_CONNECTION_PROPERTY[direction]).isConnected !=
-                newState.get(DIRECTION_TO_WIRE_CONNECTION_PROPERTY[direction]).isConnected &&
-                world.getBlockState(blockPos).isSolidBlock(world, blockPos)
-            ) {
-                world.updateNeighborsExcept(blockPos, newState.block, direction.opposite)
             }
         }
     }
 
     private fun getReceivedIgnition(world: World, pos: BlockPos): Boolean {
         this.powderIgnites = false
-        val i = getReceivedIgnition(pos, world)
+        val receiveIgnite = getReceivedIgnition(pos, world)
         this.powderIgnites = true
-        var j = false
-        if (!i) {
-            val var5: Iterator<*> = Type.HORIZONTAL.iterator()
+        var ignited = false
+        if (!receiveIgnite) {
             while (true) {
-                while (var5.hasNext()) {
-                    val direction = var5.next() as Direction
+                for (direction in Type.HORIZONTAL) {
                     val blockPos = pos.offset(direction)
                     val blockState = world.getBlockState(blockPos)
-                    j = j || ignite(blockState)
+                    ignited = ignited || ignite(blockState)
                     val blockPos2 = pos.up()
                     if (blockState.isSolidBlock(world, blockPos) &&
                         !world.getBlockState(blockPos2).isSolidBlock(world, blockPos2)
                     ) {
-                        j = j || ignite(world.getBlockState(blockPos.up()))
+                        ignited = ignited || ignite(world.getBlockState(blockPos.up()))
                     } else if (!blockState.isSolidBlock(world, blockPos)) {
-                        j = j || ignite(world.getBlockState(blockPos.down()))
+                        ignited = ignited || ignite(world.getBlockState(blockPos.down()))
                     }
                 }
-                return true
+                return ignited
             }
         } else {
             return false
@@ -452,8 +494,7 @@ class GunpowderBlock(settings: Settings) : Block(settings) {
     }
 
     private fun getReceivedIgnition(pos: BlockPos, world: World): Boolean {
-        val var3 = DIRECTIONS
-        for (element in var3) {
+        for (element in DIRECTIONS) {
             val j = this.getEmittedIgnition(pos.offset(element), world)
             if (j) {
                 return true
@@ -463,59 +504,11 @@ class GunpowderBlock(settings: Settings) : Block(settings) {
     }
 
     private fun getEmittedIgnition(pos: BlockPos, world: World): Boolean {
-        val blockState: BlockState = world.getBlockState(pos)
-        val i = getEmittedStrongIgnition(pos, world)
-        return if (blockState.isSolidBlock(world, pos))
-            i || this.getReceivedStrongIgnition(pos, world)
-        else i
-    }
-
-    private fun getReceivedStrongIgnition(pos: BlockPos, world: World): Boolean {
-        val ignite = getEmittedStrongIgnition(pos.down(), world) ||
-                getEmittedStrongIgnition(pos.up(), world) ||
-                getEmittedStrongIgnition(pos.north(), world) ||
-                getEmittedStrongIgnition(pos.south(), world) ||
-                getEmittedStrongIgnition(pos.west(), world) ||
-                getEmittedStrongIgnition(pos.east(), world)
-        return ignite
-    }
-//Is this done for efficiency?
-//    fun getReceivedStrongIgnition(pos: BlockPos, world: World): Boolean {
-//        var ignite = false
-//        ignite = ignite || this.getEmittedStrongIgnition(pos.down(), Direction.DOWN, world)
-//        if (ignite) {
-//            return true
-//        } else {
-//            ignite = false || this.getEmittedStrongIgnition(pos.up(), Direction.UP, world)
-//            if (ignite) {
-//                return true
-//            } else {
-//                ignite = false || this.getEmittedStrongIgnition(pos.north(), Direction.NORTH, world)
-//                if (ignite) {
-//                    return true
-//                } else {
-//                    ignite = false || this.getEmittedStrongIgnition(pos.south(), Direction.SOUTH, world)
-//                    if (ignite) {
-//                        return true
-//                    } else {
-//                        ignite = false || this.getEmittedStrongIgnition(pos.west(), Direction.WEST, world)
-//                        if (ignite) {
-//                            return true
-//                        } else {
-//                            ignite = false || this.getEmittedStrongIgnition(pos.east(), Direction.EAST, world)
-//                            return ignite
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//    }
-
-    private fun getEmittedStrongIgnition(pos: BlockPos, world: World): Boolean {
         val ignited = if (world.getBlockState(pos).isOf(this)) world.getBlockState(pos).get(IGNITED) else false
         return ignited
     }
 
+    //remove plz
     private fun ignite(state: BlockState): Boolean {
         return if (state.isOf(this)) state.get(IGNITED) else false
     }
@@ -534,18 +527,8 @@ class GunpowderBlock(settings: Settings) : Block(settings) {
     }
 
     private fun updateOffsetNeighbors(world: World, pos: BlockPos) {
-        var var3: Iterator<*> = Type.HORIZONTAL.iterator()
-
-        var direction: Direction
-        while (var3.hasNext()) {
-            direction = var3.next() as Direction
+        for (direction in Type.HORIZONTAL) {
             this.updateNeighbors(world, pos.offset(direction))
-        }
-
-        var3 = Type.HORIZONTAL.iterator()
-
-        while (var3.hasNext()) {
-            direction = var3.next() as Direction
             val blockPos = pos.offset(direction)
             if (world.getBlockState(blockPos).isSolidBlock(world, blockPos)) {
                 this.updateNeighbors(world, blockPos.up())
@@ -565,7 +548,7 @@ class GunpowderBlock(settings: Settings) : Block(settings) {
         g: Float
     ) {
         val h = g - f
-        if (!(random.nextFloat() >= 0.2f * h)) {
+        if (!(random.nextFloat() >= h / 2)) {
             val genericOffset = 0.4375f
             val j = f + h * random.nextFloat()
             val x =
@@ -603,8 +586,8 @@ class GunpowderBlock(settings: Settings) : Block(settings) {
         val WIRE_CONNECTION_SOUTH = Properties.SOUTH_WIRE_CONNECTION
         val WIRE_CONNECTION_WEST = Properties.WEST_WIRE_CONNECTION
         val DIRECTION_TO_WIRE_CONNECTION_PROPERTY =
-            newEnumMap<Direction, EnumProperty<WireConnection>>(
-                ImmutableMap.of<Direction, EnumProperty<WireConnection>>(
+            newEnumMap(
+                ImmutableMap.of(
                     Direction.NORTH, WIRE_CONNECTION_NORTH,
                     Direction.EAST, WIRE_CONNECTION_EAST,
                     Direction.SOUTH, WIRE_CONNECTION_SOUTH,
@@ -612,7 +595,7 @@ class GunpowderBlock(settings: Settings) : Block(settings) {
                 )
             )
         val DOT_SHAPE = createCuboidShape(3.0, 0.0, 3.0, 13.0, 1.0, 13.0)
-        val SHAPES_FLOOR = newEnumMap<Direction, VoxelShape>(
+        val SHAPES_FLOOR = newEnumMap(
             ImmutableMap.of(
                 Direction.NORTH, createCuboidShape(3.0, 0.0, 0.0, 13.0, 1.0, 13.0),
                 Direction.SOUTH, createCuboidShape(3.0, 0.0, 3.0, 13.0, 1.0, 16.0),
@@ -620,7 +603,7 @@ class GunpowderBlock(settings: Settings) : Block(settings) {
                 Direction.WEST, createCuboidShape(0.0, 0.0, 3.0, 13.0, 1.0, 13.0)
             )
         )
-        val SHAPES_UP = newEnumMap<Direction, VoxelShape>(
+        val SHAPES_UP = newEnumMap(
             ImmutableMap.of(
                 Direction.NORTH,
                 VoxelShapes.union(

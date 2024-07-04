@@ -58,7 +58,7 @@ open class SpecialExplosionBehavior(
 
     override fun calculateDamage(explosion: Explosion, entity: Entity): Float {
         val sourcePosition = explosion.position
-        val distance = sqrt(entity.squaredDistanceTo(sourcePosition)) / range
+        val distance = sqrt(entity.squaredDistanceTo(sourcePosition)) / (range)
         val exposeDist = (1.0 - distance) * Explosion.getExposure(sourcePosition, entity).toDouble()
         return (-(exposeDist * exposeDist - (2 * exposeDist)) * maxDamage).toFloat()
     }

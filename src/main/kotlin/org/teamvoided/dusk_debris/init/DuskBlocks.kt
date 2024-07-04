@@ -106,7 +106,7 @@ object DuskBlocks {
         "gunpowder_barrel",
         GunpowderBarrelBlock(
             4,
-            1f,
+            4f,
             gunpowderBarrelColor,
             AbstractBlock.Settings.create().mapColor(Blocks.FIRE.defaultMapColor).instrument(NoteBlockInstrument.BASS)
                 .strength(1f, 0.0f).sounds(BlockSoundGroup.WOOD).lavaIgnitable().solidBlock(Blocks::nonSolid)
@@ -116,7 +116,7 @@ object DuskBlocks {
         "stronghold_gunpowder_barrel",
         GunpowderBarrelBlock(
             10,
-            2f,
+            24f,
             gunpowderBarrelColor,
             AbstractBlock.Settings.create().mapColor(Blocks.FIRE.defaultMapColor).instrument(NoteBlockInstrument.BASS)
                 .strength(1.5f, 0.0f).sounds(BlockSoundGroup.WOOD).lavaIgnitable().solidBlock(Blocks::nonSolid)
@@ -126,7 +126,7 @@ object DuskBlocks {
         "ancient_black_powder_barrel",
         GunpowderBarrelBlock(
             16,
-            4f,
+            32f,
             gunpowderBarrelBlueColor,
             AbstractBlock.Settings.create().mapColor(Blocks.SOUL_FIRE.defaultMapColor)
                 .instrument(NoteBlockInstrument.BASS).strength(2f, 0.0f).sounds(BlockSoundGroup.WOOD).lavaIgnitable()

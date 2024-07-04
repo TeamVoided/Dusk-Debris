@@ -15,11 +15,13 @@ object DuskParticles {
     val GUNPOWDER_EXPLOSION_SMOKE = FabricParticleTypes.complex(GunpowderExplosionSmokeParticleEffect.CODEC, GunpowderExplosionSmokeParticleEffect.PACKET_CODEC)
     val GUNPOWDER_EXPLOSION_EMMITER = FabricParticleTypes.complex(GunpowderExplosionEmitterParticleEffect.CODEC, GunpowderExplosionEmitterParticleEffect.PACKET_CODEC)
     val BLUNDERBOMB: DefaultParticleType = FabricParticleTypes.simple()
+    val FIREBOMB: DefaultParticleType = FabricParticleTypes.simple()
 
     fun init() {
         Registry.register(Registries.PARTICLE_TYPE, id("toxic_smoke_particle"), TOXIC_SMOKE_PARTICLE)
         Registry.register(Registries.PARTICLE_TYPE, id("gunpowder_explosion_smoke"), GUNPOWDER_EXPLOSION_SMOKE)
         Registry.register(Registries.PARTICLE_TYPE, id("gunpowder_explosion_emitter"), GUNPOWDER_EXPLOSION_EMMITER)
         Registry.register(Registries.PARTICLE_TYPE, id("blunderbomb"), BLUNDERBOMB)
+        Registry.register(Registries.PARTICLE_TYPE, id("firebomb"), FIREBOMB)
     }
 }

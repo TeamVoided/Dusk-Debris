@@ -12,9 +12,6 @@ open class GunpowderExplosionSmokeParticle(
     x: Double,
     y: Double,
     z: Double,
-    velocityX: Double,
-    velocityY: Double,
-    velocityZ: Double,
     val color: Color
 ) :
     SpriteBillboardParticle(world, x, y, z) {
@@ -28,7 +25,6 @@ open class GunpowderExplosionSmokeParticle(
         this.colorGreen = color.green / 255f
         this.colorBlue = color.blue / 255f
         this.scale = 0.33f * (random.nextFloat() * random.nextFloat() * 6.0f + 1.0f)
-//        this.maxAge = 80
         this.maxAge = ((random.nextFloat() * 80).toInt() + 60)
     }
 
@@ -68,7 +64,7 @@ open class GunpowderExplosionSmokeParticle(
             velY: Double,
             velZ: Double,
         ): Particle {
-            val particle = GunpowderExplosionSmokeParticle(world, posX, posY, posZ, velX, velY, velZ, type.color)
+            val particle = GunpowderExplosionSmokeParticle(world, posX, posY, posZ, type.color)
             particle.setSprite(spriteProvider)
             return particle
         }

@@ -2,12 +2,15 @@ package org.teamvoided.dusk_debris
 
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap
 import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry
+import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry
+import net.minecraft.client.color.world.FoliageColors
 import net.minecraft.client.render.RenderLayer
 import net.minecraft.client.render.entity.EmptyEntityRenderer
 import net.minecraft.client.render.entity.FlyingItemEntityRenderer
 import org.teamvoided.dusk_debris.DuskDebris.log
 import org.teamvoided.dusk_debris.block.DuskBlockLists
+import org.teamvoided.dusk_debris.block.GunpowderBlock
 import org.teamvoided.dusk_debris.entity.gunpowder_barrel.GunpowderBarrelEntityRenderer
 import org.teamvoided.dusk_debris.init.DuskBlocks
 import org.teamvoided.dusk_debris.init.DuskEntities
@@ -18,6 +21,7 @@ import org.teamvoided.dusk_debris.particle.*
 object DuskDebrisClient {
 
     val cutoutBlock = listOf(
+        DuskBlocks.GUNPOWDER,
         DuskBlocks.BLUE_NETHERSHROOM,
         DuskBlocks.PURPLE_NETHERSHROOM,
         DuskBlocks.CYPRESS_DOOR,
@@ -40,6 +44,13 @@ object DuskDebrisClient {
             .register(DuskParticles.GUNPOWDER_EXPLOSION_EMMITER, GunpowderExplosionEmitterParticle.Factory())
         ParticleFactoryRegistry.getInstance()
             .register(DuskParticles.BLUNDERBOMB, BlunderbombParticle::Factory)
+        ParticleFactoryRegistry.getInstance()
+            .register(DuskParticles.FIREBOMB, FirebombParticle::Factory)
+
+        ColorProviderRegistry.BLOCK.register(
+            { state, _, _, _ -> if (state.get(GunpowderBlock.IGNITED)) 0xFF9F32 else 0x383838 },
+            DuskBlocks.GUNPOWDER
+        )
 
         EntityRendererRegistry.register(DuskEntities.BOX_AREA_EFFECT_CLOUD, ::EmptyEntityRenderer)
         EntityRendererRegistry.register(DuskEntities.GUNPOWDER_BARREL, ::GunpowderBarrelEntityRenderer)

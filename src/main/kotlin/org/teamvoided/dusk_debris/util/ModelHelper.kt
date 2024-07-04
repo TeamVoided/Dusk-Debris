@@ -1,15 +1,15 @@
 package org.teamvoided.dusk_debris.util
 
 import net.minecraft.block.Block
-import net.minecraft.block.Blocks
 import net.minecraft.block.enums.JigsawOrientation
 import net.minecraft.block.enums.WireConnection
 import net.minecraft.data.client.model.*
 import net.minecraft.data.client.model.VariantSettings.Rotation
-import net.minecraft.item.Items
+import net.minecraft.item.Item
 import net.minecraft.state.property.Properties
 import net.minecraft.util.Identifier
 import org.teamvoided.dusk_debris.DuskDebris
+import org.teamvoided.dusk_debris.DuskDebris.MODID
 import org.teamvoided.dusk_debris.DuskDebris.id
 import org.teamvoided.dusk_debris.block.NethershroomPlantBlock
 import java.util.*
@@ -57,49 +57,63 @@ fun BlockStateModelGenerator.rollableBlock(block: Block) {
         })
     )
 }
+
 fun BlockStateModelGenerator.registerDustBlock(block: Block) {
-    val dustUp = Texture.getSubId(block, "_dust_up")
+    this.registerDustBlock(block, MODID, block.toString())
+}
+fun BlockStateModelGenerator.registerDustBlockFromRedstone(block: Block) {
+    this.registerDustBlock(block,"minecraft", "redstone")
+}
+
+fun BlockStateModelGenerator.registerDustBlock(block: Block, namespace: String, texture: String) {
+    val dustUp = Identifier(namespace, "block/" + texture + "_dust_up")
+    val dustDot = Identifier(namespace, "block/" + texture + "_dust_dot")
+    val dustSide0 = Identifier(namespace, "block/" + texture + "_dust_side0")
+    val dustSide1 = Identifier(namespace, "block/" + texture + "_dust_side1")
+    val dustSideAlt0 = Identifier(namespace, "block/" + texture + "_dust_side_alt0")
+    val dustSideAlt1 = Identifier(namespace, "block/" + texture + "_dust_side_alt1")
     this.blockStateCollector.accept(
         MultipartBlockStateSupplier.create(block).with(
             When.anyOf(
                 *arrayOf<When>(
-                    When.create().set(Properties.NORTH_WIRE_CONNECTION, WireConnection.NONE)
-                        .set(Properties.EAST_WIRE_CONNECTION, WireConnection.NONE).set(
-                            Properties.SOUTH_WIRE_CONNECTION, WireConnection.NONE
-                        ).set(Properties.WEST_WIRE_CONNECTION, WireConnection.NONE),
-                    When.create().set(
-                        Properties.NORTH_WIRE_CONNECTION, WireConnection.SIDE, *arrayOf(WireConnection.UP)
-                    ).set(Properties.EAST_WIRE_CONNECTION, WireConnection.SIDE, *arrayOf(WireConnection.UP)),
-                    When.create().set(
-                        Properties.EAST_WIRE_CONNECTION, WireConnection.SIDE, *arrayOf(WireConnection.UP)
-                    ).set(Properties.SOUTH_WIRE_CONNECTION, WireConnection.SIDE, *arrayOf(WireConnection.UP)),
-                    When.create().set(
-                        Properties.SOUTH_WIRE_CONNECTION, WireConnection.SIDE, *arrayOf(WireConnection.UP)
-                    ).set(Properties.WEST_WIRE_CONNECTION, WireConnection.SIDE, *arrayOf(WireConnection.UP)),
-                    When.create().set(
-                        Properties.WEST_WIRE_CONNECTION, WireConnection.SIDE, *arrayOf(WireConnection.UP)
-                    ).set(Properties.NORTH_WIRE_CONNECTION, WireConnection.SIDE, *arrayOf(WireConnection.UP))
+                    When.create()
+                        .set(Properties.NORTH_WIRE_CONNECTION, WireConnection.NONE)
+                        .set(Properties.EAST_WIRE_CONNECTION, WireConnection.NONE)
+                        .set(Properties.SOUTH_WIRE_CONNECTION, WireConnection.NONE)
+                        .set(Properties.WEST_WIRE_CONNECTION, WireConnection.NONE),
+                    When.create()
+                        .set(Properties.NORTH_WIRE_CONNECTION, WireConnection.SIDE, *arrayOf(WireConnection.UP))
+                        .set(Properties.EAST_WIRE_CONNECTION, WireConnection.SIDE, *arrayOf(WireConnection.UP)),
+                    When.create()
+                        .set(Properties.EAST_WIRE_CONNECTION, WireConnection.SIDE, *arrayOf(WireConnection.UP))
+                        .set(Properties.SOUTH_WIRE_CONNECTION, WireConnection.SIDE, *arrayOf(WireConnection.UP)),
+                    When.create()
+                        .set(Properties.SOUTH_WIRE_CONNECTION, WireConnection.SIDE, *arrayOf(WireConnection.UP))
+                        .set(Properties.WEST_WIRE_CONNECTION, WireConnection.SIDE, *arrayOf(WireConnection.UP)),
+                    When.create()
+                        .set(Properties.WEST_WIRE_CONNECTION, WireConnection.SIDE, *arrayOf(WireConnection.UP))
+                        .set(Properties.NORTH_WIRE_CONNECTION, WireConnection.SIDE, *arrayOf(WireConnection.UP))
                 )
             ),
             BlockStateVariant.create()
-                .put(VariantSettings.MODEL, Texture.getSubId(block, "_dust_dot"))
+                .put(VariantSettings.MODEL, dustDot)
         ).with(
             When.create().set(Properties.NORTH_WIRE_CONNECTION, WireConnection.SIDE, *arrayOf(WireConnection.UP)),
             BlockStateVariant.create()
-                .put(VariantSettings.MODEL, Texture.getSubId(block, "_dust_side0"))
+                .put(VariantSettings.MODEL, dustSide0)
         ).with(
             When.create().set(Properties.SOUTH_WIRE_CONNECTION, WireConnection.SIDE, *arrayOf(WireConnection.UP)),
             BlockStateVariant.create()
-                .put(VariantSettings.MODEL, Texture.getSubId(block, "_dust_side_alt0"))
+                .put(VariantSettings.MODEL, dustSideAlt0)
         ).with(
             When.create().set(Properties.EAST_WIRE_CONNECTION, WireConnection.SIDE, *arrayOf(WireConnection.UP)),
             BlockStateVariant.create()
-                .put(VariantSettings.MODEL, Texture.getSubId(block, "_dust_side_alt1"))
+                .put(VariantSettings.MODEL, dustSideAlt1)
                 .put(VariantSettings.Y, Rotation.R270)
         ).with(
             When.create().set(Properties.WEST_WIRE_CONNECTION, WireConnection.SIDE, *arrayOf(WireConnection.UP)),
             BlockStateVariant.create()
-                .put(VariantSettings.MODEL, Texture.getSubId(block, "_dust_side1"))
+                .put(VariantSettings.MODEL, dustSide1)
                 .put(VariantSettings.Y, Rotation.R270)
         ).with(
             When.create().set(Properties.NORTH_WIRE_CONNECTION, WireConnection.UP),
@@ -123,6 +137,7 @@ fun BlockStateModelGenerator.registerDustBlock(block: Block) {
         )
     )
 }
+
 fun BlockStateModelGenerator.gunpowderBarrelBlock(block: Block) {
     val front = Texture.getSubId(block, "_front")
     val side = Texture.getSubId(block, "_side")
@@ -286,7 +301,7 @@ fun BlockStateModelGenerator.registerRibbon(block: Block) {
 
 fun BlockStateModelGenerator.getRibbonBlockStateVariants(block: Block, variants: Int): List<BlockStateVariant> {
     return IntStream.range(1, variants + 1).mapToObj { variant ->
-            BlockStateVariant.create().put(
+        BlockStateVariant.create().put(
             VariantSettings.MODEL,
             this.makeRibbonModel(block, variant)
         )

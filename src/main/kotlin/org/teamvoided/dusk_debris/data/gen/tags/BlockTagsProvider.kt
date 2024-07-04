@@ -5,6 +5,7 @@ import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider
 import net.minecraft.block.Blocks
 import net.minecraft.registry.HolderLookup
 import net.minecraft.registry.tag.BlockTags
+import org.teamvoided.dusk_debris.block.DuskBlockLists.GUNPOWDER_BARREL_BLOCK_LIST
 import org.teamvoided.dusk_debris.block.DuskBlockLists.RIBBON_BLOCKS_LIST
 import org.teamvoided.dusk_debris.block.DuskBlockLists.THROWABLE_BLOCK_LIST
 import org.teamvoided.dusk_debris.data.DuskBlockTags
@@ -25,24 +26,29 @@ class BlockTagsProvider(output: FabricDataOutput, registriesFuture: CompletableF
         getOrCreateTagBuilder(DuskBlockTags.THROWABLE_BLOCK)
             .add(*THROWABLE_BLOCK_LIST.toTypedArray())
         getOrCreateTagBuilder(DuskBlockTags.GUNPOWDER_BARRELS)
-            .add(*THROWABLE_BLOCK_LIST.toTypedArray())
+            .add(*GUNPOWDER_BARREL_BLOCK_LIST.toTypedArray())
+        getOrCreateTagBuilder(DuskBlockTags.GUNPOWDER_CONNECTS_TO)
+            .forceAddTag(DuskBlockTags.GUNPOWDER_BARRELS)
+            .forceAddTag(BlockTags.FIRE)
+            .add(DuskBlocks.GUNPOWDER)
+            .add(Blocks.TNT)
         getOrCreateTagBuilder(DuskBlockTags.FIREBOMB_DESTROYS)
-            .addOptionalTag(DuskBlockTags.GUNPOWDER_BARRELS)
+            .forceAddTag(DuskBlockTags.GUNPOWDER_BARRELS)
             .add(Blocks.TNT)
         getOrCreateTagBuilder(DuskBlockTags.BLUNDERBOMB_DESTROYS)
-            .addOptionalTag(DuskBlockTags.FIREBOMB_DESTROYS)
-            .addOptionalTag(DuskBlockTags.THROWABLE_BLOCK)
+            .forceAddTag(DuskBlockTags.FIREBOMB_DESTROYS)
+            .forceAddTag(DuskBlockTags.THROWABLE_BLOCK)
         getOrCreateTagBuilder(DuskBlockTags.GUNPOWDER_BARREL_DESTROYS)
-            .addOptionalTag(DuskBlockTags.BLUNDERBOMB_DESTROYS)
+            .forceAddTag(DuskBlockTags.BLUNDERBOMB_DESTROYS)
             .add(Blocks.NETHER_PORTAL)
         getOrCreateTagBuilder(DuskBlockTags.NETHERSHROOM_GROWABLE_ON)
-            .addOptionalTag(BlockTags.MUSHROOM_GROW_BLOCK)
-            .addOptionalTag(BlockTags.NYLIUM)
+            .forceAddTag(BlockTags.MUSHROOM_GROW_BLOCK)
+            .forceAddTag(BlockTags.NYLIUM)
             .add(Blocks.SOUL_SOIL)
         getOrCreateTagBuilder(DuskBlockTags.NETHERSHROOM_REPLACEABLE)
-            .addOptionalTag(BlockTags.REPLACEABLE)
-            .addOptionalTag(BlockTags.REPLACEABLE_BY_TREES)
-            .addOptionalTag(BlockTags.WART_BLOCKS)
+            .forceAddTag(BlockTags.REPLACEABLE)
+            .forceAddTag(BlockTags.REPLACEABLE_BY_TREES)
+            .forceAddTag(BlockTags.WART_BLOCKS)
             .add(DuskBlocks.BLUE_NETHERSHROOM_BLOCK)
             .add(DuskBlocks.PURPLE_NETHERSHROOM_BLOCK)
             .add(Blocks.WEEPING_VINES_PLANT)
@@ -50,11 +56,8 @@ class BlockTagsProvider(output: FabricDataOutput, registriesFuture: CompletableF
             .add(Blocks.TWISTING_VINES_PLANT)
             .add(Blocks.TWISTING_VINES)
         getOrCreateTagBuilder(DuskBlockTags.NETHERSHROOM_IGNORE)
-            .addOptionalTag(DuskBlockTags.NETHERSHROOM_GROWABLE_ON)
-            .addOptionalTag(DuskBlockTags.NETHERSHROOM_REPLACEABLE)
-        getOrCreateTagBuilder(DuskBlockTags.GUNPOWDER_CONNECTS_TO)
-            .addOptionalTag(DuskBlockTags.GUNPOWDER_BARRELS)
-            .add(Blocks.TNT)
+            .forceAddTag(DuskBlockTags.NETHERSHROOM_GROWABLE_ON)
+            .forceAddTag(DuskBlockTags.NETHERSHROOM_REPLACEABLE)
     }
 
     private fun vanillaTags() {

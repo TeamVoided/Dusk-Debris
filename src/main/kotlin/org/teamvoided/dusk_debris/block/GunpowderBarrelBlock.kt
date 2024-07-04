@@ -4,7 +4,6 @@ import com.mojang.serialization.MapCodec
 import net.minecraft.block.Block
 import net.minecraft.block.BlockState
 import net.minecraft.block.Blocks
-import net.minecraft.block.CrafterBlock
 import net.minecraft.block.enums.JigsawOrientation
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.player.PlayerEntity
@@ -29,7 +28,7 @@ import net.minecraft.world.event.GameEvent
 import net.minecraft.world.explosion.Explosion
 import org.teamvoided.dusk_debris.entity.GunpowderBarrelEntity
 
-class GunpowderBarrelBlock(val power: Int = 5, val knockbackMultiplier: Float = 1f, val color: Int = 0xffffff, settings: Settings) :
+class GunpowderBarrelBlock(val power: Int = 5, val range: Float = 4f, val color: Int = 0xffffff, settings: Settings) :
     Block(settings) {
 
     public override fun getCodec(): MapCodec<GunpowderBarrelBlock> {
@@ -78,7 +77,7 @@ class GunpowderBarrelBlock(val power: Int = 5, val knockbackMultiplier: Float = 
             )
             gunpowderBarrelEntity.setProperties(
                 this.power,
-                this.knockbackMultiplier,
+                this.range,
                 this.defaultState,
                 this.color
             )
@@ -182,7 +181,7 @@ class GunpowderBarrelBlock(val power: Int = 5, val knockbackMultiplier: Float = 
                     )
                 gunpowderBarrelEntity.setProperties(
                     (world.getBlockState(pos).block as GunpowderBarrelBlock).power,
-                    (world.getBlockState(pos).block as GunpowderBarrelBlock).knockbackMultiplier,
+                    (world.getBlockState(pos).block as GunpowderBarrelBlock).range,
                     world.getBlockState(pos),
                     (world.getBlockState(pos).block as GunpowderBarrelBlock).color,
                 )
