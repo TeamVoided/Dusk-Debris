@@ -4,13 +4,13 @@ import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap
 import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry
-import net.minecraft.client.color.world.FoliageColors
 import net.minecraft.client.render.RenderLayer
 import net.minecraft.client.render.entity.EmptyEntityRenderer
 import net.minecraft.client.render.entity.FlyingItemEntityRenderer
 import org.teamvoided.dusk_debris.DuskDebris.log
 import org.teamvoided.dusk_debris.block.DuskBlockLists
 import org.teamvoided.dusk_debris.block.GunpowderBlock
+import org.teamvoided.dusk_debris.entity.DuskEntityLists.THROWABLE_BOMB_ENTITIES
 import org.teamvoided.dusk_debris.entity.gunpowder_barrel.GunpowderBarrelEntityRenderer
 import org.teamvoided.dusk_debris.init.DuskBlocks
 import org.teamvoided.dusk_debris.init.DuskEntities
@@ -28,7 +28,7 @@ object DuskDebrisClient {
         DuskBlocks.CYPRESS_TRAPDOOR,
         DuskBlocks.CHARRED_DOOR,
         DuskBlocks.CHARRED_TRAPDOOR,
-    ) + DuskBlockLists.THROWABLE_BLOCK_LIST +
+    ) + DuskBlockLists.THROWABLE_BOMB_BLOCK_LIST +
             DuskBlockLists.RIBBON_BLOCKS_LIST
 //    val translucentBlock = listOf()
 
@@ -43,23 +43,23 @@ object DuskDebrisClient {
         ParticleFactoryRegistry.getInstance()
             .register(DuskParticles.GUNPOWDER_EXPLOSION_EMMITER, GunpowderExplosionEmitterParticle.Factory())
         ParticleFactoryRegistry.getInstance()
-            .register(DuskParticles.BLUNDERBOMB, BlunderbombParticle::Factory)
+            .register(DuskParticles.BLUNDERBOMB, BlunderbombParticle.Factory())
         ParticleFactoryRegistry.getInstance()
-            .register(DuskParticles.FIREBOMB, FirebombParticle::Factory)
+            .register(DuskParticles.FIREBOMB, FirebombParticle.Factory())
+        ParticleFactoryRegistry.getInstance()
+            .register(DuskParticles.BONECALLER, BonecallerParticle::Factory)
 
         ColorProviderRegistry.BLOCK.register(
-            { state, _, _, _ -> if (state.get(GunpowderBlock.IGNITED)) 0xFF9F32 else 0x383838 },
+            { state, _, _, _ -> if (state.get(GunpowderBlock.LIT)) 0xFF9F32 else 0x383838 },
             DuskBlocks.GUNPOWDER
         )
 
         EntityRendererRegistry.register(DuskEntities.BOX_AREA_EFFECT_CLOUD, ::EmptyEntityRenderer)
         EntityRendererRegistry.register(DuskEntities.GUNPOWDER_BARREL, ::GunpowderBarrelEntityRenderer)
-        EntityRendererRegistry.register(DuskEntities.BLUNDERBOMB, ::FlyingItemEntityRenderer)
-        EntityRendererRegistry.register(DuskEntities.FIREBOMB, ::FlyingItemEntityRenderer)
-        EntityRendererRegistry.register(DuskEntities.BONECALLER, ::FlyingItemEntityRenderer)
-        EntityRendererRegistry.register(DuskEntities.POCKETPOISON, ::FlyingItemEntityRenderer)
-        EntityRendererRegistry.register(DuskEntities.BLINDBOMB, ::FlyingItemEntityRenderer)
-        EntityRendererRegistry.register(DuskEntities.SMOKEBOMB, ::FlyingItemEntityRenderer)
+
+        THROWABLE_BOMB_ENTITIES.forEach{
+            EntityRendererRegistry.register(it, ::FlyingItemEntityRenderer)
+        }
 
         cutoutBlock.forEach {
             BlockRenderLayerMap.INSTANCE.putBlock(it, RenderLayer.getCutout())

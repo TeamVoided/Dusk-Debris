@@ -3,9 +3,10 @@ package org.teamvoided.dusk_debris.init
 import net.minecraft.block.Block
 import net.minecraft.block.dispenser.DispenserBlock
 import net.minecraft.block.dispenser.ItemDispenserBehavior
+import net.minecraft.component.DataComponentTypes
+import net.minecraft.component.type.DyedColorComponent
 import net.minecraft.entity.Entity
 import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.effect.StatusEffects
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.*
 import net.minecraft.registry.Registries
@@ -16,13 +17,19 @@ import net.minecraft.util.math.BlockPointer
 import net.minecraft.world.World
 import net.minecraft.world.event.GameEvent
 import org.teamvoided.dusk_debris.DuskDebris.id
-import org.teamvoided.dusk_debris.block.DuskBlockLists.GUNPOWDER_BARREL_BLOCK_LIST
-import org.teamvoided.dusk_debris.block.DuskBlockLists.THROWABLE_BLOCK_LIST
+import org.teamvoided.dusk_debris.block.DuskBlockLists
 import org.teamvoided.dusk_debris.block.GunpowderBarrelBlock
 import org.teamvoided.dusk_debris.entity.GunpowderBarrelEntity
+import org.teamvoided.dusk_debris.item.DuskItemLists
 import org.teamvoided.dusk_debris.item.throwable_bomb.BlunderbombItem
+import org.teamvoided.dusk_debris.item.throwable_bomb.BonecallerItem
 import org.teamvoided.dusk_debris.item.throwable_bomb.FirebombItem
-import org.teamvoided.dusk_debris.item.throwable_bomb.NethershroomThrowableItem
+import org.teamvoided.dusk_debris.item.throwable_bomb.bonecaller.BoneboggerItem
+import org.teamvoided.dusk_debris.item.throwable_bomb.bonecaller.BonechillerItem
+import org.teamvoided.dusk_debris.item.throwable_bomb.bonecaller.BonewitherItem
+import org.teamvoided.dusk_debris.item.throwable_bomb.nethershroom_throwable_item.BlindbombItem
+import org.teamvoided.dusk_debris.item.throwable_bomb.nethershroom_throwable_item.PocketpoisonItem
+import org.teamvoided.dusk_debris.item.throwable_bomb.nethershroom_throwable_item.SmokebombItem
 
 
 @Suppress("unused", "MemberVisibilityCanBePrivate")
@@ -48,39 +55,22 @@ object DuskItems {
     val BLUNDERBOMB_ITEM =
         register("blunderbomb", BlunderbombItem(DuskBlocks.BLUNDERBOMB_BLOCK, Item.Settings().maxCount(16)))
     val FIREBOMB_ITEM = register("firebomb", FirebombItem(DuskBlocks.FIREBOMB_BLOCK, Item.Settings().maxCount(16)))
-    val POCKETPOISON_ITEM = register(
-        "pocketpoison",
-        NethershroomThrowableItem(
-            DuskBlocks.POCKETPOISON_BLOCK,
-            DuskEntities.POCKETPOISON,
-            DuskBlocks.blueNethershroomSmoke,
-            StatusEffects.POISON,
-            true,
-            Item.Settings().maxCount(1)
+    val BONECALLER_ITEM =register("bonecaller", BonecallerItem(DuskBlocks.BONECALLER_BLOCK, Item.Settings().maxCount(16)))
+    val BONECHILLER_ITEM =register("bonechiller", BonechillerItem(DuskBlocks.BONECHILLER_BLOCK, Item.Settings().maxCount(16)))
+    val BONEBOGGER_ITEM =register("bonebogger", BoneboggerItem(DuskBlocks.BONEBOGGER_BLOCK, Item.Settings().maxCount(16)))
+    val BONEWITHER_ITEM =register("bonewither", BonewitherItem(DuskBlocks.BONEWITHER_BLOCK, Item.Settings().maxCount(16)))
+
+    val SMOKEBOMB_ITEM =
+        register(
+            "smokebomb",
+            SmokebombItem(
+                DuskBlocks.SMOKEBOMB_BLOCK,
+                Item.Settings().maxCount(1).component(DataComponentTypes.DYED_COLOR, DyedColorComponent(0x7F7F7F, true))
+            )
         )
-    )
-    val BLINDBOMB_ITEM = register(
-        "blindbomb",
-        NethershroomThrowableItem(
-            DuskBlocks.BLINDBOMB_BLOCK,
-            DuskEntities.BLINDBOMB,
-            DuskBlocks.purpleNethershroomSmoke,
-            StatusEffects.BLINDNESS,
-            false,
-            Item.Settings().maxCount(1)
-        )
-    )
-    val SMOKEBOMB_ITEM = register(
-        "smokebomb",
-        NethershroomThrowableItem(
-            DuskBlocks.SMOKEBOMB_BLOCK,
-            DuskEntities.SMOKEBOMB,
-            DuskBlocks.smokebombSmoke,
-            null,
-            false,
-            Item.Settings().maxCount(1)
-        )
-    )
+    val BLINDBOMB_ITEM = register("blindbomb", BlindbombItem(DuskBlocks.BLINDBOMB_BLOCK, Item.Settings().maxCount(1)))
+    val POCKETPOISON_ITEM =
+        register("pocketpoison", PocketpoisonItem(DuskBlocks.POCKETPOISON_BLOCK, Item.Settings().maxCount(1)))
 
     val LIGHT_BLUE_RIBBON = register("light_blue_ribbon", BlockItem(DuskBlocks.LIGHT_BLUE_RIBBON, Item.Settings()))
 
@@ -131,6 +121,71 @@ object DuskItems {
     val SMOOTH_VOLCANIC_SANDSTONE_SLAB =
         register("smooth_volcanic_sandstone_slab", BlockItem(DuskBlocks.SMOOTH_VOLCANIC_SANDSTONE_SLAB))
 
+    @JvmField
+    val BLACKSTONE_SWORD = register(
+        "blackstone_sword", (SwordItem(
+            ToolMaterials.STONE,
+            (Item.Settings()).attributeModifiersComponent(
+                SwordItem.createAttributes(
+                    ToolMaterials.STONE,
+                    3,
+                    -2.4f
+                )
+            )
+        ))
+    )
+    val BLACKSTONE_PICKAXE = register(
+        "blackstone_pickaxe", (PickaxeItem(
+            ToolMaterials.STONE,
+            (Item.Settings()).attributeModifiersComponent(
+                PickaxeItem.createAttributes(
+                    ToolMaterials.STONE,
+                    1.0f,
+                    -2.8f
+                )
+            )
+        ))
+    )
+
+    @JvmField
+    val BLACKSTONE_AXE = register(
+        "blackstone_axe", (AxeItem(
+            ToolMaterials.STONE,
+            (Item.Settings()).attributeModifiersComponent(
+                AxeItem.createAttributes(
+                    ToolMaterials.STONE,
+                    7.0f,
+                    -3.2f
+                )
+            )
+        ))
+    )
+    val BLACKSTONE_SHOVEL = register(
+        "blackstone_shovel", (ShovelItem(
+            ToolMaterials.STONE,
+            (Item.Settings()).attributeModifiersComponent(
+                ShovelItem.createAttributes(
+                    ToolMaterials.STONE,
+                    1.5f,
+                    -3.0f
+                )
+            )
+        ))
+    )
+    val BLACKSTONE_HOE = register(
+        "blackstone_hoe", (HoeItem(
+            ToolMaterials.STONE,
+            (Item.Settings()).attributeModifiersComponent(
+                HoeItem.createAttributes(
+                    ToolMaterials.STONE,
+                    -1.0f,
+                    -2.0f
+                )
+            )
+        ))
+    )
+
+
     val CHARRED_LOG = register("charred_log", BlockItem(DuskBlocks.CHARRED_LOG))
     val CHARRED_WOOD = register("charred_wood", BlockItem(DuskBlocks.CHARRED_WOOD))
     val STRIPPED_CHARRED_LOG = register("stripped_charred_log", BlockItem(DuskBlocks.STRIPPED_CHARRED_LOG))
@@ -157,15 +212,11 @@ object DuskItems {
         )
     )
 
-
-//add void util compat
-
-
     fun init() {
-        THROWABLE_BLOCK_LIST.forEach {
-            DispenserBlock.registerBehavior(it.asItem())
+        DuskItemLists.THROWABLE_BOMB_ITEM_LIST.forEach {
+            DispenserBlock.registerBehavior(it)
         }
-        GUNPOWDER_BARREL_BLOCK_LIST.forEach {
+        DuskBlockLists.GUNPOWDER_BARREL_BLOCK_LIST.forEach {
             registerGunpowderDispensedBehavior(it)
         }
     }

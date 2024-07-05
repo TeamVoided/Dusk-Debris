@@ -26,9 +26,10 @@ import net.minecraft.util.math.Direction
 import net.minecraft.world.World
 import net.minecraft.world.event.GameEvent
 import net.minecraft.world.explosion.Explosion
+import org.teamvoided.dusk_debris.data.DuskItemTags
 import org.teamvoided.dusk_debris.entity.GunpowderBarrelEntity
 
-class GunpowderBarrelBlock(val power: Int = 5, val range: Float = 4f, val color: Int = 0xffffff, settings: Settings) :
+class GunpowderBarrelBlock(val power: Int = 5, val range: Int = 4, val color: Int = 0xffffff, settings: Settings) :
     Block(settings) {
 
     public override fun getCodec(): MapCodec<GunpowderBarrelBlock> {
@@ -96,13 +97,13 @@ class GunpowderBarrelBlock(val power: Int = 5, val range: Float = 4f, val color:
         hand: Hand,
         hitResult: BlockHitResult
     ): ItemInteractionResult {
-        if (!stack.isOf(Items.FLINT_AND_STEEL) && !stack.isOf(Items.FIRE_CHARGE)) {
+        if (!stack.isIn(DuskItemTags.IGNITES_GUNPOWDER)) {
             return super.onInteract(stack, state, world, pos, entity, hand, hitResult)
         } else {
             primeGunpowderBarrel(world, pos, entity)
             world.setBlockState(pos, Blocks.AIR.defaultState, 11)
             val item = stack.item
-            if (stack.isOf(Items.FLINT_AND_STEEL)) {
+            if (stack.isDamageable) {
                 stack.damageEquipment(1, entity, LivingEntity.getHand(hand))
             } else {
                 stack.consume(1, entity)
@@ -156,7 +157,7 @@ class GunpowderBarrelBlock(val power: Int = 5, val range: Float = 4f, val color:
         val CODEC: MapCodec<GunpowderBarrelBlock> = createCodec { settings: Settings ->
             GunpowderBarrelBlock(
                 5,
-                1f,
+                1,
                 0xffffff,
                 settings
             )

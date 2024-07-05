@@ -32,12 +32,9 @@ open class AbstractThrwowableBombEntity : ThrownItemEntity {
 
     constructor(world: World, x: Double, y: Double, z: Double) : super(null, x, y, z, world)
 
-    open var explosionBehavior: ExplosionBehavior = ExplosionBehavior()
-    open val hitDamage = 0f
-    open val trailingParticle: ParticleEffect = ParticleTypes.SMOKE
 
     override fun onEntityHit(entityHitResult: EntityHitResult) {
-        entityHitResult.entity.damage(this.damageSources.thrown(this, this.owner), hitDamage)
+        entityHitResult.entity.damage(this.damageSources.thrown(this, this.owner), getHitDamage())
         super.onEntityHit(entityHitResult)
     }
 
@@ -50,9 +47,9 @@ open class AbstractThrwowableBombEntity : ThrownItemEntity {
     }
 
     override fun tick() {
-        if (world.isClient) {
+        if (world.isClient && age >= 2) {
             world.addParticle(
-                trailingParticle,
+                getTrailingParticle(),
                 this.x,
                 this.y + 0.15,
                 this.z,
@@ -87,4 +84,8 @@ open class AbstractThrwowableBombEntity : ThrownItemEntity {
         println("this should not occur, please check that you override the getDefaultItem function")
         return DuskItems.BLUNDERBOMB_ITEM
     }
+
+    open fun getTrailingParticle(): ParticleEffect = ParticleTypes.SMOKE
+    open fun getHitDamage(): Float = 0f
+    open fun getExplosionBehavior(): ExplosionBehavior = ExplosionBehavior()
 }

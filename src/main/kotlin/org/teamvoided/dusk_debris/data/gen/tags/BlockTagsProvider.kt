@@ -7,7 +7,7 @@ import net.minecraft.registry.HolderLookup
 import net.minecraft.registry.tag.BlockTags
 import org.teamvoided.dusk_debris.block.DuskBlockLists.GUNPOWDER_BARREL_BLOCK_LIST
 import org.teamvoided.dusk_debris.block.DuskBlockLists.RIBBON_BLOCKS_LIST
-import org.teamvoided.dusk_debris.block.DuskBlockLists.THROWABLE_BLOCK_LIST
+import org.teamvoided.dusk_debris.block.DuskBlockLists.THROWABLE_BOMB_BLOCK_LIST
 import org.teamvoided.dusk_debris.data.DuskBlockTags
 import org.teamvoided.dusk_debris.init.DuskBlocks
 import java.util.concurrent.CompletableFuture
@@ -23,8 +23,8 @@ class BlockTagsProvider(output: FabricDataOutput, registriesFuture: CompletableF
     private fun duskTags() {
         getOrCreateTagBuilder(DuskBlockTags.RIBBON_BLOCK)
             .add(*RIBBON_BLOCKS_LIST.toTypedArray())
-        getOrCreateTagBuilder(DuskBlockTags.THROWABLE_BLOCK)
-            .add(*THROWABLE_BLOCK_LIST.toTypedArray())
+        getOrCreateTagBuilder(DuskBlockTags.THROWABLE_BOMB_BLOCK)
+            .add(*THROWABLE_BOMB_BLOCK_LIST.toTypedArray())
         getOrCreateTagBuilder(DuskBlockTags.GUNPOWDER_BARRELS)
             .add(*GUNPOWDER_BARREL_BLOCK_LIST.toTypedArray())
         getOrCreateTagBuilder(DuskBlockTags.GUNPOWDER_CONNECTS_TO)
@@ -34,10 +34,13 @@ class BlockTagsProvider(output: FabricDataOutput, registriesFuture: CompletableF
             .add(Blocks.TNT)
         getOrCreateTagBuilder(DuskBlockTags.FIREBOMB_DESTROYS)
             .forceAddTag(DuskBlockTags.GUNPOWDER_BARRELS)
+            .forceAddTag(BlockTags.CAMPFIRES)
+            .forceAddTag(BlockTags.CANDLES)
+            .add(DuskBlocks.GUNPOWDER)
             .add(Blocks.TNT)
         getOrCreateTagBuilder(DuskBlockTags.BLUNDERBOMB_DESTROYS)
             .forceAddTag(DuskBlockTags.FIREBOMB_DESTROYS)
-            .forceAddTag(DuskBlockTags.THROWABLE_BLOCK)
+            .forceAddTag(DuskBlockTags.THROWABLE_BOMB_BLOCK)
         getOrCreateTagBuilder(DuskBlockTags.GUNPOWDER_BARREL_DESTROYS)
             .forceAddTag(DuskBlockTags.BLUNDERBOMB_DESTROYS)
             .add(Blocks.NETHER_PORTAL)
@@ -58,6 +61,7 @@ class BlockTagsProvider(output: FabricDataOutput, registriesFuture: CompletableF
         getOrCreateTagBuilder(DuskBlockTags.NETHERSHROOM_IGNORE)
             .forceAddTag(DuskBlockTags.NETHERSHROOM_GROWABLE_ON)
             .forceAddTag(DuskBlockTags.NETHERSHROOM_REPLACEABLE)
+            .add(DuskBlocks.NETHERSHROOM_STEM)
     }
 
     private fun vanillaTags() {

@@ -6,8 +6,6 @@ import net.minecraft.client.particle.*
 import net.minecraft.client.world.ClientWorld
 import net.minecraft.particle.DefaultParticleType
 import net.minecraft.particle.ParticleTypes
-import net.minecraft.util.math.MathHelper
-import kotlin.math.sqrt
 
 @Environment(EnvType.CLIENT)
 class FirebombParticle(
@@ -19,9 +17,9 @@ class FirebombParticle(
     NoRenderParticle(world, x, y, z, 0.0, 0.0, 0.0) {
 
     init {
-        this.velocityX = 2*(random.nextDouble() - random.nextDouble())
-        this.velocityY = 2*(random.nextDouble() - random.nextDouble())
-        this.velocityZ = 2*(random.nextDouble() - random.nextDouble())
+        this.velocityX = 2 * (random.nextDouble() - random.nextDouble())
+        this.velocityY = 2 * (random.nextDouble() - random.nextDouble())
+        this.velocityZ = 2 * (random.nextDouble() - random.nextDouble())
         this.maxAge = 10
     }
 
@@ -40,7 +38,7 @@ class FirebombParticle(
     }
 
     @Environment(EnvType.CLIENT)
-    class Factory(private val spriteProvider: SpriteProvider) : ParticleFactory<DefaultParticleType> {
+    class Factory : ParticleFactory<DefaultParticleType> {
         override fun createParticle(
             defaultParticleType: DefaultParticleType,
             world: ClientWorld,
@@ -54,9 +52,5 @@ class FirebombParticle(
             val flameParticle = FirebombParticle(world, d, e, f)
             return flameParticle
         }
-    }
-
-    companion object {
-        const val defaultRadius: Float = 4f
     }
 }

@@ -2,15 +2,13 @@ package org.teamvoided.dusk_debris.init
 
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents
-import net.minecraft.item.ItemGroup
-import net.minecraft.item.ItemGroups
-import net.minecraft.item.ItemStack
-import net.minecraft.item.Items
+import net.minecraft.item.*
 import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
 import net.minecraft.registry.RegistryKey
 import net.minecraft.text.Text
 import org.teamvoided.dusk_debris.DuskDebris.id
+import org.teamvoided.dusk_debris.item.DuskItemLists
 import kotlin.jvm.optionals.getOrNull
 
 
@@ -20,6 +18,8 @@ object DuskItemGroups {
             .icon { ItemStack(DuskItems.GUNPOWDER_BARREL) }
             .name(Text.translatable("itemGroup.dusk_debris.dusk_items"))
             .entries { _, entries ->
+                entries.addItems(DuskItemLists.GUNPOWDER_BARREL_ITEM_LIST)
+                entries.addItems(DuskItemLists.THROWABLE_BOMB_ITEM_LIST)
                 entries.addStacks(
                     mutableSetOf(
                         ItemStack(DuskItems.NETHERSHROOM_STEM),
@@ -27,15 +27,11 @@ object DuskItemGroups {
                         ItemStack(DuskItems.PURPLE_NETHERSHROOM_BLOCK),
                         ItemStack(DuskItems.BLUE_NETHERSHROOM),
                         ItemStack(DuskItems.PURPLE_NETHERSHROOM),
-
-                        ItemStack(DuskItems.GUNPOWDER_BARREL),
-                        ItemStack(DuskItems.STRONGHOLD_GUNPOWDER_BARREL),
-                        ItemStack(DuskItems.ANCIENT_BLACK_POWDER_BARREL),
-                        ItemStack(DuskItems.BLUNDERBOMB_ITEM),
-                        ItemStack(DuskItems.FIREBOMB_ITEM),
-                        ItemStack(DuskItems.POCKETPOISON_ITEM),
-                        ItemStack(DuskItems.BLINDBOMB_ITEM),
-                        ItemStack(DuskItems.SMOKEBOMB_ITEM),
+                        ItemStack(DuskItems.BLACKSTONE_SWORD),
+                        ItemStack(DuskItems.BLACKSTONE_PICKAXE),
+                        ItemStack(DuskItems.BLACKSTONE_AXE),
+                        ItemStack(DuskItems.BLACKSTONE_SHOVEL),
+                        ItemStack(DuskItems.BLACKSTONE_HOE),
 
                         ItemStack(DuskItems.LIGHT_BLUE_RIBBON),
 
@@ -83,6 +79,8 @@ object DuskItemGroups {
                         ItemStack(DuskItems.CHARRED_PRESSURE_PLATE),
                         ItemStack(DuskItems.CHARRED_SIGN),
                         ItemStack(DuskItems.CHARRED_HANGING_SIGN),
+
+                        ItemStack(DuskItems.DEVELOPER_GUNPOWDER_ITEM)
                     )
                 )
             }
@@ -123,5 +121,9 @@ object DuskItemGroups {
 
     fun getKey(itemGroup: ItemGroup): RegistryKey<ItemGroup>? {
         return Registries.ITEM_GROUP.getKey(itemGroup)?.getOrNull()
+    }
+
+    fun ItemGroup.ItemStackCollector.addItems(list:Collection<Item>){
+        this.addStacks(list.map(Item::getDefaultStack))
     }
 }

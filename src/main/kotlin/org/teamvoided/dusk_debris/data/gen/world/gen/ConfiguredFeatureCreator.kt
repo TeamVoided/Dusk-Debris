@@ -7,6 +7,7 @@ import net.minecraft.registry.BootstrapContext
 import net.minecraft.registry.RegistryKey
 import net.minecraft.registry.RegistryKeys
 import net.minecraft.registry.tag.BlockTags
+import net.minecraft.util.collection.DataPool
 import net.minecraft.util.math.Direction
 import net.minecraft.util.math.int_provider.UniformIntProvider
 import net.minecraft.world.gen.blockpredicate.BlockPredicate
@@ -16,6 +17,7 @@ import net.minecraft.world.gen.feature.*
 import net.minecraft.world.gen.feature.util.ConfiguredFeatureUtil
 import net.minecraft.world.gen.feature.util.PlacedFeatureUtil
 import net.minecraft.world.gen.stateprovider.BlockStateProvider
+import net.minecraft.world.gen.stateprovider.WeightedBlockStateProvider
 import org.teamvoided.dusk_debris.data.DuskBlockTags
 import org.teamvoided.dusk_debris.init.DuskBlocks
 import org.teamvoided.dusk_debris.data.DuskConfiguredFeatures
@@ -31,7 +33,25 @@ object ConfiguredFeatureCreator {
         c.registerConfiguredFeature(
             DuskConfiguredFeatures.BLUE_NETHERSHROOM,
             Feature.SIMPLE_BLOCK,
-            SimpleBlockFeatureConfig(BlockStateProvider.of(DuskBlocks.BLUE_NETHERSHROOM))
+            SimpleBlockFeatureConfig(
+                WeightedBlockStateProvider(
+                    DataPool.builder<BlockState>()
+                        .addWeighted(DuskBlocks.BLUE_NETHERSHROOM.defaultState, 24)
+                        .add(DuskBlocks.PURPLE_NETHERSHROOM.defaultState)
+                )
+            )
+        )
+        c.registerConfiguredFeature(
+            DuskConfiguredFeatures.BLUE_NETHERSHROOM_PATCH,
+            Feature.RANDOM_PATCH,
+            ConfiguredFeatureUtil.createRandomPatchFeatureConfig(
+                64, PlacedFeatureUtil.placedInline(
+                    configuredFeatures.getHolderOrThrow(DuskConfiguredFeatures.BLUE_NETHERSHROOM),
+                    BlockPredicateFilterPlacementModifier.create(
+                        BlockPredicate.matchingBlockTags(BlockTags.AIR)
+                    )
+                )
+            )
         )
         c.registerConfiguredFeature(
             DuskConfiguredFeatures.HUGE_BLUE_NETHERSHROOM,
@@ -57,18 +77,6 @@ object ConfiguredFeatureCreator {
             )
         )
         c.registerConfiguredFeature(
-            DuskConfiguredFeatures.BLUE_NETHERSHROOM_PATCH,
-            Feature.RANDOM_PATCH,
-            ConfiguredFeatureUtil.createRandomPatchFeatureConfig(
-                64, PlacedFeatureUtil.placedInline(
-                    configuredFeatures.getHolderOrThrow(DuskConfiguredFeatures.BLUE_NETHERSHROOM),
-                    BlockPredicateFilterPlacementModifier.create(
-                        BlockPredicate.matchingBlockTags(BlockTags.AIR)
-                    )
-                )
-            )
-        )
-        c.registerConfiguredFeature(
             DuskConfiguredFeatures.LARGE_BLUE_NETHERSHROOM_PATCH,
             Feature.RANDOM_PATCH,
             ConfiguredFeatureUtil.createRandomPatchFeatureConfig(
@@ -82,14 +90,6 @@ object ConfiguredFeatureCreator {
                                         BlockPredicate.matchingBlockTags(DuskBlockTags.NETHERSHROOM_GROWABLE_ON)
                                     )
                                 ), 0.0001f
-                            ),
-                            WeightedPlacedFeature(
-                                PlacedFeatureUtil.placedInline(
-                                    configuredFeatures.getHolderOrThrow(DuskConfiguredFeatures.PURPLE_NETHERSHROOM),
-                                    BlockPredicateFilterPlacementModifier.create(
-                                        BlockPredicate.matchingBlockTags(BlockTags.AIR)
-                                    )
-                                ), 0.03f
                             )
                         ),
                         PlacedFeatureUtil.placedInline(
@@ -105,7 +105,25 @@ object ConfiguredFeatureCreator {
         c.registerConfiguredFeature(
             DuskConfiguredFeatures.PURPLE_NETHERSHROOM,
             Feature.SIMPLE_BLOCK,
-            SimpleBlockFeatureConfig(BlockStateProvider.of(DuskBlocks.PURPLE_NETHERSHROOM))
+            SimpleBlockFeatureConfig(
+                WeightedBlockStateProvider(
+                    DataPool.builder<BlockState>()
+                        .addWeighted(DuskBlocks.PURPLE_NETHERSHROOM.defaultState, 24)
+                        .add(DuskBlocks.BLUE_NETHERSHROOM.defaultState)
+                )
+            )
+        )
+        c.registerConfiguredFeature(
+            DuskConfiguredFeatures.PURPLE_NETHERSHROOM_PATCH,
+            Feature.RANDOM_PATCH,
+            ConfiguredFeatureUtil.createRandomPatchFeatureConfig(
+                64, PlacedFeatureUtil.placedInline(
+                    configuredFeatures.getHolderOrThrow(DuskConfiguredFeatures.PURPLE_NETHERSHROOM),
+                    BlockPredicateFilterPlacementModifier.create(
+                        BlockPredicate.matchingBlockTags(BlockTags.AIR)
+                    )
+                )
+            )
         )
         c.registerConfiguredFeature(
             DuskConfiguredFeatures.HUGE_PURPLE_NETHERSHROOM,
@@ -131,18 +149,6 @@ object ConfiguredFeatureCreator {
             )
         )
         c.registerConfiguredFeature(
-            DuskConfiguredFeatures.PURPLE_NETHERSHROOM_PATCH,
-            Feature.RANDOM_PATCH,
-            ConfiguredFeatureUtil.createRandomPatchFeatureConfig(
-                64, PlacedFeatureUtil.placedInline(
-                    configuredFeatures.getHolderOrThrow(DuskConfiguredFeatures.PURPLE_NETHERSHROOM),
-                    BlockPredicateFilterPlacementModifier.create(
-                        BlockPredicate.matchingBlockTags(BlockTags.AIR)
-                    )
-                )
-            )
-        )
-        c.registerConfiguredFeature(
             DuskConfiguredFeatures.LARGE_PURPLE_NETHERSHROOM_PATCH,
             Feature.RANDOM_PATCH,
             ConfiguredFeatureUtil.createRandomPatchFeatureConfig(
@@ -159,14 +165,6 @@ object ConfiguredFeatureCreator {
                                         12
                                     )
                                 ), 0.0001f
-                            ),
-                            WeightedPlacedFeature(
-                                PlacedFeatureUtil.placedInline(
-                                    configuredFeatures.getHolderOrThrow(DuskConfiguredFeatures.BLUE_NETHERSHROOM),
-                                    BlockPredicateFilterPlacementModifier.create(
-                                        BlockPredicate.matchingBlockTags(BlockTags.AIR)
-                                    )
-                                ), 0.01f
                             )
                         ),
                         PlacedFeatureUtil.placedInline(

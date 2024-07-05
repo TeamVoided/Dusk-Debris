@@ -2,7 +2,11 @@ package org.teamvoided.dusk_debris.data.gen.tags
 
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider
+import net.minecraft.item.Items
 import net.minecraft.registry.HolderLookup
+import org.teamvoided.dusk_debris.block.DuskBlockLists
+import org.teamvoided.dusk_debris.data.DuskItemTags
+import org.teamvoided.dusk_debris.item.DuskItemLists.THROWABLE_BOMB_ITEM_LIST
 import java.util.concurrent.CompletableFuture
 
 class ItemTagsProvider(output: FabricDataOutput, registriesFuture: CompletableFuture<HolderLookup.Provider>) :
@@ -14,6 +18,11 @@ class ItemTagsProvider(output: FabricDataOutput, registriesFuture: CompletableFu
     }
 
     fun duskTags() {
+        getOrCreateTagBuilder(DuskItemTags.THROWABLE_BOMB_ITEM)
+            .add(*THROWABLE_BOMB_ITEM_LIST.toTypedArray())
+        getOrCreateTagBuilder(DuskItemTags.IGNITES_GUNPOWDER)
+            .add(Items.FLINT_AND_STEEL)
+            .add(Items.FIRE_CHARGE)
 //        getOrCreateTagBuilder(DuskItemTags.CRAB_FOOD)
 //            .addOptionalTag(ConventionalItemTags.RAW_FISHES_FOODS)
 //            .add(Items.ROTTEN_FLESH)

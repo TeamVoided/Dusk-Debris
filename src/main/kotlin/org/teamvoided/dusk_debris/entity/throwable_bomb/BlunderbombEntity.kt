@@ -41,19 +41,7 @@ open class BlunderbombEntity : AbstractThrwowableBombEntity {
         this.prevX = x
         this.prevY = y
         this.prevZ = z
-        explosionBehavior = customExplosionBehavior
     }
-
-
-    override var explosionBehavior: ExplosionBehavior = SpecialExplosionBehavior(
-        DuskBlockTags.BLUNDERBOMB_DESTROYS,
-        DuskEntityTypeTags.BLUNDERBOMB_DOES_NOT_DAMAGE,
-        7f,
-        1.1f,
-        12f
-    )
-    override val hitDamage = 5.0f
-    override val trailingParticle: ParticleEffect = ParticleTypes.SMOKE
 
     override fun explode() {
         val serverWorld = this.world as ServerWorld
@@ -80,7 +68,7 @@ open class BlunderbombEntity : AbstractThrwowableBombEntity {
             this, Explosion.createDamageSource(
                 this.world,
                 this
-            ), explosionBehavior,
+            ), getExplosionBehavior(),
             this.x,
             this.getBodyY(0.0625),
             this.z,
@@ -97,6 +85,15 @@ open class BlunderbombEntity : AbstractThrwowableBombEntity {
     override fun getDefaultItem(): Item {
         return DuskItems.BLUNDERBOMB_ITEM
     }
+
+    override fun getHitDamage(): Float = 5f
+    override fun getExplosionBehavior(): ExplosionBehavior = SpecialExplosionBehavior(
+        DuskBlockTags.BLUNDERBOMB_DESTROYS,
+        DuskEntityTypeTags.BLUNDERBOMB_DOES_NOT_DAMAGE,
+        7f,
+        1.1f,
+        12f
+    )
 
 
     companion object {

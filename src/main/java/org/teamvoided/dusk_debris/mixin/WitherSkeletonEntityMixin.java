@@ -19,6 +19,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.teamvoided.dusk_debris.init.DuskItems;
 
 @Debug(export = true)
 @Mixin(WitherSkeletonEntity.class)
@@ -41,12 +42,12 @@ public abstract class WitherSkeletonEntityMixin extends AbstractSkeletonEntity {
     protected void initEquipment(RandomGenerator random, LocalDifficulty difficulty, CallbackInfo ci) {
         if (random.nextFloat() > 0.8f) {
             if (random.nextInt(3) < 2) {
-                this.equipStack(EquipmentSlot.MAINHAND, new ItemStack(Items.STONE_AXE));
+                this.equipStack(EquipmentSlot.MAINHAND, new ItemStack(DuskItems.BLACKSTONE_AXE));
             } else {
                 this.equipStack(EquipmentSlot.MAINHAND, new ItemStack(Items.BOW));
             }
         } else {
-            this.equipStack(EquipmentSlot.MAINHAND, new ItemStack(Items.STONE_SWORD));
+            this.equipStack(EquipmentSlot.MAINHAND, new ItemStack(DuskItems.BLACKSTONE_SWORD));
         }
         ci.cancel();
     }

@@ -15,8 +15,7 @@ import net.minecraft.predicate.entity.LocationPredicate
 import net.minecraft.registry.HolderLookup
 import net.minecraft.registry.RegistryKey
 import net.minecraft.registry.RegistryKeys
-import net.minecraft.registry.tag.BiomeTags
-import org.teamvoided.dusk_autumn.util.Utils
+import org.teamvoided.dusk_debris.util.Utils
 import org.teamvoided.dusk_debris.data.DuskLootTables
 import java.util.concurrent.CompletableFuture
 import java.util.function.BiConsumer

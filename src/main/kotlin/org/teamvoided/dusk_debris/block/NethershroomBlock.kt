@@ -28,7 +28,11 @@ class NethershroomBlock(
 ) : MushroomBlock(settings) {
 
     private fun tryExplode(world: World, state: BlockState, pos: BlockPos, entity: Entity, inverseChance: Int) {
-        if (!entity.type.isIn(DuskEntityTypeTags.IS_NOT_AFFECTED_BY_NETHERSHROOM)) {
+        if (
+            entity.isLiving &&
+            !entity.isSneaking &&
+            !entity.type.isIn(DuskEntityTypeTags.IS_NOT_AFFECTED_BY_NETHERSHROOM)
+        ) {
             if (!world.isClient && world.random.nextInt(inverseChance) == 0 && state.isOf(this)) {
                 if ((entity is PlayerEntity || world.gameRules.getBooleanValue(GameRules.DO_MOB_GRIEFING))) {
                     world.playSound(
@@ -46,7 +50,7 @@ class NethershroomBlock(
     }
 
     override fun onSteppedOn(world: World, pos: BlockPos, state: BlockState, entity: Entity) {
-        tryExplode(world, state, pos, entity, 1000)
+        tryExplode(world, state, pos, entity, 500)
         super.onSteppedOn(world, pos, state, entity)
     }
 
@@ -54,8 +58,9 @@ class NethershroomBlock(
         tryExplode(world, state, pos, entity, 10)
         super.onLandedUpon(world, state, pos, entity, fallDistance)
     }
+
     override fun scheduledTick(state: BlockState, world: ServerWorld, pos: BlockPos, random: RandomGenerator) {
-            explode(world, pos, particle, statusEffect, hasDoubleEffect)
+        explode(world, pos, particle, statusEffect, hasDoubleEffect)
     }
 
     override fun randomDisplayTick(state: BlockState, world: World, pos: BlockPos, random: RandomGenerator) {

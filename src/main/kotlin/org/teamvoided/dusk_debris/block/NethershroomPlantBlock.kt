@@ -64,7 +64,11 @@ class NethershroomPlantBlock(
     }
 
     override fun onEntityCollision(state: BlockState, world: World, pos: BlockPos, entity: Entity) {
-        if (!state.get(SQUISHED) && !entity.isSneaking && !entity.type.isIn(DuskEntityTypeTags.IS_NOT_AFFECTED_BY_NETHERSHROOM)) {
+        if (!state.get(SQUISHED) &&
+            entity.isLiving &&
+            !entity.isSneaking &&
+            !entity.type.isIn(DuskEntityTypeTags.IS_NOT_AFFECTED_BY_NETHERSHROOM)
+        ) {
             if ((entity is PlayerEntity || world.gameRules.getBooleanValue(GameRules.DO_MOB_GRIEFING))) {
                 world.setBlockState(
                     pos,
@@ -166,7 +170,13 @@ class NethershroomPlantBlock(
             )
         }
 
-        fun explode(world: World, pos: BlockPos, particle: ParticleEffect, statusEffect: Holder<StatusEffect>, hasDoubleEffect: Boolean) {
+        fun explode(
+            world: World,
+            pos: BlockPos,
+            particle: ParticleEffect,
+            statusEffect: Holder<StatusEffect>,
+            hasDoubleEffect: Boolean
+        ) {
             world.playSound(
                 null,
                 pos,
@@ -205,6 +215,7 @@ class NethershroomPlantBlock(
                 world.spawnEntity(poisonCloud)
             }
         }
+
         fun explode(world: World, pos: BlockPos, particle: ParticleEffect) {
             world.playSound(
                 null,

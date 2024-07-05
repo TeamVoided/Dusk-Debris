@@ -9,3 +9,4 @@ accessible method net/minecraft/data/client/model/Models block (Ljava/lang/Strin
 accessible class net/minecraft/client/particle/ParticleManager$SpriteAwareFactory
 accessible method net/minecraft/client/particle/WaterSuspendParticle <init> (Lnet/minecraft/client/world/ClientWorld;Lnet/minecraft/client/particle/SpriteProvider;DDDDDD)V
 accessible field net/minecraft/client/particle/Particle gravityStrength F
+accessible method net/minecraft/util/SpawnUtil method_42121 (Lnet/minecraft/server/world/ServerWorld;ILnet/minecraft/util/math/BlockPos$Mutable;Lnet/minecraft/util/SpawnUtil$Strategy;)Z

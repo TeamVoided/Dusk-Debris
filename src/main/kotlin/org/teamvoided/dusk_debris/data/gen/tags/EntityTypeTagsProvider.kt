@@ -5,8 +5,10 @@ import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider
 import net.minecraft.entity.EntityType
 import net.minecraft.registry.HolderLookup
 import net.minecraft.registry.tag.EntityTypeTags
+import org.teamvoided.dusk_debris.block.DuskBlockLists
 import org.teamvoided.dusk_debris.init.DuskEntities
 import org.teamvoided.dusk_debris.data.DuskEntityTypeTags
+import org.teamvoided.dusk_debris.entity.DuskEntityLists.THROWABLE_BOMB_ENTITIES
 import java.util.concurrent.CompletableFuture
 
 class EntityTypeTagsProvider(output: FabricDataOutput, registriesFuture: CompletableFuture<HolderLookup.Provider>) :
@@ -27,11 +29,7 @@ class EntityTypeTagsProvider(output: FabricDataOutput, registriesFuture: Complet
             .add(EntityType.TADPOLE)
             .add(EntityType.DROWNED)
         getOrCreateTagBuilder(DuskEntityTypeTags.THROWABLE_BOMB)
-            .add(DuskEntities.FIREBOMB)
-            .add(DuskEntities.BLUNDERBOMB)
-            .add(DuskEntities.SMOKEBOMB)
-            .add(DuskEntities.POCKETPOISON)
-            .add(DuskEntities.BLINDBOMB)
+            .add(*THROWABLE_BOMB_ENTITIES.toTypedArray())
         getOrCreateTagBuilder(DuskEntityTypeTags.IS_NOT_AFFECTED_BY_NETHERSHROOM)
             .addOptionalTag(EntityTypeTags.IGNORES_POISON_AND_REGEN)
             .add(EntityType.PIGLIN)

@@ -10,6 +10,7 @@ import net.minecraft.nbt.NbtHelper
 import net.minecraft.particle.ParticleTypes
 import net.minecraft.registry.RegistryKeys
 import net.minecraft.unmapped.C_zbvyjshu
+import net.minecraft.util.math.Box
 import net.minecraft.world.World
 import net.minecraft.world.World.ExplosionSourceType
 import net.minecraft.world.explosion.Explosion
@@ -30,14 +31,14 @@ class GunpowderBarrelEntity(entityType: EntityType<out GunpowderBarrelEntity>, w
     private val explosionBehavior: SpecialExplosionBehavior = SpecialExplosionBehavior(
         DuskBlockTags.GUNPOWDER_BARREL_DESTROYS,
         DuskEntityTypeTags.GUNPOWDER_BARREL_DOES_NOT_DAMAGE,
-        explosionRange,
+        explosionRange.toFloat(),
         explosionPower / 4f,
         explosionPower * 6f
     )
     private val explosionBehaviorPostDimensionChange: SpecialExplosionBehavior = SpecialExplosionBehavior(
         DuskBlockTags.BLUNDERBOMB_DESTROYS,
         DuskEntityTypeTags.GUNPOWDER_BARREL_DOES_NOT_DAMAGE,
-        explosionRange,
+        explosionRange.toFloat(),
         explosionPower / 4f,
         explosionPower * 6f
     )
@@ -120,23 +121,41 @@ class GunpowderBarrelEntity(entityType: EntityType<out GunpowderBarrelEntity>, w
     }
 
     private fun explode() {
-            world.createExplosion(
-                this,
-                Explosion.createDamageSource(
-                    this.world,
-                    this
-                ),
-                if (this.passedThoughPortal) explosionBehaviorPostDimensionChange else explosionBehavior,
-                this.x,
-                this.getBodyY(0.5),
-                this.z,
-                explosionPower.toFloat(),
-                false,
-                ExplosionSourceType.TNT,
-                ParticleTypes.SMOKE,
-                GunpowderExplosionEmitterParticleEffect(explosionPower * 2f, color),
-                DuskSoundEvents.BLOCK_GUNPOWDER_BARREL_EXPLODE
+        world.createExplosion(
+            this,
+            Explosion.createDamageSource(
+                this.world,
+                this
+            ),
+            if (this.passedThoughPortal) explosionBehaviorPostDimensionChange else explosionBehavior,
+            this.x,
+            this.getBodyY(0.5),
+            this.z,
+            explosionPower.toFloat(),
+            false,
+            ExplosionSourceType.TNT,
+            ParticleTypes.SMOKE,
+            GunpowderExplosionEmitterParticleEffect(explosionPower * 2f, color),
+            DuskSoundEvents.BLOCK_GUNPOWDER_BARREL_EXPLODE
+        )
+        burnEntities(this.world, (explosionPower * 0.8).toInt())
+    }
+
+    fun burnEntities(world: World, radius: Int) {
+        val entitiesNearby = world.getOtherEntities(
+            this, Box(
+                this.x - radius,
+                this.y - radius,
+                this.z - radius,
+                this.x + radius,
+                this.y + radius,
+                this.z + radius
             )
+        ) { obj: Entity -> obj.isAlive && !obj.type.isIn(DuskEntityTypeTags.FIREBOMB_DOES_NOT_DAMAGE) }
+
+        return entitiesNearby.forEach {
+            it.fireTicks += 200
+        }
     }
 
     override fun writeCustomDataToNbt(nbt: NbtCompound) {
@@ -157,9 +176,9 @@ class GunpowderBarrelEntity(entityType: EntityType<out GunpowderBarrelEntity>, w
         }
     }
 
-    fun setProperties(power: Int, knockback: Float, blockState: BlockState, color: Int) {
+    fun setProperties(power: Int, range: Int, blockState: BlockState, color: Int) {
         this.explosionPower = power
-        this.explosionRange = knockback
+        this.explosionRange = range
         this.blockState = blockState
         this.color = color
     }
@@ -185,7 +204,7 @@ class GunpowderBarrelEntity(entityType: EntityType<out GunpowderBarrelEntity>, w
         set(explosionPower) {
             dataTracker.set(EXPLOSION_POWER, explosionPower)
         }
-    var explosionRange: Float
+    var explosionRange: Int
         get() = dataTracker.get(EXPLOSION_RANGE)
         set(explosionRange) {
             dataTracker.set(EXPLOSION_RANGE, explosionRange)
@@ -218,15 +237,15 @@ class GunpowderBarrelEntity(entityType: EntityType<out GunpowderBarrelEntity>, w
             DataTracker.registerData(GunpowderBarrelEntity::class.java, TrackedDataHandlerRegistry.INTEGER)
         private val EXPLOSION_POWER: TrackedData<Int> =
             DataTracker.registerData(GunpowderBarrelEntity::class.java, TrackedDataHandlerRegistry.INTEGER)
-        private val EXPLOSION_RANGE: TrackedData<Float> =
-            DataTracker.registerData(GunpowderBarrelEntity::class.java, TrackedDataHandlerRegistry.FLOAT)
+        private val EXPLOSION_RANGE: TrackedData<Int> =
+            DataTracker.registerData(GunpowderBarrelEntity::class.java, TrackedDataHandlerRegistry.INTEGER)
         private val BLOCK_STATE: TrackedData<BlockState> =
             DataTracker.registerData(GunpowderBarrelEntity::class.java, TrackedDataHandlerRegistry.BLOCK_STATE)
         private val PARTICLE_COLOR: TrackedData<Int> =
             DataTracker.registerData(GunpowderBarrelEntity::class.java, TrackedDataHandlerRegistry.INTEGER)
         private const val DEFAULT_FUSE = 100
         private const val DEFAULT_EXPLOSION_POWER = 4
-        private const val DEFAULT_EXPLOSION_RANGE = 4f
+        private const val DEFAULT_EXPLOSION_RANGE = 4
         private const val DEFAULT_PARTICLE_COLOR = 0xffffff
         private const val BLOCK_STATE_KEY = "block_state"
         const val FUSE_KEY: String = "fuse"

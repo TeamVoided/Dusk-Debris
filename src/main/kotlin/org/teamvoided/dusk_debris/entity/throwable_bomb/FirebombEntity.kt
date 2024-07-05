@@ -5,26 +5,29 @@ import net.minecraft.block.Block
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.LivingEntity
-import net.minecraft.item.Item
+import net.minecraft.item.ItemStack
+import net.minecraft.particle.ParticleEffect
 import net.minecraft.particle.ParticleTypes
 import net.minecraft.registry.tag.TagKey
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvents
+import net.minecraft.state.property.Properties
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Box
 import net.minecraft.util.math.Direction
 import net.minecraft.world.GameRules
 import net.minecraft.world.World
+import net.minecraft.world.explosion.Explosion
+import net.minecraft.world.explosion.Explosion.DestructionType
 import net.minecraft.world.explosion.ExplosionBehavior
-import org.teamvoided.dusk_debris.block.GunpowderBlock
 import org.teamvoided.dusk_debris.data.DuskBlockTags
 import org.teamvoided.dusk_debris.data.DuskEntityTypeTags
-import org.teamvoided.dusk_debris.init.DuskBlocks
 import org.teamvoided.dusk_debris.init.DuskEntities
 import org.teamvoided.dusk_debris.init.DuskItems
 import org.teamvoided.dusk_debris.init.DuskParticles
 import org.teamvoided.dusk_debris.world.explosion.FirebombExplosionBehavior
+import java.util.function.BiConsumer
 
 class FirebombEntity : AbstractThrwowableBombEntity {
     constructor(entityType: EntityType<out FirebombEntity>, world: World) : super(entityType, world)
@@ -32,13 +35,9 @@ class FirebombEntity : AbstractThrwowableBombEntity {
     constructor(world: World, owner: LivingEntity?) : super(DuskEntities.FIREBOMB, owner, world)
 
     constructor(world: World, x: Double, y: Double, z: Double) : super(DuskEntities.FIREBOMB, x, y, z, world)
-
-
-    override val trailingParticle = ParticleTypes.FLAME
-    override var explosionBehavior: ExplosionBehavior = FirebombExplosionBehavior(
-        DuskBlockTags.FIREBOMB_DESTROYS
-    )
 //    DustColorTransitionParticleEffect(FIRE, GREY, 1.0F)
+
+    val firebombRadius = 4
 
     override fun explode() {
         val serverWorld = this.world as ServerWorld
@@ -70,50 +69,34 @@ class FirebombEntity : AbstractThrwowableBombEntity {
             SoundEvents.BLOCK_GLASS_BREAK,
             SoundCategory.BLOCKS,
             0.7f,
-            0.9f + world.random.nextFloat() * 0.2f
+            0.6f + world.random.nextFloat() * 0.2f
         )
-//        world.createExplosion(
-//            this, Explosion.createDamageSource(
-//                this.world,
-//                this
-//            ), explosionBehavior,
-//            this.x,
-//            this.getBodyY(0.0625),
-//            this.z,
-//            BlunderbombEntity.DEFAULT_EXPLOSION_POWER,
-//            false,
-//            World.ExplosionSourceType.TNT,
-//            DuskParticles.FIREBOMB,
-//            ParticleTypes.FLASH,
-//            SoundEvents.BLOCK_RESPAWN_ANCHOR_DEPLETE
-//        )
-        val firebombRadius = 5
         modifyNearbyBlocks(world, DuskBlockTags.FIREBOMB_DESTROYS, firebombRadius)
         burnEntities(world, firebombRadius)
         super.explode()
     }
 
-    private fun burnEntities(world: World, firebombRadius: Int) {
+    fun burnEntities(world: World, radius: Int) {
         val entitiesNearby = world.getOtherEntities(
             this, Box(
-                this.x - firebombRadius,
-                this.y - firebombRadius,
-                this.z - firebombRadius,
-                this.x + firebombRadius,
-                this.y + firebombRadius,
-                this.z + firebombRadius
+                this.x - radius,
+                this.y - radius,
+                this.z - radius,
+                this.x + radius,
+                this.y + radius,
+                this.z + radius
             )
         ) { obj: Entity -> obj.isAlive && !obj.type.isIn(DuskEntityTypeTags.FIREBOMB_DOES_NOT_DAMAGE) }
 
         return entitiesNearby.forEach {
-            it.damage(this.damageSources.onFire(), 3f)
+            it.damage(this.damageSources.onFire(), 4f)
             it.fireTicks += 200
         }
     }
 
     fun modifyNearbyBlocks(world: World, condition: TagKey<Block>, firebombRadius: Int) {
-        val posList: MutableList<BlockPos> = Lists.newArrayList<BlockPos>()
-        var posListGunpowder: MutableList<BlockPos> = Lists.newArrayList<BlockPos>()
+        val posListDestroy: MutableList<BlockPos> = Lists.newArrayList<BlockPos>()
+        var posListLight: MutableList<BlockPos> = Lists.newArrayList<BlockPos>()
         for (x in -firebombRadius..firebombRadius) {
             for (y in -firebombRadius..firebombRadius) {
                 for (z in -firebombRadius..firebombRadius) {
@@ -121,22 +104,53 @@ class FirebombEntity : AbstractThrwowableBombEntity {
                         .offset(Direction.Axis.X, x)
                         .offset(Direction.Axis.Y, y)
                         .offset(Direction.Axis.Z, z)
-                    if (world.getBlockState(block).isIn(condition))
-                        posList.add(block)
-                    else if (world.getBlockState(block).isOf(DuskBlocks.GUNPOWDER))
-                        posListGunpowder.add(block)
+                    if (world.getBlockState(block).isIn(condition)) {
+                        if (world.getBlockState(block).contains(Properties.LIT))
+                            posListLight.add(block)
+                        else
+                            posListDestroy.add(block)
+                    }
                 }
             }
         }
-        posList.forEach {
+        posListDestroy.forEach {
+            world.getBlockState(it)
+                .onExplosion(
+                    world,
+                    it,
+                    Explosion(
+                        world,
+                        null,
+                        it.x.toDouble(),
+                        it.y.toDouble(),
+                        it.z.toDouble(),
+                        0f,
+                        false,
+                        DestructionType.DESTROY
+                    )
+                ) { itemStack: ItemStack, blockPos: BlockPos ->
+                    if (world.isClient) return@onExplosion
+                    val stacks = Block.getDroppedStacks(
+                        world.getBlockState(blockPos),
+                        world as ServerWorld,
+                        blockPos,
+                        world.getBlockEntity(blockPos),
+                        null, // player
+                        itemStack
+                    )
+                    stacks.forEach { stack ->
+                        Block.dropStack(world, it, stack)
+                    }
+                }
             world.breakBlock(it, world.gameRules.getBooleanValue(GameRules.BLOCK_EXPLOSION_DROP_DECAY))
         }
-        posListGunpowder.forEach {
-            world.setBlockState(it, world.getBlockState(it).with(GunpowderBlock.IGNITED, true))
+        posListLight.forEach {
+            world.setBlockState(it, world.getBlockState(it).with(Properties.LIT, true))
         }
     }
 
-    override fun getDefaultItem(): Item {
-        return DuskItems.FIREBOMB_ITEM
-    }
+    override fun getDefaultItem() = DuskItems.FIREBOMB_ITEM
+
+    override fun getTrailingParticle(): ParticleEffect = ParticleTypes.FLAME
+    override fun getExplosionBehavior(): ExplosionBehavior = FirebombExplosionBehavior(DuskBlockTags.FIREBOMB_DESTROYS)
 }

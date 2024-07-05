@@ -1,4 +1,4 @@
-package org.teamvoided.dusk_autumn.util
+package org.teamvoided.dusk_debris.util
 
 import net.minecraft.block.Blocks
 import net.minecraft.loot.function.SetCountLootFunction

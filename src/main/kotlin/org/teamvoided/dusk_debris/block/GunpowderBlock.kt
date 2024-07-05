@@ -16,7 +16,6 @@ import net.minecraft.particle.ParticleTypes
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.stat.Stats
 import net.minecraft.state.StateManager
-import net.minecraft.state.property.BooleanProperty
 import net.minecraft.state.property.Properties
 import net.minecraft.state.property.Property
 import net.minecraft.util.Hand
@@ -33,14 +32,12 @@ import net.minecraft.world.World
 import net.minecraft.world.WorldAccess
 import net.minecraft.world.WorldView
 import org.teamvoided.dusk_debris.data.DuskBlockTags
-import kotlin.random.Random
+import org.teamvoided.dusk_debris.data.DuskItemTags
 
 
 class GunpowderBlock(settings: Settings) : Block(settings) {
     private val dotState: BlockState
     private var powderIgnites = true
-    val delay = 16
-    val delayDestroy = 60
 
     init {
         this.defaultState = stateManager.defaultState
@@ -48,7 +45,7 @@ class GunpowderBlock(settings: Settings) : Block(settings) {
             .with(WIRE_CONNECTION_SOUTH, WireConnection.NONE)
             .with(WIRE_CONNECTION_EAST, WireConnection.NONE)
             .with(WIRE_CONNECTION_WEST, WireConnection.NONE)
-            .with(IGNITED, false)
+            .with(LIT, false)
         this.dotState = defaultState
             .with(WIRE_CONNECTION_NORTH, WireConnection.SIDE)
             .with(WIRE_CONNECTION_SOUTH, WireConnection.SIDE)
@@ -56,7 +53,7 @@ class GunpowderBlock(settings: Settings) : Block(settings) {
             .with(WIRE_CONNECTION_WEST, WireConnection.SIDE)
 
         for (blockState in getStateManager().states) {
-            if (blockState.get(IGNITED) == false) {
+            if (blockState.get(LIT) == false) {
                 SHAPES[blockState] = getShapeForState(blockState)
             }
         }
@@ -64,7 +61,7 @@ class GunpowderBlock(settings: Settings) : Block(settings) {
 
     override fun appendProperties(builder: StateManager.Builder<Block, BlockState>) {
         builder.add(
-            IGNITED,
+            LIT,
             WIRE_CONNECTION_NORTH,
             WIRE_CONNECTION_SOUTH,
             WIRE_CONNECTION_EAST,
@@ -103,12 +100,12 @@ class GunpowderBlock(settings: Settings) : Block(settings) {
         hand: Hand,
         hitResult: BlockHitResult
     ): ItemInteractionResult {
-        if (!stack.isOf(Items.FLINT_AND_STEEL) && !stack.isOf(Items.FIRE_CHARGE)) {
+        if (!stack.isIn(DuskItemTags.IGNITES_GUNPOWDER)) {
             return super.onInteract(stack, state, world, pos, entity, hand, hitResult)
         } else {
             world.scheduleBlockTick(pos, this, 0)
             val item = stack.item
-            if (stack.isOf(Items.FLINT_AND_STEEL)) {
+            if (stack.isDamageable) {
                 stack.damageEquipment(1, entity, LivingEntity.getHand(hand))
             } else {
                 stack.consume(1, entity)
@@ -120,7 +117,7 @@ class GunpowderBlock(settings: Settings) : Block(settings) {
     }
 
     override fun scheduledTick(state: BlockState, world: ServerWorld, pos: BlockPos, random: RandomGenerator) {
-        if (state.get(IGNITED)) {
+        if (state.get(LIT)) {
             for (direction in Type.HORIZONTAL) {
                 val offsetPos = pos.offset(direction)
                 val tntState = world.getBlockState(offsetPos)
@@ -131,8 +128,8 @@ class GunpowderBlock(settings: Settings) : Block(settings) {
             }
             world.breakBlock(pos, false)
         } else {
-            world.setBlockState(pos, state.with(IGNITED, true))
-            world.scheduleBlockTick(pos, this, delayDestroy)
+            world.setBlockState(pos, state.with(LIT, true))
+            world.scheduleBlockTick(pos, this, gunpowderIgniteDelayDestruction())
         }
     }
 
@@ -157,7 +154,7 @@ class GunpowderBlock(settings: Settings) : Block(settings) {
         pos: BlockPos,
         context: ShapeContext
     ): VoxelShape {
-        return SHAPES[state.with(IGNITED, false)] as VoxelShape
+        return SHAPES[state.with(LIT, false)] as VoxelShape
     }
 
     override fun canPlaceAt(state: BlockState, world: WorldView, pos: BlockPos): Boolean {
@@ -185,7 +182,7 @@ class GunpowderBlock(settings: Settings) : Block(settings) {
                 if (connectsTo(upState)) {
                     outputState = state.with(DIRECTION_TO_WIRE_CONNECTION_PROPERTY[direction], WireConnection.UP)
                     if (ignite(upState)) {
-                        world.scheduleBlockTick(blockPos, this, delay)
+                        world.scheduleBlockTick(blockPos, this, gunpowderIgniteDelay())
                         println("ignite1, ${pos.up()}")
                     }
                 }
@@ -194,11 +191,11 @@ class GunpowderBlock(settings: Settings) : Block(settings) {
                 if (connectsTo(downState) || connectsTo(levelState)) {
                     outputState = state.with(DIRECTION_TO_WIRE_CONNECTION_PROPERTY[direction], WireConnection.SIDE)
                     if (ignite(downState)) {
-                        world.scheduleBlockTick(blockPos, this, delay)
+                        world.scheduleBlockTick(blockPos, this, gunpowderIgniteDelay())
                         println("ignite2, ${pos.down()}")
                     }
                     if (ignite(levelState)) {
-                        world.scheduleBlockTick(blockPos, this, delay)
+                        world.scheduleBlockTick(blockPos, this, gunpowderIgniteDelay())
                         println("ignite3, $pos")
                     }
                 } else {
@@ -309,7 +306,7 @@ class GunpowderBlock(settings: Settings) : Block(settings) {
     }
 
     override fun randomDisplayTick(state: BlockState, world: World, pos: BlockPos, random: RandomGenerator) {
-        if (state.get(IGNITED)) {
+        if (state.get(LIT)) {
             for (direction in Type.HORIZONTAL) {
                 val wireConnection =
                     state.get(DIRECTION_TO_WIRE_CONNECTION_PROPERTY[direction] as Property<*>)
@@ -447,9 +444,9 @@ class GunpowderBlock(settings: Settings) : Block(settings) {
 
     private fun update(world: World, pos: BlockPos, state: BlockState) {
         val i = this.getReceivedIgnition(world, pos)
-        if (state.get(IGNITED) != i) {
+        if (state.get(LIT) != i) {
             if (world.getBlockState(pos) === state) {
-                world.setBlockState(pos, state.with(IGNITED, i) as BlockState, 2)
+                world.setBlockState(pos, state.with(LIT, i) as BlockState, 2)
             }
 
             val set: MutableSet<BlockPos> = Sets.newHashSet()
@@ -504,13 +501,13 @@ class GunpowderBlock(settings: Settings) : Block(settings) {
     }
 
     private fun getEmittedIgnition(pos: BlockPos, world: World): Boolean {
-        val ignited = if (world.getBlockState(pos).isOf(this)) world.getBlockState(pos).get(IGNITED) else false
+        val ignited = if (world.getBlockState(pos).isOf(this)) world.getBlockState(pos).get(LIT) else false
         return ignited
     }
 
     //remove plz
     private fun ignite(state: BlockState): Boolean {
-        return if (state.isOf(this)) state.get(IGNITED) else false
+        return if (state.isOf(this)) state.get(LIT) else false
     }
 
     private fun updateNeighbors(world: World, pos: BlockPos) {
@@ -576,11 +573,19 @@ class GunpowderBlock(settings: Settings) : Block(settings) {
             )
         }
 
+        fun gunpowderIgniteDelayDestruction(): Int {
+            return (10 + Math.random() * 150).toInt()
+        }
+
+        fun gunpowderIgniteDelay(): Int {
+            return 10
+        }
+
         fun connectsTo(state: BlockState): Boolean {
             return state.isIn(DuskBlockTags.GUNPOWDER_CONNECTS_TO)
         }
 
-        var IGNITED: BooleanProperty = BooleanProperty.of("ignited")
+        var LIT = Properties.LIT
         val WIRE_CONNECTION_NORTH = Properties.NORTH_WIRE_CONNECTION
         val WIRE_CONNECTION_EAST = Properties.EAST_WIRE_CONNECTION
         val WIRE_CONNECTION_SOUTH = Properties.SOUTH_WIRE_CONNECTION

@@ -9,7 +9,7 @@ object DuskBlockTags {
     val TEST = create("","")
 
     val RIBBON_BLOCK = create("ribbon_block")
-    val THROWABLE_BLOCK = create("throwable_block")
+    val THROWABLE_BOMB_BLOCK = create("throwable_bomb_block")
     val GUNPOWDER_BARRELS = create("gunpowder_barrels")
     val FIREBOMB_DESTROYS = create("firebomb_destroys")
     val BLUNDERBOMB_DESTROYS = create("blunderbomb_destroys")

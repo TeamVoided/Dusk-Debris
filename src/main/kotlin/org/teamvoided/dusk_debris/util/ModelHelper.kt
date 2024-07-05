@@ -57,6 +57,13 @@ fun BlockStateModelGenerator.rollableBlock(block: Block) {
         })
     )
 }
+fun BlockStateModelGenerator.registerHandheldItem(item: Item){
+    Models.HANDHELD.upload(
+        ModelIds.getItemModelId(item),
+        Texture.layer0(item),
+        this.modelCollector
+    )
+}
 
 fun BlockStateModelGenerator.registerDustBlock(block: Block) {
     this.registerDustBlock(block, MODID, block.toString())

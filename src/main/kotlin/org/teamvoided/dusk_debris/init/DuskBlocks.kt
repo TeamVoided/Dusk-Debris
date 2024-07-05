@@ -2,7 +2,7 @@ package org.teamvoided.dusk_debris.init
 
 import net.fabricmc.fabric.api.registry.StrippableBlockRegistry
 import net.minecraft.block.*
-import net.minecraft.block.Blocks.legacyStairsOf
+import net.minecraft.block.Blocks.*
 import net.minecraft.block.enums.NoteBlockInstrument
 import net.minecraft.block.piston.PistonBehavior
 import net.minecraft.entity.effect.StatusEffects
@@ -15,8 +15,14 @@ import net.minecraft.util.math.Direction
 import org.teamvoided.dusk_debris.DuskDebris.id
 import org.teamvoided.dusk_debris.block.*
 import org.teamvoided.dusk_debris.block.throwable_bomb.BlunderbombBlock
+import org.teamvoided.dusk_debris.block.throwable_bomb.BonecallerBlock
 import org.teamvoided.dusk_debris.block.throwable_bomb.FirebombBlock
-import org.teamvoided.dusk_debris.block.throwable_bomb.NethershroomThrowableBlock
+import org.teamvoided.dusk_debris.block.throwable_bomb.bonecaller.BoneboggerBlock
+import org.teamvoided.dusk_debris.block.throwable_bomb.bonecaller.BonechillerBlock
+import org.teamvoided.dusk_debris.block.throwable_bomb.bonecaller.BonewitherBlock
+import org.teamvoided.dusk_debris.block.throwable_bomb.nethershroom_throwable_block.BlindbombBlock
+import org.teamvoided.dusk_debris.block.throwable_bomb.nethershroom_throwable_block.PocketpoisonBlock
+import org.teamvoided.dusk_debris.block.throwable_bomb.nethershroom_throwable_block.SmokebombBlock
 import org.teamvoided.dusk_debris.block.voided.sign.VoidCeilingHangingSignBlock
 import org.teamvoided.dusk_debris.block.voided.sign.VoidSignBlock
 import org.teamvoided.dusk_debris.block.voided.sign.VoidWallHangingSignBlock
@@ -39,6 +45,10 @@ object DuskBlocks {
     val smokebombSmoke = NethershroomSporeParticleEffect(0x7F7F7F)
     val gunpowderBarrelColor = 0xF7C53B
     val gunpowderBarrelBlueColor = 0x7FD4FF
+    val bonecallerBlockSettings =
+        AbstractBlock.Settings.create().mapColor(BONE_BLOCK.defaultMapColor).sounds(BlockSoundGroup.GLASS)
+            .instrument(NoteBlockInstrument.HAT).strength(1f, 0.0f).solidBlock(Blocks::nonSolid)
+            .pistonBehavior(PistonBehavior.DESTROY)
 
     val BLUE_NETHERSHROOM = register(
         "blue_nethershroom",
@@ -106,7 +116,7 @@ object DuskBlocks {
         "gunpowder_barrel",
         GunpowderBarrelBlock(
             4,
-            4f,
+            4,
             gunpowderBarrelColor,
             AbstractBlock.Settings.create().mapColor(Blocks.FIRE.defaultMapColor).instrument(NoteBlockInstrument.BASS)
                 .strength(1f, 0.0f).sounds(BlockSoundGroup.WOOD).lavaIgnitable().solidBlock(Blocks::nonSolid)
@@ -116,7 +126,7 @@ object DuskBlocks {
         "stronghold_gunpowder_barrel",
         GunpowderBarrelBlock(
             10,
-            24f,
+            24,
             gunpowderBarrelColor,
             AbstractBlock.Settings.create().mapColor(Blocks.FIRE.defaultMapColor).instrument(NoteBlockInstrument.BASS)
                 .strength(1.5f, 0.0f).sounds(BlockSoundGroup.WOOD).lavaIgnitable().solidBlock(Blocks::nonSolid)
@@ -126,7 +136,7 @@ object DuskBlocks {
         "ancient_black_powder_barrel",
         GunpowderBarrelBlock(
             16,
-            32f,
+            32,
             gunpowderBarrelBlueColor,
             AbstractBlock.Settings.create().mapColor(Blocks.SOUL_FIRE.defaultMapColor)
                 .instrument(NoteBlockInstrument.BASS).strength(2f, 0.0f).sounds(BlockSoundGroup.WOOD).lavaIgnitable()
@@ -149,13 +159,21 @@ object DuskBlocks {
                 .pistonBehavior(PistonBehavior.DESTROY).luminance { _: BlockState -> 8 }
         )
     )
+    val BONECALLER_BLOCK = register("bonecaller", BonecallerBlock(bonecallerBlockSettings))
+    val BONECHILLER_BLOCK = register("bonechiller", BonechillerBlock(bonecallerBlockSettings))
+    val BONEBOGGER_BLOCK = register("bonebogger", BoneboggerBlock(bonecallerBlockSettings))
+    val BONEWITHER_BLOCK = register("bonewither", BonewitherBlock(bonecallerBlockSettings))
+    val SMOKEBOMB_BLOCK = register(
+        "smokebomb",
+        SmokebombBlock(
+            AbstractBlock.Settings.create().mapColor(WHITE_STAINED_GLASS.defaultMapColor).sounds(BlockSoundGroup.GLASS)
+                .instrument(NoteBlockInstrument.HAT).strength(1f, 0.0f).solidBlock(Blocks::nonSolid)
+                .pistonBehavior(PistonBehavior.DESTROY)
+        )
+    )
     val POCKETPOISON_BLOCK = register(
         "pocketpoison",
-        NethershroomThrowableBlock(
-            DuskEntities.POCKETPOISON,
-            blueNethershroomSmoke,
-            StatusEffects.POISON,
-            true,
+        PocketpoisonBlock(
             AbstractBlock.Settings.create().mapColor(BLUE_NETHERSHROOM.defaultMapColor).sounds(BlockSoundGroup.GLASS)
                 .instrument(NoteBlockInstrument.HAT).strength(1f, 0.0f).solidBlock(Blocks::nonSolid)
                 .pistonBehavior(PistonBehavior.DESTROY)
@@ -163,26 +181,10 @@ object DuskBlocks {
     )
     val BLINDBOMB_BLOCK = register(
         "blindbomb",
-        NethershroomThrowableBlock(
-            DuskEntities.BLINDBOMB,
-            purpleNethershroomSmoke,
-            StatusEffects.BLINDNESS,
-            false,
-            AbstractBlock.Settings.create().mapColor(BLUE_NETHERSHROOM.defaultMapColor).sounds(BlockSoundGroup.GLASS)
+        BlindbombBlock(
+            AbstractBlock.Settings.create().mapColor(PURPLE_NETHERSHROOM.defaultMapColor).sounds(BlockSoundGroup.GLASS)
                 .instrument(NoteBlockInstrument.HAT).strength(1f, 0.0f).solidBlock(Blocks::nonSolid)
                 .pistonBehavior(PistonBehavior.DESTROY)
-        )
-    )
-    val SMOKEBOMB_BLOCK = register(
-        "smokebomb",
-        NethershroomThrowableBlock(
-            DuskEntities.SMOKEBOMB,
-            smokebombSmoke,
-            null,
-            false,
-            AbstractBlock.Settings.create().mapColor(BLUE_NETHERSHROOM.defaultMapColor)
-                .instrument(NoteBlockInstrument.HAT)
-                .strength(1f, 0.0f).sounds(BlockSoundGroup.GLASS).solidBlock(Blocks::nonSolid)
         )
     )
     val RED_RIBBON = register("red_ribbon", registerRibbon(Blocks.RED_WOOL.defaultMapColor))
