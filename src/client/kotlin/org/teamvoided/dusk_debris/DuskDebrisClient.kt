@@ -7,8 +7,6 @@ import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry
 import net.minecraft.client.render.RenderLayer
 import net.minecraft.client.render.entity.EmptyEntityRenderer
 import net.minecraft.client.render.entity.FlyingItemEntityRenderer
-import net.minecraft.client.render.entity.SkeletonEntityRenderer
-import net.minecraft.component.DataComponentTypes
 import net.minecraft.component.type.DyedColorComponent
 import net.minecraft.item.ItemStack
 import org.teamvoided.dusk_debris.DuskDebris.log
@@ -22,6 +20,7 @@ import org.teamvoided.dusk_debris.init.DuskEntities
 import org.teamvoided.dusk_debris.init.DuskItems
 import org.teamvoided.dusk_debris.init.DuskParticles
 import org.teamvoided.dusk_debris.particle.*
+import org.teamvoided.dusk_debris.render.entity.model.DuskEntityModelLayers
 
 @Suppress("unused")
 object DuskDebrisClient {
@@ -40,6 +39,7 @@ object DuskDebrisClient {
 
     fun init() {
         log.info("Hello from Client")
+        DuskEntityModelLayers.init()
 
 
         ParticleFactoryRegistry.getInstance()
@@ -67,7 +67,7 @@ object DuskDebrisClient {
 
         EntityRendererRegistry.register(DuskEntities.BOX_AREA_EFFECT_CLOUD, ::EmptyEntityRenderer)
         EntityRendererRegistry.register(DuskEntities.GUNPOWDER_BARREL, ::GunpowderBarrelEntityRenderer)
-        EntityRendererRegistry.register(DuskEntities.GLOOM, ::SkeletonEntityRenderer)
+        EntityRendererRegistry.register(DuskEntities.GLOOM, ::GloomEntityRenderer)
 
         THROWABLE_BOMB_ENTITIES.forEach {
             EntityRendererRegistry.register(it, ::FlyingItemEntityRenderer)

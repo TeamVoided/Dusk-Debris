@@ -1,13 +1,11 @@
 package org.teamvoided.dusk_debris.entity
 
-import net.minecraft.block.Blocks
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.SpawnReason
 import net.minecraft.entity.ai.goal.*
 import net.minecraft.entity.attribute.DefaultAttributeContainer
-import net.minecraft.entity.attribute.EntityAttributes
 import net.minecraft.entity.damage.DamageSource
 import net.minecraft.entity.data.DataTracker
 import net.minecraft.entity.data.TrackedData
@@ -30,7 +28,6 @@ import net.minecraft.world.ServerWorldAccess
 import net.minecraft.world.World
 import org.teamvoided.dusk_debris.data.DuskEntityTypeTags
 import org.teamvoided.dusk_debris.entity.ai.goal.EnterDarknessGoal
-import java.awt.Color
 
 class GloomEntity(entityType: EntityType<out GloomEntity>, world: World) :
     AbstractSkeletonEntity(entityType, world) {
@@ -234,10 +231,10 @@ class GloomEntity(entityType: EntityType<out GloomEntity>, world: World) :
         private val LIGHT_MODE_TIME = 300
         private var conversionToDarkModeTime = 0
 
-        private val EYE_COLOR: TrackedData<Int> =
-            DataTracker.registerData(GloomEntity::class.java, TrackedDataHandlerRegistry.INTEGER)
-        val EYE_COLOR_KEY: String = "EyeColor"
-        private var eyeColorDefault: Int = Color(217, 230, 244).rgb
+//        private val EYE_COLOR: TrackedData<Int> =
+//            DataTracker.registerData(GloomEntity::class.java, TrackedDataHandlerRegistry.INTEGER)
+//        val EYE_COLOR_KEY: String = "EyeColor"
+//        private var eyeColorDefault: Int = Color(217, 230, 244).rgb
 
         fun createAttributes(): DefaultAttributeContainer.Builder {
             return MobEntity.createAttributes()

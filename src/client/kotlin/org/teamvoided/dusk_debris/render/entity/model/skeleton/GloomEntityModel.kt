@@ -8,7 +8,7 @@ import org.teamvoided.dusk_debris.entity.GloomEntity
 
 @Environment(EnvType.CLIENT)
 class GloomEntityModel(modelPart: ModelPart) : SkeletonEntityModel<GloomEntity>(modelPart) {
-    private val mushrooms: ModelPart = modelPart.getChild("head").getChild("mushrooms")
+//    private val mushrooms: ModelPart = modelPart.getChild("head").getChild("mushrooms")
 
     override fun animateModel(gloomEntity: GloomEntity, f: Float, g: Float, h: Float) {
 //        mushrooms.visible = !gloomEntity.isSheared
