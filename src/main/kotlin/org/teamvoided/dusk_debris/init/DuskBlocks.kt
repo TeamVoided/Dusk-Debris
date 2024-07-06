@@ -104,7 +104,6 @@ object DuskBlocks {
         )
     )
 
-
     val GUNPOWDER = register(
         "gunpowder",
         GunpowderBlock(

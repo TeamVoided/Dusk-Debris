@@ -20,6 +20,7 @@ import org.teamvoided.dusk_debris.DuskDebris.id
 import org.teamvoided.dusk_debris.block.DuskBlockLists
 import org.teamvoided.dusk_debris.block.GunpowderBarrelBlock
 import org.teamvoided.dusk_debris.entity.GunpowderBarrelEntity
+import org.teamvoided.dusk_debris.item.BonecallerBandanaItem
 import org.teamvoided.dusk_debris.item.DuskItemLists
 import org.teamvoided.dusk_debris.item.throwable_bomb.BlunderbombItem
 import org.teamvoided.dusk_debris.item.throwable_bomb.BonecallerItem
@@ -59,6 +60,13 @@ object DuskItems {
     val BONECHILLER_ITEM =register("bonechiller", BonechillerItem(DuskBlocks.BONECHILLER_BLOCK, Item.Settings().maxCount(16)))
     val BONEBOGGER_ITEM =register("bonebogger", BoneboggerItem(DuskBlocks.BONEBOGGER_BLOCK, Item.Settings().maxCount(16)))
     val BONEWITHER_ITEM =register("bonewither", BonewitherItem(DuskBlocks.BONEWITHER_BLOCK, Item.Settings().maxCount(16)))
+    val BONECALLER_BANDANA =
+        register(
+            "bonecaller_bandana",
+            BonecallerBandanaItem(
+                Item.Settings().maxCount(1).component(DataComponentTypes.DYED_COLOR, DyedColorComponent(0x7F7F7F, true))
+            )
+        )
 
     val SMOKEBOMB_ITEM =
         register(

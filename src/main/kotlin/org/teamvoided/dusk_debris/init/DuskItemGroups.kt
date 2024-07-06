@@ -22,6 +22,7 @@ object DuskItemGroups {
                 entries.addItems(DuskItemLists.THROWABLE_BOMB_ITEM_LIST)
                 entries.addStacks(
                     mutableSetOf(
+                        ItemStack(DuskItems.BONECALLER_BANDANA),
                         ItemStack(DuskItems.NETHERSHROOM_STEM),
                         ItemStack(DuskItems.BLUE_NETHERSHROOM_BLOCK),
                         ItemStack(DuskItems.PURPLE_NETHERSHROOM_BLOCK),

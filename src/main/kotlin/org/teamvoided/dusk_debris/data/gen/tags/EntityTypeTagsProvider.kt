@@ -8,6 +8,7 @@ import net.minecraft.registry.tag.EntityTypeTags
 import org.teamvoided.dusk_debris.block.DuskBlockLists
 import org.teamvoided.dusk_debris.init.DuskEntities
 import org.teamvoided.dusk_debris.data.DuskEntityTypeTags
+import org.teamvoided.dusk_debris.entity.DuskEntityLists.DUSK_SKELETON_ENTITIES
 import org.teamvoided.dusk_debris.entity.DuskEntityLists.THROWABLE_BOMB_ENTITIES
 import java.util.concurrent.CompletableFuture
 
@@ -30,6 +31,14 @@ class EntityTypeTagsProvider(output: FabricDataOutput, registriesFuture: Complet
             .add(EntityType.DROWNED)
         getOrCreateTagBuilder(DuskEntityTypeTags.THROWABLE_BOMB)
             .add(*THROWABLE_BOMB_ENTITIES.toTypedArray())
+        getOrCreateTagBuilder(DuskEntityTypeTags.DUSK_SKELETON_ATTACKS)
+            .add(EntityType.IRON_GOLEM)
+            .add(EntityType.SNOW_GOLEM)
+            .add(EntityType.DROWNED)
+            .add(EntityType.PIGLIN)
+            .add(EntityType.PIGLIN_BRUTE)
+        getOrCreateTagBuilder(DuskEntityTypeTags.DUSK_SKELETON_RETREATS)
+            .add(EntityType.WOLF)
         getOrCreateTagBuilder(DuskEntityTypeTags.IS_NOT_AFFECTED_BY_NETHERSHROOM)
             .addOptionalTag(EntityTypeTags.IGNORES_POISON_AND_REGEN)
             .add(EntityType.PIGLIN)
@@ -51,9 +60,14 @@ class EntityTypeTagsProvider(output: FabricDataOutput, registriesFuture: Complet
     }
 
     private fun vanillaTags() {
+        getOrCreateTagBuilder(EntityTypeTags.SKELETONS)
+            .add(*DUSK_SKELETON_ENTITIES.toTypedArray())
+        getOrCreateTagBuilder(EntityTypeTags.NO_ANGER_FROM_WIND_CHARGE)
+            .add(*DUSK_SKELETON_ENTITIES.toTypedArray())
+//        getOrCreateTagBuilder(EntityTypeTags.DEFLECTS_PROJECTILES)
+//           .add(DuskEntities.GREED)
         getOrCreateTagBuilder(EntityTypeTags.IMPACT_PROJECTILES)
             .addOptionalTag(DuskEntityTypeTags.THROWABLE_BOMB)
-        getOrCreateTagBuilder(EntityTypeTags.REDIRECTABLE_PROJECTILE)
 //        getOrCreateTagBuilder(EntityTypeTags.AQUATIC)
 //            .add(DuskEntities.CRAB)
 //        getOrCreateTagBuilder(EntityTypeTags.ARTHROPOD)

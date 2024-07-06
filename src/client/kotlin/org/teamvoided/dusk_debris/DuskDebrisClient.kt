@@ -7,13 +7,19 @@ import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry
 import net.minecraft.client.render.RenderLayer
 import net.minecraft.client.render.entity.EmptyEntityRenderer
 import net.minecraft.client.render.entity.FlyingItemEntityRenderer
+import net.minecraft.client.render.entity.SkeletonEntityRenderer
+import net.minecraft.component.DataComponentTypes
+import net.minecraft.component.type.DyedColorComponent
+import net.minecraft.item.ItemStack
 import org.teamvoided.dusk_debris.DuskDebris.log
 import org.teamvoided.dusk_debris.block.DuskBlockLists
 import org.teamvoided.dusk_debris.block.GunpowderBlock
 import org.teamvoided.dusk_debris.entity.DuskEntityLists.THROWABLE_BOMB_ENTITIES
 import org.teamvoided.dusk_debris.entity.gunpowder_barrel.GunpowderBarrelEntityRenderer
+import org.teamvoided.dusk_debris.entity.skeleton.GloomEntityRenderer
 import org.teamvoided.dusk_debris.init.DuskBlocks
 import org.teamvoided.dusk_debris.init.DuskEntities
+import org.teamvoided.dusk_debris.init.DuskItems
 import org.teamvoided.dusk_debris.init.DuskParticles
 import org.teamvoided.dusk_debris.particle.*
 
@@ -49,6 +55,11 @@ object DuskDebrisClient {
         ParticleFactoryRegistry.getInstance()
             .register(DuskParticles.BONECALLER, BonecallerParticle::Factory)
 
+        ColorProviderRegistry.ITEM.register(
+            { itemStack: ItemStack, i: Int ->
+                DyedColorComponent.getColorOrDefault(itemStack, 0x7F7F7F)
+            }, DuskItems.BONECALLER_BANDANA
+        )
         ColorProviderRegistry.BLOCK.register(
             { state, _, _, _ -> if (state.get(GunpowderBlock.LIT)) 0xFF9F32 else 0x383838 },
             DuskBlocks.GUNPOWDER
@@ -56,8 +67,9 @@ object DuskDebrisClient {
 
         EntityRendererRegistry.register(DuskEntities.BOX_AREA_EFFECT_CLOUD, ::EmptyEntityRenderer)
         EntityRendererRegistry.register(DuskEntities.GUNPOWDER_BARREL, ::GunpowderBarrelEntityRenderer)
+        EntityRendererRegistry.register(DuskEntities.GLOOM, ::SkeletonEntityRenderer)
 
-        THROWABLE_BOMB_ENTITIES.forEach{
+        THROWABLE_BOMB_ENTITIES.forEach {
             EntityRendererRegistry.register(it, ::FlyingItemEntityRenderer)
         }
 

@@ -38,34 +38,38 @@ class BoxAreaEffectCloud(entityType: EntityType<out BoxAreaEffectCloud>, world: 
             }
 
             for (j in 0 until i) {
-                val pi2Rand = random.nextFloat() * 6.2831855f
                 val randInRadius = MathHelper.sqrt(random.nextFloat()) * radius * 1.25
-                var x = (random.nextDouble() - random.nextDouble())
-                var y = (random.nextDouble() - random.nextDouble())
-                var z = (random.nextDouble() - random.nextDouble())
-                val a = sqrt(x * x + y * y + z * z)
-                x = this.x + (randInRadius * x) / a
-                y = this.y + (randInRadius * y) / a + radius
-                z = this.z + (randInRadius * z) / a
+                var inSphereX = (random.nextDouble() - random.nextDouble())
+                var inSphereY = (random.nextDouble() - random.nextDouble())
+                var inSphereZ = (random.nextDouble() - random.nextDouble())
+                val theSphereFunction = sqrt(inSphereX * inSphereX + inSphereY * inSphereY + inSphereZ * inSphereZ)
+                inSphereX = this.x + (randInRadius * inSphereX) / theSphereFunction
+                inSphereY = this.y + (randInRadius * inSphereY) / theSphereFunction + radius
+                inSphereZ = this.z + (randInRadius * inSphereZ) / theSphereFunction
                 if (particleEffect.type === ParticleTypes.ENTITY_EFFECT) {
                     if (isWaiting && random.nextBoolean()) {
                         world.addParticle(
                             ColoredParticleEffect.create(ParticleTypes.ENTITY_EFFECT, -1),
-                            x,
-                            y,
-                            z,
+                            inSphereX,
+                            inSphereY,
+                            inSphereZ,
                             0.0,
                             0.0,
                             0.0
                         )
                     } else {
-                        world.addParticle(particleEffect, x, y, z, 0.0, 0.0, 0.0)
+                        world.addParticle(particleEffect, inSphereX, inSphereY, inSphereZ, 0.0, 0.0, 0.0)
                     }
                 } else if (isWaiting) {
-                    world.addParticle(particleEffect, x, y, z, 0.0, 0.0, 0.0)
+                    world.addParticle(particleEffect, inSphereX, inSphereY, inSphereZ, 0.0, 0.0, 0.0)
                 } else {
+                    if (j <= 3){
+                        world.addImportantParticle(particleEffect, inSphereX, inSphereY, inSphereZ, 0.0, 0.0, 0.0)}
                     world.addParticle(
-                        particleEffect, x, y, z,
+                        particleEffect,
+                        inSphereX,
+                        inSphereY,
+                        inSphereZ,
                         0.0,
                         0.0,
                         0.0

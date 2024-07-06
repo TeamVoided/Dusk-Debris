@@ -25,12 +25,12 @@ open class BonecallerParticle(
         this.velocityY += (random.nextFloat().toDouble() * 0.75)
         this.velocityZ += ((random.nextFloat() - random.nextFloat()) * 0.2)
         this.gravityStrength = 0f
-        chooseColors()
+        chooseColor()
         this.scale = random.nextFloat() * 0.3f + 0.3f
         this.maxAge = ((random.nextFloat() * 80).toInt() + 60)
     }
 
-    private fun chooseColors() {
+    private fun chooseColor() {
         val f = (Math.random().toFloat())
         val colorOption1 = Vector3f(color1.red / 255f, color1.green / 255f, color1.blue / 255f)
         val colorOption2 = Vector3f(color2.red / 255f, color2.green / 255f, color2.blue / 255f)

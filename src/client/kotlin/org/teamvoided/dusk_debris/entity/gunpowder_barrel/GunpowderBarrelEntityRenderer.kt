@@ -33,9 +33,9 @@ class GunpowderBarrelEntityRenderer(context: EntityRendererFactory.Context) : En
     ) {
         matrices.push()
         matrices.translate(0.0f, 0.5f, 0.0f)
-        val j = gunpowderBlockEntity.fuse
-        if (j.toFloat() - g + 1.0f < 10.0f) {
-            var h = 1.0f - (j.toFloat() - g + 1.0f) / 10.0f
+        val fuse = gunpowderBlockEntity.fuse
+        if (fuse.toFloat() - g + 1.0f < 10.0f) {
+            var h = 1.0f - (fuse.toFloat() - g + 1.0f) / 10.0f
             h = MathHelper.clamp(h, 0.0f, 1.0f)
             h *= h
             h *= h
@@ -52,7 +52,7 @@ class GunpowderBarrelEntityRenderer(context: EntityRendererFactory.Context) : En
             matrices,
             vertexConsumers,
             i,
-            j / 5 % 2 == 0
+            fuse / 5 % 2 == 0
         )
         matrices.pop()
         super.render(gunpowderBlockEntity, f, g, matrices, vertexConsumers, i)
