@@ -5,9 +5,11 @@ import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider
 import net.minecraft.data.client.ItemModelGenerator
 import net.minecraft.data.client.model.*
+import net.minecraft.util.Identifier
 import org.teamvoided.dusk_debris.block.DuskBlockLists
 import org.teamvoided.dusk_debris.init.DuskBlocks
 import org.teamvoided.dusk_debris.init.DuskItems
+import org.teamvoided.dusk_debris.item.DuskItemLists
 import org.teamvoided.dusk_debris.util.*
 
 class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
@@ -33,6 +35,9 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
             gen.registerCubeAllModelTexturePool(it.baseBlock).family(it)
         }
 
+        DuskItemLists.SPAWN_EGGS_ITEM_LIST.forEach {
+            gen.registerParentedItemModel(it, Identifier.ofDefault("item/template_spawn_egg"))
+        }
         DuskBlockLists.RIBBON_BLOCKS_LIST.forEach {
             gen.registerRibbon(it)
         }

@@ -6,6 +6,7 @@ import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.SpawnReason
 import net.minecraft.entity.ai.goal.*
 import net.minecraft.entity.attribute.DefaultAttributeContainer
+import net.minecraft.entity.attribute.EntityAttributes
 import net.minecraft.entity.damage.DamageSource
 import net.minecraft.entity.data.DataTracker
 import net.minecraft.entity.data.TrackedData
@@ -32,7 +33,7 @@ import org.teamvoided.dusk_debris.entity.ai.goal.EnterDarknessGoal
 class GloomEntity(entityType: EntityType<out GloomEntity>, world: World) :
     AbstractSkeletonEntity(entityType, world) {
     override fun initGoals() {
-//        goalSelector.add(1, StunThisEntity(this, time, criteria))
+//        goalSelector.add(1, StunEntity(this, time, isDarkMode() && !(inDarkness() && !isOnFire)))
         goalSelector.add(2, AvoidSunlightGoal(this))
         goalSelector.add(3, EnterDarknessGoal(this, 1.0, lightThreshold))
         goalSelector.add(
@@ -164,6 +165,10 @@ class GloomEntity(entityType: EntityType<out GloomEntity>, world: World) :
 
     protected fun convertToLightMode() {
         dataTracker.set(DARK_MODE, false)
+        this.addStatusEffect(StatusEffectInstance(StatusEffects.SLOWNESS,  60, 255), this)
+    }
+    override fun isAffectedByDaylight(): Boolean {
+        return false
     }
 
     fun inDarkness(): Boolean {
@@ -171,7 +176,7 @@ class GloomEntity(entityType: EntityType<out GloomEntity>, world: World) :
     }
 
     override fun isShaking(): Boolean {
-        return isConvertingToStray() || conversionToDarkModeTime > LIGHT_MODE_TIME - 10
+        return isConvertingToStray()
     }
 
     override fun canFreeze(): Boolean {
@@ -215,6 +220,7 @@ class GloomEntity(entityType: EntityType<out GloomEntity>, world: World) :
     }
 
     companion object {
+
         private val lightThreshold = 10
         val statusEffect = StatusEffects.DARKNESS
 
@@ -238,6 +244,8 @@ class GloomEntity(entityType: EntityType<out GloomEntity>, world: World) :
 
         fun createAttributes(): DefaultAttributeContainer.Builder {
             return MobEntity.createAttributes()
+                .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 1.0)
+                .add(EntityAttributes.GENERIC_ATTACK_SPEED, 1.0)
         }
 
         fun canSpawn(

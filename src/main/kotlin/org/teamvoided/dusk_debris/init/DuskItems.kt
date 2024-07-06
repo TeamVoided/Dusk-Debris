@@ -79,6 +79,8 @@ object DuskItems {
     val BLINDBOMB_ITEM = register("blindbomb", BlindbombItem(DuskBlocks.BLINDBOMB_BLOCK, Item.Settings().maxCount(1)))
     val POCKETPOISON_ITEM =
         register("pocketpoison", PocketpoisonItem(DuskBlocks.POCKETPOISON_BLOCK, Item.Settings().maxCount(1)))
+    val GLOOM_SPAWN_EGG =
+        register("gloom_spawn_egg", (SpawnEggItem(DuskEntities.GLOOM, 0x222222, 0x222222, Item.Settings())))
 
     val LIGHT_BLUE_RIBBON = register("light_blue_ribbon", BlockItem(DuskBlocks.LIGHT_BLUE_RIBBON, Item.Settings()))
 

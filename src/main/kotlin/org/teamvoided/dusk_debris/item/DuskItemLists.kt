@@ -19,4 +19,7 @@ object DuskItemLists {
         DuskItems.STRONGHOLD_GUNPOWDER_BARREL,
         DuskItems.ANCIENT_BLACK_POWDER_BARREL
     )
+    val SPAWN_EGGS_ITEM_LIST = listOf(
+        DuskItems.GLOOM_SPAWN_EGG
+    )
 }

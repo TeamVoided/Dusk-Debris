@@ -333,7 +333,7 @@ fun BlockStateModelGenerator.registerParentedItemModel(block: Block) =
 fun block(parent: String, vararg requiredTextures: TextureKey): Model {
     return Model(
         Optional.of(
-            DuskDebris.id("block/$parent")
+            id("block/$parent")
         ), Optional.empty(), *requiredTextures
     )
 }
@@ -341,7 +341,7 @@ fun block(parent: String, vararg requiredTextures: TextureKey): Model {
 fun block(parent: String, variant: String, vararg requiredTextures: TextureKey): Model {
     return Model(
         Optional.of(
-            DuskDebris.id("block/$parent")
+            id("block/$parent")
         ), Optional.of(variant), *requiredTextures
     )
 }

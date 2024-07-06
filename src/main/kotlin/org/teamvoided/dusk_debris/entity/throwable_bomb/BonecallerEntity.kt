@@ -6,6 +6,7 @@ import net.minecraft.entity.EntityType
 import net.minecraft.entity.EquipmentSlot
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.SpawnReason
+import net.minecraft.entity.mob.AbstractSkeletonEntity
 import net.minecraft.entity.mob.SkeletonEntity
 import net.minecraft.item.Item
 import net.minecraft.particle.ParticleEffect
@@ -65,35 +66,8 @@ open class BonecallerEntity : AbstractThrwowableBombEntity {
             val team: Team? = livingEntity?.scoreboardTeam
             val bandanaColor = if (team != null) team.color.colorValue!! else bandanaColors()
             if (!world.isClient) {
-                for (ignored in 0..2) {
-                    val skeletonEntity = SkeletonEntity(getCalledEntity() as EntityType<out SkeletonEntity>, world)
-                    val spawnPos = getSummonPos(
-                        skeletonEntity, SpawnReason.MOB_SUMMONED, serverWorld,
-                        blockPos, 20, 3, 6, SpawnUtil.Strategy.field_39401
-                    )
-                    skeletonEntity.refreshPositionAndAngles(spawnPos, 0f, 0.0f)
-                    skeletonEntity.initialize(
-                        serverWorld,
-                        this.world.getLocalDifficulty(this.blockPos),
-                        SpawnReason.MOB_SUMMONED,
-                        null
-                    )
-                    doOtherSkeletonThingsAndColor(skeletonEntity, bandanaColor)
-                    if (team != null) {
-                        serverWorld.scoreboard.addPlayerToTeam(skeletonEntity.profileName, team)
-                    }
-                    serverWorld.spawnParticles(
-                        getTrailingParticle(),
-                        spawnPos.x + 0.5,
-                        spawnPos.y.toDouble(),
-                        spawnPos.z + 0.5,
-                        20,
-                        0.0,
-                        0.0,
-                        0.0,
-                        1.0
-                    )
-                    world.spawnEntity(skeletonEntity)
+                for (ignored in 1..3) {
+                    getCalledEntity(serverWorld, bandanaColor, team)
                 }
             }
             serverWorld.spawnParticles(
@@ -110,8 +84,51 @@ open class BonecallerEntity : AbstractThrwowableBombEntity {
         }
     }
 
+    open fun getCalledEntity(serverWorld: ServerWorld, bandanaColor: Int, team: Team?) {
+        //overide this to get your own
+        val bandana = DuskItems.BONECALLER_BANDANA.defaultStack
+        val skeletonEntity = SkeletonEntity(EntityType.SKELETON as EntityType<out SkeletonEntity>, world)
+        val spawnPos = getSummonPos(
+            skeletonEntity,
+            SpawnReason.MOB_SUMMONED,
+            serverWorld,
+            blockPos,
+            20,
+            3,
+            6,
+            SpawnUtil.Strategy.field_39401
+        )
+        skeletonEntity.refreshPositionAndAngles(spawnPos, 0f, 0.0f)
+        skeletonEntity.initialize(
+            serverWorld,
+            this.world.getLocalDifficulty(this.blockPos),
+            SpawnReason.MOB_SUMMONED,
+            null
+        )
+        bandana.set(
+            DataComponentTypes.DYED_COLOR,
+            DyedColorComponent(bandanaColor, true)
+        )
+        skeletonEntity.equipStack(EquipmentSlot.HEAD, bandana)
+        if (team != null) {
+            serverWorld.scoreboard.addPlayerToTeam(skeletonEntity.profileName, team)
+        }
+        serverWorld.spawnParticles(
+            getTrailingParticle(),
+            spawnPos.x + 0.5,
+            spawnPos.y.toDouble(),
+            spawnPos.z + 0.5,
+            20,
+            0.0,
+            0.0,
+            0.0,
+            1.0
+        )
+        world.spawnEntity(skeletonEntity)
+    }
+
     open fun getSummonPos(
-        entityType: SkeletonEntity,
+        entityType: AbstractSkeletonEntity,
         reason: SpawnReason,
         world: ServerWorld,
         pos: BlockPos,
@@ -120,6 +137,7 @@ open class BonecallerEntity : AbstractThrwowableBombEntity {
         rangeY: Int,
         spawnStrategy: SpawnUtil.Strategy
     ): BlockPos {
+        //overide this to get your own
         val mutable = pos.mutableCopy()
         for (l in 0 until attempts) {
             val x = MathHelper.nextBetween(world.random, -rangeXZ, rangeXZ)
@@ -136,20 +154,6 @@ open class BonecallerEntity : AbstractThrwowableBombEntity {
         return pos
     }
 
-    open fun doOtherSkeletonThings(skeletonEntity: SkeletonEntity) {}
-
-    open fun doOtherSkeletonThingsAndColor(skeletonEntity: SkeletonEntity, bandanaColor: Int) {
-        doOtherSkeletonThings(skeletonEntity)
-        val bandana = DuskItems.BONECALLER_BANDANA.defaultStack
-        bandana.set(
-            DataComponentTypes.DYED_COLOR,
-            DyedColorComponent(bandanaColor, true)
-        )
-        skeletonEntity.equipStack(EquipmentSlot.HEAD, bandana)
-    }
-
-    open fun getCalledEntity(): EntityType<*> = EntityType.SKELETON
-
     override fun getDefaultItem(): Item {
         return DuskItems.BONECALLER_ITEM
     }
@@ -157,14 +161,10 @@ open class BonecallerEntity : AbstractThrwowableBombEntity {
     open val color1: Color = Color(0xBC3235)
     open val color2: Color = Color(0x1B6666)
     open fun bandanaColors(): Int {
-        val random = 100
-        val default = 50
-        val one = Math.random() * random
-        val two = Math.random() * random - one
-        val three = random - one - two
-        val r = default + one.toInt()
-        val g = if (two > 0) default + two.toInt() else default
-        val b = if (three > 0) default + three.toInt() else default
+        val random = 175
+        val r = (Math.random() * random).toInt()
+        val g = (Math.random() * random).toInt()
+        val b = (Math.random() * random).toInt()
         return Color(r, g, b).rgb
     }
 
