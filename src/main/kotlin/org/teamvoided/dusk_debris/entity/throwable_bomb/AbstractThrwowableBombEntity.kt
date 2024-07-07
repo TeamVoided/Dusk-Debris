@@ -34,15 +34,16 @@ open class AbstractThrwowableBombEntity : ThrownItemEntity {
 
 
     override fun onEntityHit(entityHitResult: EntityHitResult) {
-        entityHitResult.entity.damage(this.damageSources.thrown(this, this.owner), getHitDamage())
+        if (getHitDamage() > 0f)
+            entityHitResult.entity.damage(this.damageSources.thrown(this, this.owner), getHitDamage())
         super.onEntityHit(entityHitResult)
     }
 
     override fun onCollision(hitResult: HitResult) {
         super.onCollision(hitResult)
         if (!world.isClient) {
-            this.discard()
             this.explode()
+            this.discard()
         }
     }
 
