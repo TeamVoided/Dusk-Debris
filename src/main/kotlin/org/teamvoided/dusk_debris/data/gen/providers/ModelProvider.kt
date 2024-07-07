@@ -3,9 +3,11 @@ package org.teamvoided.dusk_debris.data.gen.providers
 
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider
+import net.minecraft.block.Blocks
 import net.minecraft.data.client.ItemModelGenerator
 import net.minecraft.data.client.model.*
 import net.minecraft.util.Identifier
+import org.teamvoided.dusk_debris.DuskDebris.mc
 import org.teamvoided.dusk_debris.block.DuskBlockLists
 import org.teamvoided.dusk_debris.init.DuskBlocks
 import org.teamvoided.dusk_debris.init.DuskItems
@@ -48,9 +50,22 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
             gen.gunpowderBarrelBlock(it)
         }
         gen.registerDustBlockFromRedstone(DuskBlocks.GUNPOWDER)
+
         gen.registerItemModel(DuskItems.DEVELOPER_GUNPOWDER_ITEM)
-        gen.registerVesselBlock(DuskBlocks.GILDED_VESSEL)
-        
+//        gen.registerBuiltin(ModelIds.getMinecraftNamespacedBlock("skull"), Blocks.SOUL_SAND)
+//            .includeWithItem(
+//                DuskBlocks.STRAY_SKULL,
+//                DuskBlocks.BOGGED_SKULL,
+//                DuskBlocks.GLOOM_SKULL
+//            )
+//            .includeWithoutItem(
+//                DuskBlocks.STRAY_WALL_SKULL,
+//                DuskBlocks.BOGGED_WALL_SKULL,
+//                DuskBlocks.GLOOM_WALL_SKULL
+//            )
+
+        gen.registerVesselBlock(DuskBlocks.GOLDEN_VESSEL)
+
         gen.registerNethershroom(DuskBlocks.BLUE_NETHERSHROOM)
         gen.registerNethershroomBlock(DuskBlocks.BLUE_NETHERSHROOM_BLOCK)
         gen.registerNethershroom(DuskBlocks.PURPLE_NETHERSHROOM)
@@ -64,6 +79,8 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
 
         gen.registerSimpleCubeAll(DuskBlocks.PAPER_BLOCK)
 
+        gen.registerSimpleState(DuskBlocks.BOG_MUD)
+        gen.registerItemModel(DuskItems.BOG_MUD_BUCKET)
         gen.registerLog(DuskBlocks.CYPRESS_LOG)
             .log(DuskBlocks.CYPRESS_LOG)
             .wood(DuskBlocks.CYPRESS_WOOD)
@@ -94,5 +111,9 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
 //        }
     }
 
-    override fun generateItemModels(gen: ItemModelGenerator) {}
+    override fun generateItemModels(gen: ItemModelGenerator) {
+        gen.register(DuskItems.STRAY_SKULL, parentedItemModel(mc("template_skull")))
+        gen.register(DuskItems.BOGGED_SKULL, parentedItemModel(mc("template_skull")))
+        gen.register(DuskItems.GLOOM_SKULL, parentedItemModel(mc("template_skull")))
+    }
 }

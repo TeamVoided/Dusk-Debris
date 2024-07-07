@@ -344,7 +344,7 @@ fun BlockStateModelGenerator.makeRibbonModel(block: Block, variant: Int): Identi
         TextureKey.ALL
     ).upload(block.modelSuffix("_$variant"), texture, this.modelCollector)
 }
-
+fun parentedItemModel(id:Identifier) = Model(Optional.of(id.withPrefix("item/")), Optional.empty())
 fun BlockStateModelGenerator.registerParentedItemModel(block: Block) =
     this.registerParentedItemModel(block, block.model())
 

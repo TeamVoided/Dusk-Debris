@@ -2,16 +2,14 @@ package org.teamvoided.dusk_debris.entity.skeleton
 
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
-import net.minecraft.client.render.VertexConsumerProvider
 import net.minecraft.client.render.entity.EntityRendererFactory
 import net.minecraft.client.render.entity.SkeletonEntityRenderer
 import net.minecraft.client.render.entity.feature.SkeletonOverlayFeatureRenderer
-import net.minecraft.client.util.math.MatrixStack
 import org.teamvoided.dusk_debris.entity.GloomEntity
 import net.minecraft.util.Identifier
 import org.teamvoided.dusk_debris.DuskDebris.id
-import org.teamvoided.dusk_debris.render.entity.model.skeleton.GloomEntityModel
-import org.teamvoided.dusk_debris.render.entity.model.DuskEntityModelLayers
+import org.teamvoided.dusk_debris.entity.skeleton.render.GloomEntityModel
+import org.teamvoided.dusk_debris.entity.DuskEntityModelLayers
 
 @Environment(EnvType.CLIENT)
 class GloomEntityRenderer(context: EntityRendererFactory.Context) : SkeletonEntityRenderer<GloomEntity>(
@@ -46,7 +44,7 @@ class GloomEntityRenderer(context: EntityRendererFactory.Context) : SkeletonEnti
     }
 
     companion object {
-        private val TEXTURE: Identifier = id("textures/entity/skeleton/gloom.png")
-        private val OVERLAY_TEXTURE: Identifier = id("textures/entity/skeleton/gloom.png")
+        private val TEXTURE: Identifier = id("textures/entity/skeleton/gloomed.png")
+        private val OVERLAY_TEXTURE: Identifier = id("textures/entity/skeleton/gloomed_overlay.png")
     }
 }

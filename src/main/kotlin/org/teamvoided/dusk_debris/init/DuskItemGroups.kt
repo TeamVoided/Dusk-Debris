@@ -84,6 +84,7 @@ object DuskItemGroups {
                         ItemStack(DuskItems.DEVELOPER_GUNPOWDER_ITEM)
                     )
                 )
+                entries.addItems(DuskItemLists.SPAWN_EGGS_ITEM_LIST)
             }
             .build()
     )

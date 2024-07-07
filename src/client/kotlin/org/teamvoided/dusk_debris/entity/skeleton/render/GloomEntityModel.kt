@@ -1,4 +1,4 @@
-package org.teamvoided.dusk_debris.render.entity.model.skeleton
+package org.teamvoided.dusk_debris.entity.skeleton.render
 
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
@@ -26,32 +26,32 @@ class GloomEntityModel(modelPart: ModelPart) : SkeletonEntityModel<GloomEntity>(
                 modelPartBandana.addChild(
                     "red_mushroom_1",
                     ModelPartBuilder.create().uv(50, 16).cuboid(-3.0f, -3.0f, 0.0f, 6.0f, 4.0f, 0.0f),
-                    ModelTransform.of(3.0f, -8.0f, 3.0f, 0.0f, 0.7853982f, 0.0f)
+                    ModelTransform.of(3.0f, -8.0f, 3.0f, 0.0f, 0.785f, 0.0f)
                 )
                 modelPartBandana.addChild(
                     "red_mushroom_2",
                     ModelPartBuilder.create().uv(50, 16).cuboid(-3.0f, -3.0f, 0.0f, 6.0f, 4.0f, 0.0f),
-                    ModelTransform.of(3.0f, -8.0f, 3.0f, 0.0f, 2.3561945f, 0.0f)
+                    ModelTransform.of(3.0f, -8.0f, 3.0f, 0.0f, 2.356f, 0.0f)
                 )
                 modelPartBandana.addChild(
                     "brown_mushroom_1",
                     ModelPartBuilder.create().uv(50, 22).cuboid(-3.0f, -3.0f, 0.0f, 6.0f, 4.0f, 0.0f),
-                    ModelTransform.of(-3.0f, -8.0f, -3.0f, 0.0f, 0.7853982f, 0.0f)
+                    ModelTransform.of(-3.0f, -8.0f, -3.0f, 0.0f, 0.785f, 0.0f)
                 )
                 modelPartBandana.addChild(
                     "brown_mushroom_2",
                     ModelPartBuilder.create().uv(50, 22).cuboid(-3.0f, -3.0f, 0.0f, 6.0f, 4.0f, 0.0f),
-                    ModelTransform.of(-3.0f, -8.0f, -3.0f, 0.0f, 2.3561945f, 0.0f)
+                    ModelTransform.of(-3.0f, -8.0f, -3.0f, 0.0f, 2.356f, 0.0f)
                 )
                 modelPartBandana.addChild(
                     "brown_mushroom_3",
                     ModelPartBuilder.create().uv(50, 28).cuboid(-3.0f, -4.0f, 0.0f, 6.0f, 4.0f, 0.0f),
-                    ModelTransform.of(-2.0f, -1.0f, 4.0f, -1.5707964f, 0.0f, 0.7853982f)
+                    ModelTransform.of(-2.0f, -1.0f, 4.0f, -1.57f, 0.0f, 0.785f)
                 )
                 modelPartBandana.addChild(
                     "brown_mushroom_4",
                     ModelPartBuilder.create().uv(50, 28).cuboid(-3.0f, -4.0f, 0.0f, 6.0f, 4.0f, 0.0f),
-                    ModelTransform.of(-2.0f, -1.0f, 4.0f, -1.5707964f, 0.0f, 2.3561945f)
+                    ModelTransform.of(-2.0f, -1.0f, 4.0f, -1.57f, 0.0f, 2.356f)
                 )
                 return TexturedModelData.of(modelData, 64, 32)
             }

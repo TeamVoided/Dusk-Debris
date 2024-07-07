@@ -30,7 +30,7 @@ object DuskBlockLists {
         DuskBlocks.LIGHT_BLUE_RIBBON
     )
     val VESSEL_BLOCK_LIST = listOf(
-        DuskBlocks.GILDED_VESSEL
+        DuskBlocks.GOLDEN_VESSEL
     )
 //    val CHALICE_BLOCK_LIST = listOf()
     val DECORATIVE_WHATEVER_BLOCK_LIST = VESSEL_BLOCK_LIST

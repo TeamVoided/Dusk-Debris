@@ -1,21 +1,21 @@
-package org.teamvoided.dusk_debris.render.entity.model
+package org.teamvoided.dusk_debris.entity
 
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry
 import net.minecraft.client.render.entity.model.EntityModelLayer
 import org.teamvoided.dusk_debris.DuskDebris.id
-import org.teamvoided.dusk_debris.render.entity.model.skeleton.GloomEntityModel
+import org.teamvoided.dusk_debris.entity.skeleton.render.GloomEntityModel
 
 object DuskEntityModelLayers {
-    val GLOOM: EntityModelLayer = registerMain("gloom")
-    val GLOOM_INNER_ARMOR: EntityModelLayer = createInnerArmor("gloom")
-    val GLOOM_OUTER_ARMOR: EntityModelLayer = createOuterArmor("gloom")
-    val GLOOM_OUTER: EntityModelLayer = register("gloom", "outer")
+    val GLOOM: EntityModelLayer = registerMain("gloomed")
+    val GLOOM_OUTER: EntityModelLayer = register("gloomed", "outer")
+    val GLOOM_INNER_ARMOR: EntityModelLayer = createInnerArmor("gloomed")
+    val GLOOM_OUTER_ARMOR: EntityModelLayer = createOuterArmor("gloomed")
 
     fun init(){
         EntityModelLayerRegistry.registerModelLayer(GLOOM, GloomEntityModel::texturedModelData)
+        EntityModelLayerRegistry.registerModelLayer(GLOOM_OUTER, GloomEntityModel::texturedModelData)
         EntityModelLayerRegistry.registerModelLayer(GLOOM_INNER_ARMOR, GloomEntityModel::texturedModelData)
         EntityModelLayerRegistry.registerModelLayer(GLOOM_OUTER_ARMOR, GloomEntityModel::texturedModelData)
-        EntityModelLayerRegistry.registerModelLayer(GLOOM_OUTER, GloomEntityModel::texturedModelData)
     }
 
     private fun registerMain(id: String): EntityModelLayer {

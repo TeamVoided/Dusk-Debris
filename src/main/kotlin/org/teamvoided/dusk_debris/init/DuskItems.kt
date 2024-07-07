@@ -88,11 +88,18 @@ object DuskItems {
 
     val LIGHT_BLUE_RIBBON = register("light_blue_ribbon", BlockItem(DuskBlocks.LIGHT_BLUE_RIBBON))
 
-    val GILDED_VESSEL =
-        register("gilded_vessel", BlockItem(DuskBlocks.GILDED_VESSEL, Item.Settings().maxCount(16)))
+    val STRAY_SKULL = register("stray_skull", BlockItem(DuskBlocks.STRAY_SKULL))
+    val BOGGED_SKULL = register("bogged_skull", BlockItem(DuskBlocks.BOGGED_SKULL))
+    val GLOOM_SKULL = register("gloom_skull", BlockItem(DuskBlocks.GLOOM_SKULL))
+    val GOLDEN_VESSEL =
+        register("golden_vessel", BlockItem(DuskBlocks.GOLDEN_VESSEL, Item.Settings().maxCount(16)))
 
     val PAPER_BLOCK = register("paper_block", BlockItem(DuskBlocks.PAPER_BLOCK))
 
+    val BOG_MUD_BUCKET = register(
+        "bog_mud_bucket",
+        PowderSnowBucketItem(DuskBlocks.BOG_MUD, SoundEvents.ITEM_BUCKET_EMPTY, Item.Settings())
+    )
     val CYPRESS_LOG = register("cypress_log", BlockItem(DuskBlocks.CYPRESS_LOG))
     val CYPRESS_WOOD = register("cypress_wood", BlockItem(DuskBlocks.CYPRESS_WOOD))
     val STRIPPED_CYPRESS_LOG = register("stripped_cypress_log", BlockItem(DuskBlocks.STRIPPED_CYPRESS_LOG))

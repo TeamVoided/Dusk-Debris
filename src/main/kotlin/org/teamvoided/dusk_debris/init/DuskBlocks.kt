@@ -5,13 +5,16 @@ import net.minecraft.block.*
 import net.minecraft.block.Blocks.*
 import net.minecraft.block.enums.NoteBlockInstrument
 import net.minecraft.block.piston.PistonBehavior
+import net.minecraft.entity.EntityType
 import net.minecraft.entity.effect.StatusEffects
 import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
 import net.minecraft.sound.BlockSoundGroup
 import net.minecraft.sound.SoundEvents
 import net.minecraft.util.Color
+import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
+import net.minecraft.world.BlockView
 import org.teamvoided.dusk_debris.DuskDebris.id
 import org.teamvoided.dusk_debris.block.*
 import org.teamvoided.dusk_debris.block.throwable_bomb.BlunderbombBlock
@@ -186,38 +189,78 @@ object DuskBlocks {
                 .pistonBehavior(PistonBehavior.DESTROY)
         )
     )
-    val RED_RIBBON = register("red_ribbon", registerRibbon(Blocks.RED_WOOL.defaultMapColor))
-    val ORANGE_RIBBON = register("orange_ribbon", registerRibbon(Blocks.ORANGE_WOOL.defaultMapColor))
-    val YELLOW_RIBBON = register("yellow_ribbon", registerRibbon(Blocks.YELLOW_WOOL.defaultMapColor))
-    val LIME_RIBBON = register("lime_ribbon", registerRibbon(Blocks.LIME_WOOL.defaultMapColor))
-    val GREEN_RIBBON = register("green_ribbon", registerRibbon(Blocks.GREEN_WOOL.defaultMapColor))
-    val CYAN_RIBBON = register("cyan_ribbon", registerRibbon(Blocks.CYAN_WOOL.defaultMapColor))
-    val BLUE_RIBBON = register("blue_ribbon", registerRibbon(Blocks.BLUE_WOOL.defaultMapColor))
-    val LIGHT_BLUE_RIBBON = register("light_blue_ribbon", registerRibbon(Blocks.LIGHT_BLUE_WOOL.defaultMapColor))
-    val PURPLE_RIBBON = register("purple_ribbon", registerRibbon(Blocks.PURPLE_WOOL.defaultMapColor))
-    val MAGENTA_RIBBON = register("magenta_ribbon", registerRibbon(Blocks.MAGENTA_WOOL.defaultMapColor))
-    val PINK_RIBBON = register("pink_ribbon", registerRibbon(Blocks.PINK_WOOL.defaultMapColor))
-    val BROWN_RIBBON = register("brown_ribbon", registerRibbon(Blocks.BROWN_WOOL.defaultMapColor))
-    val WHITE_RIBBON = register("white_ribbon", registerRibbon(Blocks.WHITE_WOOL.defaultMapColor))
-    val LIGHT_GRAY_RIBBON = register("light_gray_ribbon", registerRibbon(Blocks.LIGHT_GRAY_WOOL.defaultMapColor))
-    val GRAY_RIBBON = register("gray_ribbon", registerRibbon(Blocks.GRAY_WOOL.defaultMapColor))
-    val BLACK_RIBBON = register("black_ribbon", registerRibbon(Blocks.BLACK_WOOL.defaultMapColor))
+    val RED_RIBBON = register("red_ribbon", registerRibbon(RED_WOOL.defaultMapColor))
+    val ORANGE_RIBBON = register("orange_ribbon", registerRibbon(ORANGE_WOOL.defaultMapColor))
+    val YELLOW_RIBBON = register("yellow_ribbon", registerRibbon(YELLOW_WOOL.defaultMapColor))
+    val LIME_RIBBON = register("lime_ribbon", registerRibbon(LIME_WOOL.defaultMapColor))
+    val GREEN_RIBBON = register("green_ribbon", registerRibbon(GREEN_WOOL.defaultMapColor))
+    val CYAN_RIBBON = register("cyan_ribbon", registerRibbon(CYAN_WOOL.defaultMapColor))
+    val BLUE_RIBBON = register("blue_ribbon", registerRibbon(BLUE_WOOL.defaultMapColor))
+    val LIGHT_BLUE_RIBBON = register("light_blue_ribbon", registerRibbon(LIGHT_BLUE_WOOL.defaultMapColor))
+    val PURPLE_RIBBON = register("purple_ribbon", registerRibbon(PURPLE_WOOL.defaultMapColor))
+    val MAGENTA_RIBBON = register("magenta_ribbon", registerRibbon(MAGENTA_WOOL.defaultMapColor))
+    val PINK_RIBBON = register("pink_ribbon", registerRibbon(PINK_WOOL.defaultMapColor))
+    val BROWN_RIBBON = register("brown_ribbon", registerRibbon(BROWN_WOOL.defaultMapColor))
+    val WHITE_RIBBON = register("white_ribbon", registerRibbon(WHITE_WOOL.defaultMapColor))
+    val LIGHT_GRAY_RIBBON = register("light_gray_ribbon", registerRibbon(LIGHT_GRAY_WOOL.defaultMapColor))
+    val GRAY_RIBBON = register("gray_ribbon", registerRibbon(GRAY_WOOL.defaultMapColor))
+    val BLACK_RIBBON = register("black_ribbon", registerRibbon(BLACK_WOOL.defaultMapColor))
 
-    val GILDED_VESSEL = register(
-        "gilded_vessel",
+    val GOLDEN_VESSEL = register(
+        "golden_vessel",
         MysteriousVesselBlock(
-            AbstractBlock.Settings.create().mapColor(Blocks.GOLD_BLOCK.defaultMapColor)
+            AbstractBlock.Settings.create().mapColor(GOLD_BLOCK.defaultMapColor)
                 .pistonBehavior(PistonBehavior.DESTROY)
         )
+    )
+
+    val GLOOM_SKULL = registerSkull(
+        "gloomed_skull",
+        DuskSkullType.GLOOM,
+        NoteBlockInstrument.SKELETON
+    )
+    val GLOOM_WALL_SKULL = registerWallSkull(
+        "skeleton_wall_skull",
+        DuskSkullType.GLOOM,
+        GLOOM_SKULL
+    )
+    val STRAY_SKULL = registerSkull(
+        "stray_skull",
+        DuskSkullType.STRAY,
+        NoteBlockInstrument.SKELETON
+    )
+    val STRAY_WALL_SKULL = registerWallSkull(
+        "stray_wall_skull",
+        DuskSkullType.STRAY,
+        STRAY_SKULL
+    )
+    val BOGGED_SKULL = registerSkull(
+        "bogged_skull",
+        DuskSkullType.BOGGED,
+        NoteBlockInstrument.SKELETON
+    )
+    val BOGGED_WALL_SKULL = registerWallSkull(
+        "bogged_wall_skull",
+        DuskSkullType.BOGGED,
+        BOGGED_SKULL
     )
 
     val PAPER_BLOCK = register(
         "paper_block",
         PaperBlock(
-            AbstractBlock.Settings.create().mapColor(Blocks.WHITE_WOOL.defaultMapColor).strength(0.25F)
+            AbstractBlock.Settings.create().mapColor(WHITE_WOOL.defaultMapColor).strength(0.25F)
         )
     )
 
+    val BOG_MUD = register(
+        "bog_mud", BogMudBlock(
+            AbstractBlock.Settings.variantOf(MUD).dynamicBounds()
+                .allowsSpawning(Blocks::spawnable)
+                .solidBlock(Blocks::nonSolid)
+                .blockVision(Blocks::solid)
+                .suffocates(Blocks::solid)
+        )
+    )
 
     val CYPRESS_LOG = register("cypress_log", Blocks.logOf(charredPlanksColor, charredLogColor))
     val STRIPPED_CYPRESS_LOG = register("stripped_cypress_log", Blocks.logOf(charredPlanksColor, charredPlanksColor))
@@ -515,6 +558,27 @@ object DuskBlocks {
                 .pistonBehavior(PistonBehavior.DESTROY)
         )
     )
+
+    fun registerSkull(id: String, skullType: SkullBlock.SkullType, instrument: NoteBlockInstrument): Block {
+        return register(
+            id, SkullBlock(
+                skullType,
+                AbstractBlock.Settings.create().instrument(instrument).strength(1.0f)
+                    .pistonBehavior(PistonBehavior.DESTROY)
+            )
+        )
+    }
+
+    fun registerWallSkull(id: String, skullType: SkullBlock.SkullType, dropsLike: Block): Block {
+        return register(
+            id,
+            WallSkullBlock(
+                skullType,
+                AbstractBlock.Settings.create().strength(1.0f).dropsLike(dropsLike)
+                    .pistonBehavior(PistonBehavior.DESTROY)
+            )
+        )
+    }
 
     fun registerRibbon(mapColor: MapColor): Block {
         return RibbonBlock(

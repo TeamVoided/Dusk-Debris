@@ -12,7 +12,6 @@ import net.minecraft.entity.effect.StatusEffectInstance
 import net.minecraft.entity.effect.StatusEffects
 import net.minecraft.entity.mob.AbstractSkeletonEntity
 import net.minecraft.entity.mob.HostileEntity
-import net.minecraft.entity.mob.MobEntity
 import net.minecraft.entity.passive.TurtleEntity
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.entity.projectile.ArrowEntity
@@ -35,38 +34,34 @@ import org.teamvoided.dusk_debris.init.DuskItems
 class GloomEntity(entityType: EntityType<out GloomEntity>, world: World) :
     AbstractSkeletonEntity(entityType, world) {
     override fun initGoals() {
-//        goalSelector.add(1, StunEntity(this, time, isDarkMode() && !(inDarkness() && !isOnFire)))
-        goalSelector.add(2, AvoidSunlightGoal(this))
+        goalSelector.add(3, AvoidSunlightGoal(this))
         goalSelector.add(3, EnterDarknessGoal(this, 1.0, lightThreshold))
         goalSelector.add(
             3, FleeEntityGoal(
-                this,
-                LivingEntity::class.java, 6.0f, 1.0, 1.2
+                this, LivingEntity::class.java, 6.0f, 1.0, 1.2
             ) { entity -> entity.type.isIn(DuskEntityTypeTags.DUSK_SKELETON_RETREATS) })
         goalSelector.add(5, WanderAroundFarGoal(this, 1.0))
         goalSelector.add(
             6, LookAtEntityGoal(
-                this,
-                PlayerEntity::class.java, 8.0f
+                this, PlayerEntity::class.java, 8.0f
             )
         )
         goalSelector.add(6, LookAroundGoal(this))
         targetSelector.add(1, RevengeGoal(this, *arrayOfNulls(0)))
         targetSelector.add(
             2, TargetGoal(
-                this,
-                PlayerEntity::class.java, true
+                this, PlayerEntity::class.java, true
             )
         )
         targetSelector.add(
             3, TargetGoal(
-                this,
-                LivingEntity::class.java, true
-            ) { entity -> entity.type.isIn(DuskEntityTypeTags.DUSK_SKELETON_ATTACKS) })
+                this, LivingEntity::class.java, true
+            ) { entity ->
+                (entity.type.isIn(DuskEntityTypeTags.DUSK_SKELETON_ATTACKS))
+            })
         targetSelector.add(
             3, TargetGoal(
-                this,
-                TurtleEntity::class.java, 10, true, false, TurtleEntity.BABY_TURTLE_ON_LAND_FILTER
+                this, TurtleEntity::class.java, 10, true, false, TurtleEntity.BABY_TURTLE_ON_LAND_FILTER
             )
         )
     }
@@ -81,16 +76,13 @@ class GloomEntity(entityType: EntityType<out GloomEntity>, world: World) :
     override fun writeCustomDataToNbt(nbt: NbtCompound) {
         super.writeCustomDataToNbt(nbt)
         nbt.putInt(STRAY_CONVERSION_TIME_KEY, if (isConvertingToStray()) conversionToStrayTime else -1)
-        nbt.putInt(MODE_CONVERSION_TIME_KEY, if (isConvertingToDarkMode()) darkModeCountdown else -1)
+        nbt.putInt(MODE_CONVERSION_TIME_KEY, if (isLightMode()) countdownToDarkMode else -1)
     }
 
     override fun readCustomDataFromNbt(nbt: NbtCompound) {
         super.readCustomDataFromNbt(nbt)
         if (nbt.contains(STRAY_CONVERSION_TIME_KEY, 99) && nbt.getInt(STRAY_CONVERSION_TIME_KEY) > -1) {
             setConversionToStrayTime(nbt.getInt(STRAY_CONVERSION_TIME_KEY))
-        }
-        if (nbt.contains(DARK_MODE_KEY, 99) && nbt.getBoolean(DARK_MODE_KEY)) {
-            nbt.getString(DARK_MODE_KEY)
         }
         if (nbt.contains(MODE_CONVERSION_TIME_KEY, 99) && nbt.getInt(MODE_CONVERSION_TIME_KEY) > -1) {
             setConversionModeTime(nbt.getInt(MODE_CONVERSION_TIME_KEY))
@@ -116,26 +108,23 @@ class GloomEntity(entityType: EntityType<out GloomEntity>, world: World) :
                 setConvertingToStray(false)
             }
             if (inDarkness()) {
-                //for some reason, darkModeCountdown gets set to 300 but isConvertingToDarkMode() remains false
-                if (isConvertingToDarkMode()) {
-                    if (darkModeCountdown > 0) {
-                        --darkModeCountdown
+                if (isLightMode()) {
+                    if (countdownToDarkMode > 0) {
+                        --countdownToDarkMode
                     } else {
-                        convertToDarkMode()
+                        this.addStatusEffect(StatusEffectInstance(StatusEffects.DARKNESS, 60), this)
+                        setConvertingToDarkMode(false)
+                        setConversionModeTime(-1)
                     }
                 }
-            } else if (darkModeCountdown <= 140) {
-                if (!isConvertingToDarkMode()) {
-                    convertToLightMode()
-                } else {
-                    setConversionModeTime(LIGHT_MODE_TIME)
+            } else if (countdownToDarkMode <= 140 || !isLightMode()) {
+                if (!isLightMode()) {
+                    this.addStatusEffect(StatusEffectInstance(StatusEffects.SLOWNESS, 60, 255), this)
                 }
-            } else if (!isConvertingToDarkMode()) {
-                //this second else if is also here because of the same reason, yes i know laggy
-                convertToLightMode()
+                setConvertingToDarkMode(true)
+                setConversionModeTime(LIGHT_MODE_TIME)
             }
         }
-
         super.tick()
     }
 
@@ -163,7 +152,7 @@ class GloomEntity(entityType: EntityType<out GloomEntity>, world: World) :
 
     //Become Discord
 
-    fun isConvertingToDarkMode(): Boolean {
+    fun isLightMode(): Boolean {
         return getDataTracker().get(CONVERTING_TO_DARK_MODE)
     }
 
@@ -172,41 +161,30 @@ class GloomEntity(entityType: EntityType<out GloomEntity>, world: World) :
     }
 
     private fun setConversionModeTime(time: Int) {
-        darkModeCountdown = time
-        setConvertingToDarkMode(true)
-    }
-
-    protected fun convertToDarkMode() {
-        this.addStatusEffect(StatusEffectInstance(StatusEffects.DARKNESS, 60), this)
-        setConvertingToDarkMode(false)
-        setConversionModeTime(0)
-    }
-
-    protected fun convertToLightMode() {
-        this.addStatusEffect(StatusEffectInstance(StatusEffects.SLOWNESS, 60, 255), this)
-        setConvertingToDarkMode(true)
-        setConversionModeTime(LIGHT_MODE_TIME)
-    }
-
-    override fun isAffectedByDaylight(): Boolean {
-        return false
+        countdownToDarkMode = time
     }
 
     fun inDarkness(): Boolean {
         return world.getLightLevel(blockPos) < lightThreshold
     }
 
+    //Other things
+
     override fun isShaking(): Boolean {
-        return isConvertingToStray()
+        return isConvertingToStray() || (countdownToDarkMode > 290)
     }
 
     override fun canFreeze(): Boolean {
         return false
     }
 
+    override fun isAffectedByDaylight(): Boolean {
+        return false
+    }
+
     override fun dampensVibrations(): Boolean {
 //        line 373 of the WardenEntity.class to make wardens not anger at this entity
-        return !isConvertingToDarkMode()
+        return !isLightMode()
     }
 
     override fun getAmbientSound(): SoundEvent {
@@ -226,12 +204,11 @@ class GloomEntity(entityType: EntityType<out GloomEntity>, world: World) :
     }
 
     override fun applyEnchantmentsToDamage(source: DamageSource, amount: Float): Float {
-
-        return if (!isConvertingToDarkMode() && !source.isTypeIn(DuskDamageTypeTags.BYPASSES_GLOOM_RESISTANCE)) {
-            0f
-        } else {
-            super.applyEnchantmentsToDamage(source, amount)
+        var damage = amount
+        if (!isLightMode() && !source.isTypeIn(DuskDamageTypeTags.BYPASSES_GLOOM_RESISTANCE)) {
+            damage *= 0.01f
         }
+        return super.applyEnchantmentsToDamage(source, damage)
     }
 
     override fun initEquipment(random: RandomGenerator, difficulty: LocalDifficulty) {
@@ -265,7 +242,7 @@ class GloomEntity(entityType: EntityType<out GloomEntity>, world: World) :
         if (!super.tryAttack(target)) {
             return false
         } else {
-            if (target is LivingEntity && !isConvertingToDarkMode()) {
+            if (target is LivingEntity && !isLightMode()) {
                 target.addStatusEffect(StatusEffectInstance(statusEffect, 200), this)
             }
 
@@ -275,7 +252,7 @@ class GloomEntity(entityType: EntityType<out GloomEntity>, world: World) :
 
     override fun method_6996(itemStack: ItemStack, f: Float, itemStack2: ItemStack?): PersistentProjectileEntity {
         val persistentProjectileEntity = super.method_6996(itemStack, f, itemStack2)
-        if (persistentProjectileEntity is ArrowEntity && !isConvertingToDarkMode()) {
+        if (persistentProjectileEntity is ArrowEntity && !isLightMode()) {
             persistentProjectileEntity.addEffect(StatusEffectInstance(statusEffect, 600))
         }
         return persistentProjectileEntity
@@ -295,10 +272,9 @@ class GloomEntity(entityType: EntityType<out GloomEntity>, world: World) :
 
         private val CONVERTING_TO_DARK_MODE: TrackedData<Boolean> =
             DataTracker.registerData(GloomEntity::class.java, TrackedDataHandlerRegistry.BOOLEAN)
-        const val DARK_MODE_KEY: String = "DarkMode"
-        const val MODE_CONVERSION_TIME_KEY: String = "DarkModeConversionTime"
+        const val MODE_CONVERSION_TIME_KEY: String = "LightModeTime"
         private const val LIGHT_MODE_TIME = 300
-        private var darkModeCountdown = 0
+        private var countdownToDarkMode = -1
 
 //        private val EYE_COLOR: TrackedData<Int> =
 //            DataTracker.registerData(GloomEntity::class.java, TrackedDataHandlerRegistry.INTEGER)

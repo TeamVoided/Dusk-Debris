@@ -14,7 +14,6 @@ import net.minecraft.util.math.Direction
 import net.minecraft.util.shape.VoxelShape
 import net.minecraft.util.shape.VoxelShapes
 import net.minecraft.world.*
-import org.teamvoided.dusk_debris.block.throwable_bomb.BlunderbombBlock
 
 class MysteriousVesselBlock(settings: Settings) : HorizontalFacingBlock(settings), Waterloggable {
     override fun getCodec(): MapCodec<out HorizontalFacingBlock> {
@@ -51,11 +50,14 @@ class MysteriousVesselBlock(settings: Settings) : HorizontalFacingBlock(settings
     }
 
     override fun getPlacementState(ctx: ItemPlacementContext): BlockState {
-        return defaultState.with(CarvedPumpkinBlock.FACING, ctx.playerFacing.opposite) as BlockState
+        val waterlog = ctx.world.getFluidState(ctx.blockPos).fluid === Fluids.WATER
+        return defaultState
+            .with(FACING, ctx.playerFacing.opposite)
+            .with(WATERLOGGED, waterlog)
     }
 
     override fun getFluidState(state: BlockState): FluidState {
-        return if (state.get(LanternBlock.WATERLOGGED)) Fluids.WATER.getStill(false)
+        return if (state.get(WATERLOGGED)) Fluids.WATER.getStill(false)
         else super.getFluidState(state)
     }
 
