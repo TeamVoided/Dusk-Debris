@@ -34,7 +34,8 @@ object DuskDebrisClient {
         DuskBlocks.CHARRED_DOOR,
         DuskBlocks.CHARRED_TRAPDOOR,
     ) + DuskBlockLists.THROWABLE_BOMB_BLOCK_LIST +
-            DuskBlockLists.RIBBON_BLOCKS_LIST
+            DuskBlockLists.RIBBON_BLOCKS_LIST +
+            DuskBlockLists.DECORATIVE_WHATEVER_BLOCK_LIST
 //    val translucentBlock = listOf()
 
     fun init() {

@@ -49,6 +49,8 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
         }
         gen.registerDustBlockFromRedstone(DuskBlocks.GUNPOWDER)
         gen.registerItemModel(DuskItems.DEVELOPER_GUNPOWDER_ITEM)
+        gen.registerVesselBlock(DuskBlocks.GILDED_VESSEL)
+        
         gen.registerNethershroom(DuskBlocks.BLUE_NETHERSHROOM)
         gen.registerNethershroomBlock(DuskBlocks.BLUE_NETHERSHROOM_BLOCK)
         gen.registerNethershroom(DuskBlocks.PURPLE_NETHERSHROOM)

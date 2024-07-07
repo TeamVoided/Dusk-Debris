@@ -56,10 +56,14 @@ object DuskItems {
     val BLUNDERBOMB_ITEM =
         register("blunderbomb", BlunderbombItem(DuskBlocks.BLUNDERBOMB_BLOCK, Item.Settings().maxCount(16)))
     val FIREBOMB_ITEM = register("firebomb", FirebombItem(DuskBlocks.FIREBOMB_BLOCK, Item.Settings().maxCount(16)))
-    val BONECALLER_ITEM =register("bonecaller", BonecallerItem(DuskBlocks.BONECALLER_BLOCK, Item.Settings().maxCount(16)))
-    val BONECHILLER_ITEM =register("bonechiller", BonechillerItem(DuskBlocks.BONECHILLER_BLOCK, Item.Settings().maxCount(16)))
-    val BONEBOGGER_ITEM =register("bonebogger", BoneboggerItem(DuskBlocks.BONEBOGGER_BLOCK, Item.Settings().maxCount(16)))
-    val BONEWITHER_ITEM =register("bonewither", BonewitherItem(DuskBlocks.BONEWITHER_BLOCK, Item.Settings().maxCount(16)))
+    val BONECALLER_ITEM =
+        register("bonecaller", BonecallerItem(DuskBlocks.BONECALLER_BLOCK, Item.Settings().maxCount(16)))
+    val BONECHILLER_ITEM =
+        register("bonechiller", BonechillerItem(DuskBlocks.BONECHILLER_BLOCK, Item.Settings().maxCount(16)))
+    val BONEBOGGER_ITEM =
+        register("bonebogger", BoneboggerItem(DuskBlocks.BONEBOGGER_BLOCK, Item.Settings().maxCount(16)))
+    val BONEWITHER_ITEM =
+        register("bonewither", BonewitherItem(DuskBlocks.BONEWITHER_BLOCK, Item.Settings().maxCount(16)))
     val BONECALLER_BANDANA =
         register(
             "bonecaller_bandana",
@@ -80,9 +84,12 @@ object DuskItems {
     val POCKETPOISON_ITEM =
         register("pocketpoison", PocketpoisonItem(DuskBlocks.POCKETPOISON_BLOCK, Item.Settings().maxCount(1)))
     val GLOOM_SPAWN_EGG =
-        register("gloom_spawn_egg", (SpawnEggItem(DuskEntities.GLOOM, 0x222222, 0x222222, Item.Settings())))
+        register("gloomed_spawn_egg", (SpawnEggItem(DuskEntities.GLOOM, 0x222222, 0x222222, Item.Settings())))
 
-    val LIGHT_BLUE_RIBBON = register("light_blue_ribbon", BlockItem(DuskBlocks.LIGHT_BLUE_RIBBON, Item.Settings()))
+    val LIGHT_BLUE_RIBBON = register("light_blue_ribbon", BlockItem(DuskBlocks.LIGHT_BLUE_RIBBON))
+
+    val GILDED_VESSEL =
+        register("gilded_vessel", BlockItem(DuskBlocks.GILDED_VESSEL, Item.Settings().maxCount(16)))
 
     val PAPER_BLOCK = register("paper_block", BlockItem(DuskBlocks.PAPER_BLOCK))
 

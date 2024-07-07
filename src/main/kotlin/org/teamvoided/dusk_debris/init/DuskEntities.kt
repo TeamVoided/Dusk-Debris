@@ -49,7 +49,7 @@ object DuskEntities {
     val BLINDBOMB = throwableBomb("blindbomb", ::BlindbombEntity)
     val SMOKEBOMB = throwableBomb("smokebomb", ::SmokebombEntity)
 
-    val GLOOM = skeleton("gloom", ::GloomEntity)
+    val GLOOM = skeleton("gloomed", ::GloomEntity)
 
 
     fun <T : Entity> throwableBomb(id: String, factory: EntityType.EntityFactory<T>): EntityType<T> {

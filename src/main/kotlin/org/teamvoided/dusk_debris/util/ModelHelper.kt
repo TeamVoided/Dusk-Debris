@@ -8,7 +8,6 @@ import net.minecraft.data.client.model.VariantSettings.Rotation
 import net.minecraft.item.Item
 import net.minecraft.state.property.Properties
 import net.minecraft.util.Identifier
-import org.teamvoided.dusk_debris.DuskDebris
 import org.teamvoided.dusk_debris.DuskDebris.MODID
 import org.teamvoided.dusk_debris.DuskDebris.id
 import org.teamvoided.dusk_debris.block.NethershroomPlantBlock
@@ -30,7 +29,7 @@ fun BlockStateModelGenerator.sixDirectionalBlock(block: Block) {
 }
 
 fun BlockStateModelGenerator.rollableBlock(block: Block) {
-    val front = Texture.getSubId(block, "")
+    val front = Texture.getId(block)
     val bottom = Texture.getSubId(block, "_bottom")
     val side = Texture.getSubId(block, "_side")
     val top = Texture.getSubId(block, "_top")
@@ -57,7 +56,8 @@ fun BlockStateModelGenerator.rollableBlock(block: Block) {
         })
     )
 }
-fun BlockStateModelGenerator.registerHandheldItem(item: Item){
+
+fun BlockStateModelGenerator.registerHandheldItem(item: Item) {
     Models.HANDHELD.upload(
         ModelIds.getItemModelId(item),
         Texture.layer0(item),
@@ -68,8 +68,9 @@ fun BlockStateModelGenerator.registerHandheldItem(item: Item){
 fun BlockStateModelGenerator.registerDustBlock(block: Block) {
     this.registerDustBlock(block, MODID, block.toString())
 }
+
 fun BlockStateModelGenerator.registerDustBlockFromRedstone(block: Block) {
-    this.registerDustBlock(block,"minecraft", "redstone")
+    this.registerDustBlock(block, "minecraft", "redstone")
 }
 
 fun BlockStateModelGenerator.registerDustBlock(block: Block, namespace: String, texture: String) {
@@ -199,6 +200,24 @@ fun BlockStateModelGenerator.throwableBlock(block: Block) {
                 hangingModel,
                 model
             )
+        ).coordinate(BlockStateModelGenerator.createNorthDefaultHorizontalRotationStates())
+    )
+}
+
+fun BlockStateModelGenerator.registerVesselBlock(block: Block) {
+    this.registerItemModel(block.asItem())
+    val texture = Texture()
+        .put(TextureKey.PARTICLE, Texture.getId(block.asItem()))
+        .put(TextureKey.ALL, Texture.getId(block))
+    val model = block(
+        "parent/mysterious_vessel",
+        TextureKey.PARTICLE,
+        TextureKey.ALL
+    ).upload(block, texture, this.modelCollector)
+    this.blockStateCollector.accept(
+        VariantsBlockStateSupplier.create(
+            block,
+            BlockStateVariant.create().put(VariantSettings.MODEL, model)
         ).coordinate(BlockStateModelGenerator.createNorthDefaultHorizontalRotationStates())
     )
 }

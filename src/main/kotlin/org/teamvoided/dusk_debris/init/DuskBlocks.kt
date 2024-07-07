@@ -203,6 +203,14 @@ object DuskBlocks {
     val GRAY_RIBBON = register("gray_ribbon", registerRibbon(Blocks.GRAY_WOOL.defaultMapColor))
     val BLACK_RIBBON = register("black_ribbon", registerRibbon(Blocks.BLACK_WOOL.defaultMapColor))
 
+    val GILDED_VESSEL = register(
+        "gilded_vessel",
+        MysteriousVesselBlock(
+            AbstractBlock.Settings.create().mapColor(Blocks.GOLD_BLOCK.defaultMapColor)
+                .pistonBehavior(PistonBehavior.DESTROY)
+        )
+    )
+
     val PAPER_BLOCK = register(
         "paper_block",
         PaperBlock(
