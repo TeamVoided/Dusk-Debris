@@ -15,7 +15,7 @@ import net.minecraft.util.shape.VoxelShape
 import net.minecraft.util.shape.VoxelShapes
 import net.minecraft.world.*
 
-class MysteriousVesselBlock(settings: Settings) : HorizontalFacingBlock(settings), Waterloggable {
+open class MysteriousVesselBlock(settings: Settings) : HorizontalFacingBlock(settings), Waterloggable {
     override fun getCodec(): MapCodec<out HorizontalFacingBlock> {
         return CODEC
     }
@@ -89,7 +89,7 @@ class MysteriousVesselBlock(settings: Settings) : HorizontalFacingBlock(settings
                 settings
             )
         }
-        private val SHAPE: VoxelShape = VoxelShapes.union(
+        val SHAPE: VoxelShape = VoxelShapes.union(
             createCuboidShape(5.0, 0.0, 5.0, 11.0, 8.0, 11.0),
             createCuboidShape(6.0, 8.0, 6.0, 10.0, 10.0, 10.0)
         )

@@ -4,12 +4,12 @@ import net.minecraft.util.math.BlockPos
 import net.minecraft.world.*
 import net.minecraft.world.explosion.ExplosionBehavior
 import org.teamvoided.dusk_debris.block.throwable_bomb.AbstractThrwowableBombBlock
-import org.teamvoided.dusk_debris.entity.throwable_bomb.bonecaller.BoneboggerEntity
+import org.teamvoided.dusk_debris.entity.throwable_bomb.bonecaller.BogcallerEntity
 
-open class BoneboggerBlock(settings: Settings) : AbstractThrwowableBombBlock(settings) {
+open class BogcallerBlock(settings: Settings) : AbstractThrwowableBombBlock(settings) {
     override fun explode(world: World, pos: BlockPos, explosionBehavior: ExplosionBehavior) {
         world.breakBlock(pos, false)
-        val bombEntity = BoneboggerEntity(
+        val bombEntity = BogcallerEntity(
             pos.x.toDouble() + 0.5,
             pos.y.toDouble() + Math.random() * 0.8,
             pos.z.toDouble() + 0.5,

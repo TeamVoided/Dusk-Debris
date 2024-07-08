@@ -74,7 +74,7 @@ object DuskDebrisClient {
         EntityRendererRegistry.register(DuskEntities.BOX_AREA_EFFECT_CLOUD, ::EmptyEntityRenderer)
         EntityRendererRegistry.register(DuskEntities.GUNPOWDER_BARREL, ::GunpowderBarrelEntityRenderer)
         EntityRendererRegistry.register(DuskEntities.GLOOM, ::GloomEntityRenderer)
-        BuiltinItemRendererRegistry.INSTANCE.register(DuskItems.STRAY_SKULL)
+//        BuiltinItemRendererRegistry.INSTANCE.register(DuskItems.STRAY_SKULL)
 
 
         THROWABLE_BOMB_ENTITIES.forEach {

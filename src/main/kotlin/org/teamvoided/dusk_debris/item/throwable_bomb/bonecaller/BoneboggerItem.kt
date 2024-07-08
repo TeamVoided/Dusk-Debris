@@ -7,8 +7,7 @@ import net.minecraft.item.ItemStack
 import net.minecraft.util.math.Direction
 import net.minecraft.util.math.Position
 import net.minecraft.world.World
-import org.teamvoided.dusk_debris.entity.throwable_bomb.bonecaller.BoneboggerEntity
-import org.teamvoided.dusk_debris.entity.throwable_bomb.bonecaller.BonechillerEntity
+import org.teamvoided.dusk_debris.entity.throwable_bomb.bonecaller.BogcallerEntity
 import org.teamvoided.dusk_debris.item.throwable_bomb.AbstractThrowableBombItem
 
 
@@ -16,7 +15,7 @@ open class BoneboggerItem(block: Block, settings: Settings) : AbstractThrowableB
 
     override fun throwBomb(world: World, user: PlayerEntity, itemStack: ItemStack) {
         if (!world.isClient) {
-            val bombItem = BoneboggerEntity(user, world)
+            val bombItem = BogcallerEntity(user, world)
             bombItem.setItem(itemStack)
             bombItem.setProperties(user, user.pitch, user.yaw, 0.0f, 1.5f, 1.0f)
             world.spawnEntity(bombItem)
@@ -24,7 +23,7 @@ open class BoneboggerItem(block: Block, settings: Settings) : AbstractThrowableB
     }
 
     override fun createEntity(world: World, pos: Position, stack: ItemStack, direction: Direction): ProjectileEntity {
-        val bombEntity = BoneboggerEntity(pos.x, pos.y, pos.z, world)
+        val bombEntity = BogcallerEntity(pos.x, pos.y, pos.z, world)
         bombEntity.setItem(stack)
         return bombEntity
     }

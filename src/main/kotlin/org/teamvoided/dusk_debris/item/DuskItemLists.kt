@@ -8,7 +8,7 @@ object DuskItemLists {
         DuskItems.FIREBOMB_ITEM,
         DuskItems.BONECALLER_ITEM,
         DuskItems.BONECHILLER_ITEM,
-        DuskItems.BONEBOGGER_ITEM,
+        DuskItems.BOGCALLER_ITEM,
         DuskItems.BONEWITHER_ITEM,
         DuskItems.POCKETPOISON_ITEM,
         DuskItems.BLINDBOMB_ITEM,

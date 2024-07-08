@@ -6,16 +6,12 @@ import net.minecraft.entity.EntityType
 import net.minecraft.entity.EquipmentSlot
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.SpawnReason
-import net.minecraft.entity.mob.AbstractSkeletonEntity
 import net.minecraft.entity.mob.BoggedEntity
-import net.minecraft.entity.mob.StrayEntity
 import net.minecraft.item.Item
 import net.minecraft.particle.ParticleEffect
 import net.minecraft.scoreboard.Team
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.SpawnUtil
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.MathHelper
 import net.minecraft.world.World
 import org.teamvoided.dusk_debris.entity.throwable_bomb.BonecallerEntity
 import org.teamvoided.dusk_debris.init.DuskEntities
@@ -23,9 +19,9 @@ import org.teamvoided.dusk_debris.init.DuskItems
 import org.teamvoided.dusk_debris.particle.BonecallerParticleEffect
 import java.awt.Color
 
-open class BoneboggerEntity : BonecallerEntity {
+open class BogcallerEntity : BonecallerEntity {
 
-    constructor(entityType: EntityType<out BoneboggerEntity>, world: World) : super(entityType, world)
+    constructor(entityType: EntityType<out BogcallerEntity>, world: World) : super(entityType, world)
 
     constructor(world: World) : super(DuskEntities.BONEBOGGER, world)
     constructor(owner: LivingEntity?, world: World) :
@@ -79,7 +75,7 @@ open class BoneboggerEntity : BonecallerEntity {
         world.spawnEntity(boggedEntity)
     }
     override fun getDefaultItem(): Item {
-        return DuskItems.BONEBOGGER_ITEM
+        return DuskItems.BOGCALLER_ITEM
     }
 
     override fun bandanaColors(): Int {

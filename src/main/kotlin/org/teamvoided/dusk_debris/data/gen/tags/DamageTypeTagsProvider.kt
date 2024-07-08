@@ -3,6 +3,7 @@ package org.teamvoided.dusk_debris.data.gen.tags
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider
 import net.minecraft.entity.damage.DamageType
+import net.minecraft.entity.damage.DamageTypes
 import net.minecraft.registry.HolderLookup
 import net.minecraft.registry.RegistryKeys
 import net.minecraft.registry.tag.DamageTypeTags
@@ -20,7 +21,8 @@ class DamageTypeTagsProvider(o: FabricDataOutput, r: CompletableFuture<HolderLoo
     fun duskTags() {
         getOrCreateTagBuilder(DuskDamageTypeTags.BYPASSES_GLOOM_RESISTANCE)
             .forceAddTag(DamageTypeTags.BYPASSES_INVULNERABILITY)
-//        will probably add other things here
+            .add(DamageTypes.LIGHTNING_BOLT)
+//        will probably add other things here, NOT fire, fire is too overused
     }
 
     fun vanillaTags() {

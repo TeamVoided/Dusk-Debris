@@ -5,22 +5,19 @@ import net.minecraft.block.*
 import net.minecraft.block.Blocks.*
 import net.minecraft.block.enums.NoteBlockInstrument
 import net.minecraft.block.piston.PistonBehavior
-import net.minecraft.entity.EntityType
 import net.minecraft.entity.effect.StatusEffects
 import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
 import net.minecraft.sound.BlockSoundGroup
 import net.minecraft.sound.SoundEvents
 import net.minecraft.util.Color
-import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
-import net.minecraft.world.BlockView
 import org.teamvoided.dusk_debris.DuskDebris.id
 import org.teamvoided.dusk_debris.block.*
 import org.teamvoided.dusk_debris.block.throwable_bomb.BlunderbombBlock
 import org.teamvoided.dusk_debris.block.throwable_bomb.BonecallerBlock
 import org.teamvoided.dusk_debris.block.throwable_bomb.FirebombBlock
-import org.teamvoided.dusk_debris.block.throwable_bomb.bonecaller.BoneboggerBlock
+import org.teamvoided.dusk_debris.block.throwable_bomb.bonecaller.BogcallerBlock
 import org.teamvoided.dusk_debris.block.throwable_bomb.bonecaller.BonechillerBlock
 import org.teamvoided.dusk_debris.block.throwable_bomb.bonecaller.BonewitherBlock
 import org.teamvoided.dusk_debris.block.throwable_bomb.nethershroom_throwable_block.BlindbombBlock
@@ -163,7 +160,7 @@ object DuskBlocks {
     )
     val BONECALLER_BLOCK = register("bonecaller", BonecallerBlock(bonecallerBlockSettings))
     val BONECHILLER_BLOCK = register("bonechiller", BonechillerBlock(bonecallerBlockSettings))
-    val BONEBOGGER_BLOCK = register("bonebogger", BoneboggerBlock(bonecallerBlockSettings))
+    val BOGCALLER_BLOCK = register("bogcaller", BogcallerBlock(bonecallerBlockSettings))
     val BONEWITHER_BLOCK = register("bonewither", BonewitherBlock(bonecallerBlockSettings))
     val SMOKEBOMB_BLOCK = register(
         "smokebomb",
@@ -213,37 +210,43 @@ object DuskBlocks {
                 .pistonBehavior(PistonBehavior.DESTROY)
         )
     )
+    val LAPIS_RELIC = register(
+        "lapis_relic", PerculiarRelicBlock(
+            AbstractBlock.Settings.create().mapColor(LAPIS_BLOCK.defaultMapColor)
+                .pistonBehavior(PistonBehavior.DESTROY)
+        )
+    )
 
-    val GLOOM_SKULL = registerSkull(
-        "gloomed_skull",
-        DuskSkullType.GLOOM,
-        NoteBlockInstrument.SKELETON
-    )
-    val GLOOM_WALL_SKULL = registerWallSkull(
-        "skeleton_wall_skull",
-        DuskSkullType.GLOOM,
-        GLOOM_SKULL
-    )
-    val STRAY_SKULL = registerSkull(
-        "stray_skull",
-        DuskSkullType.STRAY,
-        NoteBlockInstrument.SKELETON
-    )
-    val STRAY_WALL_SKULL = registerWallSkull(
-        "stray_wall_skull",
-        DuskSkullType.STRAY,
-        STRAY_SKULL
-    )
-    val BOGGED_SKULL = registerSkull(
-        "bogged_skull",
-        DuskSkullType.BOGGED,
-        NoteBlockInstrument.SKELETON
-    )
-    val BOGGED_WALL_SKULL = registerWallSkull(
-        "bogged_wall_skull",
-        DuskSkullType.BOGGED,
-        BOGGED_SKULL
-    )
+//    val GLOOM_SKULL = registerSkull(
+//        "gloomed_skull",
+//        DuskSkullType.GLOOM,
+//        NoteBlockInstrument.SKELETON
+//    )
+//    val GLOOM_WALL_SKULL = registerWallSkull(
+//        "skeleton_wall_skull",
+//        DuskSkullType.GLOOM,
+//        GLOOM_SKULL
+//    )
+//    val STRAY_SKULL = registerSkull(
+//        "stray_skull",
+//        DuskSkullType.STRAY,
+//        NoteBlockInstrument.SKELETON
+//    )
+//    val STRAY_WALL_SKULL = registerWallSkull(
+//        "stray_wall_skull",
+//        DuskSkullType.STRAY,
+//        STRAY_SKULL
+//    )
+//    val BOGGED_SKULL = registerSkull(
+//        "bogged_skull",
+//        DuskSkullType.BOGGED,
+//        NoteBlockInstrument.SKELETON
+//    )
+//    val BOGGED_WALL_SKULL = registerWallSkull(
+//        "bogged_wall_skull",
+//        DuskSkullType.BOGGED,
+//        BOGGED_SKULL
+//    )
 
     val PAPER_BLOCK = register(
         "paper_block",
@@ -258,7 +261,7 @@ object DuskBlocks {
                 .allowsSpawning(Blocks::spawnable)
                 .solidBlock(Blocks::nonSolid)
                 .blockVision(Blocks::solid)
-                .suffocates(Blocks::solid)
+                .suffocates(Blocks::nonSolid)
         )
     )
 

@@ -150,7 +150,7 @@ class GloomEntity(entityType: EntityType<out GloomEntity>, world: World) :
         }
     }
 
-    //Become Discord
+    //Become Edgy
 
     fun isLightMode(): Boolean {
         return getDataTracker().get(CONVERTING_TO_DARK_MODE)
@@ -171,7 +171,7 @@ class GloomEntity(entityType: EntityType<out GloomEntity>, world: World) :
     //Other things
 
     override fun isShaking(): Boolean {
-        return isConvertingToStray() || (countdownToDarkMode > 290)
+        return isConvertingToStray()
     }
 
     override fun canFreeze(): Boolean {

@@ -22,37 +22,67 @@ class GloomEntityModel(modelPart: ModelPart) : SkeletonEntityModel<GloomEntity>(
                 val modelPartData = modelData.root
                 addLimbs(modelPartData)
                 val modelPartBandana =
-                    modelPartData.getChild("head").addChild("bandana_extra", ModelPartBuilder.create(), ModelTransform.NONE)
+                    modelPartData.getChild("head")
+                        .addChild("bandana_extra", ModelPartBuilder.create(), ModelTransform.NONE)
                 modelPartBandana.addChild(
-                    "red_mushroom_1",
-                    ModelPartBuilder.create().uv(50, 16).cuboid(-3.0f, -3.0f, 0.0f, 6.0f, 4.0f, 0.0f),
-                    ModelTransform.of(3.0f, -8.0f, 3.0f, 0.0f, 0.785f, 0.0f)
+                    "bandana_1",
+                    ModelPartBuilder.create().uv(0, 0).cuboid(
+                        -3.0f,
+                        -3.0f,
+                        0.0f,
+                        4.0f,
+                        8.0f,
+                        0.0f
+                    ),
+                    ModelTransform.of(
+                        3.0f,
+                        -8.0f,
+                        3.0f,
+                        0.0f,
+                        0.75f,
+                        0.0f
+                    )
                 )
                 modelPartBandana.addChild(
-                    "red_mushroom_2",
-                    ModelPartBuilder.create().uv(50, 16).cuboid(-3.0f, -3.0f, 0.0f, 6.0f, 4.0f, 0.0f),
-                    ModelTransform.of(3.0f, -8.0f, 3.0f, 0.0f, 2.356f, 0.0f)
+                    "bandana_2",
+                    ModelPartBuilder.create().uv(0, 0)
+                        .cuboid(
+                            -3.0f,
+                            -3.0f,
+                            0.0f,
+                            4.0f,
+                            8.0f,
+                            0.0f
+                        ),
+                    ModelTransform.of(
+                        3.0f,
+                        -8.0f,
+                        3.0f,
+                        0.0f,
+                        2.356f,
+                        0.0f
+                    )
                 )
-                modelPartBandana.addChild(
-                    "brown_mushroom_1",
-                    ModelPartBuilder.create().uv(50, 22).cuboid(-3.0f, -3.0f, 0.0f, 6.0f, 4.0f, 0.0f),
-                    ModelTransform.of(-3.0f, -8.0f, -3.0f, 0.0f, 0.785f, 0.0f)
-                )
-                modelPartBandana.addChild(
-                    "brown_mushroom_2",
-                    ModelPartBuilder.create().uv(50, 22).cuboid(-3.0f, -3.0f, 0.0f, 6.0f, 4.0f, 0.0f),
-                    ModelTransform.of(-3.0f, -8.0f, -3.0f, 0.0f, 2.356f, 0.0f)
-                )
-                modelPartBandana.addChild(
-                    "brown_mushroom_3",
-                    ModelPartBuilder.create().uv(50, 28).cuboid(-3.0f, -4.0f, 0.0f, 6.0f, 4.0f, 0.0f),
-                    ModelTransform.of(-2.0f, -1.0f, 4.0f, -1.57f, 0.0f, 0.785f)
-                )
-                modelPartBandana.addChild(
-                    "brown_mushroom_4",
-                    ModelPartBuilder.create().uv(50, 28).cuboid(-3.0f, -4.0f, 0.0f, 6.0f, 4.0f, 0.0f),
-                    ModelTransform.of(-2.0f, -1.0f, 4.0f, -1.57f, 0.0f, 2.356f)
-                )
+//                modelPartBandana.addChild(
+//                    "brown_mushroom_1",
+//                    ModelPartBuilder.create().uv(50, 22).cuboid(-3.0f, -3.0f, 0.0f, 6.0f, 4.0f, 0.0f),
+//                    ModelTransform.of(-3.0f, -8.0f, -3.0f, 0.0f, 0.785f, 0.0f)
+//                )
+//                modelPartBandana.addChild(
+//                    "brown_mushroom_2",
+//                    ModelPartBuilder.create().uv(50, 22).cuboid(-3.0f, -3.0f, 0.0f, 6.0f, 4.0f, 0.0f),
+//                    ModelTransform.of(-3.0f, -8.0f, -3.0f, 0.0f, 2.356f, 0.0f)
+//                )
+//                modelPartBandana.addChild(
+//                    "brown_mushroom_3",
+//                    ModelPartBuilder.create().uv(50, 28).cuboid(-3.0f, -4.0f, 0.0f, 6.0f, 4.0f, 0.0f),
+//                    ModelTransform.of(-2.0f, -1.0f, 4.0f, -1.57f, 0.0f, 0.785f)
+//                )
+//                modelPartBandana.addChild(
+//                    "brown_mushroom_4",
+//                    ModelPartBuilder.create().uv(50, 28).cuboid(-3.0f, -4.0f, 0.0f, 6.0f, 4.0f, 0.0f),
+//                    ModelTransform.of(-2.0f, -1.0f, 4.0f, -1.57f, 0.0f, 2.356f)
+//                )
                 return TexturedModelData.of(modelData, 64, 32)
             }
     }

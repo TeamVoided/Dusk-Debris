@@ -15,7 +15,7 @@ object DuskBlockLists {
         DuskBlocks.FIREBOMB_BLOCK,
         DuskBlocks.BONECALLER_BLOCK,
         DuskBlocks.BONECHILLER_BLOCK,
-        DuskBlocks.BONEBOGGER_BLOCK,
+        DuskBlocks.BOGCALLER_BLOCK,
         DuskBlocks.BONEWITHER_BLOCK,
         DuskBlocks.POCKETPOISON_BLOCK,
         DuskBlocks.BLINDBOMB_BLOCK,
@@ -32,8 +32,12 @@ object DuskBlockLists {
     val VESSEL_BLOCK_LIST = listOf(
         DuskBlocks.GOLDEN_VESSEL
     )
-//    val CHALICE_BLOCK_LIST = listOf()
-    val DECORATIVE_WHATEVER_BLOCK_LIST = VESSEL_BLOCK_LIST
+    val RELIC_BLOCK_LIST = listOf(
+        DuskBlocks.LAPIS_RELIC
+    )
+
+    //    val CHALICE_BLOCK_LIST = listOf()
+    val DECORATIVE_WHATEVER_BLOCK_LIST = VESSEL_BLOCK_LIST + RELIC_BLOCK_LIST
     val PAPER_BLOCKS_LIST = listOf(
         DuskBlocks.PAPER_BLOCK
     )

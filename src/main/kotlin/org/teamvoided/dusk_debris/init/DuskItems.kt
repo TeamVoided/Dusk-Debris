@@ -60,8 +60,8 @@ object DuskItems {
         register("bonecaller", BonecallerItem(DuskBlocks.BONECALLER_BLOCK, Item.Settings().maxCount(16)))
     val BONECHILLER_ITEM =
         register("bonechiller", BonechillerItem(DuskBlocks.BONECHILLER_BLOCK, Item.Settings().maxCount(16)))
-    val BONEBOGGER_ITEM =
-        register("bonebogger", BoneboggerItem(DuskBlocks.BONEBOGGER_BLOCK, Item.Settings().maxCount(16)))
+    val BOGCALLER_ITEM =
+        register("bogcaller", BoneboggerItem(DuskBlocks.BOGCALLER_BLOCK, Item.Settings().maxCount(16)))
     val BONEWITHER_ITEM =
         register("bonewither", BonewitherItem(DuskBlocks.BONEWITHER_BLOCK, Item.Settings().maxCount(16)))
     val BONECALLER_BANDANA =
@@ -88,11 +88,13 @@ object DuskItems {
 
     val LIGHT_BLUE_RIBBON = register("light_blue_ribbon", BlockItem(DuskBlocks.LIGHT_BLUE_RIBBON))
 
-    val STRAY_SKULL = register("stray_skull", BlockItem(DuskBlocks.STRAY_SKULL))
-    val BOGGED_SKULL = register("bogged_skull", BlockItem(DuskBlocks.BOGGED_SKULL))
-    val GLOOM_SKULL = register("gloom_skull", BlockItem(DuskBlocks.GLOOM_SKULL))
+    //    val STRAY_SKULL = register("stray_skull", BlockItem(DuskBlocks.STRAY_SKULL))
+//    val BOGGED_SKULL = register("bogged_skull", BlockItem(DuskBlocks.BOGGED_SKULL))
+//    val GLOOM_SKULL = register("gloom_skull", BlockItem(DuskBlocks.GLOOM_SKULL))
     val GOLDEN_VESSEL =
         register("golden_vessel", BlockItem(DuskBlocks.GOLDEN_VESSEL, Item.Settings().maxCount(16)))
+    val LAPIS_RELIC =
+        register("lapis_relic", BlockItem(DuskBlocks.LAPIS_RELIC, Item.Settings().maxCount(16)))
 
     val PAPER_BLOCK = register("paper_block", BlockItem(DuskBlocks.PAPER_BLOCK))
 

@@ -65,6 +65,7 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
 //            )
 
         gen.registerVesselBlock(DuskBlocks.GOLDEN_VESSEL)
+        gen.registerRelicBlock(DuskBlocks.LAPIS_RELIC)
 
         gen.registerNethershroom(DuskBlocks.BLUE_NETHERSHROOM)
         gen.registerNethershroomBlock(DuskBlocks.BLUE_NETHERSHROOM_BLOCK)
@@ -112,8 +113,8 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
     }
 
     override fun generateItemModels(gen: ItemModelGenerator) {
-        gen.register(DuskItems.STRAY_SKULL, parentedItemModel(mc("template_skull")))
-        gen.register(DuskItems.BOGGED_SKULL, parentedItemModel(mc("template_skull")))
-        gen.register(DuskItems.GLOOM_SKULL, parentedItemModel(mc("template_skull")))
+//        gen.register(DuskItems.STRAY_SKULL, parentedItemModel(mc("template_skull")))
+//        gen.register(DuskItems.BOGGED_SKULL, parentedItemModel(mc("template_skull")))
+//        gen.register(DuskItems.GLOOM_SKULL, parentedItemModel(mc("template_skull")))
     }
 }

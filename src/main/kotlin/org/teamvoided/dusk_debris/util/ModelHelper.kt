@@ -221,6 +221,23 @@ fun BlockStateModelGenerator.registerVesselBlock(block: Block) {
         ).coordinate(BlockStateModelGenerator.createNorthDefaultHorizontalRotationStates())
     )
 }
+fun BlockStateModelGenerator.registerRelicBlock(block: Block) {
+    this.registerItemModel(block.asItem())
+    val texture = Texture()
+        .put(TextureKey.PARTICLE, Texture.getId(block.asItem()))
+        .put(TextureKey.ALL, Texture.getId(block))
+    val model = block(
+        "parent/peculiar_relic",
+        TextureKey.PARTICLE,
+        TextureKey.ALL
+    ).upload(block, texture, this.modelCollector)
+    this.blockStateCollector.accept(
+        VariantsBlockStateSupplier.create(
+            block,
+            BlockStateVariant.create().put(VariantSettings.MODEL, model)
+        ).coordinate(BlockStateModelGenerator.createNorthDefaultHorizontalRotationStates())
+    )
+}
 
 fun BlockStateModelGenerator.registerNethershroom(block: Block) {
     this.excludeFromSimpleItemModelGeneration(block)
