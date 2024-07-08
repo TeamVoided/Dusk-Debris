@@ -22,4 +22,12 @@ object DuskItemLists {
     val SPAWN_EGGS_ITEM_LIST = listOf(
         DuskItems.GLOOM_SPAWN_EGG
     )
+    val DECORATIVE_GOLD_SKELETON_ITEM_LIST = listOf(
+        DuskItems.GOLDEN_VESSEL,
+        DuskItems.LAPIS_RELIC,
+        DuskItems.GILDED_CHALICE,
+        DuskItems.GOLDEN_RUBY_CROWN,
+        DuskItems.GOLDEN_SAPPHIRE_CROWN,
+        DuskItems.GOLDEN_QUARTZ_CROWN
+    )
 }

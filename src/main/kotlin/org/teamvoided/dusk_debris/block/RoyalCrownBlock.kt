@@ -15,7 +15,8 @@ import net.minecraft.util.shape.VoxelShape
 import net.minecraft.util.shape.VoxelShapes
 import net.minecraft.world.*
 
-class PerculiarRelicBlock(settings: Settings) : MysteriousVesselBlock(settings) {
+class RoyalCrownBlock(settings: Settings) : MysteriousVesselBlock(settings) {
+
     override fun getOutlineShape(
         state: BlockState,
         world: BlockView,
@@ -24,14 +25,16 @@ class PerculiarRelicBlock(settings: Settings) : MysteriousVesselBlock(settings) 
     ): VoxelShape {
         return SHAPE
     }
+
+
     companion object {
-        val CODEC: MapCodec<PerculiarRelicBlock> = createCodec { settings: Settings ->
-            PerculiarRelicBlock(
+        val CODEC: MapCodec<RoyalCrownBlock> = createCodec { settings: Settings ->
+            RoyalCrownBlock(
                 settings
             )
         }
         val SHAPE: VoxelShape = VoxelShapes.union(
-            createCuboidShape(5.5, 0.0, 5.5, 10.5, 9.0, 10.5)
+            createCuboidShape(4.0, 0.0, 4.0, 12.0, 4.0, 12.0)
         )
     }
 }

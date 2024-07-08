@@ -1,5 +1,4 @@
 {
-	"parent": "minecraft:block/block",
 	"elements": [
 		{
 			"from": [6, 0, 6],
@@ -45,5 +44,11 @@
 				"west": {"uv": [0, 8, 4, 12], "texture": "#all"}
 			}
 		}
-	]
+	],
+	"display": {
+		"head": {
+			"translation": [0, 18.5, 0],
+			"scale": [1.5, 1.5, 1.5]
+		}
+	}
 }

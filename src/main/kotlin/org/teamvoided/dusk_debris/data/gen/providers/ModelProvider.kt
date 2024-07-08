@@ -64,12 +64,22 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
 //                DuskBlocks.GLOOM_WALL_SKULL
 //            )
 
-        gen.registerVesselBlock(DuskBlocks.GOLDEN_VESSEL)
-        gen.registerRelicBlock(DuskBlocks.LAPIS_RELIC)
+        DuskBlockLists.VESSEL_BLOCK_LIST.forEach {
+            gen.registerDecorativeGoldBlock(it,"parent/mysterious_vessel", true)
+        }
+        DuskBlockLists.RELIC_BLOCK_LIST.forEach {
+            gen.registerDecorativeGoldBlock(it,"parent/peculiar_relic", true)
+        }
+        DuskBlockLists.CHALICE_BLOCK_LIST.forEach {
+            gen.registerDecorativeGoldBlock(it,"parent/gilded_chalice", true)
+        }
+        DuskBlockLists.CROWN_BLOCK_LIST.forEach {
+            gen.registerDecorativeGoldBlock(it, "parent/royal_crown", false)
+        }
 
         gen.registerNethershroom(DuskBlocks.BLUE_NETHERSHROOM)
-        gen.registerNethershroomBlock(DuskBlocks.BLUE_NETHERSHROOM_BLOCK)
         gen.registerNethershroom(DuskBlocks.PURPLE_NETHERSHROOM)
+        gen.registerNethershroomBlock(DuskBlocks.BLUE_NETHERSHROOM_BLOCK)
         gen.registerNethershroomBlock(DuskBlocks.PURPLE_NETHERSHROOM_BLOCK)
         gen.registerNethershroomBlock(DuskBlocks.NETHERSHROOM_STEM)
         gen.registerHandheldItem(DuskItems.BLACKSTONE_SWORD)

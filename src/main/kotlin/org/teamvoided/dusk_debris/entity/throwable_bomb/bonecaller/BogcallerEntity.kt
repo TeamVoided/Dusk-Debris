@@ -18,6 +18,7 @@ import org.teamvoided.dusk_debris.init.DuskEntities
 import org.teamvoided.dusk_debris.init.DuskItems
 import org.teamvoided.dusk_debris.particle.BonecallerParticleEffect
 import java.awt.Color
+import java.lang.Math.clamp
 
 open class BogcallerEntity : BonecallerEntity {
 
@@ -74,27 +75,19 @@ open class BogcallerEntity : BonecallerEntity {
         )
         world.spawnEntity(boggedEntity)
     }
+
     override fun getDefaultItem(): Item {
         return DuskItems.BOGCALLER_ITEM
     }
 
     override fun bandanaColors(): Int {
-        val randomRange = 100
-        val one = Math.random() * randomRange
-        val two = Math.random() * randomRange - one
-        val r: Int
-        val b: Int
-        val g: Int
-        if (two + one > 50 && one > 0 && two > 0) {
-            r = 25 + one.toInt()
-            g = 25
-            b = 25 + two.toInt()
-        } else {
-            r = if (one > 0) 25 + one.toInt() else 25
-            g = 100
-            b = if (two > 0) two.toInt() else 0
-        }
-        return Color(r, g, b).rgb
+        val hue = 70f + (Math.random().toFloat() * 270f)
+        val saturation = 0.4f + (Math.random().toFloat() * 0.4f)
+        val value: Float = 0.1f + (Math.random().toFloat() * 0.4f)
+        val h = hue % 1f
+        val s = clamp(saturation, 0f, 1f)
+        val v = clamp(value, 0f, 1f)
+        return Color.HSBtoRGB(h, s, v)
     }
 
     override fun getTrailingParticle(): ParticleEffect = BonecallerParticleEffect(0xEDE8BD, 0x93BA77)

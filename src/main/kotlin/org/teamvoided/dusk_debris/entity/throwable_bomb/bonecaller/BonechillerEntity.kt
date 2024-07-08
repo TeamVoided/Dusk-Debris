@@ -81,14 +81,13 @@ open class BonechillerEntity : BonecallerEntity {
         return DuskItems.BONECHILLER_ITEM
     }
     override fun bandanaColors(): Int {
-        val randomRange = 100
-        val one = Math.random() * randomRange
-        val two = Math.random() * randomRange - one
-        val three = randomRange - one - two
-        val r = one.toInt()
-        val g = if (two > 0) 25 + two.toInt() else 25
-        val b = if (three > 0) 75 + three.toInt() else 75
-        return Color(r, g, b).rgb
+        val hue = 180f + (Math.random().toFloat() * 90f)
+        val saturation = 0.2f + (Math.random().toFloat() * 0.6f)
+        val value: Float = 0.2f + (Math.random().toFloat() * 0.6f)
+        val h = hue % 1f
+        val s = Math.clamp(saturation, 0f, 1f)
+        val v = Math.clamp(value, 0f, 1f)
+        return Color.HSBtoRGB(h, s, v)
     }
 
     override fun getTrailingParticle(): ParticleEffect = BonecallerParticleEffect(0xE6ECED, 0xA2B6C4)

@@ -32,10 +32,13 @@ object DuskItemGroups {
                         ItemStack(DuskItems.BLACKSTONE_PICKAXE),
                         ItemStack(DuskItems.BLACKSTONE_AXE),
                         ItemStack(DuskItems.BLACKSTONE_SHOVEL),
-                        ItemStack(DuskItems.BLACKSTONE_HOE),
-
-                        ItemStack(DuskItems.LIGHT_BLUE_RIBBON),
-
+                        ItemStack(DuskItems.BLACKSTONE_HOE)
+                    )
+                )
+                entries.addItems(DuskItemLists.DECORATIVE_GOLD_SKELETON_ITEM_LIST)
+                entries.addItems(DuskItemLists.SPAWN_EGGS_ITEM_LIST)
+                entries.addStacks(
+                    mutableSetOf(
                         ItemStack(DuskItems.CYPRESS_LOG),
                         ItemStack(DuskItems.CYPRESS_WOOD),
                         ItemStack(DuskItems.STRIPPED_CYPRESS_LOG),
@@ -50,8 +53,11 @@ object DuskItemGroups {
                         ItemStack(DuskItems.CYPRESS_BUTTON),
                         ItemStack(DuskItems.CYPRESS_PRESSURE_PLATE),
                         ItemStack(DuskItems.CYPRESS_SIGN),
-                        ItemStack(DuskItems.CYPRESS_HANGING_SIGN),
-
+                        ItemStack(DuskItems.CYPRESS_HANGING_SIGN)
+                    )
+                )
+                entries.addStacks(
+                    mutableSetOf(
                         ItemStack(DuskItems.VOLCANIC_SAND),
                         ItemStack(DuskItems.SUSPICIOUS_VOLCANIC_SAND),
                         ItemStack(DuskItems.VOLCANIC_SANDSTONE),
@@ -63,8 +69,11 @@ object DuskItemGroups {
                         ItemStack(DuskItems.SMOOTH_VOLCANIC_SANDSTONE_STAIRS),
                         ItemStack(DuskItems.SMOOTH_VOLCANIC_SANDSTONE_SLAB),
                         ItemStack(DuskItems.CUT_VOLCANIC_SANDSTONE),
-                        ItemStack(DuskItems.CUT_VOLCANIC_SANDSTONE_SLAB),
-
+                        ItemStack(DuskItems.CUT_VOLCANIC_SANDSTONE_SLAB)
+                    )
+                )
+                entries.addStacks(
+                    mutableSetOf(
                         ItemStack(DuskItems.CHARRED_LOG),
                         ItemStack(DuskItems.CHARRED_WOOD),
                         ItemStack(DuskItems.STRIPPED_CHARRED_LOG),
@@ -84,7 +93,6 @@ object DuskItemGroups {
                         ItemStack(DuskItems.DEVELOPER_GUNPOWDER_ITEM)
                     )
                 )
-                entries.addItems(DuskItemLists.SPAWN_EGGS_ITEM_LIST)
             }
             .build()
     )
@@ -125,7 +133,7 @@ object DuskItemGroups {
         return Registries.ITEM_GROUP.getKey(itemGroup)?.getOrNull()
     }
 
-    fun ItemGroup.ItemStackCollector.addItems(list:Collection<Item>){
+    fun ItemGroup.ItemStackCollector.addItems(list: Collection<Item>) {
         this.addStacks(list.map(Item::getDefaultStack))
     }
 }

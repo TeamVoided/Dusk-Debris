@@ -204,30 +204,21 @@ fun BlockStateModelGenerator.throwableBlock(block: Block) {
     )
 }
 
-fun BlockStateModelGenerator.registerVesselBlock(block: Block) {
-    this.registerItemModel(block.asItem())
-    val texture = Texture()
-        .put(TextureKey.PARTICLE, Texture.getId(block.asItem()))
-        .put(TextureKey.ALL, Texture.getId(block))
+fun BlockStateModelGenerator.registerDecorativeGoldBlock(block: Block, modelString: String, asItem: Boolean) {
+    val texture: Texture
+    if (asItem) {
+        this.registerItemModel(block.asItem())
+        texture = Texture()
+            .put(TextureKey.PARTICLE, Texture.getId(block.asItem()))
+            .put(TextureKey.ALL, Texture.getId(block))
+    } else {
+        this.registerParentedItemModel(block)
+        texture = Texture()
+            .put(TextureKey.PARTICLE, Texture.getId(block))
+            .put(TextureKey.ALL, Texture.getId(block))
+    }
     val model = block(
-        "parent/mysterious_vessel",
-        TextureKey.PARTICLE,
-        TextureKey.ALL
-    ).upload(block, texture, this.modelCollector)
-    this.blockStateCollector.accept(
-        VariantsBlockStateSupplier.create(
-            block,
-            BlockStateVariant.create().put(VariantSettings.MODEL, model)
-        ).coordinate(BlockStateModelGenerator.createNorthDefaultHorizontalRotationStates())
-    )
-}
-fun BlockStateModelGenerator.registerRelicBlock(block: Block) {
-    this.registerItemModel(block.asItem())
-    val texture = Texture()
-        .put(TextureKey.PARTICLE, Texture.getId(block.asItem()))
-        .put(TextureKey.ALL, Texture.getId(block))
-    val model = block(
-        "parent/peculiar_relic",
+        modelString,
         TextureKey.PARTICLE,
         TextureKey.ALL
     ).upload(block, texture, this.modelCollector)
@@ -361,7 +352,8 @@ fun BlockStateModelGenerator.makeRibbonModel(block: Block, variant: Int): Identi
         TextureKey.ALL
     ).upload(block.modelSuffix("_$variant"), texture, this.modelCollector)
 }
-fun parentedItemModel(id:Identifier) = Model(Optional.of(id.withPrefix("item/")), Optional.empty())
+
+fun parentedItemModel(id: Identifier) = Model(Optional.of(id.withPrefix("item/")), Optional.empty())
 fun BlockStateModelGenerator.registerParentedItemModel(block: Block) =
     this.registerParentedItemModel(block, block.model())
 

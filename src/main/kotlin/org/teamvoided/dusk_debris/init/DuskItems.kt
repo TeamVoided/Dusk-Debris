@@ -22,6 +22,7 @@ import org.teamvoided.dusk_debris.block.GunpowderBarrelBlock
 import org.teamvoided.dusk_debris.entity.GunpowderBarrelEntity
 import org.teamvoided.dusk_debris.item.BonecallerBandanaItem
 import org.teamvoided.dusk_debris.item.DuskItemLists
+import org.teamvoided.dusk_debris.item.EquipableBlockItemItem
 import org.teamvoided.dusk_debris.item.throwable_bomb.BlunderbombItem
 import org.teamvoided.dusk_debris.item.throwable_bomb.BonecallerItem
 import org.teamvoided.dusk_debris.item.throwable_bomb.FirebombItem
@@ -95,6 +96,24 @@ object DuskItems {
         register("golden_vessel", BlockItem(DuskBlocks.GOLDEN_VESSEL, Item.Settings().maxCount(16)))
     val LAPIS_RELIC =
         register("lapis_relic", BlockItem(DuskBlocks.LAPIS_RELIC, Item.Settings().maxCount(16)))
+    val GILDED_CHALICE = register(
+        "gilded_chalice", BlockItem(DuskBlocks.GILDED_CHALICE, Item.Settings().maxCount(16))
+    )
+    val GOLDEN_RUBY_CROWN =
+        register(
+            "golden_ruby_crown",
+            EquipableBlockItemItem(DuskBlocks.GOLDEN_RUBY_CROWN, Item.Settings().maxCount(16))
+        )
+    val GOLDEN_SAPPHIRE_CROWN =
+        register(
+            "golden_sapphire_crown",
+            EquipableBlockItemItem(DuskBlocks.GOLDEN_SAPPHIRE_CROWN, Item.Settings().maxCount(16))
+        )
+    val GOLDEN_QUARTZ_CROWN =
+        register(
+            "golden_quartz_crown",
+            EquipableBlockItemItem(DuskBlocks.GOLDEN_QUARTZ_CROWN, Item.Settings().maxCount(16))
+        )
 
     val PAPER_BLOCK = register("paper_block", BlockItem(DuskBlocks.PAPER_BLOCK))
 

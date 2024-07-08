@@ -161,11 +161,13 @@ open class BonecallerEntity : AbstractThrwowableBombEntity {
     open val color1: Color = Color(0xBC3235)
     open val color2: Color = Color(0x1B6666)
     open fun bandanaColors(): Int {
-        val random = 175
-        val r = (Math.random() * random).toInt()
-        val g = (Math.random() * random).toInt()
-        val b = (Math.random() * random).toInt()
-        return Color(r, g, b).rgb
+        val hue =(Math.random().toFloat() * 360f)
+        val saturation = 0.3f + (Math.random().toFloat() * 0.6f)
+        val value: Float = Math.random().toFloat()
+        val h = hue % 1f
+        val s = Math.clamp(saturation, 0f, 1f)
+        val v = Math.clamp(value, 0f, 1f)
+        return Color.HSBtoRGB(h, s, v)
     }
 
     override fun getTrailingParticle(): ParticleEffect = BonecallerParticleEffect(0xEFC90B, 0x935D26)

@@ -35,9 +35,16 @@ object DuskBlockLists {
     val RELIC_BLOCK_LIST = listOf(
         DuskBlocks.LAPIS_RELIC
     )
+    val CHALICE_BLOCK_LIST = listOf(
+        DuskBlocks.GILDED_CHALICE
+    )
+    val CROWN_BLOCK_LIST = listOf(
+        DuskBlocks.GOLDEN_RUBY_CROWN,
+        DuskBlocks.GOLDEN_SAPPHIRE_CROWN,
+        DuskBlocks.GOLDEN_QUARTZ_CROWN
+    )
 
-    //    val CHALICE_BLOCK_LIST = listOf()
-    val DECORATIVE_WHATEVER_BLOCK_LIST = VESSEL_BLOCK_LIST + RELIC_BLOCK_LIST
+    val DECORATIVE_WHATEVER_BLOCK_LIST = VESSEL_BLOCK_LIST + RELIC_BLOCK_LIST + CHALICE_BLOCK_LIST + CROWN_BLOCK_LIST
     val PAPER_BLOCKS_LIST = listOf(
         DuskBlocks.PAPER_BLOCK
     )

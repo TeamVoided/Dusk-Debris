@@ -1,5 +1,4 @@
 {
-	"parent": "minecraft:block/block",
 	"elements": [
 		{
 			"from": [5.5, 0, 5.5],
@@ -53,5 +52,6 @@
 				"down": {"uv": [0, 0, 3, 3], "texture": "#all"}
 			}
 		}
-	]
+	],
+	"display": {}
 }
