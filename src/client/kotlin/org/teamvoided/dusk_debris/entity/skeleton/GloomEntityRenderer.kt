@@ -5,11 +5,11 @@ import net.fabricmc.api.Environment
 import net.minecraft.client.render.entity.EntityRendererFactory
 import net.minecraft.client.render.entity.SkeletonEntityRenderer
 import net.minecraft.client.render.entity.feature.SkeletonOverlayFeatureRenderer
-import org.teamvoided.dusk_debris.entity.GloomEntity
 import net.minecraft.util.Identifier
 import org.teamvoided.dusk_debris.DuskDebris.id
-import org.teamvoided.dusk_debris.entity.skeleton.render.GloomEntityModel
 import org.teamvoided.dusk_debris.entity.DuskEntityModelLayers
+import org.teamvoided.dusk_debris.entity.GloomEntity
+import org.teamvoided.dusk_debris.entity.skeleton.render.GloomEntityModel
 
 @Environment(EnvType.CLIENT)
 class GloomEntityRenderer(context: EntityRendererFactory.Context) : SkeletonEntityRenderer<GloomEntity>(
@@ -27,6 +27,8 @@ class GloomEntityRenderer(context: EntityRendererFactory.Context) : SkeletonEnti
                 OVERLAY_TEXTURE
             )
         )
+        this.addFeature(GloomEyesFeatureRenderer(this))
+
     }
 //    override fun render(
 //        gloomEntity: GloomEntity,

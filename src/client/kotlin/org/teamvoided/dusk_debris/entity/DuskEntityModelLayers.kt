@@ -12,12 +12,14 @@ import org.teamvoided.dusk_debris.entity.skeleton.render.GloomEntityModel
 
 object DuskEntityModelLayers {
     val GLOOM: EntityModelLayer = registerMain("gloomed")
+    val GLOOM_EYES: EntityModelLayer = registerMain("gloomed_eyes")
     val GLOOM_OUTER: EntityModelLayer = register("gloomed", "outer")
     val GLOOM_INNER_ARMOR: EntityModelLayer = createInnerArmor("gloomed")
     val GLOOM_OUTER_ARMOR: EntityModelLayer = createOuterArmor("gloomed")
 
     fun init() {
         EntityModelLayerRegistry.registerModelLayer(GLOOM, GloomEntityModel::texturedModelData)
+        EntityModelLayerRegistry.registerModelLayer(GLOOM_EYES, GloomEntityModel::texturedModelData)
         EntityModelLayerRegistry.registerModelLayer(GLOOM_INNER_ARMOR, ::createInnerArmor)
         EntityModelLayerRegistry.registerModelLayer(GLOOM_OUTER_ARMOR, ::createOuterArmor)
         EntityModelLayerRegistry.registerModelLayer(GLOOM_OUTER, ::createSkeletonOuterLayer)

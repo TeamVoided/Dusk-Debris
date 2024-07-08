@@ -211,9 +211,29 @@ class GloomEntity(entityType: EntityType<out GloomEntity>, world: World) :
         return super.applyEnchantmentsToDamage(source, damage)
     }
 
+
+    override fun tryAttack(target: Entity): Boolean {
+        if (!super.tryAttack(target)) {
+            return false
+        } else {
+            if (target is LivingEntity && !isLightMode()) {
+                target.addStatusEffect(StatusEffectInstance(statusEffect, 200), this)
+            }
+            return true
+        }
+    }
+
+    override fun method_6996(itemStack: ItemStack, f: Float, itemStack2: ItemStack?): PersistentProjectileEntity {
+        val persistentProjectileEntity = super.method_6996(itemStack, f, itemStack2)
+        if (persistentProjectileEntity is ArrowEntity) {
+            persistentProjectileEntity.addEffect(StatusEffectInstance(statusEffect, 600))
+        }
+        return persistentProjectileEntity
+    }
+
     override fun initEquipment(random: RandomGenerator, difficulty: LocalDifficulty) {
         val weaponMaterial = random.nextFloat()
-        val weaponTypeAxe = random.nextInt(25) < 24
+        val weaponTypeAxe = random.nextInt(25) > 24
         if (weaponMaterial > 0.95) {
             if (weaponTypeAxe) {
                 this.equipStack(EquipmentSlot.MAINHAND, ItemStack(Items.IRON_AXE))
@@ -235,27 +255,6 @@ class GloomEntity(entityType: EntityType<out GloomEntity>, world: World) :
         } else {
             this.equipStack(EquipmentSlot.MAINHAND, ItemStack(Items.BOW))
         }
-    }
-
-
-    override fun tryAttack(target: Entity): Boolean {
-        if (!super.tryAttack(target)) {
-            return false
-        } else {
-            if (target is LivingEntity && !isLightMode()) {
-                target.addStatusEffect(StatusEffectInstance(statusEffect, 200), this)
-            }
-
-            return true
-        }
-    }
-
-    override fun method_6996(itemStack: ItemStack, f: Float, itemStack2: ItemStack?): PersistentProjectileEntity {
-        val persistentProjectileEntity = super.method_6996(itemStack, f, itemStack2)
-        if (persistentProjectileEntity is ArrowEntity && !isLightMode()) {
-            persistentProjectileEntity.addEffect(StatusEffectInstance(statusEffect, 600))
-        }
-        return persistentProjectileEntity
     }
 
     companion object {
