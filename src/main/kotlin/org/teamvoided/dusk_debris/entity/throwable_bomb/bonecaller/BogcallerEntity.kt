@@ -18,20 +18,19 @@ import org.teamvoided.dusk_debris.init.DuskEntities
 import org.teamvoided.dusk_debris.init.DuskItems
 import org.teamvoided.dusk_debris.particle.BonecallerParticleEffect
 import java.awt.Color
-import java.lang.Math.clamp
 
 open class BogcallerEntity : BonecallerEntity {
 
     constructor(entityType: EntityType<out BogcallerEntity>, world: World) : super(entityType, world)
 
-    constructor(world: World) : super(DuskEntities.BONEBOGGER, world)
+    constructor(world: World) : super(DuskEntities.BOGCALLER, world)
     constructor(owner: LivingEntity?, world: World) :
-            super(DuskEntities.BONEBOGGER, owner, world) {
+            super(DuskEntities.BOGCALLER, owner, world) {
         this.owner = owner
     }
 
     constructor(x: Double, y: Double, z: Double, world: World) :
-            super(DuskEntities.BONEBOGGER, x, y, z, world)
+            super(DuskEntities.BOGCALLER, x, y, z, world)
 
     override fun getCalledEntity(serverWorld: ServerWorld, bandanaColor: Int, team: Team?) {
         //overide this to get your own
@@ -81,13 +80,10 @@ open class BogcallerEntity : BonecallerEntity {
     }
 
     override fun bandanaColors(): Int {
-        val hue = 70f + (Math.random().toFloat() * 270f)
+        val hue = 70f + (Math.random().toFloat() * 210f)
         val saturation = 0.4f + (Math.random().toFloat() * 0.4f)
-        val value: Float = 0.1f + (Math.random().toFloat() * 0.4f)
-        val h = hue % 1f
-        val s = clamp(saturation, 0f, 1f)
-        val v = clamp(value, 0f, 1f)
-        return Color.HSBtoRGB(h, s, v)
+        val value = 0.1f + (Math.random().toFloat() * 0.4f)
+        return Color.HSBtoRGB(hue / 360, saturation, value)
     }
 
     override fun getTrailingParticle(): ParticleEffect = BonecallerParticleEffect(0xEDE8BD, 0x93BA77)

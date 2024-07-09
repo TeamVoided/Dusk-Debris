@@ -71,7 +71,7 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
             gen.registerDecorativeGoldBlock(it,"parent/peculiar_relic", true)
         }
         DuskBlockLists.CHALICE_BLOCK_LIST.forEach {
-            gen.registerDecorativeGoldBlock(it,"parent/gilded_chalice", true)
+            gen.registerChalice(it)
         }
         DuskBlockLists.CROWN_BLOCK_LIST.forEach {
             gen.registerDecorativeGoldBlock(it, "parent/royal_crown", false)

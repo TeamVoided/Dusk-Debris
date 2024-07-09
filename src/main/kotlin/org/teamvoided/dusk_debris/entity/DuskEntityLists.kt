@@ -11,7 +11,7 @@ object DuskEntityLists {
         DuskEntities.FIREBOMB,
         DuskEntities.BONECALLER,
         DuskEntities.BONECHILLER,
-        DuskEntities.BONEBOGGER,
+        DuskEntities.BOGCALLER,
         DuskEntities.BONEWITHER,
 
         DuskEntities.SMOKEBOMB,

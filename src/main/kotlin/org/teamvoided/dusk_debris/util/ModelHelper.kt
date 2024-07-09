@@ -10,6 +10,7 @@ import net.minecraft.state.property.Properties
 import net.minecraft.util.Identifier
 import org.teamvoided.dusk_debris.DuskDebris.MODID
 import org.teamvoided.dusk_debris.DuskDebris.id
+import org.teamvoided.dusk_debris.block.GildedChaliceBlock
 import org.teamvoided.dusk_debris.block.NethershroomPlantBlock
 import java.util.*
 import java.util.stream.IntStream
@@ -226,6 +227,30 @@ fun BlockStateModelGenerator.registerDecorativeGoldBlock(block: Block, modelStri
         VariantsBlockStateSupplier.create(
             block,
             BlockStateVariant.create().put(VariantSettings.MODEL, model)
+        ).coordinate(BlockStateModelGenerator.createNorthDefaultHorizontalRotationStates())
+    )
+}
+
+fun BlockStateModelGenerator.registerChalice(chalice: Block) {
+    this.registerItemModel(chalice.asItem())
+    val texture = Texture()
+        .put(TextureKey.PARTICLE, Texture.getId(chalice.asItem()))
+        .put(TextureKey.ALL, Texture.getId(chalice))
+    val templateChalice1 = block("parent/gilded_chalice", TextureKey.ALL, TextureKey.PARTICLE)
+    val templateChalice2 = block("parent/gilded_chalices_2", TextureKey.ALL, TextureKey.PARTICLE)
+    val templateChalice3 = block("parent/gilded_chalices_3", TextureKey.ALL, TextureKey.PARTICLE)
+    val templateChalice4 = block("parent/gilded_chalices_4", TextureKey.ALL, TextureKey.PARTICLE)
+    val chalices1 = templateChalice1.upload(chalice, "_one_chalice", texture, this.modelCollector)
+    val chalices2 = templateChalice2.upload(chalice, "_two_chalices", texture, this.modelCollector)
+    val chalices3 = templateChalice3.upload(chalice, "_three_chalices", texture, this.modelCollector)
+    val chalices4 = templateChalice4.upload(chalice, "_four_chalices", texture, this.modelCollector)
+    this.blockStateCollector.accept(
+        VariantsBlockStateSupplier.create(chalice).coordinate(
+            BlockStateVariantMap.create(GildedChaliceBlock.CHALICES)
+                .register(1, BlockStateVariant.create().put(VariantSettings.MODEL, chalices1))
+                .register(2, BlockStateVariant.create().put(VariantSettings.MODEL, chalices2))
+                .register(3, BlockStateVariant.create().put(VariantSettings.MODEL, chalices3))
+                .register(4, BlockStateVariant.create().put(VariantSettings.MODEL, chalices4))
         ).coordinate(BlockStateModelGenerator.createNorthDefaultHorizontalRotationStates())
     )
 }

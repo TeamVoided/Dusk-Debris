@@ -41,7 +41,7 @@ object DuskEntities {
     val FIREBOMB = throwableBomb("firebomb", ::FirebombEntity)
     val BONECALLER = throwableBomb("bonecaller", ::BonecallerEntity)
     val BONECHILLER = throwableBomb("bonechiller", ::BonechillerEntity)
-    val BONEBOGGER = throwableBomb("bonebogger", ::BogcallerEntity)
+    val BOGCALLER = throwableBomb("bogcaller", ::BogcallerEntity)
     val BONEWITHER = throwableBomb("bonewither", ::BonewitherEntity)
 //    val BONESHADER = throwableBomb("boneshader", ::BonewitherEntity)
 

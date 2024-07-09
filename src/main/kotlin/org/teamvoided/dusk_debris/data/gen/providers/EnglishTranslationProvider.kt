@@ -42,7 +42,9 @@ class EnglishTranslationProvider(o: FabricDataOutput, r: CompletableFuture<Holde
         DuskItems.SMOOTH_VOLCANIC_SANDSTONE_SLAB
     ) +
             DuskItemLists.THROWABLE_BOMB_ITEM_LIST +
-            DuskItemLists.GUNPOWDER_BARREL_ITEM_LIST
+            DuskItemLists.GUNPOWDER_BARREL_ITEM_LIST +
+            DuskItemLists.DECORATIVE_GOLD_SKELETON_ITEM_LIST +
+            DuskItemLists.SPAWN_EGGS_ITEM_LIST
     val blocks = listOf(
         DuskBlocks.GUNPOWDER
     )
@@ -53,8 +55,15 @@ class EnglishTranslationProvider(o: FabricDataOutput, r: CompletableFuture<Holde
         DuskEntities.SMOKEBOMB,
         DuskEntities.POCKETPOISON,
         DuskEntities.BLINDBOMB,
-        DuskEntities.BOX_AREA_EFFECT_CLOUD
+        DuskEntities.BONECALLER,
+        DuskEntities.BONECHILLER,
+        DuskEntities.BOGCALLER,
+        DuskEntities.BONEWITHER,
+        DuskEntities.BOX_AREA_EFFECT_CLOUD,
+
+        DuskEntities.GLOOM
     )
+
     override fun generateTranslations(lookup: HolderLookup.Provider, gen: TranslationBuilder) {
         items.forEach { gen.add(it.translationKey, genLang(it.id)) }
         blocks.forEach { gen.add(it.translationKey, genLang(it.id)) }

@@ -35,7 +35,6 @@ open class BonechillerEntity : BonecallerEntity {
             super(DuskEntities.BONECHILLER, x, y, z, world)
 
     override fun getCalledEntity(serverWorld: ServerWorld, bandanaColor: Int, team: Team?) {
-        //overide this to get your own
         val bandana = DuskItems.BONECALLER_BANDANA.defaultStack
         val strayEntity = StrayEntity(EntityType.STRAY as EntityType<out StrayEntity>, world)
         val spawnPos = getSummonPos(
@@ -80,14 +79,12 @@ open class BonechillerEntity : BonecallerEntity {
     override fun getDefaultItem(): Item {
         return DuskItems.BONECHILLER_ITEM
     }
+
     override fun bandanaColors(): Int {
         val hue = 180f + (Math.random().toFloat() * 90f)
         val saturation = 0.2f + (Math.random().toFloat() * 0.6f)
-        val value: Float = 0.2f + (Math.random().toFloat() * 0.6f)
-        val h = hue % 1f
-        val s = Math.clamp(saturation, 0f, 1f)
-        val v = Math.clamp(value, 0f, 1f)
-        return Color.HSBtoRGB(h, s, v)
+        val value = 0.2f + (Math.random().toFloat() * 0.6f)
+        return Color.HSBtoRGB(hue / 360, saturation, value)
     }
 
     override fun getTrailingParticle(): ParticleEffect = BonecallerParticleEffect(0xE6ECED, 0xA2B6C4)
