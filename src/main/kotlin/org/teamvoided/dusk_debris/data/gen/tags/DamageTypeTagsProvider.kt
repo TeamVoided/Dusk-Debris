@@ -7,7 +7,7 @@ import net.minecraft.entity.damage.DamageTypes
 import net.minecraft.registry.HolderLookup
 import net.minecraft.registry.RegistryKeys
 import net.minecraft.registry.tag.DamageTypeTags
-import org.teamvoided.dusk_debris.data.DuskDamageTypeTags
+import org.teamvoided.dusk_debris.data.tags.DuskDamageTypeTags
 import java.util.concurrent.CompletableFuture
 
 class DamageTypeTagsProvider(o: FabricDataOutput, r: CompletableFuture<HolderLookup.Provider>) :

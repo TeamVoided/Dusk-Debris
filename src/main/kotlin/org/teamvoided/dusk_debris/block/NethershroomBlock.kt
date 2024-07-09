@@ -9,15 +9,13 @@ import net.minecraft.particle.ParticleEffect
 import net.minecraft.registry.Holder
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.sound.SoundCategory
-import net.minecraft.sound.SoundEvents
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.random.RandomGenerator
 import net.minecraft.world.GameRules
 import net.minecraft.world.World
 import org.teamvoided.dusk_debris.block.NethershroomPlantBlock.Companion.explode
-import org.teamvoided.dusk_debris.data.DuskEntityTypeTags
+import org.teamvoided.dusk_debris.data.tags.DuskEntityTypeTags
 import org.teamvoided.dusk_debris.init.DuskSoundEvents
-import kotlin.random.Random
 
 class NethershroomBlock(
     val delay: Int,

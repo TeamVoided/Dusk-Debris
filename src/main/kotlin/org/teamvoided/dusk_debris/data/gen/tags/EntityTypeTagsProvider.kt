@@ -5,9 +5,7 @@ import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider
 import net.minecraft.entity.EntityType
 import net.minecraft.registry.HolderLookup
 import net.minecraft.registry.tag.EntityTypeTags
-import org.teamvoided.dusk_debris.block.DuskBlockLists
-import org.teamvoided.dusk_debris.init.DuskEntities
-import org.teamvoided.dusk_debris.data.DuskEntityTypeTags
+import org.teamvoided.dusk_debris.data.tags.DuskEntityTypeTags
 import org.teamvoided.dusk_debris.entity.DuskEntityLists.DUSK_SKELETON_ENTITIES
 import org.teamvoided.dusk_debris.entity.DuskEntityLists.THROWABLE_BOMB_ENTITIES
 import java.util.concurrent.CompletableFuture

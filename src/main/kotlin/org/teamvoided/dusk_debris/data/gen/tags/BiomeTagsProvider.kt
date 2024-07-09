@@ -6,8 +6,7 @@ import net.minecraft.registry.HolderLookup
 import net.minecraft.registry.RegistryKeys
 import net.minecraft.world.biome.Biome
 import net.minecraft.world.biome.Biomes
-import org.teamvoided.dusk_debris.data.DuskBiomeTags
-import org.teamvoided.dusk_debris.data.DuskBlockTags
+import org.teamvoided.dusk_debris.data.tags.DuskBiomeTags
 import java.util.concurrent.CompletableFuture
 
 class BiomeTagsProvider(o: FabricDataOutput, r: CompletableFuture<HolderLookup.Provider>) :

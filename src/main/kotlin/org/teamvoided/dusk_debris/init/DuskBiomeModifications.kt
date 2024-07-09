@@ -8,7 +8,7 @@ import net.minecraft.world.biome.Biome
 import net.minecraft.world.gen.GenerationStep
 import net.minecraft.world.gen.feature.PlacedFeature
 import org.teamvoided.dusk_debris.DuskDebris.id
-import org.teamvoided.dusk_debris.data.DuskBiomeTags
+import org.teamvoided.dusk_debris.data.tags.DuskBiomeTags
 import org.teamvoided.dusk_debris.data.DuskPlacedFeatures
 import java.util.function.Predicate
 

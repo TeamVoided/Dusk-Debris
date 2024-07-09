@@ -10,7 +10,6 @@ import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.entity.projectile.ProjectileEntity
 import net.minecraft.item.ItemPlacementContext
 import net.minecraft.item.ItemStack
-import net.minecraft.item.Items
 import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvents
 import net.minecraft.stat.Stats
@@ -26,7 +25,7 @@ import net.minecraft.util.math.Direction
 import net.minecraft.world.World
 import net.minecraft.world.event.GameEvent
 import net.minecraft.world.explosion.Explosion
-import org.teamvoided.dusk_debris.data.DuskItemTags
+import org.teamvoided.dusk_debris.data.tags.DuskItemTags
 import org.teamvoided.dusk_debris.entity.GunpowderBarrelEntity
 
 class GunpowderBarrelBlock(val power: Int = 5, val range: Int = 4, val color: Int = 0xffffff, settings: Settings) :

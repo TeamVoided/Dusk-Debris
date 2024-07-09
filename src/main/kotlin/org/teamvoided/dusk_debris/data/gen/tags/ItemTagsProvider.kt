@@ -4,8 +4,7 @@ import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider
 import net.minecraft.item.Items
 import net.minecraft.registry.HolderLookup
-import org.teamvoided.dusk_debris.block.DuskBlockLists
-import org.teamvoided.dusk_debris.data.DuskItemTags
+import org.teamvoided.dusk_debris.data.tags.DuskItemTags
 import org.teamvoided.dusk_debris.item.DuskItemLists.THROWABLE_BOMB_ITEM_LIST
 import java.util.concurrent.CompletableFuture
 

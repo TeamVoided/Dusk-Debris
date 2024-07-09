@@ -1,4 +1,4 @@
-package org.teamvoided.dusk_debris.data
+package org.teamvoided.dusk_debris.data.tags
 
 import net.minecraft.entity.damage.DamageType
 import net.minecraft.registry.RegistryKeys

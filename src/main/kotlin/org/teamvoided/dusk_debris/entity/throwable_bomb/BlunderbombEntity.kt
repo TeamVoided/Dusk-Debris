@@ -3,7 +3,6 @@ package org.teamvoided.dusk_debris.entity.throwable_bomb
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.LivingEntity
 import net.minecraft.item.Item
-import net.minecraft.particle.ParticleEffect
 import net.minecraft.particle.ParticleTypes
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.sound.SoundCategory
@@ -13,8 +12,8 @@ import net.minecraft.world.explosion.Explosion
 import net.minecraft.world.explosion.ExplosionBehavior
 import org.teamvoided.dusk_debris.init.DuskEntities
 import org.teamvoided.dusk_debris.block.throwable_bomb.AbstractThrwowableBombBlock
-import org.teamvoided.dusk_debris.data.DuskBlockTags
-import org.teamvoided.dusk_debris.data.DuskEntityTypeTags
+import org.teamvoided.dusk_debris.data.tags.DuskBlockTags
+import org.teamvoided.dusk_debris.data.tags.DuskEntityTypeTags
 import org.teamvoided.dusk_debris.init.DuskItems
 import org.teamvoided.dusk_debris.init.DuskParticles
 import org.teamvoided.dusk_debris.world.explosion.SpecialExplosionBehavior

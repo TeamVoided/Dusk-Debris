@@ -11,7 +11,6 @@ import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.ItemPlacementContext
 import net.minecraft.item.ItemStack
-import net.minecraft.item.Items
 import net.minecraft.particle.ParticleTypes
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.stat.Stats
@@ -31,8 +30,8 @@ import net.minecraft.world.BlockView
 import net.minecraft.world.World
 import net.minecraft.world.WorldAccess
 import net.minecraft.world.WorldView
-import org.teamvoided.dusk_debris.data.DuskBlockTags
-import org.teamvoided.dusk_debris.data.DuskItemTags
+import org.teamvoided.dusk_debris.data.tags.DuskBlockTags
+import org.teamvoided.dusk_debris.data.tags.DuskItemTags
 
 
 class GunpowderBlock(settings: Settings) : Block(settings) {

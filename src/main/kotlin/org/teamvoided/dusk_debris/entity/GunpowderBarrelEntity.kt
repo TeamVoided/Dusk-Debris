@@ -14,8 +14,8 @@ import net.minecraft.util.math.Box
 import net.minecraft.world.World
 import net.minecraft.world.World.ExplosionSourceType
 import net.minecraft.world.explosion.Explosion
-import org.teamvoided.dusk_debris.data.DuskBlockTags
-import org.teamvoided.dusk_debris.data.DuskEntityTypeTags
+import org.teamvoided.dusk_debris.data.tags.DuskBlockTags
+import org.teamvoided.dusk_debris.data.tags.DuskEntityTypeTags
 import org.teamvoided.dusk_debris.init.DuskBlocks
 import org.teamvoided.dusk_debris.init.DuskEntities
 import org.teamvoided.dusk_debris.init.DuskSoundEvents

@@ -1,8 +1,6 @@
 package org.teamvoided.dusk_debris.data.gen.world.gen
 
 import net.minecraft.block.*
-import net.minecraft.fluid.Fluid
-import net.minecraft.fluid.Fluids
 import net.minecraft.registry.BootstrapContext
 import net.minecraft.registry.RegistryKey
 import net.minecraft.registry.RegistryKeys
@@ -18,7 +16,7 @@ import net.minecraft.world.gen.feature.util.ConfiguredFeatureUtil
 import net.minecraft.world.gen.feature.util.PlacedFeatureUtil
 import net.minecraft.world.gen.stateprovider.BlockStateProvider
 import net.minecraft.world.gen.stateprovider.WeightedBlockStateProvider
-import org.teamvoided.dusk_debris.data.DuskBlockTags
+import org.teamvoided.dusk_debris.data.tags.DuskBlockTags
 import org.teamvoided.dusk_debris.init.DuskBlocks
 import org.teamvoided.dusk_debris.data.DuskConfiguredFeatures
 import org.teamvoided.dusk_debris.init.worldgen.DuskFeatures

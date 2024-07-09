@@ -21,13 +21,12 @@ import net.minecraft.world.World
 import net.minecraft.world.explosion.Explosion
 import net.minecraft.world.explosion.Explosion.DestructionType
 import net.minecraft.world.explosion.ExplosionBehavior
-import org.teamvoided.dusk_debris.data.DuskBlockTags
-import org.teamvoided.dusk_debris.data.DuskEntityTypeTags
+import org.teamvoided.dusk_debris.data.tags.DuskBlockTags
+import org.teamvoided.dusk_debris.data.tags.DuskEntityTypeTags
 import org.teamvoided.dusk_debris.init.DuskEntities
 import org.teamvoided.dusk_debris.init.DuskItems
 import org.teamvoided.dusk_debris.init.DuskParticles
 import org.teamvoided.dusk_debris.world.explosion.FirebombExplosionBehavior
-import java.util.function.BiConsumer
 
 class FirebombEntity : AbstractThrwowableBombEntity {
     constructor(entityType: EntityType<out FirebombEntity>, world: World) : super(entityType, world)

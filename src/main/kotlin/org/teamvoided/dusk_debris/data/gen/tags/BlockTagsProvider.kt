@@ -8,7 +8,7 @@ import net.minecraft.registry.tag.BlockTags
 import org.teamvoided.dusk_debris.block.DuskBlockLists.GUNPOWDER_BARREL_BLOCK_LIST
 import org.teamvoided.dusk_debris.block.DuskBlockLists.RIBBON_BLOCKS_LIST
 import org.teamvoided.dusk_debris.block.DuskBlockLists.THROWABLE_BOMB_BLOCK_LIST
-import org.teamvoided.dusk_debris.data.DuskBlockTags
+import org.teamvoided.dusk_debris.data.tags.DuskBlockTags
 import org.teamvoided.dusk_debris.init.DuskBlocks
 import java.util.concurrent.CompletableFuture
 
