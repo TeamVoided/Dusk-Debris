@@ -7,6 +7,7 @@ import org.teamvoided.dusk_debris.DuskDebris.id
 
 object DuskPaintingVariantTags {
     val TEST = create("test")
+    @JvmField
     val DROPS_SELF = create("drops_self")
 
     fun create(id: String): TagKey<PaintingVariant> = TagKey.of(RegistryKeys.PAINTING_VARIANT, id(id))

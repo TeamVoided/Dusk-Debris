@@ -9,11 +9,7 @@ import org.teamvoided.dusk_debris.data.gen.providers.EnglishTranslationProvider
 import org.teamvoided.dusk_debris.data.gen.providers.ModelProvider
 import org.teamvoided.dusk_debris.data.gen.providers.EntityLootTableProvider
 import org.teamvoided.dusk_debris.data.gen.providers.PaintingVariants
-import org.teamvoided.dusk_debris.data.gen.tags.BiomeTagsProvider
-import org.teamvoided.dusk_debris.data.gen.tags.BlockTagsProvider
-import org.teamvoided.dusk_debris.data.gen.tags.DamageTypeTagsProvider
-import org.teamvoided.dusk_debris.data.gen.tags.EntityTypeTagsProvider
-import org.teamvoided.dusk_debris.data.gen.tags.ItemTagsProvider
+import org.teamvoided.dusk_debris.data.gen.tags.*
 import org.teamvoided.dusk_debris.data.gen.world.gen.ConfiguredFeatureCreator
 import org.teamvoided.dusk_debris.data.gen.world.gen.PlacedFeatureCreator
 
@@ -33,6 +29,7 @@ class DuskDebrisData : DataGeneratorEntrypoint {
 //        pack.addProvider(::RecipesProvider)
 //        pack.addProvider(::BlockLootTableProvider)
         pack.addProvider(::EntityLootTableProvider)
+        pack.addProvider(::PaintingVariantProvider)
     }
 
     override fun buildRegistry(gen: RegistrySetBuilder) {
