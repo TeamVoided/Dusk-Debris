@@ -64,6 +64,8 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
 //                DuskBlocks.GLOOM_WALL_SKULL
 //            )
 
+        gen.registerSimpleCubeAll(DuskBlocks.TREACHEROUS_GOLD_BLOCK)
+        gen.registerSimpleCubeAll(DuskBlocks.TARNISHED_GOLD_BLOCK)
         DuskBlockLists.VESSEL_BLOCK_LIST.forEach {
             gen.registerDecorativeGoldBlock(it,"parent/mysterious_vessel", true)
         }

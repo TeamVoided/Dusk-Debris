@@ -86,5 +86,6 @@ open class BogcallerEntity : BonecallerEntity {
         return Color.HSBtoRGB(hue / 360, saturation, value)
     }
 
-    override fun getTrailingParticle(): ParticleEffect = BonecallerParticleEffect(0xEDE8BD, 0x93BA77)
+    override val color1: Color = Color(0xEDE8BD)
+    override val color2: Color = Color(0x93BA77)
 }

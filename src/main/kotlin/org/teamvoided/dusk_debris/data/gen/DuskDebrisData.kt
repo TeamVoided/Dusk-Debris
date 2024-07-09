@@ -8,6 +8,7 @@ import org.teamvoided.dusk_debris.DuskDebris.log
 import org.teamvoided.dusk_debris.data.gen.providers.EnglishTranslationProvider
 import org.teamvoided.dusk_debris.data.gen.providers.ModelProvider
 import org.teamvoided.dusk_debris.data.gen.providers.EntityLootTableProvider
+import org.teamvoided.dusk_debris.data.gen.providers.PaintingVariants
 import org.teamvoided.dusk_debris.data.gen.tags.BiomeTagsProvider
 import org.teamvoided.dusk_debris.data.gen.tags.BlockTagsProvider
 import org.teamvoided.dusk_debris.data.gen.tags.DamageTypeTagsProvider
@@ -38,5 +39,6 @@ class DuskDebrisData : DataGeneratorEntrypoint {
 //        gen.add(RegistryKeys.BIOME, DuskBiomes::boostrap)
         gen.add(RegistryKeys.CONFIGURED_FEATURE, ConfiguredFeatureCreator::bootstrap)
         gen.add(RegistryKeys.PLACED_FEATURE, PlacedFeatureCreator::bootstrap)
+        gen.add(RegistryKeys.PAINTING_VARIANT, PaintingVariants::bootstrap)
     }
 }

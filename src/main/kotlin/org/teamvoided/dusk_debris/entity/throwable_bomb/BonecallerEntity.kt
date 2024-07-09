@@ -158,19 +158,20 @@ open class BonecallerEntity : AbstractThrwowableBombEntity {
         return DuskItems.BONECALLER_ITEM
     }
 
-    open val color1: Color = Color(0xBC3235)
-    open val color2: Color = Color(0x1B6666)
     open fun bandanaColors(): Int {
-        val hue =(Math.random().toFloat() * 360f)
-        val saturation = 0.3f + (Math.random().toFloat() * 0.6f)
-        val value: Float = Math.random().toFloat()
+        val hue = (Math.random().toFloat() * 360f)
+        val saturation = 0.4f + (Math.random().toFloat() * 0.5f)
+        val value: Float = 0.1f + Math.random().toFloat() * 0.8f
         val h = hue % 1f
         val s = Math.clamp(saturation, 0f, 1f)
         val v = Math.clamp(value, 0f, 1f)
         return Color.HSBtoRGB(h, s, v)
     }
 
-    override fun getTrailingParticle(): ParticleEffect = BonecallerParticleEffect(0xEFC90B, 0x935D26)
+    open val color1: Color = Color(0xEFC90B)
+    open val color2: Color = Color(0x935D26)
+
+    override fun getTrailingParticle(): ParticleEffect = BonecallerParticleEffect(color1.rgb, color2.rgb)
     fun Color.lerp(other: Color, amount: Float): Color {
         return Color(
             (this.red * (1 - amount) + other.red * amount).toInt(),

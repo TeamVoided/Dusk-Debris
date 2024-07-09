@@ -10,6 +10,7 @@ object DuskItemLists {
         DuskItems.BONECHILLER_ITEM,
         DuskItems.BOGCALLER_ITEM,
         DuskItems.BONEWITHER_ITEM,
+        DuskItems.SHADECALLER_ITEM,
         DuskItems.POCKETPOISON_ITEM,
         DuskItems.BLINDBOMB_ITEM,
         DuskItems.SMOKEBOMB_ITEM
@@ -23,9 +24,11 @@ object DuskItemLists {
         DuskItems.GLOOM_SPAWN_EGG
     )
     val DECORATIVE_GOLD_SKELETON_ITEM_LIST = listOf(
+        DuskItems.TREACHEROUS_GOLD_BLOCK,
         DuskItems.GOLDEN_VESSEL,
         DuskItems.LAPIS_RELIC,
         DuskItems.GILDED_CHALICE,
+        DuskItems.SILVERED_CHALICE,
         DuskItems.GOLDEN_RUBY_CROWN,
         DuskItems.GOLDEN_SAPPHIRE_CROWN,
         DuskItems.GOLDEN_QUARTZ_CROWN

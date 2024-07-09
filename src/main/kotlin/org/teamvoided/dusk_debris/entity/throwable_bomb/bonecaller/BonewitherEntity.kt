@@ -78,8 +78,8 @@ open class BonewitherEntity : BonecallerEntity {
         world.spawnEntity(WitherSkeletonEntity)
     }
 
-    override val color1: Color = Color(0x515353)
-    override val color2: Color = Color(0x303233)
+    override val color1: Color = Color(0x232326)
+    override val color2: Color = Color(0x2C4551)
     override fun bandanaColors(): Int {
         val f = (Math.random().toFloat())
         return color1.lerp(color2, f).rgb
@@ -87,6 +87,4 @@ open class BonewitherEntity : BonecallerEntity {
     override fun getDefaultItem(): Item {
         return DuskItems.BONEWITHER_ITEM
     }
-
-    override fun getTrailingParticle(): ParticleEffect = BonecallerParticleEffect(0x515353, 0x303233)
 }

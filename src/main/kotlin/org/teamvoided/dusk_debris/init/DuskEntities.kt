@@ -16,6 +16,7 @@ import org.teamvoided.dusk_debris.entity.throwable_bomb.FirebombEntity
 import org.teamvoided.dusk_debris.entity.throwable_bomb.bonecaller.BogcallerEntity
 import org.teamvoided.dusk_debris.entity.throwable_bomb.bonecaller.BonechillerEntity
 import org.teamvoided.dusk_debris.entity.throwable_bomb.bonecaller.BonewitherEntity
+import org.teamvoided.dusk_debris.entity.throwable_bomb.bonecaller.ShadecallerEntity
 import org.teamvoided.dusk_debris.entity.throwable_bomb.nethershroom_throwable.BlindbombEntity
 import org.teamvoided.dusk_debris.entity.throwable_bomb.nethershroom_throwable.PocketpoisonEntity
 import org.teamvoided.dusk_debris.entity.throwable_bomb.nethershroom_throwable.SmokebombEntity
@@ -43,7 +44,7 @@ object DuskEntities {
     val BONECHILLER = throwableBomb("bonechiller", ::BonechillerEntity)
     val BOGCALLER = throwableBomb("bogcaller", ::BogcallerEntity)
     val BONEWITHER = throwableBomb("bonewither", ::BonewitherEntity)
-//    val BONESHADER = throwableBomb("boneshader", ::BonewitherEntity)
+    val SHADECALLER = throwableBomb("shadecaller", ::ShadecallerEntity)
 
     val POCKETPOISON = throwableBomb("pocketpoison", ::PocketpoisonEntity)
     val BLINDBOMB = throwableBomb("blindbomb", ::BlindbombEntity)

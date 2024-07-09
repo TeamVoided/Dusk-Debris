@@ -2,20 +2,15 @@ package org.teamvoided.dusk_debris
 
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap
 import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry
-import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry
 import net.minecraft.client.render.RenderLayer
 import net.minecraft.client.render.entity.EmptyEntityRenderer
-import net.minecraft.client.render.entity.EntityRendererFactory
-import net.minecraft.client.render.entity.EntityRenderers
 import net.minecraft.client.render.entity.FlyingItemEntityRenderer
 import net.minecraft.component.type.DyedColorComponent
-import net.minecraft.entity.EntityType
-import net.minecraft.entity.mob.BoggedEntity
 import net.minecraft.item.ItemStack
 import org.teamvoided.dusk_debris.DuskDebris.log
-import org.teamvoided.dusk_debris.block.DuskBlockLists
+import org.teamvoided.dusk_debris.block.DuskBlockLists.CUTOUT_BLOCKS
 import org.teamvoided.dusk_debris.block.GunpowderBlock
 import org.teamvoided.dusk_debris.entity.DuskEntityLists.THROWABLE_BOMB_ENTITIES
 import org.teamvoided.dusk_debris.entity.DuskEntityModelLayers
@@ -29,20 +24,6 @@ import org.teamvoided.dusk_debris.particle.*
 
 @Suppress("unused")
 object DuskDebrisClient {
-
-    val cutoutBlock = listOf(
-        DuskBlocks.GUNPOWDER,
-        DuskBlocks.BLUE_NETHERSHROOM,
-        DuskBlocks.PURPLE_NETHERSHROOM,
-        DuskBlocks.CYPRESS_DOOR,
-        DuskBlocks.CYPRESS_TRAPDOOR,
-        DuskBlocks.CHARRED_DOOR,
-        DuskBlocks.CHARRED_TRAPDOOR,
-    ) + DuskBlockLists.THROWABLE_BOMB_BLOCK_LIST +
-            DuskBlockLists.RIBBON_BLOCKS_LIST +
-            DuskBlockLists.DECORATIVE_WHATEVER_BLOCK_LIST
-//    val translucentBlock = listOf()
-
     fun init() {
         log.info("Hello from Client")
         DuskEntityModelLayers.init()
@@ -81,7 +62,7 @@ object DuskDebrisClient {
             EntityRendererRegistry.register(it, ::FlyingItemEntityRenderer)
         }
 
-        cutoutBlock.forEach {
+        CUTOUT_BLOCKS.forEach {
             BlockRenderLayerMap.INSTANCE.putBlock(it, RenderLayer.getCutout())
         }
 //        translucentBlock.forEach {

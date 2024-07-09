@@ -20,6 +20,7 @@ import org.teamvoided.dusk_debris.block.throwable_bomb.FirebombBlock
 import org.teamvoided.dusk_debris.block.throwable_bomb.bonecaller.BogcallerBlock
 import org.teamvoided.dusk_debris.block.throwable_bomb.bonecaller.BonechillerBlock
 import org.teamvoided.dusk_debris.block.throwable_bomb.bonecaller.BonewitherBlock
+import org.teamvoided.dusk_debris.block.throwable_bomb.bonecaller.ShadecallerBlock
 import org.teamvoided.dusk_debris.block.throwable_bomb.nethershroom_throwable_block.BlindbombBlock
 import org.teamvoided.dusk_debris.block.throwable_bomb.nethershroom_throwable_block.PocketpoisonBlock
 import org.teamvoided.dusk_debris.block.throwable_bomb.nethershroom_throwable_block.SmokebombBlock
@@ -162,6 +163,7 @@ object DuskBlocks {
     val BONECHILLER_BLOCK = register("bonechiller", BonechillerBlock(bonecallerBlockSettings))
     val BOGCALLER_BLOCK = register("bogcaller", BogcallerBlock(bonecallerBlockSettings))
     val BONEWITHER_BLOCK = register("bonewither", BonewitherBlock(bonecallerBlockSettings))
+    val SHADECALLER_BLOCK = register("shadecaller", ShadecallerBlock(bonecallerBlockSettings))
     val SMOKEBOMB_BLOCK = register(
         "smokebomb",
         SmokebombBlock(
@@ -203,6 +205,16 @@ object DuskBlocks {
     val GRAY_RIBBON = register("gray_ribbon", registerRibbon(GRAY_WOOL.defaultMapColor))
     val BLACK_RIBBON = register("black_ribbon", registerRibbon(BLACK_WOOL.defaultMapColor))
 
+    val TREACHEROUS_GOLD_BLOCK = register(
+        "treacherous_gold_block", Block(
+            AbstractBlock.Settings.variantOf(GOLD_BLOCK)
+        )
+    )
+    val TARNISHED_GOLD_BLOCK = register(
+        "tarnished_gold_block", Block(
+            AbstractBlock.Settings.variantOf(TREACHEROUS_GOLD_BLOCK).mapColor(TERRACOTTA.defaultMapColor)
+        )
+    )
     val GOLDEN_VESSEL = register(
         "golden_vessel",
         MysteriousVesselBlock(
@@ -219,9 +231,15 @@ object DuskBlocks {
             AbstractBlock.Settings.create().mapColor(GOLD_BLOCK.defaultMapColor).pistonBehavior(PistonBehavior.DESTROY)
         )
     )
+    val SILVERED_CHALICE = register(
+        "silvered_chalice", GildedChaliceBlock(
+            AbstractBlock.Settings.create().mapColor(IRON_BLOCK.defaultMapColor).pistonBehavior(PistonBehavior.DESTROY)
+        )
+    )
     val GOLDEN_RUBY_CROWN = register(
         "golden_ruby_crown", RoyalCrownBlock(
-            AbstractBlock.Settings.create().mapColor(REDSTONE_BLOCK.defaultMapColor).pistonBehavior(PistonBehavior.DESTROY)
+            AbstractBlock.Settings.create().mapColor(REDSTONE_BLOCK.defaultMapColor)
+                .pistonBehavior(PistonBehavior.DESTROY)
         )
     )
     val GOLDEN_SAPPHIRE_CROWN = register(
@@ -231,7 +249,8 @@ object DuskBlocks {
     )
     val GOLDEN_QUARTZ_CROWN = register(
         "golden_quartz_crown", RoyalCrownBlock(
-            AbstractBlock.Settings.create().mapColor(QUARTZ_BLOCK.defaultMapColor).pistonBehavior(PistonBehavior.DESTROY)
+            AbstractBlock.Settings.create().mapColor(QUARTZ_BLOCK.defaultMapColor)
+                .pistonBehavior(PistonBehavior.DESTROY)
         )
     )
 

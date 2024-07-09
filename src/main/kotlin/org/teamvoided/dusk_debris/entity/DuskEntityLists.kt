@@ -13,6 +13,7 @@ object DuskEntityLists {
         DuskEntities.BONECHILLER,
         DuskEntities.BOGCALLER,
         DuskEntities.BONEWITHER,
+        DuskEntities.SHADECALLER,
 
         DuskEntities.SMOKEBOMB,
         DuskEntities.POCKETPOISON,

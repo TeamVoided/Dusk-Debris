@@ -29,6 +29,7 @@ import org.teamvoided.dusk_debris.item.throwable_bomb.FirebombItem
 import org.teamvoided.dusk_debris.item.throwable_bomb.bonecaller.BoneboggerItem
 import org.teamvoided.dusk_debris.item.throwable_bomb.bonecaller.BonechillerItem
 import org.teamvoided.dusk_debris.item.throwable_bomb.bonecaller.BonewitherItem
+import org.teamvoided.dusk_debris.item.throwable_bomb.bonecaller.ShadecallerItem
 import org.teamvoided.dusk_debris.item.throwable_bomb.nethershroom_throwable_item.BlindbombItem
 import org.teamvoided.dusk_debris.item.throwable_bomb.nethershroom_throwable_item.PocketpoisonItem
 import org.teamvoided.dusk_debris.item.throwable_bomb.nethershroom_throwable_item.SmokebombItem
@@ -65,6 +66,8 @@ object DuskItems {
         register("bogcaller", BoneboggerItem(DuskBlocks.BOGCALLER_BLOCK, Item.Settings().maxCount(16)))
     val BONEWITHER_ITEM =
         register("bonewither", BonewitherItem(DuskBlocks.BONEWITHER_BLOCK, Item.Settings().maxCount(16)))
+    val SHADECALLER_ITEM =
+        register("shadecaller", ShadecallerItem(DuskBlocks.SHADECALLER_BLOCK, Item.Settings().maxCount(16)))
     val BONECALLER_BANDANA =
         register(
             "bonecaller_bandana",
@@ -92,12 +95,21 @@ object DuskItems {
     //    val STRAY_SKULL = register("stray_skull", BlockItem(DuskBlocks.STRAY_SKULL))
 //    val BOGGED_SKULL = register("bogged_skull", BlockItem(DuskBlocks.BOGGED_SKULL))
 //    val GLOOM_SKULL = register("gloom_skull", BlockItem(DuskBlocks.GLOOM_SKULL))
+    val TREACHEROUS_GOLD_BLOCK = register(
+        "treacherous_gold_block", BlockItem(DuskBlocks.TREACHEROUS_GOLD_BLOCK, Item.Settings())
+    )
+    val TARNISHED_GOLD_BLOCK = register(
+        "tarnished_gold_block", BlockItem(DuskBlocks.TARNISHED_GOLD_BLOCK, Item.Settings())
+    )
     val GOLDEN_VESSEL =
         register("golden_vessel", BlockItem(DuskBlocks.GOLDEN_VESSEL, Item.Settings().maxCount(16)))
     val LAPIS_RELIC =
         register("lapis_relic", BlockItem(DuskBlocks.LAPIS_RELIC, Item.Settings().maxCount(16)))
     val GILDED_CHALICE = register(
         "gilded_chalice", BlockItem(DuskBlocks.GILDED_CHALICE, Item.Settings().maxCount(16))
+    )
+    val SILVERED_CHALICE = register(
+        "silvered_chalice", BlockItem(DuskBlocks.SILVERED_CHALICE, Item.Settings().maxCount(16))
     )
     val GOLDEN_RUBY_CROWN =
         register(

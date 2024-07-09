@@ -17,6 +17,7 @@ object DuskBlockLists {
         DuskBlocks.BONECHILLER_BLOCK,
         DuskBlocks.BOGCALLER_BLOCK,
         DuskBlocks.BONEWITHER_BLOCK,
+        DuskBlocks.SHADECALLER_BLOCK,
         DuskBlocks.POCKETPOISON_BLOCK,
         DuskBlocks.BLINDBOMB_BLOCK,
         DuskBlocks.SMOKEBOMB_BLOCK
@@ -32,11 +33,12 @@ object DuskBlockLists {
     val VESSEL_BLOCK_LIST = listOf(
         DuskBlocks.GOLDEN_VESSEL
     )
+    val CHALICE_BLOCK_LIST = listOf(
+        DuskBlocks.GILDED_CHALICE,
+        DuskBlocks.SILVERED_CHALICE
+    )
     val RELIC_BLOCK_LIST = listOf(
         DuskBlocks.LAPIS_RELIC
-    )
-    val CHALICE_BLOCK_LIST = listOf(
-        DuskBlocks.GILDED_CHALICE
     )
     val CROWN_BLOCK_LIST = listOf(
         DuskBlocks.GOLDEN_RUBY_CROWN,
@@ -48,4 +50,16 @@ object DuskBlockLists {
     val PAPER_BLOCKS_LIST = listOf(
         DuskBlocks.PAPER_BLOCK
     )
+    val CUTOUT_BLOCKS = listOf(
+        DuskBlocks.GUNPOWDER,
+        DuskBlocks.BLUE_NETHERSHROOM,
+        DuskBlocks.PURPLE_NETHERSHROOM,
+        DuskBlocks.CYPRESS_DOOR,
+        DuskBlocks.CYPRESS_TRAPDOOR,
+        DuskBlocks.CHARRED_DOOR,
+        DuskBlocks.CHARRED_TRAPDOOR,
+    ) + DuskBlockLists.THROWABLE_BOMB_BLOCK_LIST +
+            DuskBlockLists.RIBBON_BLOCKS_LIST +
+            DuskBlockLists.DECORATIVE_WHATEVER_BLOCK_LIST
+//    val translucentBlock = listOf()
 }

@@ -1,44 +1,40 @@
 package org.teamvoided.dusk_debris.entity.throwable_bomb.bonecaller
 
-import net.minecraft.component.DataComponentTypes
-import net.minecraft.component.type.DyedColorComponent
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.EquipmentSlot
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.SpawnReason
-import net.minecraft.entity.mob.StrayEntity
+import net.minecraft.entity.mob.WitherSkeletonEntity
 import net.minecraft.item.Item
 import net.minecraft.particle.ParticleEffect
 import net.minecraft.scoreboard.Team
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.SpawnUtil
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.MathHelper
 import net.minecraft.world.World
+import org.teamvoided.dusk_debris.entity.GloomEntity
 import org.teamvoided.dusk_debris.entity.throwable_bomb.BonecallerEntity
 import org.teamvoided.dusk_debris.init.DuskEntities
 import org.teamvoided.dusk_debris.init.DuskItems
 import org.teamvoided.dusk_debris.particle.BonecallerParticleEffect
 import java.awt.Color
 
-open class BonechillerEntity : BonecallerEntity {
+open class ShadecallerEntity : BonecallerEntity {
 
-    constructor(entityType: EntityType<out BonechillerEntity>, world: World) : super(entityType, world)
+    constructor(entityType: EntityType<out ShadecallerEntity>, world: World) : super(entityType, world)
 
-    constructor(world: World) : super(DuskEntities.BONECHILLER, world)
+    constructor(world: World) : super(DuskEntities.SHADECALLER, world)
     constructor(owner: LivingEntity?, world: World) :
-            super(DuskEntities.BONECHILLER, owner, world) {
+            super(DuskEntities.SHADECALLER, owner, world) {
         this.owner = owner
     }
 
     constructor(x: Double, y: Double, z: Double, world: World) :
-            super(DuskEntities.BONECHILLER, x, y, z, world)
+            super(DuskEntities.SHADECALLER, x, y, z, world)
 
     override fun getCalledEntity(serverWorld: ServerWorld, bandanaColor: Int, team: Team?) {
-        val bandana = DuskItems.BONECALLER_BANDANA.defaultStack
-        val strayEntity = StrayEntity(EntityType.STRAY as EntityType<out StrayEntity>, world)
+        val GloomEntity = GloomEntity(DuskEntities.GLOOM as EntityType<out GloomEntity>, world)
         val spawnPos = getSummonPos(
-            strayEntity,
+            GloomEntity,
             SpawnReason.MOB_SUMMONED,
             serverWorld,
             blockPos,
@@ -47,20 +43,15 @@ open class BonechillerEntity : BonecallerEntity {
             6,
             SpawnUtil.Strategy.field_39401
         )
-        strayEntity.refreshPositionAndAngles(spawnPos, 0f, 0.0f)
-        strayEntity.initialize(
+        GloomEntity.refreshPositionAndAngles(spawnPos, 0f, 0.0f)
+        GloomEntity.initialize(
             serverWorld,
             this.world.getLocalDifficulty(this.blockPos),
             SpawnReason.MOB_SUMMONED,
             null
         )
-        bandana.set(
-            DataComponentTypes.DYED_COLOR,
-            DyedColorComponent(bandanaColor, true)
-        )
-        strayEntity.equipStack(EquipmentSlot.HEAD, bandana)
         if (team != null) {
-            serverWorld.scoreboard.addPlayerToTeam(strayEntity.profileName, team)
+            serverWorld.scoreboard.addPlayerToTeam(GloomEntity.profileName, team)
         }
         serverWorld.spawnParticles(
             getTrailingParticle(),
@@ -73,19 +64,12 @@ open class BonechillerEntity : BonecallerEntity {
             0.0,
             1.0
         )
-        world.spawnEntity(strayEntity)
+        world.spawnEntity(GloomEntity)
     }
 
+    override val color1: Color = Color(0x2B2B2B)
+    override val color2: Color = Color(0x0F0F0F)
     override fun getDefaultItem(): Item {
-        return DuskItems.BONECHILLER_ITEM
+        return DuskItems.BONEWITHER_ITEM
     }
-
-    override fun bandanaColors(): Int {
-        val hue = 180f + (Math.random().toFloat() * 90f)
-        val saturation = 0.2f + (Math.random().toFloat() * 0.6f)
-        val value = 0.2f + (Math.random().toFloat() * 0.6f)
-        return Color.HSBtoRGB(hue / 360, saturation, value)
-    }
-    override val color1: Color = Color(0xE6ECED)
-    override val color2: Color = Color(0xA2B6C4)
 }
