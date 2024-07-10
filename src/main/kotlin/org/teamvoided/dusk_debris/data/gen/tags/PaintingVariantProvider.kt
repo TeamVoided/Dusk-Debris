@@ -21,6 +21,7 @@ class PaintingVariantProvider(o: FabricDataOutput, r: CompletableFuture<HolderLo
     fun duskTags() {
         getOrCreateTagBuilder(DuskPaintingVariantTags.DROPS_SELF)
             .add(DuskPaintingVariants.LIVE_BRIGGSY_REACTION)
+            .add(DuskPaintingVariants.FLAMEHEART_APPEARS)
             .add(PaintingVariants.WATER)
             .add(PaintingVariants.WIND)
             .add(PaintingVariants.EARTH)

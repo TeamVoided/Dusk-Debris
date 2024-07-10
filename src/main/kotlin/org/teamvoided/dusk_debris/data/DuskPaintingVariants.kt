@@ -7,7 +7,7 @@ import org.teamvoided.dusk_debris.DuskDebris
 
 object DuskPaintingVariants {
     val LIVE_BRIGGSY_REACTION = create("l_b_r")
-    val SKELETON_APPEEARS = create("skeleton_appeears")
+    val FLAMEHEART_APPEARS = create("skeleton_appears")
     fun create(id: String): RegistryKey<PaintingVariant> =
         RegistryKey.of(RegistryKeys.PAINTING_VARIANT, DuskDebris.id(id))
 }

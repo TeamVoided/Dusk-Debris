@@ -9,6 +9,7 @@ import net.minecraft.registry.HolderLookup
 import net.minecraft.registry.Registries
 import net.minecraft.util.Identifier
 import org.teamvoided.dusk_debris.data.DuskPaintingVariants
+import org.teamvoided.dusk_debris.entity.DuskEntityLists
 import org.teamvoided.dusk_debris.init.DuskBlocks
 import org.teamvoided.dusk_debris.init.DuskEntities
 import org.teamvoided.dusk_debris.item.DuskItemLists
@@ -51,24 +52,19 @@ class EnglishTranslationProvider(o: FabricDataOutput, r: CompletableFuture<Holde
     )
     val entities = listOf(
         DuskEntities.GUNPOWDER_BARREL,
-        DuskEntities.BLUNDERBOMB,
-        DuskEntities.FIREBOMB,
-        DuskEntities.SMOKEBOMB,
-        DuskEntities.POCKETPOISON,
-        DuskEntities.BLINDBOMB,
-        DuskEntities.BONECALLER,
-        DuskEntities.BONECHILLER,
-        DuskEntities.BOGCALLER,
-        DuskEntities.BONEWITHER,
-        DuskEntities.BOX_AREA_EFFECT_CLOUD,
-
-        DuskEntities.GLOOM
-    )
+        DuskEntities.BOX_AREA_EFFECT_CLOUD
+    ) +
+            DuskEntityLists.THROWABLE_BOMB_ENTITIES +
+            DuskEntityLists.DUSK_SKELETON_ENTITIES
 
     override fun generateTranslations(lookup: HolderLookup.Provider, gen: TranslationBuilder) {
         items.forEach { gen.add(it.translationKey, genLang(it.id)) }
         blocks.forEach { gen.add(it.translationKey, genLang(it.id)) }
         entities.forEach { gen.add(it.translationKey, genLang(it.id)) }
+
+        gen.add("painting.dusk_debris.l_b_r.title", "L. Briggsy R.")
+        gen.add("painting.dusk_debris.l_b_r.author", "Original Model By Ivan Yosifov")
+
         getKey(DUSK_TAB)?.let { gen.add(it, "Dusk Items") }
     }
 
@@ -78,5 +74,4 @@ class EnglishTranslationProvider(o: FabricDataOutput, r: CompletableFuture<Holde
     val Item.id get() = Registries.ITEM.getId(this)
     val Block.id get() = Registries.BLOCK.getId(this)
     val EntityType<*>.id get() = Registries.ENTITY_TYPE.getId(this)
-
 }
