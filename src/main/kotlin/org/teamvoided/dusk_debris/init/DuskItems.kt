@@ -161,6 +161,7 @@ object DuskItems {
 
     val VOLCANIC_SAND = register("volcanic_sand", BlockItem(DuskBlocks.VOLCANIC_SAND))
     val SUSPICIOUS_VOLCANIC_SAND = register("suspicious_volcanic_sand", BlockItem(DuskBlocks.SUSPICIOUS_VOLCANIC_SAND))
+    val ROARING_GEYSER = register("roaring_geyser", BlockItem(DuskBlocks.ROARING_GEYSER))
     val VOLCANIC_SANDSTONE = register("volcanic_sandstone", BlockItem(DuskBlocks.VOLCANIC_SANDSTONE))
     val VOLCANIC_SANDSTONE_STAIRS =
         register("volcanic_sandstone_stairs", BlockItem(DuskBlocks.VOLCANIC_SANDSTONE_STAIRS))

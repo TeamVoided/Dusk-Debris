@@ -432,6 +432,10 @@ object DuskBlocks {
                 .strength(0.25f).sounds(BlockSoundGroup.SUSPICIOUS_SAND).pistonBehavior(PistonBehavior.DESTROY)
         )
     )
+    val ROARING_GEYSER = register(
+        "roaring_geyser",
+        RoaringGeyserBlock(VOLCANIC_SAND, AbstractBlock.Settings.create().ticksRandomly())
+    )
     val VOLCANIC_SANDSTONE = register(
         "volcanic_sandstone",
         Block(
