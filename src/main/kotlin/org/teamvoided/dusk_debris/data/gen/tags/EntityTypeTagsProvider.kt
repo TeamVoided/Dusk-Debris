@@ -2,6 +2,7 @@ package org.teamvoided.dusk_debris.data.gen.tags
 
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider
+import net.fabricmc.fabric.api.tag.convention.v2.ConventionalEntityTypeTags
 import net.minecraft.entity.EntityType
 import net.minecraft.registry.HolderLookup
 import net.minecraft.registry.tag.EntityTypeTags
@@ -38,23 +39,25 @@ class EntityTypeTagsProvider(output: FabricDataOutput, registriesFuture: Complet
         getOrCreateTagBuilder(DuskEntityTypeTags.DUSK_SKELETON_RETREATS)
             .add(EntityType.WOLF)
         getOrCreateTagBuilder(DuskEntityTypeTags.IS_NOT_AFFECTED_BY_NETHERSHROOM)
-            .addOptionalTag(EntityTypeTags.IGNORES_POISON_AND_REGEN)
+            .forceAddTag(EntityTypeTags.IGNORES_POISON_AND_REGEN)
             .add(EntityType.PIGLIN)
             .add(EntityType.PIGLIN_BRUTE)
             .add(EntityType.HOGLIN)
             .add(EntityType.ZOMBIFIED_PIGLIN)
             .add(EntityType.ZOGLIN)
             .add(EntityType.ENDERMAN)
+        getOrCreateTagBuilder(DuskEntityTypeTags.GEYSER_DOESENT_PROPEL)
+            .forceAddTag(ConventionalEntityTypeTags.BOSSES)
         getOrCreateTagBuilder(DuskEntityTypeTags.GUNPOWDER_BARREL_DOES_NOT_DAMAGE)
             .add(EntityType.ITEM_FRAME)
             .add(EntityType.GLOW_ITEM_FRAME)
             .add(EntityType.PAINTING)
             .add(EntityType.EXPERIENCE_ORB)
         getOrCreateTagBuilder(DuskEntityTypeTags.BLUNDERBOMB_DOES_NOT_DAMAGE)
-            .addOptionalTag(DuskEntityTypeTags.GUNPOWDER_BARREL_DOES_NOT_DAMAGE)
+            .forceAddTag(DuskEntityTypeTags.GUNPOWDER_BARREL_DOES_NOT_DAMAGE)
             .add(EntityType.ITEM)
         getOrCreateTagBuilder(DuskEntityTypeTags.FIREBOMB_DOES_NOT_DAMAGE)
-            .addOptionalTag(DuskEntityTypeTags.BLUNDERBOMB_DOES_NOT_DAMAGE)
+            .forceAddTag(DuskEntityTypeTags.BLUNDERBOMB_DOES_NOT_DAMAGE)
     }
 
     private fun vanillaTags() {
@@ -65,7 +68,7 @@ class EntityTypeTagsProvider(output: FabricDataOutput, registriesFuture: Complet
 //        getOrCreateTagBuilder(EntityTypeTags.DEFLECTS_PROJECTILES)
 //           .add(DuskEntities.GREED)
         getOrCreateTagBuilder(EntityTypeTags.IMPACT_PROJECTILES)
-            .addOptionalTag(DuskEntityTypeTags.THROWABLE_BOMB)
+            .forceAddTag(DuskEntityTypeTags.THROWABLE_BOMB)
 //        getOrCreateTagBuilder(EntityTypeTags.AQUATIC)
 //            .add(DuskEntities.CRAB)
 //        getOrCreateTagBuilder(EntityTypeTags.ARTHROPOD)

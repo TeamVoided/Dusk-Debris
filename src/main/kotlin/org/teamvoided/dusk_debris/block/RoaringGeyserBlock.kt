@@ -4,6 +4,7 @@ import com.mojang.serialization.MapCodec
 import net.minecraft.block.Block
 import net.minecraft.block.BlockState
 import net.minecraft.block.LeavesBlock
+import net.minecraft.entity.Entity
 import net.minecraft.item.ItemPlacementContext
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.state.StateManager
@@ -13,6 +14,7 @@ import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Box
 import net.minecraft.util.random.RandomGenerator
 import net.minecraft.world.World
+import org.teamvoided.dusk_debris.data.tags.DuskEntityTypeTags
 import org.teamvoided.dusk_debris.init.DuskBlocks
 
 class RoaringGeyserBlock(val blockAfterFinish: Block, settings: Settings) :
@@ -27,10 +29,12 @@ class RoaringGeyserBlock(val blockAfterFinish: Block, settings: Settings) :
                 .with(ACTIVE, false)
                 .with(PERSISTENT, false)
     }
+
     override fun appendProperties(builder: StateManager.Builder<Block, BlockState>) {
         super.appendProperties(builder)
         builder.add(ACTIVE, PERSISTENT)
     }
+
     override fun getPlacementState(ctx: ItemPlacementContext): BlockState {
         val blockState = defaultState.with(PERSISTENT, true)
         return blockState
@@ -68,8 +72,7 @@ class RoaringGeyserBlock(val blockAfterFinish: Block, settings: Settings) :
                 pos.y + 1.5,
                 pos.z + 1.5
             )
-        )
-//        { obj: Entity -> obj.isAlive }
+        ) { obj: Entity -> !obj.type.isIn(DuskEntityTypeTags.GEYSER_DOESENT_PROPEL) }
         return entitiesInRange.forEach {
             val vec3d = it.velocity
             it.setVelocity(vec3d.x, vec3d.y + 1.5, vec3d.z)
