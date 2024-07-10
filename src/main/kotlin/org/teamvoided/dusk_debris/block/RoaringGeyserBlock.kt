@@ -3,9 +3,9 @@ package org.teamvoided.dusk_debris.block
 import com.mojang.serialization.MapCodec
 import net.minecraft.block.Block
 import net.minecraft.block.BlockState
-import net.minecraft.block.LeavesBlock
 import net.minecraft.entity.Entity
 import net.minecraft.item.ItemPlacementContext
+import net.minecraft.particle.ParticleTypes
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.state.StateManager
 import net.minecraft.state.property.BooleanProperty
@@ -62,6 +62,22 @@ class RoaringGeyserBlock(val blockAfterFinish: Block, settings: Settings) :
         super.scheduledTick(state, world, pos, random)
     }
 
+    override fun randomDisplayTick(state: BlockState, world: World, pos: BlockPos, random: RandomGenerator) {
+        if (state.get(ACTIVE)) {
+            world.addParticle(
+                ParticleTypes.CAMPFIRE_COSY_SMOKE,
+                true,
+                pos.x + 0.5,
+                pos.y + 1.0,
+                pos.z + 0.5,
+                0.0,
+                0.1,
+                0.0
+            )
+        }
+        super.randomDisplayTick(state, world, pos, random)
+    }
+
     private fun geyser(pos: BlockPos, world: World) {
         val entitiesInRange = world.getOtherEntities(
             null, Box(
@@ -69,11 +85,12 @@ class RoaringGeyserBlock(val blockAfterFinish: Block, settings: Settings) :
                 pos.y + 0.5,
                 pos.z - 0.5,
                 pos.x + 1.5,
-                pos.y + 1.5,
+                pos.y + 2.5,
                 pos.z + 1.5
             )
-        ) { obj: Entity -> !obj.type.isIn(DuskEntityTypeTags.GEYSER_DOESENT_PROPEL) }
+        ) { obj: Entity -> !obj.type.isIn(DuskEntityTypeTags.GEYSERS_DONT_PROPEL) }
         return entitiesInRange.forEach {
+            println(it.type)
             val vec3d = it.velocity
             it.setVelocity(vec3d.x, vec3d.y + 1.5, vec3d.z)
         }

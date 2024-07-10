@@ -46,7 +46,7 @@ class EntityTypeTagsProvider(output: FabricDataOutput, registriesFuture: Complet
             .add(EntityType.ZOMBIFIED_PIGLIN)
             .add(EntityType.ZOGLIN)
             .add(EntityType.ENDERMAN)
-        getOrCreateTagBuilder(DuskEntityTypeTags.GEYSER_DOESENT_PROPEL)
+        getOrCreateTagBuilder(DuskEntityTypeTags.GEYSERS_DONT_PROPEL)
             .forceAddTag(ConventionalEntityTypeTags.BOSSES)
         getOrCreateTagBuilder(DuskEntityTypeTags.GUNPOWDER_BARREL_DOES_NOT_DAMAGE)
             .add(EntityType.ITEM_FRAME)
