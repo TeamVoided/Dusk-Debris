@@ -13,6 +13,7 @@ import net.minecraft.util.math.Direction
 import net.minecraft.util.shape.VoxelShape
 import net.minecraft.util.shape.VoxelShapes
 import net.minecraft.world.BlockView
+import net.minecraft.world.WorldView
 import org.teamvoided.dusk_debris.util.rotate
 
 class CoinStackBlock(settings: Settings) : MysteriousVesselBlock(settings) {
@@ -27,6 +28,25 @@ class CoinStackBlock(settings: Settings) : MysteriousVesselBlock(settings) {
     override fun appendProperties(builder: StateManager.Builder<Block, BlockState>) {
         super.appendProperties(builder)
         builder.add(LAYERS)
+    }
+    override fun canPlaceAt(state: BlockState, world: WorldView, pos: BlockPos): Boolean {
+        val blockStateDown = world.getBlockState(pos.down())
+        if (blockStateDown.isOf(this) && state.get(LAYERS) == 8)
+        {
+            return true
+        }
+        return super.canPlaceAt(state, world, pos)
+    }
+
+    override fun getPlacementState(ctx: ItemPlacementContext): BlockState {
+        val blockState = ctx.world.getBlockState(ctx.blockPos)
+        val blockStateDown = ctx.world.getBlockState(ctx.blockPos.down())
+        if (blockState.isOf(this)) {
+            return blockState.cycle(LAYERS)
+        } else if (blockStateDown.isOf(this)) {
+            return super.getPlacementState(ctx).with(FACING, blockStateDown.get(FACING))
+        }
+        return super.getPlacementState(ctx)
     }
 
     override fun getOutlineShape(
@@ -60,14 +80,6 @@ class CoinStackBlock(settings: Settings) : MysteriousVesselBlock(settings) {
             return true
         }
         return super.canReplace(state, context)
-    }
-
-    override fun getPlacementState(ctx: ItemPlacementContext): BlockState {
-        val blockState = ctx.world.getBlockState(ctx.blockPos)
-        if (blockState.isOf(this)) {
-            return blockState.cycle(LAYERS)
-        }
-        return super.getPlacementState(ctx)
     }
 
     companion object {
