@@ -18,6 +18,7 @@ object DuskParticles {
     val BLUNDERBOMB: DefaultParticleType = FabricParticleTypes.simple()
     val FIREBOMB: DefaultParticleType = FabricParticleTypes.simple()
     val BONECALLER = FabricParticleTypes.complex(BonecallerParticleEffect.CODEC, BonecallerParticleEffect.PACKET_CODEC)
+    val GEYSER: DefaultParticleType = FabricParticleTypes.simple()
 
     fun init() {
         Registry.register(Registries.PARTICLE_TYPE, id("toxic_smoke_particle"), TOXIC_SMOKE_PARTICLE)
@@ -26,5 +27,6 @@ object DuskParticles {
         Registry.register(Registries.PARTICLE_TYPE, id("blunderbomb"), BLUNDERBOMB)
         Registry.register(Registries.PARTICLE_TYPE, id("firebomb"), FIREBOMB)
         Registry.register(Registries.PARTICLE_TYPE, id("bonecaller"), BONECALLER)
+        Registry.register(Registries.PARTICLE_TYPE, id("geyser"), GEYSER)
     }
 }

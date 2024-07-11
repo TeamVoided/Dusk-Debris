@@ -41,6 +41,8 @@ object DuskDebrisClient {
             .register(DuskParticles.FIREBOMB, FirebombParticle.Factory())
         ParticleFactoryRegistry.getInstance()
             .register(DuskParticles.BONECALLER, BonecallerParticle::Factory)
+        ParticleFactoryRegistry.getInstance()
+            .register(DuskParticles.GEYSER, GeyserParticle::Factory)
 
         ColorProviderRegistry.ITEM.register(
             { itemStack: ItemStack, i: Int ->

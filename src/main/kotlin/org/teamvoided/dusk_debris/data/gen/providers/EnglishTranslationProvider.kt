@@ -8,7 +8,6 @@ import net.minecraft.item.Item
 import net.minecraft.registry.HolderLookup
 import net.minecraft.registry.Registries
 import net.minecraft.util.Identifier
-import org.teamvoided.dusk_debris.data.DuskPaintingVariants
 import org.teamvoided.dusk_debris.entity.DuskEntityLists
 import org.teamvoided.dusk_debris.init.DuskBlocks
 import org.teamvoided.dusk_debris.init.DuskEntities
@@ -45,7 +44,7 @@ class EnglishTranslationProvider(o: FabricDataOutput, r: CompletableFuture<Holde
     ) +
             DuskItemLists.THROWABLE_BOMB_ITEM_LIST +
             DuskItemLists.GUNPOWDER_BARREL_ITEM_LIST +
-            DuskItemLists.DECORATIVE_GOLD_SKELETON_ITEM_LIST +
+            DuskItemLists.OCEAN_METALS_ITEM_LIST +
             DuskItemLists.SPAWN_EGGS_ITEM_LIST
     val blocks = listOf(
         DuskBlocks.GUNPOWDER

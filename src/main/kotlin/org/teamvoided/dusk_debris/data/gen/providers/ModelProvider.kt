@@ -66,6 +66,11 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
 
         gen.registerSimpleCubeAll(DuskBlocks.TREACHEROUS_GOLD_BLOCK)
         gen.registerSimpleCubeAll(DuskBlocks.TARNISHED_GOLD_BLOCK)
+        gen.registerSimpleCubeAll(DuskBlocks.LOST_SILVER_BLOCK)
+        gen.registerSimpleCubeAll(DuskBlocks.SUNKEN_BRONZE_BLOCK)
+        DuskBlockLists.COIN_STACK_BLOCK_LIST.forEach {
+            gen.registerCoinStack(it)
+        }
         DuskBlockLists.VESSEL_BLOCK_LIST.forEach {
             gen.registerDecorativeGoldBlock(it,"parent/mysterious_vessel", true)
         }
@@ -78,6 +83,7 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
         DuskBlockLists.CROWN_BLOCK_LIST.forEach {
             gen.registerDecorativeGoldBlock(it, "parent/royal_crown", false)
         }
+        gen.registerDecorativeGoldBlock(DuskBlocks.LEGENDARY_CRYSTAL_CROWN, "parent/legendary_crown", false)
 
         gen.registerNethershroom(DuskBlocks.BLUE_NETHERSHROOM)
         gen.registerNethershroom(DuskBlocks.PURPLE_NETHERSHROOM)

@@ -74,10 +74,6 @@ open class MysteriousVesselBlock(settings: Settings) : HorizontalFacingBlock(set
         return SHAPE
     }
 
-    override fun getCullingShape(state: BlockState, world: BlockView, pos: BlockPos): VoxelShape {
-        return VoxelShapes.empty()
-    }
-
     override fun appendProperties(builder: StateManager.Builder<Block, BlockState>) {
         builder.add(FACING, WATERLOGGED)
     }

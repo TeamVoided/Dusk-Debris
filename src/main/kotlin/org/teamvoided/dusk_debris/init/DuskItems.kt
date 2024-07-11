@@ -101,6 +101,15 @@ object DuskItems {
     val TARNISHED_GOLD_BLOCK = register(
         "tarnished_gold_block", BlockItem(DuskBlocks.TARNISHED_GOLD_BLOCK, Item.Settings())
     )
+    val LOST_SILVER_BLOCK = register(
+        "lost_silver_block", BlockItem(DuskBlocks.LOST_SILVER_BLOCK, Item.Settings())
+    )
+    val SUNKEN_BRONZE_BLOCK = register(
+        "sunken_bronze_block", BlockItem(DuskBlocks.SUNKEN_BRONZE_BLOCK, Item.Settings())
+    )
+    val GOLD_COINS = register(
+        "gold_coins", BlockItem(DuskBlocks.GOLD_COINS, Item.Settings().maxCount(64))
+    )
     val GOLDEN_VESSEL =
         register("golden_vessel", BlockItem(DuskBlocks.GOLDEN_VESSEL, Item.Settings().maxCount(16)))
     val LAPIS_RELIC =
@@ -125,6 +134,11 @@ object DuskItems {
         register(
             "golden_quartz_crown",
             EquipableBlockItemItem(DuskBlocks.GOLDEN_QUARTZ_CROWN, Item.Settings().maxCount(16))
+        )
+    val LEGENDARY_CRYSTAL_CROWN =
+        register(
+            "legendary_crystal_crown",
+            EquipableBlockItemItem(DuskBlocks.LEGENDARY_CRYSTAL_CROWN, Item.Settings().maxCount(16))
         )
 
     val PAPER_BLOCK = register("paper_block", BlockItem(DuskBlocks.PAPER_BLOCK))

@@ -35,7 +35,7 @@ object DuskItemGroups {
                         ItemStack(DuskItems.BLACKSTONE_HOE)
                     )
                 )
-                entries.addItems(DuskItemLists.DECORATIVE_GOLD_SKELETON_ITEM_LIST)
+                entries.addItems(DuskItemLists.OCEAN_METALS_ITEM_LIST)
                 entries.addItems(DuskItemLists.SPAWN_EGGS_ITEM_LIST)
                 entries.addStacks(
                     mutableSetOf(

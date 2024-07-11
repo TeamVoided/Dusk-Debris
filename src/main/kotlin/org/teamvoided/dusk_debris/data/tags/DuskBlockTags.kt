@@ -13,6 +13,7 @@ object DuskBlockTags {
     val GUNPOWDER_BARRELS = create("gunpowder_barrels")
     val FIREBOMB_DESTROYS = create("firebomb_destroys")
     val BLUNDERBOMB_DESTROYS = create("blunderbomb_destroys")
+    val GEYSER_PERSISTANT = create("geyser_persistant")
     val GUNPOWDER_BARREL_DESTROYS = create("gunpowder_barrel_destroys")
     val NETHERSHROOM_GROWABLE_ON = create("nethershroom_growable_on")
     val NETHERSHROOM_REPLACEABLE = create("nethershroom_replaceable")

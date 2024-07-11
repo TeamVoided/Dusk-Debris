@@ -1,6 +1,7 @@
 package org.teamvoided.dusk_debris.util
 
 import net.minecraft.block.Block
+import net.minecraft.block.Blocks
 import net.minecraft.block.enums.JigsawOrientation
 import net.minecraft.block.enums.WireConnection
 import net.minecraft.data.client.model.*
@@ -236,10 +237,10 @@ fun BlockStateModelGenerator.registerChalice(chalice: Block) {
     val texture = Texture()
         .put(TextureKey.PARTICLE, Texture.getId(chalice.asItem()))
         .put(TextureKey.ALL, Texture.getId(chalice))
-    val templateChalice1 = block("parent/gilded_chalice", TextureKey.ALL, TextureKey.PARTICLE)
-    val templateChalice2 = block("parent/gilded_chalices_2", TextureKey.ALL, TextureKey.PARTICLE)
-    val templateChalice3 = block("parent/gilded_chalices_3", TextureKey.ALL, TextureKey.PARTICLE)
-    val templateChalice4 = block("parent/gilded_chalices_4", TextureKey.ALL, TextureKey.PARTICLE)
+    val templateChalice1 = block("parent/gilded_chalice", TextureKey.PARTICLE, TextureKey.ALL)
+    val templateChalice2 = block("parent/gilded_chalices_2", TextureKey.PARTICLE, TextureKey.ALL)
+    val templateChalice3 = block("parent/gilded_chalices_3", TextureKey.PARTICLE, TextureKey.ALL)
+    val templateChalice4 = block("parent/gilded_chalices_4", TextureKey.PARTICLE, TextureKey.ALL)
     val chalices1 = templateChalice1.upload(chalice, "_one_chalice", texture, this.modelCollector)
     val chalices2 = templateChalice2.upload(chalice, "_two_chalices", texture, this.modelCollector)
     val chalices3 = templateChalice3.upload(chalice, "_three_chalices", texture, this.modelCollector)
@@ -252,6 +253,32 @@ fun BlockStateModelGenerator.registerChalice(chalice: Block) {
                 .register(3, BlockStateVariant.create().put(VariantSettings.MODEL, chalices3))
                 .register(4, BlockStateVariant.create().put(VariantSettings.MODEL, chalices4))
         ).coordinate(BlockStateModelGenerator.createNorthDefaultHorizontalRotationStates())
+    )
+}
+
+fun BlockStateModelGenerator.registerCoinStack(block: Block) {
+    this.registerItemModel(block, "_top")
+    val texture = Texture()
+        .put(TextureKey.PARTICLE, Texture.getSubId(block, "_top"))
+        .put(TextureKey.TOP, Texture.getSubId(block, "_top"))
+        .put(TextureKey.SIDE, Texture.getSubId(block, "_side"))
+    this.blockStateCollector.accept(
+        VariantsBlockStateSupplier.create(block).coordinate(
+            BlockStateVariantMap.create(Properties.LAYERS)
+                .register { integer: Int ->
+                    BlockStateVariant.create()
+                        .put(
+                            VariantSettings.MODEL,
+                            block(
+                                "parent/template_coin_stack_$integer",
+                                TextureKey.PARTICLE,
+                                TextureKey.TOP,
+                                TextureKey.SIDE
+                            ).upload(block, "_$integer", texture, this.modelCollector)
+//                            ModelIds.getBlockSubModelId(block, "_$integer")
+                        )
+                })
+            .coordinate(BlockStateModelGenerator.createNorthDefaultHorizontalRotationStates())
     )
 }
 
@@ -353,13 +380,13 @@ fun BlockStateModelGenerator.registerRibbon(block: Block) {
     this.excludeFromSimpleItemModelGeneration(block)
     this.registerItemModel(block.asItem())
     this.blockStateCollector.accept(
-        VariantsBlockStateSupplier.create(block, *(getRibbonBlockStateVariants(block, 4).toTypedArray()))
+        VariantsBlockStateSupplier.create(block, *(getRibbonBlockStateVariants(block).toTypedArray()))
             .coordinate(BlockStateModelGenerator.createAxisRotatedVariantMap())
     )
 }
 
-fun BlockStateModelGenerator.getRibbonBlockStateVariants(block: Block, variants: Int): List<BlockStateVariant> {
-    return IntStream.range(1, variants + 1).mapToObj { variant ->
+fun BlockStateModelGenerator.getRibbonBlockStateVariants(block: Block): List<BlockStateVariant> {
+    return IntStream.range(1, 5).mapToObj { variant ->
         BlockStateVariant.create().put(
             VariantSettings.MODEL,
             this.makeRibbonModel(block, variant)

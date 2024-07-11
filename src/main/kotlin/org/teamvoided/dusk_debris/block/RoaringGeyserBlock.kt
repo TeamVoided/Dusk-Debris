@@ -14,10 +14,12 @@ import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Box
 import net.minecraft.util.random.RandomGenerator
 import net.minecraft.world.World
+import org.teamvoided.dusk_debris.data.tags.DuskBlockTags
 import org.teamvoided.dusk_debris.data.tags.DuskEntityTypeTags
 import org.teamvoided.dusk_debris.init.DuskBlocks
+import org.teamvoided.dusk_debris.init.DuskParticles
 
-class RoaringGeyserBlock(val blockAfterFinish: Block, settings: Settings) :
+class RoaringGeyserBlock(settings: Settings) :
     Block(settings) {
     public override fun getCodec(): MapCodec<RoaringGeyserBlock> {
         return CODEC
@@ -36,12 +38,15 @@ class RoaringGeyserBlock(val blockAfterFinish: Block, settings: Settings) :
     }
 
     override fun getPlacementState(ctx: ItemPlacementContext): BlockState {
-        val blockState = defaultState.with(PERSISTENT, true)
-        return blockState
+        if (ctx.world.getBlockState(ctx.blockPos.down()).isIn(DuskBlockTags.GEYSER_PERSISTANT)) {
+            ctx.world.scheduleBlockTick(ctx.blockPos, this, 20)
+            return defaultState.with(ACTIVE, true).with(PERSISTENT, true)
+        }
+        return defaultState
     }
 
     override fun randomTick(state: BlockState, world: ServerWorld, pos: BlockPos, random: RandomGenerator) {
-        if (state.get(PERSISTENT)) {
+        if (!state.get(PERSISTENT) && random.range(0, 6) == 0) {
             world.setBlockState(pos, state.with(ACTIVE, true))
             world.scheduleBlockTick(pos, state.block, random.nextInt(40))
             super.randomTick(state, world, pos, random)
@@ -49,31 +54,28 @@ class RoaringGeyserBlock(val blockAfterFinish: Block, settings: Settings) :
     }
 
     override fun scheduledTick(state: BlockState, world: ServerWorld, pos: BlockPos, random: RandomGenerator) {
-        if (state.get(ACTIVE) && random.nextFloat() > 0.2) {
+        if (state.get(PERSISTENT) || (state.get(ACTIVE) && random.range(0, 5) != 0)) {
             geyser(pos, world)
             world.scheduleBlockTick(pos, state.block, random.nextInt(90) + 10)
         } else {
-            if (state.get(PERSISTENT)) {
-                world.setBlockState(pos, state.with(ACTIVE, false))
-            } else {
-                world.setBlockState(pos, blockAfterFinish.defaultState)
-            }
+            world.setBlockState(pos, state.with(ACTIVE, false))
         }
         super.scheduledTick(state, world, pos, random)
     }
 
     override fun randomDisplayTick(state: BlockState, world: World, pos: BlockPos, random: RandomGenerator) {
         if (state.get(ACTIVE)) {
-            world.addParticle(
-                ParticleTypes.CAMPFIRE_COSY_SMOKE,
-                true,
-                pos.x + 0.5,
-                pos.y + 1.0,
-                pos.z + 0.5,
-                0.0,
-                0.1,
-                0.0
-            )
+            for (i in 0..random.range(3, 10))
+                world.addParticle(
+                    DuskParticles.GEYSER,
+                    true,
+                    pos.x + 0.5,
+                    pos.y + 1.0,
+                    pos.z + 0.5,
+                    0.0,
+                    0.0,
+                    0.0
+                )
         }
         super.randomDisplayTick(state, world, pos, random)
     }
@@ -82,7 +84,7 @@ class RoaringGeyserBlock(val blockAfterFinish: Block, settings: Settings) :
         val entitiesInRange = world.getOtherEntities(
             null, Box(
                 pos.x - 0.5,
-                pos.y + 0.5,
+                pos.y + 1.0,
                 pos.z - 0.5,
                 pos.x + 1.5,
                 pos.y + 2.5,
@@ -92,22 +94,14 @@ class RoaringGeyserBlock(val blockAfterFinish: Block, settings: Settings) :
         return entitiesInRange.forEach {
             println(it.type)
             val vec3d = it.velocity
-            it.setVelocity(vec3d.x, vec3d.y + 1.5, vec3d.z)
+            it.setVelocity(vec3d.x, vec3d.y + 1.75, vec3d.z)
+            it.velocityModified = true
         }
     }
-
-//    private fun bounce(entity: Entity) {
-//        val vec3d = entity.velocity
-//        if (vec3d.y < 0.0) {
-//            val d = if (entity is LivingEntity) 1.0 else 0.8
-//            entity.setVelocity(vec3d.x, -vec3d.y * d, vec3d.z)
-//        }
-//    }
 
     companion object {
         val CODEC: MapCodec<RoaringGeyserBlock> = createCodec { settings: Settings ->
             RoaringGeyserBlock(
-                DuskBlocks.VOLCANIC_SAND,
                 settings
             )
         }

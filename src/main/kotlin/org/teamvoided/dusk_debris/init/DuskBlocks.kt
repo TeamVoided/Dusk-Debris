@@ -207,18 +207,40 @@ object DuskBlocks {
 
     val TREACHEROUS_GOLD_BLOCK = register(
         "treacherous_gold_block", Block(
-            AbstractBlock.Settings.variantOf(GOLD_BLOCK)
+            AbstractBlock.Settings.variantOf(GOLD_BLOCK).strength(3.5f, 6.0f)
         )
     )
     val TARNISHED_GOLD_BLOCK = register(
         "tarnished_gold_block", Block(
-            AbstractBlock.Settings.variantOf(TREACHEROUS_GOLD_BLOCK).mapColor(TERRACOTTA.defaultMapColor)
+            AbstractBlock.Settings.variantOf(TREACHEROUS_GOLD_BLOCK).mapColor(MapColor.YELLOW_TERRACOTTA)
+                .strength(3.5f, 6.0f)
         )
     )
+    val LOST_SILVER_BLOCK = register(
+        "lost_silver_block", Block(
+            AbstractBlock.Settings.create().mapColor(MapColor.METAL).toolRequired().strength(3.5f, 6.0f)
+                .sounds(BlockSoundGroup.METAL)
+        )
+    )
+    val SUNKEN_BRONZE_BLOCK = register(
+        "sunken_bronze_block", Block(
+            AbstractBlock.Settings.create().mapColor(MapColor.BLACK_TERRACOTTA).toolRequired().strength(3.5f, 6.0f)
+                .sounds(BlockSoundGroup.METAL)
+        )
+    )
+
+    val GOLD_COINS = register(
+        "gold_coins", CoinStackBlock(
+            AbstractBlock.Settings.create().mapColor(TREACHEROUS_GOLD_BLOCK.defaultMapColor)
+                .pistonBehavior(PistonBehavior.DESTROY)
+        )
+    )
+
     val GOLDEN_VESSEL = register(
         "golden_vessel",
         MysteriousVesselBlock(
-            AbstractBlock.Settings.create().mapColor(GOLD_BLOCK.defaultMapColor).pistonBehavior(PistonBehavior.DESTROY)
+            AbstractBlock.Settings.create().mapColor(TREACHEROUS_GOLD_BLOCK.defaultMapColor)
+                .pistonBehavior(PistonBehavior.DESTROY)
         )
     )
     val LAPIS_RELIC = register(
@@ -228,7 +250,8 @@ object DuskBlocks {
     )
     val GILDED_CHALICE = register(
         "gilded_chalice", GildedChaliceBlock(
-            AbstractBlock.Settings.create().mapColor(GOLD_BLOCK.defaultMapColor).pistonBehavior(PistonBehavior.DESTROY)
+            AbstractBlock.Settings.create().mapColor(TREACHEROUS_GOLD_BLOCK.defaultMapColor)
+                .pistonBehavior(PistonBehavior.DESTROY)
         )
     )
     val SILVERED_CHALICE = register(
@@ -250,6 +273,13 @@ object DuskBlocks {
     val GOLDEN_QUARTZ_CROWN = register(
         "golden_quartz_crown", RoyalCrownBlock(
             AbstractBlock.Settings.create().mapColor(QUARTZ_BLOCK.defaultMapColor)
+                .pistonBehavior(PistonBehavior.DESTROY)
+        )
+    )
+
+    val LEGENDARY_CRYSTAL_CROWN = register(
+        "legendary_crystal_crown", RoyalCrownBlock(
+            AbstractBlock.Settings.create().mapColor(DIAMOND_BLOCK.defaultMapColor)
                 .pistonBehavior(PistonBehavior.DESTROY)
         )
     )
@@ -434,7 +464,7 @@ object DuskBlocks {
     )
     val ROARING_GEYSER = register(
         "roaring_geyser",
-        RoaringGeyserBlock(VOLCANIC_SAND, AbstractBlock.Settings.create().ticksRandomly())
+        RoaringGeyserBlock(AbstractBlock.Settings.create().ticksRandomly())
     )
     val VOLCANIC_SANDSTONE = register(
         "volcanic_sandstone",
