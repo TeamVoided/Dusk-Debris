@@ -4,16 +4,22 @@ import com.mojang.serialization.MapCodec
 import net.minecraft.block.Block
 import net.minecraft.block.BlockState
 import net.minecraft.block.ShapeContext
+import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.ItemPlacementContext
+import net.minecraft.server.world.ServerWorld
 import net.minecraft.state.StateManager
 import net.minecraft.state.property.IntProperty
 import net.minecraft.state.property.Properties
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
+import net.minecraft.util.random.RandomGenerator
 import net.minecraft.util.shape.VoxelShape
 import net.minecraft.util.shape.VoxelShapes
 import net.minecraft.world.BlockView
+import net.minecraft.world.World
+import net.minecraft.world.WorldAccess
 import net.minecraft.world.WorldView
+import net.minecraft.world.event.GameEvent
 import org.teamvoided.dusk_debris.util.rotate
 
 class CoinStackBlock(settings: Settings) : MysteriousVesselBlock(settings) {
@@ -29,10 +35,10 @@ class CoinStackBlock(settings: Settings) : MysteriousVesselBlock(settings) {
         super.appendProperties(builder)
         builder.add(LAYERS)
     }
+
     override fun canPlaceAt(state: BlockState, world: WorldView, pos: BlockPos): Boolean {
         val blockStateDown = world.getBlockState(pos.down())
-        if (blockStateDown.isOf(this) && state.get(LAYERS) == 8)
-        {
+        if (blockStateDown.isOf(this) && blockStateDown.get(LAYERS) == 8) {
             return true
         }
         return super.canPlaceAt(state, world, pos)
@@ -82,6 +88,26 @@ class CoinStackBlock(settings: Settings) : MysteriousVesselBlock(settings) {
         return super.canReplace(state, context)
     }
 
+    override fun getStateForNeighborUpdate(
+        state: BlockState,
+        direction: Direction,
+        neighborState: BlockState,
+        world: WorldAccess,
+        pos: BlockPos,
+        neighborPos: BlockPos
+    ): BlockState {
+        if (!state.canPlaceAt(world, pos)) {
+            world.scheduleBlockTick(pos, this, 1)
+        }
+        return super.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos)
+    }
+
+    override fun scheduledTick(state: BlockState, world: ServerWorld, pos: BlockPos?, random: RandomGenerator?) {
+        if (!state.canPlaceAt(world, pos)) {
+            world.breakBlock(pos, true)
+        }
+    }
+
     companion object {
         val CODEC: MapCodec<CoinStackBlock> = createCodec { settings: Settings ->
             CoinStackBlock(
@@ -93,7 +119,7 @@ class CoinStackBlock(settings: Settings) : MysteriousVesselBlock(settings) {
         val COINS_3: VoxelShape = coinShape(3.0, 2.0, 5.0, 4.0, 3.0, 2.0, 1.0)
         val COINS_4: VoxelShape = coinShape(4.0, 5.0, 6.0, 7.0, 5.0, 4.0, 3.0)
         val COINS_5: VoxelShape = coinShape(6.0, 5.0, 8.0, 7.0, 7.0, 6.0, 5.0)
-        val COINS_6: VoxelShape = coinShape(8.0, 6.0, 10.0, 8.0, 11.0, 9.0, 7.0)
+        val COINS_6: VoxelShape = coinShape(9.0, 6.0, 10.0, 8.0, 11.0, 9.0, 7.0)
         val COINS_7: VoxelShape = coinShape(12.0, 10.0, 13.0, 14.0, 14.0, 13.0, 11.0)
         val COINS_8: VoxelShape = coinShape(16.0, 16.0, 16.0, 16.0, 16.0, 16.0, 16.0)
 

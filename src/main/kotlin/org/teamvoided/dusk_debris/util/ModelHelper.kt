@@ -1,7 +1,6 @@
 package org.teamvoided.dusk_debris.util
 
 import net.minecraft.block.Block
-import net.minecraft.block.Blocks
 import net.minecraft.block.enums.JigsawOrientation
 import net.minecraft.block.enums.WireConnection
 import net.minecraft.data.client.model.*
@@ -275,10 +274,33 @@ fun BlockStateModelGenerator.registerCoinStack(block: Block) {
                                 TextureKey.TOP,
                                 TextureKey.SIDE
                             ).upload(block, "_$integer", texture, this.modelCollector)
-//                            ModelIds.getBlockSubModelId(block, "_$integer")
                         )
                 })
             .coordinate(BlockStateModelGenerator.createNorthDefaultHorizontalRotationStates())
+    )
+}
+
+fun BlockStateModelGenerator.registerGoldPileBlock(block: Block, sideTexture: Identifier) {
+    this.registerItemModel(block.asItem())
+    val texture = Texture()
+        .put(TextureKey.PARTICLE, Texture.getId(block.asItem()))
+        .put(TextureKey.TOP, Texture.getSubId(block, "_top"))
+        .put(TextureKey.SIDE, sideTexture)
+    this.blockStateCollector.accept(
+        VariantsBlockStateSupplier.create(block).coordinate(
+            BlockStateVariantMap.create(Properties.LAYERS)
+                .register { integer: Int ->
+                    BlockStateVariant.create()
+                        .put(
+                            VariantSettings.MODEL,
+                            block(
+                                "parent/layered_column_block_" + integer * 2,
+                                TextureKey.PARTICLE,
+                                TextureKey.TOP,
+                                TextureKey.SIDE
+                            ).upload(block, "_$integer", texture, this.modelCollector)
+                        )
+                })
     )
 }
 

@@ -107,8 +107,11 @@ object DuskItems {
     val SUNKEN_BRONZE_BLOCK = register(
         "sunken_bronze_block", BlockItem(DuskBlocks.SUNKEN_BRONZE_BLOCK, Item.Settings())
     )
-    val GOLD_COINS = register(
-        "gold_coins", BlockItem(DuskBlocks.GOLD_COINS, Item.Settings().maxCount(64))
+    val TREACHEROUS_GOLD_COINS = register(
+        "gold_coins", BlockItem(DuskBlocks.TREACHEROUS_GOLD_COIN_STACK, Item.Settings().maxCount(64))
+    )
+    val TREACHEROUS_ASSORTED_GOLD_COINS = register(
+        "assorted_gold_coins", BlockItem(DuskBlocks.TREACHEROUS_GOLD_COIN_PILE, Item.Settings().maxCount(64))
     )
     val GOLDEN_VESSEL =
         register("golden_vessel", BlockItem(DuskBlocks.GOLDEN_VESSEL, Item.Settings().maxCount(16)))

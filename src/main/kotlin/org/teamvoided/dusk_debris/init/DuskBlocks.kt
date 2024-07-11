@@ -229,10 +229,20 @@ object DuskBlocks {
         )
     )
 
-    val GOLD_COINS = register(
-        "gold_coins", CoinStackBlock(
-            AbstractBlock.Settings.create().mapColor(TREACHEROUS_GOLD_BLOCK.defaultMapColor)
+    val TREACHEROUS_GOLD_COIN_STACK = register(
+        "treacherous_gold_coin_stack", CoinStackBlock(
+            AbstractBlock.Settings.create().mapColor(TREACHEROUS_GOLD_BLOCK.defaultMapColor).nonSolid().strength(0.2f)
                 .pistonBehavior(PistonBehavior.DESTROY)
+        )
+    )
+    val TREACHEROUS_GOLD_COIN_PILE = register(
+        "treacherous_gold_coin_pile", CoinPileBlock(
+            AbstractBlock.Settings.create().mapColor(TREACHEROUS_GOLD_COIN_STACK.defaultMapColor).nonSolid()
+                .strength(0.2f).sounds(BlockSoundGroup.METAL).blockVision { state: BlockState, _, _ ->
+                    state.get(
+                        CoinPileBlock.LAYERS
+                    ) >= CoinPileBlock.MAX_LAYERS
+                }.pistonBehavior(PistonBehavior.DESTROY)
         )
     )
 

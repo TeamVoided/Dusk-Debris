@@ -31,7 +31,10 @@ object DuskBlockLists {
         DuskBlocks.LIGHT_BLUE_RIBBON
     )
     val COIN_STACK_BLOCK_LIST = listOf(
-        DuskBlocks.GOLD_COINS
+        DuskBlocks.TREACHEROUS_GOLD_COIN_STACK
+    )
+    val COIN_PILE_BLOCK_LIST = listOf(
+        DuskBlocks.TREACHEROUS_GOLD_COIN_PILE
     )
     val VESSEL_BLOCK_LIST = listOf(
         DuskBlocks.GOLDEN_VESSEL
@@ -49,11 +52,14 @@ object DuskBlockLists {
         DuskBlocks.GOLDEN_QUARTZ_CROWN
     )
 
-    val DECORATIVE_WHATEVER_BLOCK_LIST = COIN_STACK_BLOCK_LIST +
-            VESSEL_BLOCK_LIST +
-            RELIC_BLOCK_LIST + CHALICE_BLOCK_LIST +
-            CROWN_BLOCK_LIST +
-            DuskBlocks.LEGENDARY_CRYSTAL_CROWN
+    val DECORATIVE_WHATEVER_BLOCK_LIST =
+        COIN_STACK_BLOCK_LIST +
+                COIN_PILE_BLOCK_LIST +
+                VESSEL_BLOCK_LIST +
+                RELIC_BLOCK_LIST +
+                CHALICE_BLOCK_LIST +
+                CROWN_BLOCK_LIST +
+                DuskBlocks.LEGENDARY_CRYSTAL_CROWN
     val PAPER_BLOCKS_LIST = listOf(
         DuskBlocks.PAPER_BLOCK
     )

@@ -25,7 +25,8 @@ object DuskItemLists {
     )
     val OCEAN_METALS_ITEM_LIST = listOf(
         DuskItems.TREACHEROUS_GOLD_BLOCK,
-        DuskItems.GOLD_COINS,
+        DuskItems.TREACHEROUS_GOLD_COINS,
+        DuskItems.TREACHEROUS_ASSORTED_GOLD_COINS,
         DuskItems.GOLDEN_VESSEL,
         DuskItems.LAPIS_RELIC,
         DuskItems.GILDED_CHALICE,

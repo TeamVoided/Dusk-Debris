@@ -3,11 +3,9 @@ package org.teamvoided.dusk_debris.data.gen.providers
 
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider
-import net.minecraft.block.Blocks
 import net.minecraft.data.client.ItemModelGenerator
 import net.minecraft.data.client.model.*
 import net.minecraft.util.Identifier
-import org.teamvoided.dusk_debris.DuskDebris.mc
 import org.teamvoided.dusk_debris.block.DuskBlockLists
 import org.teamvoided.dusk_debris.init.DuskBlocks
 import org.teamvoided.dusk_debris.init.DuskItems
@@ -71,11 +69,12 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
         DuskBlockLists.COIN_STACK_BLOCK_LIST.forEach {
             gen.registerCoinStack(it)
         }
+        gen.registerGoldPileBlock(DuskBlocks.TREACHEROUS_GOLD_COIN_PILE, Texture.getSubId(DuskBlocks.TREACHEROUS_GOLD_COIN_STACK, "_side"))
         DuskBlockLists.VESSEL_BLOCK_LIST.forEach {
-            gen.registerDecorativeGoldBlock(it,"parent/mysterious_vessel", true)
+            gen.registerDecorativeGoldBlock(it, "parent/mysterious_vessel", true)
         }
         DuskBlockLists.RELIC_BLOCK_LIST.forEach {
-            gen.registerDecorativeGoldBlock(it,"parent/peculiar_relic", true)
+            gen.registerDecorativeGoldBlock(it, "parent/peculiar_relic", true)
         }
         DuskBlockLists.CHALICE_BLOCK_LIST.forEach {
             gen.registerChalice(it)
