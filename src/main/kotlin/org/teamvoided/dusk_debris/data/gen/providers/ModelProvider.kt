@@ -110,6 +110,7 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
             .log(DuskBlocks.STRIPPED_CYPRESS_LOG)
             .wood(DuskBlocks.STRIPPED_CYPRESS_WOOD)
 
+        gen.registerGeyser(DuskBlocks.ROARING_GEYSER)
         gen.registerSimpleCubeAll(DuskBlocks.VOLCANIC_SAND)
         gen.registerDustable(DuskBlocks.SUSPICIOUS_VOLCANIC_SAND)
         gen.registerLog(DuskBlocks.CHARRED_LOG)

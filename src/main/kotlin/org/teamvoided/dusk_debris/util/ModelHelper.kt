@@ -4,6 +4,7 @@ import net.minecraft.block.Block
 import net.minecraft.block.enums.JigsawOrientation
 import net.minecraft.block.enums.WireConnection
 import net.minecraft.data.client.model.*
+import net.minecraft.data.client.model.BlockStateModelGenerator.createSingletonBlockState
 import net.minecraft.data.client.model.VariantSettings.Rotation
 import net.minecraft.item.Item
 import net.minecraft.state.property.Properties
@@ -12,6 +13,7 @@ import org.teamvoided.dusk_debris.DuskDebris.MODID
 import org.teamvoided.dusk_debris.DuskDebris.id
 import org.teamvoided.dusk_debris.block.GildedChaliceBlock
 import org.teamvoided.dusk_debris.block.NethershroomPlantBlock
+import org.teamvoided.dusk_debris.block.RoaringGeyserBlock
 import java.util.*
 import java.util.stream.IntStream
 
@@ -426,6 +428,35 @@ fun BlockStateModelGenerator.makeRibbonModel(block: Block, variant: Int): Identi
         TextureKey.ALL
     ).upload(block.modelSuffix("_$variant"), texture, this.modelCollector)
 }
+
+fun BlockStateModelGenerator.registerGeyser(block: Block) {
+    this.registerItemModel(block.asItem())
+    val texture = Texture()
+        .put(TextureKey.SIDE, Texture.getSubId(block, "_side"))
+
+    val modelActive: Identifier = Models.CUBE_BOTTOM_TOP.upload(
+        block,
+        texture
+            .put(TextureKey.TOP, Texture.getSubId(block, "_active"))
+            .put(TextureKey.BOTTOM, Texture.getSubId(block, "_inactive")),
+        this.modelCollector
+    )
+    val modelInctive: Identifier = Models.CUBE_COLUMN.upload(
+        block,
+        texture.put(TextureKey.END, Texture.getSubId(block, "_inactive")),
+        this.modelCollector
+    )
+    this.blockStateCollector.accept(
+        VariantsBlockStateSupplier.create(block).coordinate(
+            BlockStateModelGenerator.createBooleanModelMap(
+                RoaringGeyserBlock.ACTIVE,
+                modelActive,
+                modelInctive
+            )
+        )
+    )
+}
+
 
 fun parentedItemModel(id: Identifier) = Model(Optional.of(id.withPrefix("item/")), Optional.empty())
 fun BlockStateModelGenerator.registerParentedItemModel(block: Block) =
