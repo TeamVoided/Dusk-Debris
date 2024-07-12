@@ -17,59 +17,20 @@ data class CypressRootConfig(
     val maxRootLength: Int,
     val randomSkewChance: Float
 ) {
-    fun canGrowThrough(): HolderSet<Block> {
-        return this.canGrowThrough
-    }
-
-    fun muddyRootsIn(): HolderSet<Block> {
-        return this.muddyRootsIn
-    }
-
-    fun muddyRootsProvider(): BlockStateProvider {
-        return this.muddyRootsProvider
-    }
-
-    fun maxRootWidth(): Int {
-        return this.maxRootWidth
-    }
-
-    fun maxRootLength(): Int {
-        return this.maxRootLength
-    }
-
-    fun randomSkewChance(): Float {
-        return this.randomSkewChance
-    }
-
     companion object {
-        val CODEC: Codec<CypressRootConfig> =
-            RecordCodecBuilder.create { instance: RecordCodecBuilder.Instance<CypressRootConfig> ->
-                instance.group(
-                    RegistryCodecs.homogeneousList(RegistryKeys.BLOCK)
-                        .fieldOf("can_grow_through")
-                        .forGetter { placement: CypressRootConfig -> placement.canGrowThrough },
-                    RegistryCodecs.homogeneousList(RegistryKeys.BLOCK).fieldOf("muddy_roots_in")
-                        .forGetter { placement: CypressRootConfig -> placement.muddyRootsIn },
-                    BlockStateProvider.TYPE_CODEC.fieldOf("muddy_roots_provider")
-                        .forGetter { placement: CypressRootConfig -> placement.muddyRootsProvider },
-                    Codec.intRange(1, 12).fieldOf("max_root_width")
-                        .forGetter { placement: CypressRootConfig -> placement.maxRootWidth },
-                    Codec.intRange(1, 64).fieldOf("max_root_length")
-                        .forGetter { placement: CypressRootConfig -> placement.maxRootLength },
-                    Codec.floatRange(0.0f, 1.0f).fieldOf("random_skew_chance")
-                        .forGetter { placement: CypressRootConfig -> placement.randomSkewChance }
-                ).apply(
-                    instance
-                ) { canGrowThrough: HolderSet<Block>, muddyRootsIn: HolderSet<Block>, muddyRootsProvider: BlockStateProvider, maxRootWidth: Int, maxRootLength: Int, randomSkewChance: Float ->
-                    CypressRootConfig(
-                        canGrowThrough,
-                        muddyRootsIn,
-                        muddyRootsProvider,
-                        maxRootWidth,
-                        maxRootLength,
-                        randomSkewChance
-                    )
-                }
-            }
+        val CODEC: Codec<CypressRootConfig> = RecordCodecBuilder.create {
+            it.group(
+                RegistryCodecs.homogeneousList(RegistryKeys.BLOCK)
+                    .fieldOf("can_grow_through").forGetter(CypressRootConfig::canGrowThrough),
+                RegistryCodecs.homogeneousList(RegistryKeys.BLOCK).fieldOf("muddy_roots_in")
+                    .forGetter { placement: CypressRootConfig -> placement.muddyRootsIn },
+                BlockStateProvider.TYPE_CODEC.fieldOf("muddy_roots_provider")
+                    .forGetter(CypressRootConfig::muddyRootsProvider),
+                Codec.intRange(1, 12).fieldOf("max_root_width").forGetter(CypressRootConfig::maxRootWidth),
+                Codec.intRange(1, 64).fieldOf("max_root_length").forGetter(CypressRootConfig::maxRootLength),
+                Codec.floatRange(0.0f, 1.0f).fieldOf("random_skew_chance")
+                    .forGetter(CypressRootConfig::randomSkewChance)
+            ).apply(it, ::CypressRootConfig)
+        }
     }
 }
