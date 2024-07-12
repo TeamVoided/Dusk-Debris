@@ -70,6 +70,9 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
             gen.registerCoinStack(it)
         }
         gen.registerGoldPileBlock(DuskBlocks.TREACHEROUS_GOLD_COIN_PILE, Texture.getSubId(DuskBlocks.TREACHEROUS_GOLD_COIN_STACK, "_side"))
+        gen.registerGoldPileBlock(DuskBlocks.TARNISHED_GOLD_COIN_PILE, Texture.getSubId(DuskBlocks.TARNISHED_GOLD_COIN_STACK, "_side"))
+        gen.registerGoldPileBlock(DuskBlocks.LOST_SILVER_COIN_PILE, Texture.getSubId(DuskBlocks.LOST_SILVER_COIN_STACK, "_side"))
+        gen.registerGoldPileBlock(DuskBlocks.SUNKEN_BRONZE_COIN_PILE, Texture.getSubId(DuskBlocks.SUNKEN_BRONZE_COIN_STACK, "_side"))
         DuskBlockLists.VESSEL_BLOCK_LIST.forEach {
             gen.registerDecorativeGoldBlock(it, "parent/mysterious_vessel", true)
         }

@@ -3,7 +3,6 @@ accessible method net/minecraft/block/Blocks legacyStairsOf (Lnet/minecraft/bloc
 accessible method net/minecraft/util/Identifier <init> (Ljava/lang/String;Ljava/lang/String;)V
 accessible field net/minecraft/data/client/model/BlockStateModelGenerator sandstoneModels Ljava/util/Map;
 mutable field net/minecraft/data/client/model/BlockStateModelGenerator sandstoneModels Ljava/util/Map;
-accessible method net/minecraft/block/sign/SignType register (Lnet/minecraft/block/sign/SignType;)Lnet/minecraft/block/sign/SignType;
 accessible field net/minecraft/entity/Entity random Lnet/minecraft/util/random/RandomGenerator;
 accessible method net/minecraft/data/client/model/Models block (Ljava/lang/String;[Lnet/minecraft/data/client/model/TextureKey;)Lnet/minecraft/data/client/model/Model;
 accessible class net/minecraft/client/particle/ParticleManager$SpriteAwareFactory
@@ -11,3 +10,4 @@ accessible method net/minecraft/client/particle/WaterSuspendParticle <init> (Lne
 accessible field net/minecraft/client/particle/Particle gravityStrength F
 accessible method net/minecraft/util/SpawnUtil method_42121 (Lnet/minecraft/server/world/ServerWorld;ILnet/minecraft/util/math/BlockPos$Mutable;Lnet/minecraft/util/SpawnUtil$Strategy;)Z
 accessible method net/minecraft/entity/mob/AbstractSkeletonEntity getStepSound ()Lnet/minecraft/sound/SoundEvent;
+accessible method net/minecraft/block/WoodType register (Lnet/minecraft/block/WoodType;)Lnet/minecraft/block/WoodType;

@@ -5,6 +5,8 @@ import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry
 import net.minecraft.client.render.RenderLayer
+import net.minecraft.client.render.block.entity.BlockEntityRendererFactories
+import net.minecraft.client.render.block.entity.ChestBlockEntityRenderer
 import net.minecraft.client.render.entity.EmptyEntityRenderer
 import net.minecraft.client.render.entity.FlyingItemEntityRenderer
 import net.minecraft.component.type.DyedColorComponent
@@ -16,10 +18,7 @@ import org.teamvoided.dusk_debris.entity.DuskEntityLists.THROWABLE_BOMB_ENTITIES
 import org.teamvoided.dusk_debris.entity.DuskEntityModelLayers
 import org.teamvoided.dusk_debris.entity.gunpowder_barrel.GunpowderBarrelEntityRenderer
 import org.teamvoided.dusk_debris.entity.skeleton.GloomEntityRenderer
-import org.teamvoided.dusk_debris.init.DuskBlocks
-import org.teamvoided.dusk_debris.init.DuskEntities
-import org.teamvoided.dusk_debris.init.DuskItems
-import org.teamvoided.dusk_debris.init.DuskParticles
+import org.teamvoided.dusk_debris.init.*
 import org.teamvoided.dusk_debris.particle.*
 
 @Suppress("unused")
@@ -58,6 +57,8 @@ object DuskDebrisClient {
         EntityRendererRegistry.register(DuskEntities.GUNPOWDER_BARREL, ::GunpowderBarrelEntityRenderer)
         EntityRendererRegistry.register(DuskEntities.GLOOM, ::GloomEntityRenderer)
 //        BuiltinItemRendererRegistry.INSTANCE.register(DuskItems.STRAY_SKULL)
+
+        BlockEntityRendererFactories.register(DuskBlockEntities.TREASURE_CHEST, ::ChestBlockEntityRenderer)
 
 
         THROWABLE_BOMB_ENTITIES.forEach {

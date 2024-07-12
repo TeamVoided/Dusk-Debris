@@ -107,12 +107,32 @@ object DuskItems {
     val SUNKEN_BRONZE_BLOCK = register(
         "sunken_bronze_block", BlockItem(DuskBlocks.SUNKEN_BRONZE_BLOCK, Item.Settings())
     )
+
     val TREACHEROUS_GOLD_COINS = register(
-        "gold_coins", BlockItem(DuskBlocks.TREACHEROUS_GOLD_COIN_STACK, Item.Settings().maxCount(64))
+        "treacherous_gold_coins", BlockItem(DuskBlocks.TREACHEROUS_GOLD_COIN_STACK, Item.Settings().maxCount(64))
     )
     val TREACHEROUS_ASSORTED_GOLD_COINS = register(
-        "assorted_gold_coins", BlockItem(DuskBlocks.TREACHEROUS_GOLD_COIN_PILE, Item.Settings().maxCount(64))
+        "treacherous_assorted_gold_coins", BlockItem(DuskBlocks.TREACHEROUS_GOLD_COIN_PILE, Item.Settings().maxCount(64))
     )
+    val TARNISHED_GOLD_COINS = register(
+        "tarnished_gold_coins", BlockItem(DuskBlocks.TARNISHED_GOLD_COIN_STACK, Item.Settings().maxCount(64))
+    )
+    val TARNISHED_ASSORTED_GOLD_COINS = register(
+        "tarnished_assorted_gold_coins", BlockItem(DuskBlocks.TARNISHED_GOLD_COIN_PILE, Item.Settings().maxCount(64))
+    )
+    val LOST_SILVER_COINS = register(
+        "lost_silver_coins", BlockItem(DuskBlocks.LOST_SILVER_COIN_STACK, Item.Settings().maxCount(64))
+    )
+    val LOST_ASSORTED_SILVER_COINS = register(
+        "lost_assorted_silver_coins", BlockItem(DuskBlocks.LOST_SILVER_COIN_PILE, Item.Settings().maxCount(64))
+    )
+    val SUNKEN_BRONZE_COINS = register(
+        "sunken_bronze_coins", BlockItem(DuskBlocks.SUNKEN_BRONZE_COIN_STACK, Item.Settings().maxCount(64))
+    )
+    val SUNKEN_ASSORTED_BRONZE_COINS = register(
+        "sunken_assorted_bronze_coins", BlockItem(DuskBlocks.SUNKEN_BRONZE_COIN_PILE, Item.Settings().maxCount(64))
+    )
+
     val GOLDEN_VESSEL =
         register("golden_vessel", BlockItem(DuskBlocks.GOLDEN_VESSEL, Item.Settings().maxCount(16)))
     val LAPIS_RELIC =
@@ -143,6 +163,10 @@ object DuskItems {
             "legendary_crystal_crown",
             EquipableBlockItemItem(DuskBlocks.LEGENDARY_CRYSTAL_CROWN, Item.Settings().maxCount(16))
         )
+    val FORGOTTEN_CHEST = register(
+        "forgotten_chest",
+        EquipableBlockItemItem(DuskBlocks.FORGOTTEN_CHEST, Item.Settings())
+    )
 
     val PAPER_BLOCK = register("paper_block", BlockItem(DuskBlocks.PAPER_BLOCK))
 

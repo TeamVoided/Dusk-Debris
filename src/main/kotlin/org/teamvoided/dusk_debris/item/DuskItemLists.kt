@@ -35,11 +35,17 @@ object DuskItemLists {
         DuskItems.GOLDEN_QUARTZ_CROWN,
 
         DuskItems.TARNISHED_GOLD_BLOCK,
+        DuskItems.TARNISHED_GOLD_COINS,
+        DuskItems.TARNISHED_ASSORTED_GOLD_COINS,
 
         DuskItems.LOST_SILVER_BLOCK,
+        DuskItems.LOST_SILVER_COINS,
+        DuskItems.LOST_ASSORTED_SILVER_COINS,
         DuskItems.SILVERED_CHALICE,
 
         DuskItems.SUNKEN_BRONZE_BLOCK,
+        DuskItems.SUNKEN_ASSORTED_BRONZE_COINS,
+        DuskItems.SUNKEN_BRONZE_COINS,
 
         DuskItems.LEGENDARY_CRYSTAL_CROWN
     )

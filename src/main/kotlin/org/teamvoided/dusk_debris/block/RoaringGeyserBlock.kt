@@ -12,12 +12,16 @@ import net.minecraft.state.property.BooleanProperty
 import net.minecraft.state.property.Properties
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Box
+import net.minecraft.util.math.Direction
+import net.minecraft.util.math.Vec3d
 import net.minecraft.util.random.RandomGenerator
 import net.minecraft.world.World
+import net.minecraft.world.WorldAccess
 import org.teamvoided.dusk_debris.data.tags.DuskBlockTags
 import org.teamvoided.dusk_debris.data.tags.DuskEntityTypeTags
 import org.teamvoided.dusk_debris.init.DuskBlocks
 import org.teamvoided.dusk_debris.init.DuskParticles
+import org.teamvoided.dusk_debris.util.spawnParticles
 
 class RoaringGeyserBlock(settings: Settings) :
     Block(settings) {
@@ -45,10 +49,25 @@ class RoaringGeyserBlock(settings: Settings) :
         return defaultState
     }
 
+    override fun getStateForNeighborUpdate(
+        state: BlockState,
+        direction: Direction,
+        neighborState: BlockState,
+        world: WorldAccess,
+        pos: BlockPos,
+        neighborPos: BlockPos
+    ): BlockState {
+        if (!world.getBlockState(pos.down()).isIn(DuskBlockTags.GEYSER_PERSISTANT)) {
+            world.scheduleBlockTick(pos, this, 20)
+            return state.with(PERSISTENT, true).with(ACTIVE, true)
+        }
+        return state.with(PERSISTENT, false)
+    }
+
     override fun randomTick(state: BlockState, world: ServerWorld, pos: BlockPos, random: RandomGenerator) {
-        if (!state.get(PERSISTENT) && random.range(0, 6) == 0) {
+        if (!state.get(PERSISTENT) && random.range(0, 8) == 0) {
             world.setBlockState(pos, state.with(ACTIVE, true))
-            world.scheduleBlockTick(pos, state.block, random.nextInt(40))
+            world.scheduleBlockTick(pos, state.block, random.nextInt(100))
             super.randomTick(state, world, pos, random)
         }
     }
@@ -56,7 +75,7 @@ class RoaringGeyserBlock(settings: Settings) :
     override fun scheduledTick(state: BlockState, world: ServerWorld, pos: BlockPos, random: RandomGenerator) {
         if (state.get(PERSISTENT) || (state.get(ACTIVE) && random.range(0, 5) != 0)) {
             geyser(pos, world)
-            world.scheduleBlockTick(pos, state.block, random.nextInt(90) + 10)
+            world.scheduleBlockTick(pos, state.block, random.nextInt(130) + 10)
         } else {
             world.setBlockState(pos, state.with(ACTIVE, false))
         }
@@ -65,22 +84,35 @@ class RoaringGeyserBlock(settings: Settings) :
 
     override fun randomDisplayTick(state: BlockState, world: World, pos: BlockPos, random: RandomGenerator) {
         if (state.get(ACTIVE)) {
-            for (i in 0..random.range(3, 10))
+            repeat(random.range(5, 13)) {
                 world.addParticle(
                     DuskParticles.GEYSER,
                     true,
                     pos.x + 0.5,
                     pos.y + 1.0,
                     pos.z + 0.5,
-                    0.0,
-                    0.0,
-                    0.0
+                    (random.nextDouble() - random.nextDouble()) * 0.1,
+                    random.nextDouble() * 0.75,
+                    (random.nextDouble() - random.nextDouble()) * 0.1
                 )
+            }
         }
         super.randomDisplayTick(state, world, pos, random)
     }
 
-    private fun geyser(pos: BlockPos, world: World) {
+    private fun geyser(pos: BlockPos, world: ServerWorld) {
+        val random = world.random
+        repeat(random.range(10, 23)) {
+            world.spawnParticles(
+                DuskParticles.GEYSER,
+                pos.up().method_61082(),
+                Vec3d(
+                    (random.nextDouble() - random.nextDouble()) * 0.15,
+                    random.nextDouble() + 0.6,
+                    (random.nextDouble() - random.nextDouble()) * 0.15
+                )
+            )
+        }
         val entitiesInRange = world.getOtherEntities(
             null, Box(
                 pos.x - 0.5,

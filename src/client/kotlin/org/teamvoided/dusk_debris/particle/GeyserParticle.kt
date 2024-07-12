@@ -19,9 +19,9 @@ open class GeyserParticle(
 
     init {
         val color = random.nextFloat() * 0.2f + 0.5f
-        this.velocityX = (random.nextDouble() - random.nextDouble()) * 0.15
-        this.velocityY = random.nextDouble() + 0.6
-        this.velocityZ = (random.nextDouble() - random.nextDouble()) * 0.15
+        this.velocityX = velocityX
+        this.velocityY = velocityY
+        this.velocityZ = velocityZ
         this.gravityStrength = 1f
         this.colorRed = color + 0.01f
         this.colorGreen = color

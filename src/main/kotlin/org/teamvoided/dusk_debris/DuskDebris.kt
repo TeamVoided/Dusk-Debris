@@ -17,6 +17,7 @@ object DuskDebris {
     fun init() {
         log.info("Hello from Common")
         DuskBlocks.init()
+        DuskBlockEntities.init()
         DuskItems.init()
         DuskItemGroups.init()
         DuskEntities.init()

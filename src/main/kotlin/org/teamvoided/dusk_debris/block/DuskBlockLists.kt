@@ -31,10 +31,16 @@ object DuskBlockLists {
         DuskBlocks.LIGHT_BLUE_RIBBON
     )
     val COIN_STACK_BLOCK_LIST = listOf(
-        DuskBlocks.TREACHEROUS_GOLD_COIN_STACK
+        DuskBlocks.TREACHEROUS_GOLD_COIN_STACK,
+        DuskBlocks.TARNISHED_GOLD_COIN_STACK,
+        DuskBlocks.LOST_SILVER_COIN_STACK,
+        DuskBlocks.SUNKEN_BRONZE_COIN_STACK
     )
     val COIN_PILE_BLOCK_LIST = listOf(
-        DuskBlocks.TREACHEROUS_GOLD_COIN_PILE
+        DuskBlocks.TREACHEROUS_GOLD_COIN_PILE,
+        DuskBlocks.TARNISHED_GOLD_COIN_PILE,
+        DuskBlocks.LOST_SILVER_COIN_PILE,
+        DuskBlocks.SUNKEN_BRONZE_COIN_PILE
     )
     val VESSEL_BLOCK_LIST = listOf(
         DuskBlocks.GOLDEN_VESSEL

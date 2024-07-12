@@ -50,6 +50,15 @@ object DuskBlocks {
         AbstractBlock.Settings.create().mapColor(BONE_BLOCK.defaultMapColor).sounds(BlockSoundGroup.GLASS)
             .instrument(NoteBlockInstrument.HAT).strength(1f, 0.0f).solidBlock(Blocks::nonSolid)
             .pistonBehavior(PistonBehavior.DESTROY)
+    val coin_stack_settings = AbstractBlock.Settings.create().nonSolid().strength(0.2f)
+        .pistonBehavior(PistonBehavior.DESTROY)
+    val coin_pile_settings = AbstractBlock.Settings.create().nonSolid()
+        .strength(0.2f).sounds(BlockSoundGroup.METAL).blockVision { state: BlockState, _, _ ->
+            state.get(
+                CoinPileBlock.LAYERS
+            ) >= CoinPileBlock.MAX_LAYERS
+        }.pistonBehavior(PistonBehavior.DESTROY)
+
 
     val BLUE_NETHERSHROOM = register(
         "blue_nethershroom",
@@ -230,20 +239,29 @@ object DuskBlocks {
     )
 
     val TREACHEROUS_GOLD_COIN_STACK = register(
-        "treacherous_gold_coin_stack", CoinStackBlock(
-            AbstractBlock.Settings.create().mapColor(TREACHEROUS_GOLD_BLOCK.defaultMapColor).nonSolid().strength(0.2f)
-                .pistonBehavior(PistonBehavior.DESTROY)
-        )
+        "treacherous_gold_coin_stack",
+        CoinStackBlock(coin_stack_settings.mapColor(TREACHEROUS_GOLD_BLOCK.defaultMapColor))
     )
     val TREACHEROUS_GOLD_COIN_PILE = register(
-        "treacherous_gold_coin_pile", CoinPileBlock(
-            AbstractBlock.Settings.create().mapColor(TREACHEROUS_GOLD_COIN_STACK.defaultMapColor).nonSolid()
-                .strength(0.2f).sounds(BlockSoundGroup.METAL).blockVision { state: BlockState, _, _ ->
-                    state.get(
-                        CoinPileBlock.LAYERS
-                    ) >= CoinPileBlock.MAX_LAYERS
-                }.pistonBehavior(PistonBehavior.DESTROY)
-        )
+        "treacherous_gold_coin_pile", CoinPileBlock(coin_pile_settings.mapColor(TREACHEROUS_GOLD_BLOCK.defaultMapColor))
+    )
+    val TARNISHED_GOLD_COIN_STACK = register(
+        "tarnished_gold_coin_stack", CoinStackBlock(coin_stack_settings.mapColor(TARNISHED_GOLD_BLOCK.defaultMapColor))
+    )
+    val TARNISHED_GOLD_COIN_PILE = register(
+        "tarnished_gold_coin_pile", CoinPileBlock(coin_pile_settings.mapColor(TARNISHED_GOLD_BLOCK.defaultMapColor))
+    )
+    val LOST_SILVER_COIN_STACK = register(
+        "lost_silver_coin_stack", CoinStackBlock(coin_stack_settings.mapColor(LOST_SILVER_BLOCK.defaultMapColor))
+    )
+    val LOST_SILVER_COIN_PILE = register(
+        "lost_silver_coin_pile", CoinPileBlock(coin_pile_settings.mapColor(LOST_SILVER_BLOCK.defaultMapColor))
+    )
+    val SUNKEN_BRONZE_COIN_STACK = register(
+        "sunken_bronze_coin_stack", CoinStackBlock(coin_stack_settings.mapColor(SUNKEN_BRONZE_BLOCK.defaultMapColor))
+    )
+    val SUNKEN_BRONZE_COIN_PILE = register(
+        "sunken_bronze_coin_pile", CoinPileBlock(coin_pile_settings.mapColor(SUNKEN_BRONZE_BLOCK.defaultMapColor))
     )
 
     val GOLDEN_VESSEL = register(
@@ -293,7 +311,12 @@ object DuskBlocks {
                 .pistonBehavior(PistonBehavior.DESTROY)
         )
     )
-
+    val FORGOTTEN_CHEST = register(
+        "forgotten_chest",
+        TreasureChestBlock(
+            AbstractBlock.Settings.create().pistonBehavior(PistonBehavior.IGNORE)
+        )
+    )
 //    val GLOOM_SKULL = registerSkull(
 //        "gloomed_skull",
 //        DuskSkullType.GLOOM,
