@@ -3,6 +3,7 @@ package org.teamvoided.dusk_debris.util
 import net.minecraft.block.Block
 import net.minecraft.particle.ParticleEffect
 import net.minecraft.registry.HolderSet
+import net.minecraft.registry.tag.TagKey
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Vec3d
@@ -13,7 +14,8 @@ import net.minecraft.world.TestableWorld
 fun ServerWorld.spawnParticles(particle: ParticleEffect, pos: Vec3d, velocity: Vec3d) =
     this.spawnParticles(particle, pos.x, pos.y, pos.z, 0, velocity.x, velocity.y, velocity.z, 1.0)
 
-fun TestableWorld.isInTag(pos: BlockPos, tag: HolderSet<Block>): Boolean = this.testBlockState(pos) { it.isIn(tag) }
+fun TestableWorld.isInSet(pos: BlockPos, tag: HolderSet<Block>): Boolean = this.testBlockState(pos) { it.isIn(tag) }
+fun TestableWorld.isInTag(pos: BlockPos, tag: TagKey<Block>): Boolean = this.testBlockState(pos) { it.isIn(tag) }
 
 fun rotateVoxelShape(times: Int, shape: VoxelShape): VoxelShape {
     val shapes = arrayOf(shape, VoxelShapes.empty())
