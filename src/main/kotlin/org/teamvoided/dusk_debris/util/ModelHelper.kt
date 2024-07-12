@@ -435,14 +435,14 @@ fun BlockStateModelGenerator.registerGeyser(block: Block) {
         .put(TextureKey.SIDE, Texture.getSubId(block, "_side"))
 
     val modelActive: Identifier = Models.CUBE_BOTTOM_TOP.upload(
-        block,
+        block.modelSuffix("_active"),
         texture
             .put(TextureKey.TOP, Texture.getSubId(block, "_active"))
             .put(TextureKey.BOTTOM, Texture.getSubId(block, "_inactive")),
         this.modelCollector
     )
     val modelInctive: Identifier = Models.CUBE_COLUMN.upload(
-        block,
+        block.modelSuffix("_inactive"),
         texture.put(TextureKey.END, Texture.getSubId(block, "_inactive")),
         this.modelCollector
     )
