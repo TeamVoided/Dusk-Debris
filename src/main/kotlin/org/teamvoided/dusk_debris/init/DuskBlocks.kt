@@ -706,6 +706,7 @@ object DuskBlocks {
 
     fun init() {
         DuskBlockFamilies.init()
+        DuskBlockSetType.init()
         StrippableBlockRegistry.register(CHARRED_LOG, STRIPPED_CHARRED_LOG)
         StrippableBlockRegistry.register(CHARRED_WOOD, STRIPPED_CHARRED_WOOD)
         StrippableBlockRegistry.register(CYPRESS_LOG, STRIPPED_CYPRESS_LOG)
