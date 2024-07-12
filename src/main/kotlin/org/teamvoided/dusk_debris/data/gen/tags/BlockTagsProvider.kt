@@ -75,6 +75,12 @@ class BlockTagsProvider(output: FabricDataOutput, registriesFuture: CompletableF
             .add(DuskBlocks.BLUE_NETHERSHROOM)
             .add(DuskBlocks.PURPLE_NETHERSHROOM)
 
+        getOrCreateTagBuilder(BlockTags.LOGS)
+            .add(DuskBlocks.CYPRESS_LOG)
+            .add(DuskBlocks.STRIPPED_CYPRESS_LOG)
+            .add(DuskBlocks.CYPRESS_WOOD)
+            .add(DuskBlocks.STRIPPED_CYPRESS_WOOD)
+
         getOrCreateTagBuilder(BlockTags.SAND)
             .add(DuskBlocks.VOLCANIC_SAND)
             .add(DuskBlocks.SUSPICIOUS_VOLCANIC_SAND)
