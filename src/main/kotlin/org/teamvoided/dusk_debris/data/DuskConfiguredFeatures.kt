@@ -7,6 +7,8 @@ import org.teamvoided.dusk_debris.DuskDebris.id
 
 @Suppress("MemberVisibilityCanBePrivate")
 object DuskConfiguredFeatures {
+    val SWAMP_CYPRESS = create("swamp_cyprus")
+
     val BLUE_NETHERSHROOM = create("blue_nethershroom")
     val HUGE_BLUE_NETHERSHROOM = create("huge_blue_nethershroom")
     val LARGE_BLUE_NETHERSHROOM_PATCH = create("large_blue_nethershroom_patch")

@@ -1,32 +1,93 @@
 package org.teamvoided.dusk_debris.data.gen.world.gen
 
+import com.google.common.collect.ImmutableList
 import net.minecraft.block.*
 import net.minecraft.registry.BootstrapContext
+import net.minecraft.registry.HolderSet
 import net.minecraft.registry.RegistryKey
 import net.minecraft.registry.RegistryKeys
 import net.minecraft.registry.tag.BlockTags
 import net.minecraft.util.collection.DataPool
 import net.minecraft.util.math.Direction
+import net.minecraft.util.math.int_provider.ConstantIntProvider
 import net.minecraft.util.math.int_provider.UniformIntProvider
 import net.minecraft.world.gen.blockpredicate.BlockPredicate
 import net.minecraft.world.gen.decorator.BlockPredicateFilterPlacementModifier
 import net.minecraft.world.gen.decorator.EnvironmentScanPlacementModifier
 import net.minecraft.world.gen.feature.*
+import net.minecraft.world.gen.feature.size.TwoLayersFeatureSize
 import net.minecraft.world.gen.feature.util.ConfiguredFeatureUtil
 import net.minecraft.world.gen.feature.util.PlacedFeatureUtil
+import net.minecraft.world.gen.foliage.RandomSpreadFoliagePlacer
+import net.minecraft.world.gen.root.AboveRootPlacement
+import net.minecraft.world.gen.root.MangroveRootPlacement
+import net.minecraft.world.gen.root.MangroveRootPlacer
+import net.minecraft.world.gen.root.RootPlacer
 import net.minecraft.world.gen.stateprovider.BlockStateProvider
+import net.minecraft.world.gen.stateprovider.RandomizedIntBlockStateProvider
 import net.minecraft.world.gen.stateprovider.WeightedBlockStateProvider
+import net.minecraft.world.gen.treedecorator.AttachedToLeavesTreeDecorator
+import net.minecraft.world.gen.treedecorator.LeavesVineTreeDecorator
+import net.minecraft.world.gen.treedecorator.TreeDecorator
+import net.minecraft.world.gen.trunk.StraightTrunkPlacer
+import net.minecraft.world.gen.trunk.UpwardsBranchingTrunkPlacer
+import org.teamvoided.dusk_debris.data.DuskConfiguredFeatures
 import org.teamvoided.dusk_debris.data.tags.DuskBlockTags
 import org.teamvoided.dusk_debris.init.DuskBlocks
-import org.teamvoided.dusk_debris.data.DuskConfiguredFeatures
 import org.teamvoided.dusk_debris.init.worldgen.DuskFeatures
 import org.teamvoided.dusk_debris.world.gen.configured_feature.config.HugeNethershroomFeatureConfig
+import org.teamvoided.dusk_debris.world.gen.foliage.CypressFoliagePlacer
+import org.teamvoided.dusk_debris.world.gen.root.CypressRootPlacer
+import org.teamvoided.dusk_debris.world.gen.root.config.CypressRootPlacement
+import java.util.*
+import java.util.List
+import kotlin.collections.listOf
 
 @Suppress("DEPRECATION")
 object ConfiguredFeatureCreator {
+
     fun bootstrap(c: BootstrapContext<ConfiguredFeature<*, *>>) {
         val configuredFeatures = c.getRegistryLookup(RegistryKeys.CONFIGURED_FEATURE)
         val placedFeatures = c.getRegistryLookup(RegistryKeys.PLACED_FEATURE)
+        val block = c.getRegistryLookup(RegistryKeys.BLOCK)
+
+        c.registerConfiguredFeature(
+            DuskConfiguredFeatures.SWAMP_CYPRESS,
+            Feature.TREE,
+            TreeFeatureConfig.Builder(
+                BlockStateProvider.of(DuskBlocks.CYPRESS_LOG),
+                StraightTrunkPlacer(5, 3, 0),
+                BlockStateProvider.of(Blocks.SPRUCE_LEAVES),
+                CypressFoliagePlacer(ConstantIntProvider.create(3), ConstantIntProvider.create(0)),
+                Optional.of<RootPlacer>(
+                    CypressRootPlacer(
+                        UniformIntProvider.create(1, 3),
+                        BlockStateProvider.of(Blocks.MANGROVE_ROOTS),
+                        Optional.of<AboveRootPlacement>(
+                            AboveRootPlacement(
+                                BlockStateProvider.of(Blocks.MOSS_CARPET),
+                                0.5f
+                            )
+                        ),
+                        CypressRootPlacement(
+                            block.getTagOrThrow(BlockTags.MANGROVE_ROOTS_CAN_GROW_THROUGH),
+                            HolderSet.createDirect<Block, Block>(
+                                { obj: Block -> obj.builtInRegistryHolder },
+                                *arrayOf<Block>(Blocks.MUD, Blocks.MUDDY_MANGROVE_ROOTS)
+                            ),
+                            BlockStateProvider.of(Blocks.MUDDY_MANGROVE_ROOTS),
+                            8,
+                            15,
+                            0.2f
+                        )
+                    )
+                ),
+                TwoLayersFeatureSize(1, 0, 1)
+            ).ignoreVines().decorators(
+                ImmutableList.of<TreeDecorator>(LeavesVineTreeDecorator(0.25f))
+            ).build()
+        )
+
 
         c.registerConfiguredFeature(
             DuskConfiguredFeatures.BLUE_NETHERSHROOM,
