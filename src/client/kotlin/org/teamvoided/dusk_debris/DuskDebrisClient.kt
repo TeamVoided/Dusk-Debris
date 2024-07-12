@@ -4,6 +4,8 @@ import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap
 import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry
+import net.minecraft.client.color.world.BiomeColors
+import net.minecraft.client.color.world.FoliageColors
 import net.minecraft.client.render.RenderLayer
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactories
 import net.minecraft.client.render.block.entity.ChestBlockEntityRenderer
@@ -51,6 +53,13 @@ object DuskDebrisClient {
         ColorProviderRegistry.BLOCK.register(
             { state, _, _, _ -> if (state.get(GunpowderBlock.LIT)) 0xFF9F32 else 0x383838 },
             DuskBlocks.GUNPOWDER
+        )
+        ColorProviderRegistry.BLOCK.register(
+            { _, world, pos, _ ->
+                if (world != null && pos != null) BiomeColors.getFoliageColor(world, pos)
+                else FoliageColors.getColor(0.8, 0.4)
+            },
+            DuskBlocks.CYPRESS_LEAVES
         )
 
         EntityRendererRegistry.register(DuskEntities.BOX_AREA_EFFECT_CLOUD, ::EmptyEntityRenderer)

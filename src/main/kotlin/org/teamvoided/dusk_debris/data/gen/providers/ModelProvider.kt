@@ -102,6 +102,7 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
 
         gen.registerSimpleState(DuskBlocks.BOG_MUD)
         gen.registerItemModel(DuskItems.BOG_MUD_BUCKET)
+        gen.registerSimpleCubeAll(DuskBlocks.CYPRESS_LEAVES)
         gen.registerLog(DuskBlocks.CYPRESS_LOG)
             .log(DuskBlocks.CYPRESS_LOG)
             .wood(DuskBlocks.CYPRESS_WOOD)

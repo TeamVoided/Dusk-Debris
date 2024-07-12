@@ -61,8 +61,12 @@ class EnglishTranslationProvider(o: FabricDataOutput, r: CompletableFuture<Holde
         blocks.forEach { gen.add(it.translationKey, genLang(it.id)) }
         entities.forEach { gen.add(it.translationKey, genLang(it.id)) }
 
+        gen.add("container.treasure_chest", "Treasure Chest")
+
         gen.add("painting.dusk_debris.l_b_r.title", "L. Briggsy R.")
         gen.add("painting.dusk_debris.l_b_r.author", "Original Model By Ivan Yosifov")
+        gen.add("painting.dusk_debris.skeleton_appears.title", "The Skeleton")
+        gen.add("painting.dusk_debris.skeleton_appears.author", "Appears")
 
         getKey(DUSK_TAB)?.let { gen.add(it, "Dusk Items") }
     }

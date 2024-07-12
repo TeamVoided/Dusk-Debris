@@ -365,6 +365,7 @@ object DuskBlocks {
         )
     )
 
+    val CYPRESS_LEAVES = register("cypress_leaves", Blocks.leavesOf(BlockSoundGroup.GRASS))
     val CYPRESS_LOG = register("cypress_log", Blocks.logOf(charredPlanksColor, charredLogColor))
     val STRIPPED_CYPRESS_LOG = register("stripped_cypress_log", Blocks.logOf(charredPlanksColor, charredPlanksColor))
     val CYPRESS_WOOD = register(

@@ -102,7 +102,7 @@ class TreasureChestBlockEntity : LootableContainerBlockEntity, ChestAnimationPro
 
     override fun size(): Int = CHEST_SIZE
 
-    override fun getContainerName(): Text = Text.translatable("container.chest")
+    override fun getContainerName(): Text = Text.translatable("container.treasure_chest")
 
     override fun method_11282(): DefaultedList<ItemStack> = this.inventory
 
