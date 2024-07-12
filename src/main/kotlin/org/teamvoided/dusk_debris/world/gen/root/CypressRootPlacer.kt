@@ -15,7 +15,7 @@ import net.minecraft.world.gen.root.RootPlacer
 import net.minecraft.world.gen.root.RootPlacerType
 import net.minecraft.world.gen.stateprovider.BlockStateProvider
 import org.teamvoided.dusk_debris.init.DuskWorldgen
-import org.teamvoided.dusk_debris.world.gen.root.config.CypressRootPlacement
+import org.teamvoided.dusk_debris.world.gen.root.config.CypressRootConfig
 import java.util.*
 import java.util.function.BiConsumer
 
@@ -23,7 +23,7 @@ class CypressRootPlacer(
     trunkOffsetY: IntProvider,
     rootProvider: BlockStateProvider,
     aboveRootPlacement: Optional<AboveRootPlacement>,
-    private val cypressRootPlacement: CypressRootPlacement
+    private val cypressRootPlacement: CypressRootConfig
 ) :
     RootPlacer(trunkOffsetY, rootProvider, aboveRootPlacement) {
     override fun generate(
@@ -163,11 +163,11 @@ class CypressRootPlacer(
         val CODEC: MapCodec<CypressRootPlacer> =
             RecordCodecBuilder.mapCodec { instance: RecordCodecBuilder.Instance<CypressRootPlacer> ->
                 rootPlacerCodec(instance).and(
-                    CypressRootPlacement.CODEC.fieldOf("cypress_root_placement")
+                    CypressRootConfig.CODEC.fieldOf("cypress_root_placement")
                         .forGetter { placer: CypressRootPlacer -> placer.cypressRootPlacement }
                 ).apply(
                     instance
-                ) { trunkOffsetY: IntProvider, rootProvider: BlockStateProvider, aboveRootPlacement: Optional<AboveRootPlacement>, cypressRootPlacement: CypressRootPlacement ->
+                ) { trunkOffsetY: IntProvider, rootProvider: BlockStateProvider, aboveRootPlacement: Optional<AboveRootPlacement>, cypressRootPlacement: CypressRootConfig ->
                     CypressRootPlacer(
                         trunkOffsetY,
                         rootProvider,

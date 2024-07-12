@@ -9,7 +9,7 @@ import net.minecraft.registry.RegistryKeys
 import net.minecraft.world.gen.stateprovider.BlockStateProvider
 
 @JvmRecord
-data class CypressRootPlacement(
+data class CypressRootConfig(
     val canGrowThrough: HolderSet<Block>,
     val muddyRootsIn: HolderSet<Block>,
     val muddyRootsProvider: BlockStateProvider,
@@ -42,26 +42,26 @@ data class CypressRootPlacement(
     }
 
     companion object {
-        val CODEC: Codec<CypressRootPlacement> =
-            RecordCodecBuilder.create { instance: RecordCodecBuilder.Instance<CypressRootPlacement> ->
+        val CODEC: Codec<CypressRootConfig> =
+            RecordCodecBuilder.create { instance: RecordCodecBuilder.Instance<CypressRootConfig> ->
                 instance.group(
                     RegistryCodecs.homogeneousList(RegistryKeys.BLOCK)
                         .fieldOf("can_grow_through")
-                        .forGetter { placement: CypressRootPlacement -> placement.canGrowThrough },
+                        .forGetter { placement: CypressRootConfig -> placement.canGrowThrough },
                     RegistryCodecs.homogeneousList(RegistryKeys.BLOCK).fieldOf("muddy_roots_in")
-                        .forGetter { placement: CypressRootPlacement -> placement.muddyRootsIn },
+                        .forGetter { placement: CypressRootConfig -> placement.muddyRootsIn },
                     BlockStateProvider.TYPE_CODEC.fieldOf("muddy_roots_provider")
-                        .forGetter { placement: CypressRootPlacement -> placement.muddyRootsProvider },
+                        .forGetter { placement: CypressRootConfig -> placement.muddyRootsProvider },
                     Codec.intRange(1, 12).fieldOf("max_root_width")
-                        .forGetter { placement: CypressRootPlacement -> placement.maxRootWidth },
+                        .forGetter { placement: CypressRootConfig -> placement.maxRootWidth },
                     Codec.intRange(1, 64).fieldOf("max_root_length")
-                        .forGetter { placement: CypressRootPlacement -> placement.maxRootLength },
+                        .forGetter { placement: CypressRootConfig -> placement.maxRootLength },
                     Codec.floatRange(0.0f, 1.0f).fieldOf("random_skew_chance")
-                        .forGetter { placement: CypressRootPlacement -> placement.randomSkewChance }
+                        .forGetter { placement: CypressRootConfig -> placement.randomSkewChance }
                 ).apply(
                     instance
                 ) { canGrowThrough: HolderSet<Block>, muddyRootsIn: HolderSet<Block>, muddyRootsProvider: BlockStateProvider, maxRootWidth: Int, maxRootLength: Int, randomSkewChance: Float ->
-                    CypressRootPlacement(
+                    CypressRootConfig(
                         canGrowThrough,
                         muddyRootsIn,
                         muddyRootsProvider,
