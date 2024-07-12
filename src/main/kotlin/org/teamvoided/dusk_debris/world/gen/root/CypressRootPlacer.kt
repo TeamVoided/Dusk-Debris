@@ -1,6 +1,5 @@
 package org.teamvoided.dusk_debris.world.gen.root
 
-import com.google.common.collect.Lists
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.minecraft.block.BlockState
@@ -16,7 +15,6 @@ import net.minecraft.world.gen.root.RootPlacer
 import net.minecraft.world.gen.root.RootPlacerType
 import net.minecraft.world.gen.stateprovider.BlockStateProvider
 import org.teamvoided.dusk_debris.init.DuskWorldgen
-import org.teamvoided.dusk_debris.util.Utils.placeDebug
 import org.teamvoided.dusk_debris.util.isInSet
 import org.teamvoided.dusk_debris.util.isInTag
 import org.teamvoided.dusk_debris.world.gen.root.config.CypressRootConfig
@@ -37,77 +35,24 @@ class CypressRootPlacer(
         trunkPos: BlockPos,
         config: TreeFeatureConfig
     ): Boolean {
-        val list: MutableList<BlockPos> = Lists.newArrayList()
-        val mutable = pos.mutableCopy()
+        val rootTops = mutableSetOf<BlockPos>()
 
-        replacer.placeDebug(mutable, 6)
-
-        Direction.Type.HORIZONTAL.forEach { direction ->
-            val blockPos = trunkPos.offset(direction)
+        Direction.Type.HORIZONTAL.forEach { dir1 ->
+            Direction.Type.HORIZONTAL.forEach loop1@{ dir2 ->
+                if (dir1 == dir2) return@loop1
+                val blockPos = trunkPos.down().offset(dir1).offset(dir2)
+                if (canReplace(world, blockPos)) {
+                    rootTops.add(blockPos.down(if (random.range(0, 4) == 0) 2 else 1))
+                }
+            }
+            val blockPos = trunkPos.offset(dir1)
             if (canReplace(world, blockPos)) {
-                list.add(trunkPos.offset(direction))
+                rootTops.add(blockPos.up(if (random.range(0, 3) == 0) 1 else 0))
             }
         }
 
-        list.forEach { posB ->
-            replacer.placeDebug(posB, 9)
-            this.placeRoot(world, replacer, random, posB.down(), config) // .down() is temporary
-        }
-
-
+        rootTops.forEach { this.placeRoot(world, replacer, random, it, config) }
         return true
-    }
-
-    private fun canGrow(
-        world: TestableWorld,
-        random: RandomGenerator,
-        pos: BlockPos,
-        direction: Direction,
-        origin: BlockPos,
-        potentialRootPositions: MutableList<BlockPos>,
-        rootLength: Int
-    ): Boolean {
-//        val i = config.maxRootLength
-//        if (rootLength != i && potentialRootPositions.size <= i) {
-//            val list = this.getPotentialRootPositions(pos, direction, random, origin)
-//            val var10: Iterator<*> = list.iterator()
-//
-//            while (var10.hasNext()) {
-//                val blockPos = var10.next() as BlockPos
-//                if (this.canReplace(world, blockPos)) {
-//                    potentialRootPositions.add(blockPos)
-//                    if (!this.canGrow(
-//                            world, random, blockPos, direction, origin, potentialRootPositions, rootLength + 1
-//                        )
-//                    ) {
-//                        return false
-//                    }
-//                }
-//            }
-//
-//            return true
-//        } else {
-            return false
-//        }
-    }
-
-    protected fun getPotentialRootPositions(
-        pos: BlockPos, direction: Direction?, random: RandomGenerator, origin: BlockPos?
-    ): List<BlockPos> {
-        val blockPos = pos.down()
-        val blockPos2 = pos.offset(direction)
-        val i = pos.getManhattanDistance(origin)
-        val j = config.maxRootWidth
-        val f = config.randomSkewChance
-        return if (i > j - 3 && i <= j) {
-            if (random.nextFloat() < f) java.util.List.of(blockPos, blockPos2.down()) else java.util.List.of(blockPos)
-        } else if (i > j) {
-            java.util.List.of(blockPos)
-        } else if (random.nextFloat() < f) {
-            java.util.List.of(blockPos)
-        } else {
-            if (random.nextBoolean()) listOf(blockPos2) else java.util.List.of(blockPos)
-        }
     }
 
     override fun canReplace(world: TestableWorld, pos: BlockPos): Boolean {
@@ -125,7 +70,7 @@ class CypressRootPlacer(
     ) {
         var mPos = pos
         while (canReplace(world, mPos)) {
-            replacer.placeDebug(mPos, 5)
+            replacer.accept(mPos, config.trunkProvider.getBlockState(random, mPos))
             mPos = mPos.down()
         }
     }
