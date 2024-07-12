@@ -1,11 +1,14 @@
 package org.teamvoided.dusk_debris.util
 
+import net.minecraft.block.Block
+import net.minecraft.block.BlockState
 import net.minecraft.block.Blocks
 import net.minecraft.loot.function.SetCountLootFunction
 import net.minecraft.loot.provider.number.ConstantLootNumberProvider
 import net.minecraft.loot.provider.number.UniformLootNumberProvider
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.StructureWorldAccess
+import java.util.function.BiConsumer
 
 object Utils {
     val rotate45 = 0.785f
@@ -23,11 +26,15 @@ object Utils {
     fun constantNum(x: Number): ConstantLootNumberProvider =
         ConstantLootNumberProvider.create(x.toFloat())
 
-    fun StructureWorldAccess.placeDebug(
-        pos: BlockPos,
-        block: Int
-    ) {
-        val x = when (block) {
+    fun StructureWorldAccess.placeDebug(pos: BlockPos, block: Int) =
+        this.setBlockState(pos, getState(block), Block.NOTIFY_ALL)
+
+
+    fun BiConsumer<BlockPos, BlockState>.placeDebug(pos: BlockPos, block: Int) = this.accept(pos, getState(block))
+
+
+    fun getState(block: Int): BlockState {
+        return when (block) {
             0 -> Blocks.GLASS
             1 -> Blocks.WHITE_STAINED_GLASS
             2 -> Blocks.LIGHT_GRAY_STAINED_GLASS
@@ -47,6 +54,5 @@ object Utils {
             16 -> Blocks.PINK_STAINED_GLASS
             else -> Blocks.TINTED_GLASS
         }.defaultState
-        this.setBlockState(pos, x, 2)
     }
 }
