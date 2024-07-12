@@ -51,4 +51,5 @@ object DuskBlockSetType {
         WoodType.register(WoodType(id.toString(), blockSetType))
 
     fun init() {}
+
 }
