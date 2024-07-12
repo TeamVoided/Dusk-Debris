@@ -69,8 +69,11 @@ class CypressRootPlacer(
         config: TreeFeatureConfig
     ) {
         var mPos = pos
+        var x =0
         while (canReplace(world, mPos)) {
+            if (x > MAX_ROOT_LENGTH) return
             replacer.accept(mPos, config.trunkProvider.getBlockState(random, mPos))
+            x++
             mPos = mPos.down()
         }
     }
@@ -78,7 +81,6 @@ class CypressRootPlacer(
     override fun getType(): RootPlacerType<CypressRootPlacer> = DuskWorldgen.CYPRESS_ROOT_PLACER
 
     companion object {
-        const val MAX_ROOT_WIDTH: Int = 8
         const val MAX_ROOT_LENGTH: Int = 15
         val CODEC: MapCodec<CypressRootPlacer> = RecordCodecBuilder.mapCodec {
             rootPlacerCodec(it).and(
