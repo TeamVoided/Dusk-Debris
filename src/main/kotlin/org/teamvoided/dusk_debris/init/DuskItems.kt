@@ -174,6 +174,7 @@ object DuskItems {
         "bog_mud_bucket",
         PowderSnowBucketItem(DuskBlocks.BOG_MUD, SoundEvents.ITEM_BUCKET_EMPTY, Item.Settings())
     )
+    val CYPRESS_LEAVES = register("cypress_leaves", BlockItem(DuskBlocks.CYPRESS_LEAVES))
     val CYPRESS_LOG = register("cypress_log", BlockItem(DuskBlocks.CYPRESS_LOG))
     val CYPRESS_WOOD = register("cypress_wood", BlockItem(DuskBlocks.CYPRESS_WOOD))
     val STRIPPED_CYPRESS_LOG = register("stripped_cypress_log", BlockItem(DuskBlocks.STRIPPED_CYPRESS_LOG))

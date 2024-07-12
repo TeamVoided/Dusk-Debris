@@ -18,13 +18,20 @@ import net.minecraft.world.gen.feature.*
 import net.minecraft.world.gen.feature.size.TwoLayersFeatureSize
 import net.minecraft.world.gen.feature.util.ConfiguredFeatureUtil
 import net.minecraft.world.gen.feature.util.PlacedFeatureUtil
+import net.minecraft.world.gen.foliage.RandomSpreadFoliagePlacer
 import net.minecraft.world.gen.root.AboveRootPlacement
+import net.minecraft.world.gen.root.MangroveRootPlacement
+import net.minecraft.world.gen.root.MangroveRootPlacer
 import net.minecraft.world.gen.root.RootPlacer
 import net.minecraft.world.gen.stateprovider.BlockStateProvider
+import net.minecraft.world.gen.stateprovider.RandomizedIntBlockStateProvider
 import net.minecraft.world.gen.stateprovider.WeightedBlockStateProvider
+import net.minecraft.world.gen.treedecorator.AttachedToLeavesTreeDecorator
 import net.minecraft.world.gen.treedecorator.LeavesVineTreeDecorator
 import net.minecraft.world.gen.treedecorator.TreeDecorator
+import net.minecraft.world.gen.trunk.BendingTrunkPlacer
 import net.minecraft.world.gen.trunk.StraightTrunkPlacer
+import net.minecraft.world.gen.trunk.UpwardsBranchingTrunkPlacer
 import org.teamvoided.dusk_debris.data.DuskConfiguredFeatures
 import org.teamvoided.dusk_debris.data.tags.DuskBlockTags
 import org.teamvoided.dusk_debris.init.DuskBlocks
@@ -34,6 +41,7 @@ import org.teamvoided.dusk_debris.world.gen.foliage.CypressFoliagePlacer
 import org.teamvoided.dusk_debris.world.gen.root.CypressRootPlacer
 import org.teamvoided.dusk_debris.world.gen.root.config.CypressRootConfig
 import java.util.*
+import java.util.List
 import kotlin.collections.listOf
 
 @Suppress("DEPRECATION")
@@ -50,7 +58,7 @@ object ConfiguredFeatureCreator {
             TreeFeatureConfig.Builder(
                 BlockStateProvider.of(DuskBlocks.CYPRESS_LOG),
                 StraightTrunkPlacer(5, 3, 0),
-                BlockStateProvider.of(Blocks.SPRUCE_LEAVES),
+                BlockStateProvider.of(DuskBlocks.CYPRESS_LEAVES),
                 CypressFoliagePlacer(ConstantIntProvider.create(3), ConstantIntProvider.create(0)),
                 Optional.of<RootPlacer>(
                     CypressRootPlacer(
@@ -76,11 +84,10 @@ object ConfiguredFeatureCreator {
                     )
                 ),
                 TwoLayersFeatureSize(1, 0, 1)
-            ).ignoreVines().decorators(
+            ).ignoreVines().forceDirt().decorators(
                 ImmutableList.of<TreeDecorator>(LeavesVineTreeDecorator(0.25f))
             ).build()
         )
-
 
         c.registerConfiguredFeature(
             DuskConfiguredFeatures.BLUE_NETHERSHROOM,

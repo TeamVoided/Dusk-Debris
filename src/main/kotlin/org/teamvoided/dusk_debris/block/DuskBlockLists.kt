@@ -73,6 +73,7 @@ object DuskBlockLists {
         DuskBlocks.GUNPOWDER,
         DuskBlocks.BLUE_NETHERSHROOM,
         DuskBlocks.PURPLE_NETHERSHROOM,
+        DuskBlocks.CYPRESS_LEAVES,
         DuskBlocks.CYPRESS_DOOR,
         DuskBlocks.CYPRESS_TRAPDOOR,
         DuskBlocks.CHARRED_DOOR,
