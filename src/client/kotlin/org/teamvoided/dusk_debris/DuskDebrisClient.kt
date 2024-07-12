@@ -8,7 +8,7 @@ import net.minecraft.client.color.world.BiomeColors
 import net.minecraft.client.color.world.FoliageColors
 import net.minecraft.client.render.RenderLayer
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactories
-import net.minecraft.client.render.block.entity.ChestBlockEntityRenderer
+import org.teamvoided.dusk_debris.entity.block.ChestBlockEntityRenderer
 import net.minecraft.client.render.entity.EmptyEntityRenderer
 import net.minecraft.client.render.entity.FlyingItemEntityRenderer
 import net.minecraft.component.type.DyedColorComponent
