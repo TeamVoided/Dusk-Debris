@@ -57,7 +57,7 @@ class RoaringGeyserBlock(settings: Settings) :
         pos: BlockPos,
         neighborPos: BlockPos
     ): BlockState {
-        if (!world.getBlockState(pos.down()).isIn(DuskBlockTags.GEYSER_PERSISTANT)) {
+        if (world.getBlockState(pos.down()).isIn(DuskBlockTags.GEYSER_PERSISTANT)) {
             world.scheduleBlockTick(pos, this, 20)
             return state.with(PERSISTENT, true).with(ACTIVE, true)
         }

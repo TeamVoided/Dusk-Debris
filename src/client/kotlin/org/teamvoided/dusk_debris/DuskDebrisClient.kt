@@ -50,9 +50,9 @@ object DuskDebrisClient {
                 DyedColorComponent.getColorOrDefault(itemStack, 0x7F7F7F)
             }, DuskItems.BONECALLER_BANDANA
         )
-        ColorProviderRegistry.BLOCK.register(
-            { state, _, _, _ -> if (state.get(GunpowderBlock.LIT)) 0xFF9F32 else 0x383838 },
-            DuskBlocks.GUNPOWDER
+        ColorProviderRegistry.ITEM.register(
+            { _, _ -> FoliageColors.getDefaultColor() },
+            DuskItems.CYPRESS_LEAVES
         )
         ColorProviderRegistry.BLOCK.register(
             { _, world, pos, _ ->
@@ -60,6 +60,10 @@ object DuskDebrisClient {
                 else FoliageColors.getColor(0.8, 0.4)
             },
             DuskBlocks.CYPRESS_LEAVES
+        )
+        ColorProviderRegistry.BLOCK.register(
+            { state, _, _, _ -> if (state.get(GunpowderBlock.LIT)) 0xFF9F32 else 0x383838 },
+            DuskBlocks.GUNPOWDER
         )
 
         EntityRendererRegistry.register(DuskEntities.BOX_AREA_EFFECT_CLOUD, ::EmptyEntityRenderer)

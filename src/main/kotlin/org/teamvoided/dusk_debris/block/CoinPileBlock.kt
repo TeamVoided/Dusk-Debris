@@ -119,9 +119,7 @@ class CoinPileBlock(settings: Settings) : Block(settings), Waterloggable {
             } else {
                 true
             }
-        } else {
-            layers == 1
-        }
+        } else false
     }
 
     override fun getPlacementState(ctx: ItemPlacementContext): BlockState {
