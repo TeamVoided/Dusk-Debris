@@ -27,9 +27,9 @@ object DuskItemLists {
         DuskItems.TREACHEROUS_GOLD_BLOCK,
         DuskItems.TREACHEROUS_GOLD_COINS,
         DuskItems.TREACHEROUS_ASSORTED_GOLD_COINS,
+        DuskItems.GILDED_CHALICE,
         DuskItems.GOLDEN_VESSEL,
         DuskItems.LAPIS_RELIC,
-        DuskItems.GILDED_CHALICE,
         DuskItems.GOLDEN_RUBY_CROWN,
         DuskItems.GOLDEN_SAPPHIRE_CROWN,
         DuskItems.GOLDEN_QUARTZ_CROWN,
@@ -37,15 +37,20 @@ object DuskItemLists {
         DuskItems.TARNISHED_GOLD_BLOCK,
         DuskItems.TARNISHED_GOLD_COINS,
         DuskItems.TARNISHED_ASSORTED_GOLD_COINS,
+        DuskItems.TARNISHED_CHALICE,
+        DuskItems.DROWNED_VESSEL,
 
         DuskItems.LOST_SILVER_BLOCK,
         DuskItems.LOST_SILVER_COINS,
         DuskItems.LOST_ASSORTED_SILVER_COINS,
         DuskItems.SILVERED_CHALICE,
+        DuskItems.PURE_VESSEL,
 
         DuskItems.SUNKEN_BRONZE_BLOCK,
         DuskItems.SUNKEN_ASSORTED_BRONZE_COINS,
         DuskItems.SUNKEN_BRONZE_COINS,
+        DuskItems.BRONZED_CHALICE,
+        DuskItems.DARKENED_VESSEL,
 
         DuskItems.LEGENDARY_CRYSTAL_CROWN
     )

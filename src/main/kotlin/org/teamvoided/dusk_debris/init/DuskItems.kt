@@ -135,14 +135,26 @@ object DuskItems {
 
     val GOLDEN_VESSEL =
         register("golden_vessel", BlockItem(DuskBlocks.GOLDEN_VESSEL, Item.Settings().maxCount(16)))
-    val LAPIS_RELIC =
-        register("lapis_relic", BlockItem(DuskBlocks.LAPIS_RELIC, Item.Settings().maxCount(16)))
+    val DROWNED_VESSEL =
+        register("drowned_vessel", BlockItem(DuskBlocks.DROWNED_VESSEL, Item.Settings().maxCount(16)))
+    val PURE_VESSEL =
+        register("pure_vessel", BlockItem(DuskBlocks.PURE_VESSEL, Item.Settings().maxCount(16)))
+    val DARKENED_VESSEL =
+        register("darkened_vessel", BlockItem(DuskBlocks.DARKENED_VESSEL, Item.Settings().maxCount(16)))
     val GILDED_CHALICE = register(
         "gilded_chalice", BlockItem(DuskBlocks.GILDED_CHALICE, Item.Settings().maxCount(16))
+    )
+    val TARNISHED_CHALICE = register(
+        "tarnished_chalice", BlockItem(DuskBlocks.TARNISHED_CHALICE, Item.Settings().maxCount(16))
     )
     val SILVERED_CHALICE = register(
         "silvered_chalice", BlockItem(DuskBlocks.SILVERED_CHALICE, Item.Settings().maxCount(16))
     )
+    val BRONZED_CHALICE = register(
+        "bronzed_chalice", BlockItem(DuskBlocks.BRONZED_CHALICE, Item.Settings().maxCount(16))
+    )
+    val LAPIS_RELIC =
+        register("lapis_relic", BlockItem(DuskBlocks.LAPIS_RELIC, Item.Settings().maxCount(16)))
     val GOLDEN_RUBY_CROWN =
         register(
             "golden_ruby_crown",

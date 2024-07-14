@@ -43,11 +43,16 @@ object DuskBlockLists {
         DuskBlocks.SUNKEN_BRONZE_COIN_PILE
     )
     val VESSEL_BLOCK_LIST = listOf(
-        DuskBlocks.GOLDEN_VESSEL
+        DuskBlocks.GOLDEN_VESSEL,
+        DuskBlocks.DROWNED_VESSEL,
+        DuskBlocks.PURE_VESSEL,
+        DuskBlocks.DARKENED_VESSEL
     )
     val CHALICE_BLOCK_LIST = listOf(
         DuskBlocks.GILDED_CHALICE,
-        DuskBlocks.SILVERED_CHALICE
+        DuskBlocks.TARNISHED_CHALICE,
+        DuskBlocks.SILVERED_CHALICE,
+        DuskBlocks.BRONZED_CHALICE
     )
     val RELIC_BLOCK_LIST = listOf(
         DuskBlocks.LAPIS_RELIC
@@ -62,8 +67,8 @@ object DuskBlockLists {
         COIN_STACK_BLOCK_LIST +
                 COIN_PILE_BLOCK_LIST +
                 VESSEL_BLOCK_LIST +
-                RELIC_BLOCK_LIST +
                 CHALICE_BLOCK_LIST +
+                RELIC_BLOCK_LIST +
                 CROWN_BLOCK_LIST +
                 DuskBlocks.LEGENDARY_CRYSTAL_CROWN
     val PAPER_BLOCKS_LIST = listOf(
