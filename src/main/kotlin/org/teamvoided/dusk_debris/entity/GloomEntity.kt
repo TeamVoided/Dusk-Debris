@@ -3,6 +3,7 @@ package org.teamvoided.dusk_debris.entity
 import net.minecraft.entity.*
 import net.minecraft.entity.ai.goal.*
 import net.minecraft.entity.attribute.DefaultAttributeContainer
+import net.minecraft.entity.attribute.EntityAttributeModifier
 import net.minecraft.entity.attribute.EntityAttributes
 import net.minecraft.entity.damage.DamageSource
 import net.minecraft.entity.data.DataTracker
@@ -12,6 +13,7 @@ import net.minecraft.entity.effect.StatusEffectInstance
 import net.minecraft.entity.effect.StatusEffects
 import net.minecraft.entity.mob.AbstractSkeletonEntity
 import net.minecraft.entity.mob.HostileEntity
+import net.minecraft.entity.mob.WitchEntity
 import net.minecraft.entity.passive.TurtleEntity
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.entity.projectile.ArrowEntity
@@ -21,6 +23,7 @@ import net.minecraft.item.Items
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.sound.SoundEvent
 import net.minecraft.sound.SoundEvents
+import net.minecraft.util.Identifier
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.random.RandomGenerator
 import net.minecraft.world.LocalDifficulty
@@ -33,6 +36,8 @@ import org.teamvoided.dusk_debris.init.DuskItems
 
 class GloomEntity(entityType: EntityType<out GloomEntity>, world: World) :
     AbstractSkeletonEntity(entityType, world) {
+
+
     override fun initGoals() {
         goalSelector.add(3, AvoidSunlightGoal(this))
         goalSelector.add(3, EnterDarknessGoal(this, 1.0, lightThreshold))
@@ -117,12 +122,18 @@ class GloomEntity(entityType: EntityType<out GloomEntity>, world: World) :
                         setConversionModeTime(-1)
                     }
                 }
-            } else if (countdownToDarkMode <= 140 || !isLightMode()) {
+            } else if (countdownToDarkMode <= 240 || !isLightMode()) {
+//                getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED)!!.removeModifier(STUNNED_MOVEMENT_PENALTY_MODIFIER.id())
                 if (!isLightMode()) {
+//          found some funky things in the witch file, no idea why they are the most complex mob with such a small file :)
+//                    val entityAttributeInstance = this.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED)
+//                    entityAttributeInstance!!.removeModifier(stunned)
+//                    entityAttributeInstance.addTemporaryModifier(STUNNED_MOVEMENT_PENALTY_MODIFIER)
                     this.addStatusEffect(StatusEffectInstance(StatusEffects.SLOWNESS, 60, 255), this)
                 }
                 setConvertingToDarkMode(true)
                 setConversionModeTime(LIGHT_MODE_TIME)
+
             }
         }
         super.tick()
@@ -274,11 +285,15 @@ class GloomEntity(entityType: EntityType<out GloomEntity>, world: World) :
         const val MODE_CONVERSION_TIME_KEY: String = "LightModeTime"
         private const val LIGHT_MODE_TIME = 300
         private var countdownToDarkMode = -1
+        val stunned: Identifier = Identifier.ofDefault("Stunned")
+        val STUNNED_MOVEMENT_PENALTY_MODIFIER =
+            EntityAttributeModifier(stunned, -0.25, EntityAttributeModifier.Operation.ADD_VALUE)
 
 //        private val EYE_COLOR: TrackedData<Int> =
 //            DataTracker.registerData(GloomEntity::class.java, TrackedDataHandlerRegistry.INTEGER)
 //        val EYE_COLOR_KEY: String = "EyeColor"
 //        private var eyeColorDefault: Int = Color(217, 230, 244).rgb
+
 
         fun createAttributes(): DefaultAttributeContainer.Builder {
             return HostileEntity.createAttributes()

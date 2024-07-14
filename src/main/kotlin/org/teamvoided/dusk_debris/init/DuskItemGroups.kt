@@ -118,8 +118,9 @@ object DuskItemGroups {
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.NATURAL_BLOCKS)
             .register(ItemGroupEvents.ModifyEntries {
                 it.addAfter(
-                    Items.RED_SAND,
-                    DuskItems.VOLCANIC_SAND
+                    Items.RED_SANDSTONE,
+                    DuskItems.VOLCANIC_SAND,
+                    DuskItems.VOLCANIC_SANDSTONE
                 )
             })
     }
