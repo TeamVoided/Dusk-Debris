@@ -7,7 +7,11 @@ import org.teamvoided.dusk_debris.DuskDebris.id
 
 @Suppress("MemberVisibilityCanBePrivate")
 object DuskConfiguredFeatures {
+
+    val DISK_MUD = create("disk_mud")
     val SWAMP_CYPRESS = create("swamp_cyprus")
+    val TALL_SWAMP_CYPRESS = create("tall_swamp_cypress")
+    val TREES_SWAMP = create("trees_swamp")
 
     val BLUE_NETHERSHROOM = create("blue_nethershroom")
     val HUGE_BLUE_NETHERSHROOM = create("huge_blue_nethershroom")
