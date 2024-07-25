@@ -1,4 +1,4 @@
-package org.teamvoided.dusk_debris.init
+package org.teamvoided.dusk_debris.init.worldgen
 
 import net.fabricmc.fabric.api.biome.v1.*
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalBiomeTags

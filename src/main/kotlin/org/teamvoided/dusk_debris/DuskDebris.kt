@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory
 import org.teamvoided.dusk_debris.init.DuskEntities
 import org.teamvoided.dusk_debris.init.DuskWorldgen
 import org.teamvoided.dusk_debris.init.*
+import org.teamvoided.dusk_debris.init.worldgen.DuskBiomeModifications
 
 @Suppress("unused")
 object DuskDebris {
