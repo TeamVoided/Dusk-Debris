@@ -6,9 +6,11 @@ import net.minecraft.client.model.TexturedModelData
 import net.minecraft.client.render.entity.model.BipedArmorEntityModel
 import net.minecraft.client.render.entity.model.BipedEntityModel
 import net.minecraft.client.render.entity.model.EntityModelLayer
-import net.minecraft.client.render.entity.model.EntityModels
+import net.minecraft.client.render.entity.model.HorseEntityModel
 import org.teamvoided.dusk_debris.DuskDebris.id
 import org.teamvoided.dusk_debris.entity.skeleton.render.GloomEntityModel
+import org.teamvoided.dusk_debris.entity.skeleton.render.SkeletonWolfEntityModel.Companion
+import org.teamvoided.dusk_debris.entity.skeleton.render.SkeletonWolfEntityModel.Companion.texturedModelData
 
 object DuskEntityModelLayers {
     val GLOOM: EntityModelLayer = registerMain("gloomed")
@@ -16,6 +18,10 @@ object DuskEntityModelLayers {
     val GLOOM_OUTER: EntityModelLayer = register("gloomed", "outer")
     val GLOOM_INNER_ARMOR: EntityModelLayer = createInnerArmor("gloomed")
     val GLOOM_OUTER_ARMOR: EntityModelLayer = createOuterArmor("gloomed")
+    val SKELETON_WOLF: EntityModelLayer = registerMain("skeleton_wolf")
+    val WITHER_SKELETON_WOLF: EntityModelLayer = registerMain("wither_skeleton_wolf")
+    val WITHER_SKELETON_HORSE: EntityModelLayer = registerMain("wither_skeleton_horse")
+
 
     fun init() {
         EntityModelLayerRegistry.registerModelLayer(GLOOM, GloomEntityModel::texturedModelData)
@@ -23,6 +29,9 @@ object DuskEntityModelLayers {
         EntityModelLayerRegistry.registerModelLayer(GLOOM_INNER_ARMOR, ::createInnerArmor)
         EntityModelLayerRegistry.registerModelLayer(GLOOM_OUTER_ARMOR, ::createOuterArmor)
         EntityModelLayerRegistry.registerModelLayer(GLOOM_OUTER, ::createSkeletonOuterLayer)
+        EntityModelLayerRegistry.registerModelLayer(SKELETON_WOLF, ::texturedModelData)
+        EntityModelLayerRegistry.registerModelLayer(WITHER_SKELETON_WOLF, ::texturedModelData)
+        EntityModelLayerRegistry.registerModelLayer(WITHER_SKELETON_HORSE, ::createHorseLayer)
     }
 
     private fun createInnerArmor(): TexturedModelData =
@@ -31,6 +40,8 @@ object DuskEntityModelLayers {
         TexturedModelData.of(BipedArmorEntityModel.getModelData(Dilation(1.0F)), 64, 32)
     private fun createSkeletonOuterLayer(): TexturedModelData =
         TexturedModelData.of(BipedEntityModel.getModelData(Dilation(0.25f), 0.0f), 64, 32)
+    private fun createHorseLayer(): TexturedModelData =
+        TexturedModelData.of(HorseEntityModel.getModelData(Dilation.NONE), 64, 64)
 
     private fun registerMain(id: String): EntityModelLayer {
         return register(id, "main")

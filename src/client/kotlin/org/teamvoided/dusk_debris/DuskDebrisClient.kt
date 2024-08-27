@@ -20,6 +20,9 @@ import org.teamvoided.dusk_debris.entity.DuskEntityLists.THROWABLE_BOMB_ENTITIES
 import org.teamvoided.dusk_debris.entity.DuskEntityModelLayers
 import org.teamvoided.dusk_debris.entity.gunpowder_barrel.GunpowderBarrelEntityRenderer
 import org.teamvoided.dusk_debris.entity.skeleton.GloomEntityRenderer
+import org.teamvoided.dusk_debris.entity.skeleton.SkeletonWolfEntityRenderer
+import org.teamvoided.dusk_debris.entity.skeleton.WitherSkeletonHorseEntityRenderer
+import org.teamvoided.dusk_debris.entity.skeleton.WitherSkeletonWolfEntityRenderer
 import org.teamvoided.dusk_debris.init.*
 import org.teamvoided.dusk_debris.particle.*
 
@@ -69,6 +72,9 @@ object DuskDebrisClient {
         EntityRendererRegistry.register(DuskEntities.BOX_AREA_EFFECT_CLOUD, ::EmptyEntityRenderer)
         EntityRendererRegistry.register(DuskEntities.GUNPOWDER_BARREL, ::GunpowderBarrelEntityRenderer)
         EntityRendererRegistry.register(DuskEntities.GLOOM, ::GloomEntityRenderer)
+        EntityRendererRegistry.register(DuskEntities.SKELETON_WOLF, ::SkeletonWolfEntityRenderer)
+        EntityRendererRegistry.register(DuskEntities.WITHER_SKELETON_WOLF, ::WitherSkeletonWolfEntityRenderer)
+        EntityRendererRegistry.register(DuskEntities.WITHER_SKELETON_HORSE, ::WitherSkeletonHorseEntityRenderer)
 //        BuiltinItemRendererRegistry.INSTANCE.register(DuskItems.STRAY_SKULL)
 
         BlockEntityRendererFactories.register(DuskBlockEntities.TREASURE_CHEST, ::ChestBlockEntityRenderer)

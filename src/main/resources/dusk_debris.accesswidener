@@ -11,3 +11,8 @@ accessible field net/minecraft/client/particle/Particle gravityStrength F
 accessible method net/minecraft/util/SpawnUtil method_42121 (Lnet/minecraft/server/world/ServerWorld;ILnet/minecraft/util/math/BlockPos$Mutable;Lnet/minecraft/util/SpawnUtil$Strategy;)Z
 accessible method net/minecraft/entity/mob/AbstractSkeletonEntity getStepSound ()Lnet/minecraft/sound/SoundEvent;
 accessible method net/minecraft/block/WoodType register (Lnet/minecraft/block/WoodType;)Lnet/minecraft/block/WoodType;
+accessible field net/minecraft/entity/mob/SkeletonHorseEntity trapped Z
+accessible field net/minecraft/entity/ai/goal/SkeletonHorseTrapTriggerGoal skeletonHorse Lnet/minecraft/entity/mob/SkeletonHorseEntity;
+accessible method net/minecraft/entity/ai/goal/SkeletonHorseTrapTriggerGoal getHorse (Lnet/minecraft/world/LocalDifficulty;)Lnet/minecraft/entity/passive/AbstractHorseEntity;
+accessible method net/minecraft/entity/ai/goal/SkeletonHorseTrapTriggerGoal getSkeleton (Lnet/minecraft/world/LocalDifficulty;Lnet/minecraft/entity/passive/AbstractHorseEntity;)Lnet/minecraft/entity/mob/SkeletonEntity;
+accessible method net/minecraft/entity/ai/goal/SkeletonHorseTrapTriggerGoal method_59939 (Lnet/minecraft/entity/mob/SkeletonEntity;Lnet/minecraft/entity/EquipmentSlot;Lnet/minecraft/world/LocalDifficulty;)V

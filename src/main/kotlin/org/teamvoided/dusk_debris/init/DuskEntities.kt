@@ -1,15 +1,16 @@
 package org.teamvoided.dusk_debris.init
 
 import net.fabricmc.fabric.api.`object`.builder.v1.entity.FabricDefaultAttributeRegistry
+import net.minecraft.block.Blocks
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.SpawnGroup
+import net.minecraft.entity.passive.AbstractHorseEntity
 import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
+import net.minecraft.util.math.Vec3d
 import org.teamvoided.dusk_debris.DuskDebris.id
-import org.teamvoided.dusk_debris.entity.BoxAreaEffectCloud
-import org.teamvoided.dusk_debris.entity.GloomEntity
-import org.teamvoided.dusk_debris.entity.GunpowderBarrelEntity
+import org.teamvoided.dusk_debris.entity.*
 import org.teamvoided.dusk_debris.entity.throwable_bomb.BlunderbombEntity
 import org.teamvoided.dusk_debris.entity.throwable_bomb.BonecallerEntity
 import org.teamvoided.dusk_debris.entity.throwable_bomb.FirebombEntity
@@ -50,6 +51,34 @@ object DuskEntities {
     val BLINDBOMB = throwableBomb("blindbomb", ::BlindbombEntity)
     val SMOKEBOMB = throwableBomb("smokebomb", ::SmokebombEntity)
 
+    val SKELETON_WOLF = register(
+        "skeleton_wolf",
+        EntityType.Builder.create(::SkeletonWolfEntity, SpawnGroup.MONSTER)
+            .setDimensions(0.6F, 0.85F)
+            .setEyeHeight(0.68F)
+            .passengerAttachments(Vec3d(0.0, 0.81875, -0.0625))
+            .maxTrackingRange(10)
+    )
+    val WITHER_SKELETON_WOLF = register(
+        "wither_skeleton_wolf",
+        EntityType.Builder.create(::WitherSkeletonWolfEntity, SpawnGroup.MONSTER)
+            .makeFireImmune()
+            .allowSpawningInside(Blocks.WITHER_ROSE)
+            .setDimensions(0.7F, 1.02F)
+            .setEyeHeight(0.82F)
+            .passengerAttachments(Vec3d(0.0, 0.95875, -0.0625))
+            .maxTrackingRange(10)
+    )
+    val WITHER_SKELETON_HORSE = register(
+        "wither_skeleton_horse",
+        EntityType.Builder.create(::WitherSkeletonHorseEntity, SpawnGroup.MONSTER)
+            .setDimensions(1.6757812f, 1.92f)
+            .setEyeHeight(1.824f)
+            .passengerAttachments(1.5825f)
+            .maxTrackingRange(10)
+    )
+
+
     val GLOOM = skeleton("gloomed", ::GloomEntity)
 
 
@@ -75,6 +104,12 @@ object DuskEntities {
 
     fun init() {
 //        FabricDefaultAttributeRegistry.register(CRAB, CrabEntity.createAttributes().build())
+        FabricDefaultAttributeRegistry.register(SKELETON_WOLF, SkeletonWolfEntity.createAttributes().build())
+        FabricDefaultAttributeRegistry.register(WITHER_SKELETON_WOLF, SkeletonWolfEntity.createAttributes().build())
+        FabricDefaultAttributeRegistry.register(
+            WITHER_SKELETON_HORSE,
+            AbstractHorseEntity.createBaseAttributes().build()
+        )
         FabricDefaultAttributeRegistry.register(GLOOM, GloomEntity.createAttributes().build())
     }
 

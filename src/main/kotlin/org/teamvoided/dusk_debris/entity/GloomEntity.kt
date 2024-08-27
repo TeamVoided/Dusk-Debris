@@ -285,9 +285,9 @@ class GloomEntity(entityType: EntityType<out GloomEntity>, world: World) :
         const val MODE_CONVERSION_TIME_KEY: String = "LightModeTime"
         private const val LIGHT_MODE_TIME = 300
         private var countdownToDarkMode = -1
-        val stunned: Identifier = Identifier.ofDefault("Stunned")
-        val STUNNED_MOVEMENT_PENALTY_MODIFIER =
-            EntityAttributeModifier(stunned, -0.25, EntityAttributeModifier.Operation.ADD_VALUE)
+//        val stunned: Identifier = Identifier.ofDefault("stunned")
+//        val STUNNED_MOVEMENT_PENALTY_MODIFIER =
+//            EntityAttributeModifier(stunned, -0.25, EntityAttributeModifier.Operation.ADD_VALUE)
 
 //        private val EYE_COLOR: TrackedData<Int> =
 //            DataTracker.registerData(GloomEntity::class.java, TrackedDataHandlerRegistry.INTEGER)
