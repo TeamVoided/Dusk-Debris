@@ -23,6 +23,7 @@ import org.teamvoided.dusk_debris.entity.skeleton.GloomEntityRenderer
 import org.teamvoided.dusk_debris.entity.skeleton.SkeletonWolfEntityRenderer
 import org.teamvoided.dusk_debris.entity.skeleton.WitherSkeletonHorseEntityRenderer
 import org.teamvoided.dusk_debris.entity.skeleton.WitherSkeletonWolfEntityRenderer
+import org.teamvoided.dusk_debris.entity.tuff_golem.TuffGolemEntityRenderer
 import org.teamvoided.dusk_debris.init.*
 import org.teamvoided.dusk_debris.particle.*
 
@@ -75,6 +76,8 @@ object DuskDebrisClient {
         EntityRendererRegistry.register(DuskEntities.SKELETON_WOLF, ::SkeletonWolfEntityRenderer)
         EntityRendererRegistry.register(DuskEntities.WITHER_SKELETON_WOLF, ::WitherSkeletonWolfEntityRenderer)
         EntityRendererRegistry.register(DuskEntities.WITHER_SKELETON_HORSE, ::WitherSkeletonHorseEntityRenderer)
+
+        EntityRendererRegistry.register(DuskEntities.TUFF_GOLEM, ::TuffGolemEntityRenderer)
 //        BuiltinItemRendererRegistry.INSTANCE.register(DuskItems.STRAY_SKULL)
 
         BlockEntityRendererFactories.register(DuskBlockEntities.TREASURE_CHEST, ::ChestBlockEntityRenderer)

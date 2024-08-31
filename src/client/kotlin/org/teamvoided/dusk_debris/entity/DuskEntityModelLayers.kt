@@ -9,8 +9,8 @@ import net.minecraft.client.render.entity.model.EntityModelLayer
 import net.minecraft.client.render.entity.model.HorseEntityModel
 import org.teamvoided.dusk_debris.DuskDebris.id
 import org.teamvoided.dusk_debris.entity.skeleton.render.GloomEntityModel
-import org.teamvoided.dusk_debris.entity.skeleton.render.SkeletonWolfEntityModel.Companion
 import org.teamvoided.dusk_debris.entity.skeleton.render.SkeletonWolfEntityModel.Companion.texturedModelData
+import org.teamvoided.dusk_debris.entity.tuff_golem.render.TuffGolemEntityModel
 
 object DuskEntityModelLayers {
     val GLOOM: EntityModelLayer = registerMain("gloomed")
@@ -22,6 +22,8 @@ object DuskEntityModelLayers {
     val WITHER_SKELETON_WOLF: EntityModelLayer = registerMain("wither_skeleton_wolf")
     val WITHER_SKELETON_HORSE: EntityModelLayer = registerMain("wither_skeleton_horse")
 
+    val TUFF_GOLEM: EntityModelLayer = registerMain("tuff_golem")
+
 
     fun init() {
         EntityModelLayerRegistry.registerModelLayer(GLOOM, GloomEntityModel::texturedModelData)
@@ -32,6 +34,8 @@ object DuskEntityModelLayers {
         EntityModelLayerRegistry.registerModelLayer(SKELETON_WOLF, ::texturedModelData)
         EntityModelLayerRegistry.registerModelLayer(WITHER_SKELETON_WOLF, ::texturedModelData)
         EntityModelLayerRegistry.registerModelLayer(WITHER_SKELETON_HORSE, ::createHorseLayer)
+
+        EntityModelLayerRegistry.registerModelLayer(TUFF_GOLEM, TuffGolemEntityModel::texturedModelData)
     }
 
     private fun createInnerArmor(): TexturedModelData =

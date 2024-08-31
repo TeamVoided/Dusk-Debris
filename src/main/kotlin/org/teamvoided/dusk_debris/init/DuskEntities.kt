@@ -72,9 +72,17 @@ object DuskEntities {
     val WITHER_SKELETON_HORSE = register(
         "wither_skeleton_horse",
         EntityType.Builder.create(::WitherSkeletonHorseEntity, SpawnGroup.MONSTER)
+            .makeFireImmune()
+            .allowSpawningInside(Blocks.WITHER_ROSE)
             .setDimensions(1.6757812f, 1.92f)
             .setEyeHeight(1.824f)
             .passengerAttachments(1.5825f)
+            .maxTrackingRange(10)
+    )
+    val TUFF_GOLEM = register(
+        "tuff_golem", EntityType.Builder.create(::TuffGolemEntity, SpawnGroup.MONSTER)
+            .setDimensions(0.7f, 1f)
+            .passengerAttachments(1f)
             .maxTrackingRange(10)
     )
 
@@ -110,6 +118,7 @@ object DuskEntities {
             WITHER_SKELETON_HORSE,
             AbstractHorseEntity.createBaseAttributes().build()
         )
+        FabricDefaultAttributeRegistry.register(TUFF_GOLEM, TuffGolemEntity.createAttributes().build())
         FabricDefaultAttributeRegistry.register(GLOOM, GloomEntity.createAttributes().build())
     }
 
