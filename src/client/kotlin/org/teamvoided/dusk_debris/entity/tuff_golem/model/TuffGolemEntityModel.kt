@@ -1,12 +1,13 @@
-package org.teamvoided.dusk_debris.entity.tuff_golem.render
+package org.teamvoided.dusk_debris.entity.tuff_golem.model
 
 import net.minecraft.client.model.*
 import net.minecraft.client.render.entity.model.SinglePartEntityModel
 import net.minecraft.util.math.MathHelper
 import org.teamvoided.dusk_debris.entity.TuffGolemEntity
+import org.teamvoided.dusk_debris.util.Utils
 
-class TuffGolemEntityModel<T>(private val root: ModelPart) : SinglePartEntityModel<TuffGolemEntity>() {
-    private val head: ModelPart = root.getChild("head")
+class TuffGolemEntityModel(private val root: ModelPart) : SinglePartEntityModel<TuffGolemEntity>() {
+    val body: ModelPart = root.getChild("body")
     val rightArm: ModelPart = root.getChild("right_arm")
     private val leftArm: ModelPart = root.getChild("left_arm")
     private val rightLeg: ModelPart = root.getChild("right_leg")
@@ -17,19 +18,20 @@ class TuffGolemEntityModel<T>(private val root: ModelPart) : SinglePartEntityMod
     }
 
     override fun setAngles(
-        ironGolemEntity: TuffGolemEntity,
+        tuffGolemEntity: TuffGolemEntity,
         limbAngle: Float,
         limbDistance: Float,
         animationProgress: Float,
         headYaw: Float,
         headPitch: Float
     ) {
-        head.yaw = headYaw * 0.017453292f
-        head.pitch = headPitch * 0.017453292f
-        rightLeg.pitch = -1.5f * MathHelper.wrap(limbAngle, 13.0f) * limbDistance
-        leftLeg.pitch = 1.5f * MathHelper.wrap(limbAngle, 13.0f) * limbDistance
+        val armAngle = MathHelper.wrap(limbAngle, 13.0f) * limbDistance
+        rightLeg.pitch = -1.5f * armAngle
+        leftLeg.pitch = 1.5f * armAngle
         rightLeg.yaw = 0.0f
         leftLeg.yaw = 0.0f
+        rightArm.pitch = if (!tuffGolemEntity.isHoldingItem()) -1.5f * armAngle else Utils.rotate270
+        leftArm.pitch = if (!tuffGolemEntity.isHoldingItem()) 1.5f * armAngle else Utils.rotate270
     }
 
 //    override fun animateModel(tuffGolemEntity: TuffGolemEntity, f: Float, g: Float, h: Float) {
@@ -49,53 +51,45 @@ class TuffGolemEntityModel<T>(private val root: ModelPart) : SinglePartEntityMod
                 val modelData = ModelData()
                 val modelPartData = modelData.root
                 modelPartData.addChild(
-                    "head",
-                    ModelPartBuilder.create()
-                        .uv(0, 0)
-                        .cuboid(-4.0f, -12.0f, -5.5f, 8.0f, 10.0f, 8.0f)
-                        .uv(0, 0)
-                        .cuboid(-1.0f, -5.0f, -7.5f, 2.0f, 4.0f, 2.0f),
-                    ModelTransform.pivot(0.0f, -7.0f, -2.0f)
-                )
-                modelPartData.addChild(
                     "body",
                     ModelPartBuilder.create()
-                        .uv(0, 40)
-                        .cuboid(-9.0f, -2.0f, -6.0f, 18.0f, 12.0f, 11.0f)
-                        .uv(0, 70)
-                        .cuboid(-4.5f, 10.0f, -3.0f, 9.0f, 5.0f, 6.0f, Dilation(0.5f)),
-                    ModelTransform.pivot(0.0f, -7.0f, 0.0f)
+                        .uv(0, 0)
+                        .cuboid(-5f, 0f, -4f, 10f, 13f, 8f)
+                        .uv(0, 0)
+                        .cuboid(-1f, 3f, -6f, 2f, 4f, 2f),
+                    ModelTransform.pivot(0f, 7f, 0f)
                 )
                 modelPartData.addChild(
                     "right_arm",
                     ModelPartBuilder.create()
-                        .uv(60, 21)
-                        .cuboid(-13.0f, -2.5f, -3.0f, 4.0f, 30.0f, 6.0f),
-                    ModelTransform.pivot(0.0f, -7.0f, 0.0f)
+                        .uv(36, 0)
+                        .cuboid(-12f, 0f, -2f, 3f, 10f, 4f),
+                    ModelTransform.pivot(4f, 13f, 0f)
                 )
                 modelPartData.addChild(
                     "left_arm",
                     ModelPartBuilder.create()
-                        .uv(60, 58)
-                        .cuboid(9.0f, -2.5f, -3.0f, 4.0f, 30.0f, 6.0f),
-                    ModelTransform.pivot(0.0f, -7.0f, 0.0f)
+                        .uv(36, 0)
+                        .mirrored()
+                        .cuboid(9f, 0f, -2f, 3f, 10f, 4f),
+                    ModelTransform.pivot(-4f, 13f, 0f)
                 )
                 modelPartData.addChild(
                     "right_leg",
                     ModelPartBuilder.create()
-                        .uv(37, 0)
-                        .cuboid(-3.5f, -3.0f, -3.0f, 6.0f, 16.0f, 5.0f),
-                    ModelTransform.pivot(-4.0f, 11.0f, 0.0f)
+                        .uv(36, 13)
+                        .cuboid(0f, -1f, -2f, 4f, 5f, 4f),
+                    ModelTransform.pivot(-5f, 20f, 0f)
                 )
                 modelPartData.addChild(
                     "left_leg",
                     ModelPartBuilder.create()
-                        .uv(60, 0)
+                        .uv(36, 13)
                         .mirrored()
-                        .cuboid(-3.5f, -3.0f, -3.0f, 6.0f, 16.0f, 5.0f),
-                    ModelTransform.pivot(5.0f, 11.0f, 0.0f)
+                        .cuboid(0f, -1f, -2f, 4f, 5f, 4f),
+                    ModelTransform.pivot(1f, 20f, 0f)
                 )
-                return TexturedModelData.of(modelData, 128, 128)
+                return TexturedModelData.of(modelData, 64, 32)
             }
     }
 }
