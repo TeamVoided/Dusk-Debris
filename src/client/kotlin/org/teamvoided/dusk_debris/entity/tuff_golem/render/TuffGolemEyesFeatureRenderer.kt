@@ -2,19 +2,23 @@ package org.teamvoided.dusk_debris.entity.tuff_golem.render
 
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
+import net.minecraft.client.render.OverlayTexture
 import net.minecraft.client.render.RenderLayer
 import net.minecraft.client.render.VertexConsumerProvider
 import net.minecraft.client.render.entity.feature.EyesFeatureRenderer
 import net.minecraft.client.render.entity.feature.FeatureRendererContext
 import net.minecraft.client.util.math.MatrixStack
+import net.minecraft.entity.EquipmentSlot
+import net.minecraft.registry.Registries
 import net.minecraft.util.Identifier
 import org.teamvoided.dusk_debris.DuskDebris.id
 import org.teamvoided.dusk_debris.entity.TuffGolemEntity
 import org.teamvoided.dusk_debris.entity.tuff_golem.model.TuffGolemEntityModel
 
 @Environment(EnvType.CLIENT)
-class TuffGolemEyesFeatureRenderer(featureRendererContext: FeatureRendererContext<TuffGolemEntity, TuffGolemEntityModel>) :
+open class TuffGolemEyesFeatureRenderer(featureRendererContext: FeatureRendererContext<TuffGolemEntity, TuffGolemEntityModel>) :
     EyesFeatureRenderer<TuffGolemEntity, TuffGolemEntityModel>(featureRendererContext) {
+
     override fun render(
         matrices: MatrixStack,
         vertexConsumers: VertexConsumerProvider,
@@ -27,27 +31,19 @@ class TuffGolemEyesFeatureRenderer(featureRendererContext: FeatureRendererContex
         headYaw: Float,
         headPitch: Float
     ) {
-        if (!tuffGolemEntity.isStatue())
-            super.render(
-                matrices,
-                vertexConsumers,
-                light,
-                tuffGolemEntity,
-                limbAngle,
-                limbDistance,
-                tickDelta,
-                animationProgress,
-                headYaw,
-                headPitch
-            )
+        if (!tuffGolemEntity.isStatue()) {
+            val vertexConsumer = vertexConsumers.getBuffer(this.getEyesLayer(tuffGolemEntity))
+            this.contextModel.method_60879(matrices, vertexConsumer, 15728640, OverlayTexture.DEFAULT_UV)
+        }
     }
 
-    override fun getEyesLayer(): RenderLayer {
-        return RenderLayer.getEyes(getEyesTexture("default"))
+    override fun getEyesLayer(): RenderLayer? {
+        return null
     }
 
-    companion object {
-        fun getEyesTexture(string: String): Identifier =
-            id("textures/entity/tuff_golem/eyes/$string.png")
+    open fun getEyesLayer(tuffGolemEntity: TuffGolemEntity): RenderLayer {
+        return RenderLayer.getEyes(
+            id("textures/entity/tuff_golem/eyes/" + tuffGolemEntity.getEyeBlock() + ".png")
+        )
     }
 }

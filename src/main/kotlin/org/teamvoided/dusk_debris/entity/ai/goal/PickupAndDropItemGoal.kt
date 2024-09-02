@@ -1,21 +1,18 @@
 package org.teamvoided.dusk_debris.entity.ai.goal
 
-import net.minecraft.block.Blocks
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EquipmentSlot
 import net.minecraft.entity.ItemEntity
 import net.minecraft.entity.ai.goal.Goal
-import net.minecraft.entity.mob.PathAwareEntity
+import net.minecraft.entity.ai.pathing.EntityNavigation
+import net.minecraft.entity.ai.pathing.Path
 import net.minecraft.item.ItemStack
-import net.minecraft.sound.SoundEvent
-import net.minecraft.sound.SoundEvents
+import org.teamvoided.dusk_debris.entity.TuffGolemEntity
 import java.util.*
 
 open class PickupAndDropItemGoal(
-    protected val mob: PathAwareEntity,
-    val wantsToPickupItem: Boolean,
+    protected val golem: TuffGolemEntity,
     val probability: Double = 1.0,
-    val soundEvent: SoundEvent = SoundEvents.ENTITY_ITEM_PICKUP,
     val checkRange: Double = 8.0
 ) : Goal() {
     init {
@@ -27,15 +24,15 @@ open class PickupAndDropItemGoal(
     }
 
     override fun canStart(): Boolean {
-        if (!wantsToPickupItem) {
+        if (golem.wasGivenItem() || golem.isStatue()) {
             return false
-        } else if (mob.target == null && mob.attacker == null) {
-            if (mob.method_59922().nextFloat() <= probability) {
+        } else if (golem.target == null && golem.attacker == null) {
+            if (golem.method_59922().nextFloat() <= probability) {
                 return false
             } else {
-                val list: List<ItemEntity> = mob.world.getEntitiesByClass(
+                val list: List<ItemEntity> = golem.world.getEntitiesByClass(
                     ItemEntity::class.java,
-                    mob.bounds.expand(checkRange, checkRange, checkRange),
+                    golem.bounds.expand(checkRange, checkRange, checkRange),
                     pickableDropFilter
                 )
                 return list.isNotEmpty()
@@ -46,50 +43,38 @@ open class PickupAndDropItemGoal(
     }
 
     override fun start() {
-        if (mob.navigation.isIdle) {
-            val list: List<ItemEntity> = mob.world.getEntitiesByClass(
+        if (golem.navigation.isIdle) {
+            val list: List<ItemEntity> = golem.world.getEntitiesByClass(
                 ItemEntity::class.java,
-                mob.bounds.expand(checkRange, checkRange, checkRange),
+                golem.bounds.expand(checkRange, checkRange, checkRange),
                 pickableDropFilter
             )
             if (list.isNotEmpty()) {
-                mob.navigation.startMovingTo(list.random() as Entity, 1.2)
+                golem.navigation.startMovingTo(list.random() as Entity, 1.2, 0)
             }
         }
     }
 
     override fun tick() {
-        if (mob.navigation.isIdle) {
-            val list: List<ItemEntity> = mob.world.getEntitiesByClass(
+        if (golem.navigation.isIdle) {
+            val list: List<ItemEntity> = golem.world.getEntitiesByClass(
                 ItemEntity::class.java,
-                mob.bounds.expand(checkRange, checkRange, checkRange),
+                golem.bounds.expand(checkRange, checkRange, checkRange),
                 pickableDropFilter
             )
-            val mainhand: ItemStack = mob.getEquippedStack(EquipmentSlot.MAINHAND)
+            val mainhand: ItemStack = golem.getEquippedStack(EquipmentSlot.MAINHAND)
             if (list.isNotEmpty()) {
                 if (mainhand != ItemStack.EMPTY) {
-                    spit(mainhand)
+                    golem.spit(mainhand)
+                    golem.equipStack(EquipmentSlot.MAINHAND, ItemStack.EMPTY)
                 }
-                mob.navigation.startMovingTo(list.random() as Entity, 1.2)
+                golem.navigation.startMovingTo(list.random() as Entity, 1.2, 0)
             }
         }
     }
 
-    private fun spit(stack: ItemStack) {
-        if (!stack.isEmpty && !mob.world.isClient) {
-            val itemEntity = ItemEntity(
-                mob.world,
-                mob.x + mob.rotationVector.x,
-                mob.y + 1.0,
-                mob.z + mob.rotationVector.z,
-                stack.copy()
-            )
-            itemEntity.setPickupDelay(40)
-            itemEntity.setThrower(mob)
-            mob.playSound(soundEvent, 1.0f, 1.0f)
-            mob.world.spawnEntity(itemEntity)
-            val itemStack = mob.getEquippedStack(EquipmentSlot.MAINHAND)
-            itemStack.decrement(itemStack.count)
-        }
+    open fun EntityNavigation.startMovingTo(entity: Entity?, speed: Double, distance: Int): Boolean {
+        val path: Path? = this.findPathTo(entity, distance)
+        return path != null && this.startMovingAlong(path, speed)
     }
 }

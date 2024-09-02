@@ -2,6 +2,7 @@ package org.teamvoided.dusk_debris.entity.tuff_golem
 
 import net.minecraft.client.render.entity.EntityRendererFactory
 import net.minecraft.client.render.entity.MobEntityRenderer
+import org.teamvoided.dusk_debris.entity.tuff_golem.render.TuffGolemHatFeatureRenderer
 import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.Axis
@@ -24,6 +25,8 @@ class TuffGolemEntityRenderer(context: EntityRendererFactory.Context) :
         this.addFeature(TuffGolemEyesFeatureRenderer(this))
         this.addFeature(TuffGolemHeldItemFeatureRenderer(this, context.heldItemRenderer))
         this.addFeature(TuffGolemCloakFeatureRenderer(this, context.modelLoader))
+        this.addFeature(TuffGolemHatFeatureRenderer(this, context.itemRenderer))
+
     }
 
     override fun getTexture(tuffGolemEntity: TuffGolemEntity): Identifier {

@@ -17,13 +17,8 @@ class TuffGolemCloakModel(private val root: ModelPart) : SinglePartEntityModel<T
         headYaw: Float,
         headPitch: Float
     ) {
-        if (tuffGolemEntity.isHoldingItem()) {
-            cloak_item.visible = true
-            cloak_no_item.visible = false
-        } else {
-            cloak_item.visible = false
-            cloak_no_item.visible = true
-        }
+        cloak_item.visible = tuffGolemEntity.isHoldingItem()
+        cloak_no_item.visible = !tuffGolemEntity.isHoldingItem()
 //        super.setAngles(tuffGolemEntity, limbAngle, limbDistance, animationProgress, headYaw, headPitch)
     }
 

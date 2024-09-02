@@ -7,6 +7,9 @@ import net.minecraft.client.render.entity.feature.FeatureRenderer
 import net.minecraft.client.render.entity.feature.FeatureRendererContext
 import net.minecraft.client.render.entity.model.EntityModelLoader
 import net.minecraft.client.util.math.MatrixStack
+import net.minecraft.entity.EquipmentSlot
+import net.minecraft.item.Items
+import net.minecraft.registry.Registries
 import net.minecraft.util.Identifier
 import org.teamvoided.dusk_debris.DuskDebris.id
 import org.teamvoided.dusk_debris.entity.DuskEntityModelLayers
@@ -35,8 +38,9 @@ class TuffGolemCloakFeatureRenderer(
         k: Float,
         l: Float
     ) {
-        val getTexture: String = if (tuffGolemEntity.geCloakBlock() != null) {
-            tuffGolemEntity.geCloakBlock()!!.block.translationKey
+        val cloakBlock = tuffGolemEntity.getEquippedStack(EquipmentSlot.BODY)
+        val getTexture: String = if (!cloakBlock.isEmpty) {
+            Registries.ITEM.getId(cloakBlock.item).path
         } else {
             "default"
         }
