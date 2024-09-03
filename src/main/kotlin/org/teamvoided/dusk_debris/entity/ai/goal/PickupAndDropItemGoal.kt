@@ -24,7 +24,7 @@ open class PickupAndDropItemGoal(
     }
 
     override fun canStart(): Boolean {
-        if (golem.wasGivenItem() || golem.state?.isStatueMode() == true) {
+        if (!golem.canPickUpItem() || !golem.navigation.isIdle) {
             return false
         } else if (golem.target == null && golem.attacker == null) {
             if (golem.method_59922().nextFloat() <= probability) {
@@ -43,33 +43,13 @@ open class PickupAndDropItemGoal(
     }
 
     override fun start() {
-        if (golem.navigation.isIdle) {
-            val list: List<ItemEntity> = golem.world.getEntitiesByClass(
-                ItemEntity::class.java,
-                golem.bounds.expand(checkRange, checkRange, checkRange),
-                pickableDropFilter
-            )
-            if (list.isNotEmpty()) {
-                golem.navigation.startMovingTo(list.random() as Entity, 1.2, 0)
-            }
-        }
-    }
-
-    override fun tick() {
-        if (golem.navigation.isIdle) {
-            val list: List<ItemEntity> = golem.world.getEntitiesByClass(
-                ItemEntity::class.java,
-                golem.bounds.expand(checkRange, checkRange, checkRange),
-                pickableDropFilter
-            )
-            val mainhand: ItemStack = golem.getEquippedStack(EquipmentSlot.MAINHAND)
-            if (list.isNotEmpty()) {
-                if (mainhand != ItemStack.EMPTY) {
-                    golem.spit(mainhand)
-                    golem.equipStack(EquipmentSlot.MAINHAND, ItemStack.EMPTY)
-                }
-                golem.navigation.startMovingTo(list.random() as Entity, 1.2, 0)
-            }
+        val list: List<ItemEntity> = golem.world.getEntitiesByClass(
+            ItemEntity::class.java,
+            golem.bounds.expand(checkRange, checkRange, checkRange),
+            pickableDropFilter
+        )
+        if (list.isNotEmpty()) {
+            golem.navigation.startMovingTo(list.random() as Entity, 1.2, 0)
         }
     }
 

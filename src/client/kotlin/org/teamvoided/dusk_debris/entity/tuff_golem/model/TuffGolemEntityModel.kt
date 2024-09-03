@@ -1,7 +1,6 @@
 package org.teamvoided.dusk_debris.entity.tuff_golem.model
 
 import net.minecraft.client.model.*
-import net.minecraft.client.render.entity.animation.ArmadilloEntityAnimations
 import net.minecraft.client.render.entity.model.SinglePartEntityModel
 import org.teamvoided.dusk_debris.entity.TuffGolemEntity
 import org.teamvoided.dusk_debris.entity.tuff_golem.animation.TuffGolemEntityAnimations
@@ -29,8 +28,8 @@ class TuffGolemEntityModel(private val root: ModelPart) : SinglePartEntityModel<
     ) {
         this.part.traverse().forEach(ModelPart::resetTransform)
         this.animateWalk(TuffGolemEntityAnimations.WALK, limbAngle, limbDistance, 16.5f, 2.5f)
-        this.animate(tuffGolemEntity.risingState, TuffGolemEntityAnimations.ARISE, animationProgress, 1.0f)
-        this.animate(tuffGolemEntity.statueState, TuffGolemEntityAnimations.STATUE, animationProgress, 1.0f)
+        this.animate(tuffGolemEntity.risingAnimationState, TuffGolemEntityAnimations.ARISE, animationProgress, 1.0f)
+        this.animate(tuffGolemEntity.statueAnimationState, TuffGolemEntityAnimations.STATUE, animationProgress, 1.0f)
 
         if (!tuffGolemEntity.isHoldingItem()) {
             rightArm.setPivot(rightArm.pivotX, -9f, rightArm.pivotZ)

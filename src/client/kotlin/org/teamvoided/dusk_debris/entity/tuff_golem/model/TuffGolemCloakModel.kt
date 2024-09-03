@@ -21,6 +21,9 @@ class TuffGolemCloakModel(private val root: ModelPart) : SinglePartEntityModel<T
     ) {
         this.part.traverse().forEach(ModelPart::resetTransform)
         this.animateWalk(TuffGolemEntityAnimations.WALK, limbAngle, limbDistance, 16.5f, 2.5f)
+        this.animate(tuffGolemEntity.risingAnimationState, TuffGolemEntityAnimations.ARISE, animationProgress, 1.0f)
+        this.animate(tuffGolemEntity.statueAnimationState, TuffGolemEntityAnimations.STATUE, animationProgress, 1.0f)
+
         cloak_item.visible = tuffGolemEntity.isHoldingItem()
         cloak_no_item.visible = !tuffGolemEntity.isHoldingItem()
     }

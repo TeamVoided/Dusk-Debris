@@ -3,7 +3,6 @@ package org.teamvoided.dusk_debris
 import net.minecraft.util.Identifier
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.teamvoided.dusk_debris.entity.data.DuskTrackedDataHandlerRegistry
 import org.teamvoided.dusk_debris.init.DuskEntities
 import org.teamvoided.dusk_debris.init.DuskWorldgen
 import org.teamvoided.dusk_debris.init.*
@@ -23,7 +22,6 @@ object DuskDebris {
         DuskBlockEntities.init()
         DuskItems.init()
         DuskItemGroups.init()
-        DuskTrackedDataHandlerRegistry.init()
         DuskEntities.init()
         DuskWorldgen.init()
         DuskBiomeModifications.init()

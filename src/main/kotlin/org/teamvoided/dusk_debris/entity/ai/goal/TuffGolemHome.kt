@@ -33,8 +33,9 @@ open class TuffGolemHome(
         if (golem.getSummonedPos() != null && golem.getStatueTicks() > 0) {
             val summonPos = golem.squaredDistanceTo(golem.getSummonedPos()!!.method_61082())
             if (summonPos < 0.5) {
-                if (golem.state != TuffGolemEntity.TuffGolemState.STATUE && summonPos < 0.1) {
-                    golem.state = TuffGolemEntity.TuffGolemState.STATUE
+                if (golem.state != golem.statueState && summonPos < 0.1) {
+                    golem.setStateStatue()
+                    golem.yaw = (golem.yaw.toInt() / 90) * 90f
                 }
                 golem.move(MovementType.SELF, moveTo(golem.getSummonedPos()!!))
             }

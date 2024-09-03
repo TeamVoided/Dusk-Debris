@@ -28,7 +28,7 @@ open class TuffGolemEyesFeatureRenderer(featureRendererContext: FeatureRendererC
         headYaw: Float,
         headPitch: Float
     ) {
-        if (tuffGolemEntity.state?.isStatueMode() == false) {
+        if (tuffGolemEntity.state < 2) {
             val vertexConsumer = vertexConsumers.getBuffer(this.getEyesLayer(tuffGolemEntity))
             this.contextModel.method_60879(matrices, vertexConsumer, 15728640, OverlayTexture.DEFAULT_UV)
         }
