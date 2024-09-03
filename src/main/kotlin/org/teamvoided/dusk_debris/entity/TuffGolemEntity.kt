@@ -133,7 +133,7 @@ class TuffGolemEntity(entityType: EntityType<out TuffGolemEntity>, world: World)
             if (getStatueTicks() > 0) {
                 val ticks = dataTracker.get(STATUE_TICKS)
                 setStatueTicks(ticks - 1)
-                if (getStatueTicks() % 400 == 0 &&
+                if (getStatueTicks() % 200 == 0 &&
                     this.health < this.maxHealth &&
                     !this.hasStatusEffect(StatusEffects.REGENERATION) &&
                     random.nextInt(100) == 0
@@ -176,18 +176,21 @@ class TuffGolemEntity(entityType: EntityType<out TuffGolemEntity>, world: World)
                 //give golem item
                 this.setStackInHand(Hand.MAIN_HAND, playerHandStack.copyWithCount(1))
                 playerHandStack.consume(1, player)
+                this.playSound(SoundEvents.ENTITY_ITEM_PICKUP, 1.0f, 0.5f)
                 setWasGivenItem(true)
                 return ActionResult.SUCCESS
             } else if (golemHatStack.isEmpty && getPreferredEquipmentSlot(playerHandStack) == EquipmentSlot.HEAD) {
                 //give golem hat
                 this.equipStack(EquipmentSlot.HEAD, playerHandStack.copyWithCount(1))
                 playerHandStack.consume(1, player)
+                this.playSound(SoundEvents.ENTITY_ITEM_PICKUP, 1.0f, 0.5f)
                 return ActionResult.SUCCESS
             } else if (playerHandStack.isIn(ItemTags.WOOL)) {
                 //give golem cloak
                 this.spit(golemChestStack)
                 this.equipStack(EquipmentSlot.CHEST, playerHandStack.copyWithCount(1))
                 playerHandStack.consume(1, player)
+                this.playSound(SoundEvents.ENTITY_ITEM_PICKUP, 1.0f, 0.5f)
                 return ActionResult.SUCCESS
             } else if (playerHandStack.isIn(ItemTags.BOATS)) {
                 //give golem eye color
@@ -201,11 +204,13 @@ class TuffGolemEntity(entityType: EntityType<out TuffGolemEntity>, world: World)
                 this.swingHand(Hand.MAIN_HAND)
                 player.giveItemStack(golemHandStack)
                 setWasGivenItem(false)
+                this.playSound(SoundEvents.ENTITY_ITEM_PICKUP, 1.0f, 0.0f)
                 return ActionResult.SUCCESS
             } else if (!golemHatStack.isEmpty) {
                 //take golem hat
                 this.equipStack(EquipmentSlot.HEAD, ItemStack.EMPTY)
                 player.giveItemStack(golemHatStack)
+                this.playSound(SoundEvents.ENTITY_ITEM_PICKUP, 1.0f, 0.0f)
                 return ActionResult.SUCCESS
             }
         }
@@ -224,7 +229,10 @@ class TuffGolemEntity(entityType: EntityType<out TuffGolemEntity>, world: World)
     override fun canPickupItem(stack: ItemStack): Boolean = canPickUpItem()
 
     fun canPickUpItem(): Boolean =
-        state == wanderingState && !wasGivenItem() && this.getEquippedStack(EquipmentSlot.MAINHAND).isEmpty
+        state == wanderingState &&
+                !wasGivenItem() &&
+                this.getEquippedStack(EquipmentSlot.MAINHAND).isEmpty &&
+                !this.getEquippedStack(EquipmentSlot.CHEST).isEmpty
 
     override fun loot(item: ItemEntity) {
         val itemStack = item.stack
@@ -238,6 +246,7 @@ class TuffGolemEntity(entityType: EntityType<out TuffGolemEntity>, world: World)
             this.equipStack(EquipmentSlot.MAINHAND, itemStack.split(1))
             this.updateDropChances(EquipmentSlot.MAINHAND)
             this.sendPickup(item, itemStack.count)
+            this.playSound(SoundEvents.ENTITY_ITEM_PICKUP, 1.0f, 0.5f)
             item.discard()
         }
     }
@@ -257,7 +266,7 @@ class TuffGolemEntity(entityType: EntityType<out TuffGolemEntity>, world: World)
             )
             itemEntity.setPickupDelay(40)
             itemEntity.setThrower(this)
-            this.playSound(SoundEvents.ENTITY_FOX_SPIT, 1.0f, 1.0f)
+            this.playSound(SoundEvents.ENTITY_ITEM_PICKUP, 1.0f, 0.0f)
             world.spawnEntity(itemEntity)
         }
     }
