@@ -3,7 +3,6 @@ package org.teamvoided.dusk_debris.entity
 import net.minecraft.entity.*
 import net.minecraft.entity.ai.goal.*
 import net.minecraft.entity.attribute.DefaultAttributeContainer
-import net.minecraft.entity.attribute.EntityAttributeModifier
 import net.minecraft.entity.attribute.EntityAttributes
 import net.minecraft.entity.damage.DamageSource
 import net.minecraft.entity.data.DataTracker
@@ -13,7 +12,6 @@ import net.minecraft.entity.effect.StatusEffectInstance
 import net.minecraft.entity.effect.StatusEffects
 import net.minecraft.entity.mob.AbstractSkeletonEntity
 import net.minecraft.entity.mob.HostileEntity
-import net.minecraft.entity.mob.WitchEntity
 import net.minecraft.entity.passive.TurtleEntity
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.entity.projectile.ArrowEntity
@@ -23,7 +21,6 @@ import net.minecraft.item.Items
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.sound.SoundEvent
 import net.minecraft.sound.SoundEvents
-import net.minecraft.util.Identifier
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.random.RandomGenerator
 import net.minecraft.world.LocalDifficulty

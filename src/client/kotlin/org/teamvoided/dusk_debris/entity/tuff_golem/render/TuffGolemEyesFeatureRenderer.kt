@@ -8,9 +8,6 @@ import net.minecraft.client.render.VertexConsumerProvider
 import net.minecraft.client.render.entity.feature.EyesFeatureRenderer
 import net.minecraft.client.render.entity.feature.FeatureRendererContext
 import net.minecraft.client.util.math.MatrixStack
-import net.minecraft.entity.EquipmentSlot
-import net.minecraft.registry.Registries
-import net.minecraft.util.Identifier
 import org.teamvoided.dusk_debris.DuskDebris.id
 import org.teamvoided.dusk_debris.entity.TuffGolemEntity
 import org.teamvoided.dusk_debris.entity.tuff_golem.model.TuffGolemEntityModel
@@ -31,7 +28,7 @@ open class TuffGolemEyesFeatureRenderer(featureRendererContext: FeatureRendererC
         headYaw: Float,
         headPitch: Float
     ) {
-        if (!tuffGolemEntity.isStatue()) {
+        if (tuffGolemEntity.state?.isStatueMode() == false) {
             val vertexConsumer = vertexConsumers.getBuffer(this.getEyesLayer(tuffGolemEntity))
             this.contextModel.method_60879(matrices, vertexConsumer, 15728640, OverlayTexture.DEFAULT_UV)
         }

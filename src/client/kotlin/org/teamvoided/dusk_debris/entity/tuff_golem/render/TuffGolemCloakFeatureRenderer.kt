@@ -38,28 +38,25 @@ class TuffGolemCloakFeatureRenderer(
         k: Float,
         l: Float
     ) {
-        val cloakBlock = tuffGolemEntity.getEquippedStack(EquipmentSlot.BODY)
-        val getTexture: String = if (!cloakBlock.isEmpty) {
-            Registries.ITEM.getId(cloakBlock.item).path
-        } else {
-            "default"
+        val cloakBlock = tuffGolemEntity.getEquippedStack(EquipmentSlot.CHEST)
+        if (!cloakBlock.isEmpty) {
+            render(
+                this.contextModel,
+                this.model,
+                tuffGolemCloakTextureId(Registries.ITEM.getId(cloakBlock.item).path),
+                matrices,
+                vertexConsumers,
+                i,
+                tuffGolemEntity,
+                f,
+                g,
+                j,
+                k,
+                l,
+                h,
+                -1
+            )
         }
-        render(
-            this.contextModel,
-            this.model,
-            tuffGolemCloakTextureId(getTexture),
-            matrices,
-            vertexConsumers,
-            i,
-            tuffGolemEntity,
-            f,
-            g,
-            j,
-            k,
-            l,
-            h,
-            -1
-        )
     }
 
     companion object {

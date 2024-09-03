@@ -19,8 +19,8 @@ import org.teamvoided.dusk_debris.entity.tuff_golem.model.TuffGolemEntityModel
 class TuffGolemHatFeatureRenderer(
     context: FeatureRendererContext<TuffGolemEntity, TuffGolemEntityModel>,
     private val itemRenderer: ItemRenderer
-) :
-    FeatureRenderer<TuffGolemEntity, TuffGolemEntityModel>(context) {
+) : FeatureRenderer<TuffGolemEntity, TuffGolemEntityModel>(context) {
+    val scale = 0.8f
     override fun render(
         matrices: MatrixStack,
         vertexConsumers: VertexConsumerProvider,

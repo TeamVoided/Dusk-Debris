@@ -24,7 +24,7 @@ open class PickupAndDropItemGoal(
     }
 
     override fun canStart(): Boolean {
-        if (golem.wasGivenItem() || golem.isStatue()) {
+        if (golem.wasGivenItem() || golem.state?.isStatueMode() == true) {
             return false
         } else if (golem.target == null && golem.attacker == null) {
             if (golem.method_59922().nextFloat() <= probability) {

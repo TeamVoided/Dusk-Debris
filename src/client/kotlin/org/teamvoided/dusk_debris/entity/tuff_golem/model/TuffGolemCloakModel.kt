@@ -4,10 +4,12 @@ package org.teamvoided.dusk_debris.entity.tuff_golem.model
 import net.minecraft.client.model.*
 import net.minecraft.client.render.entity.model.SinglePartEntityModel
 import org.teamvoided.dusk_debris.entity.TuffGolemEntity
+import org.teamvoided.dusk_debris.entity.tuff_golem.animation.TuffGolemEntityAnimations
 
 class TuffGolemCloakModel(private val root: ModelPart) : SinglePartEntityModel<TuffGolemEntity>() {
-    val cloak_item: ModelPart = root.getChild("cloak_item")
-    val cloak_no_item: ModelPart = root.getChild("cloak_no_item")
+    val body: ModelPart = root.getChild("body")
+    val cloak_item: ModelPart = body.getChild("cloak_item")
+    val cloak_no_item: ModelPart = body.getChild("cloak_no_item")
 
     override fun setAngles(
         tuffGolemEntity: TuffGolemEntity,
@@ -17,9 +19,10 @@ class TuffGolemCloakModel(private val root: ModelPart) : SinglePartEntityModel<T
         headYaw: Float,
         headPitch: Float
     ) {
+        this.part.traverse().forEach(ModelPart::resetTransform)
+        this.animateWalk(TuffGolemEntityAnimations.WALK, limbAngle, limbDistance, 16.5f, 2.5f)
         cloak_item.visible = tuffGolemEntity.isHoldingItem()
         cloak_no_item.visible = !tuffGolemEntity.isHoldingItem()
-//        super.setAngles(tuffGolemEntity, limbAngle, limbDistance, animationProgress, headYaw, headPitch)
     }
 
     override fun getPart(): ModelPart {
@@ -31,27 +34,32 @@ class TuffGolemCloakModel(private val root: ModelPart) : SinglePartEntityModel<T
             get() {
                 val modelData = ModelData()
                 val modelPartData = modelData.root
-                modelPartData.addChild(
+                val body = modelPartData.addChild(
+                    "body",
+                    ModelPartBuilder.create(),
+                    ModelTransform.pivot(0f, 20f, 0f)
+                )
+                body.addChild(
                     "cloak_no_item",
                     ModelPartBuilder.create()
                         .uv(0, 0)
                         .cuboid(
-                            -5f, 0f, -4f,
+                            -5f, -5f, -4f,
                             10f, 8f, 8f,
                             Dilation(0.5f)
                         ),
-                    ModelTransform.pivot(0f, 15f, 0f)
+                    ModelTransform.pivot(0f, 0f, 0f)
                 )
-                modelPartData.addChild(
+                body.addChild(
                     "cloak_item",
                     ModelPartBuilder.create()
                         .uv(0, 16)
                         .cuboid(
-                            -5f, 0f, -9f,
+                            -5f, -5f, -9f,
                             10f, 8f, 13f,
                             Dilation(0.5f)
                         ),
-                    ModelTransform.pivot(0f, 15f, 0f)
+                    ModelTransform.pivot(0f, 0f, 0f)
                 )
                 return TexturedModelData.of(modelData, 64, 64)
             }
