@@ -34,7 +34,8 @@ class TuffGolemEntityRenderer(context: EntityRendererFactory.Context) :
     }
 
     override fun isShaking(tuffGolemEntity: TuffGolemEntity): Boolean {
-        return tuffGolemEntity.getStatueTicks() in 1..20 || super.isShaking(tuffGolemEntity)
+        return super.isShaking(tuffGolemEntity) ||
+                (tuffGolemEntity.state == tuffGolemEntity.statueState && tuffGolemEntity.statueTicks < 20)
     }
 
     companion object {

@@ -1,26 +1,28 @@
 package org.teamvoided.dusk_debris.entity.ai.goal
 
 import net.minecraft.entity.Entity
+import net.minecraft.entity.EntityType
 import net.minecraft.entity.ItemEntity
+import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.ai.goal.Goal
 import net.minecraft.entity.ai.pathing.EntityNavigation
 import net.minecraft.entity.ai.pathing.Path
 import net.minecraft.entity.mob.MobEntity
-import org.teamvoided.dusk_debris.entity.TuffGolemEntity
+import net.minecraft.registry.tag.TagKey
 import java.util.*
+import java.util.function.Predicate
 
-open class PickupAndDropItemGoal(
+open class ShowOffGoal(
     protected val mob: MobEntity,
     val requirement: Boolean,
+    val inclusionSelector:Predicate<LivingEntity>,
     val probability: Double = 1.0,
-    val checkRange: Double = 8.0
+    val speed: Double = 1.2,
+    val distanceAwayFromEndTarget: Int = 1,
+    val checkRange: Double = 16.0
 ) : Goal() {
     init {
         this.controls = EnumSet.of(Control.MOVE)
-    }
-
-    private val pickableDropFilter = java.util.function.Predicate<ItemEntity> { item: ItemEntity ->
-        !item.cannotPickup() && item.isAlive && item.age > 30
     }
 
     override fun canStart(): Boolean {
@@ -30,10 +32,10 @@ open class PickupAndDropItemGoal(
             if (mob.method_59922().nextFloat() <= probability) {
                 return false
             } else {
-                val list: List<ItemEntity> = mob.world.getEntitiesByClass(
-                    ItemEntity::class.java,
+                val list: List<LivingEntity> = mob.world.getEntitiesByClass(
+                    LivingEntity::class.java,
                     mob.bounds.expand(checkRange, checkRange, checkRange),
-                    pickableDropFilter
+                    inclusionSelector
                 )
                 return list.isNotEmpty()
             }
@@ -43,13 +45,13 @@ open class PickupAndDropItemGoal(
     }
 
     override fun start() {
-        val list: List<ItemEntity> = mob.world.getEntitiesByClass(
-            ItemEntity::class.java,
+        val list: List<LivingEntity> = mob.world.getEntitiesByClass(
+            LivingEntity::class.java,
             mob.bounds.expand(checkRange, checkRange, checkRange),
-            pickableDropFilter
+            inclusionSelector
         )
         if (list.isNotEmpty()) {
-            mob.navigation.startMovingTo(list.random() as Entity, 1.2, 0)
+            mob.navigation.startMovingTo(list.random() as Entity, speed, distanceAwayFromEndTarget)
         }
     }
 

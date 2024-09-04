@@ -40,7 +40,7 @@ open class TuffGolemEyesFeatureRenderer(featureRendererContext: FeatureRendererC
 
     open fun getEyesLayer(tuffGolemEntity: TuffGolemEntity): RenderLayer {
         return RenderLayer.getEyes(
-            id("textures/entity/tuff_golem/eyes/" + tuffGolemEntity.getEyeBlock() + ".png")
+            id("textures/entity/tuff_golem/eyes/" + tuffGolemEntity.eyeBlock + ".png")
         )
     }
 }

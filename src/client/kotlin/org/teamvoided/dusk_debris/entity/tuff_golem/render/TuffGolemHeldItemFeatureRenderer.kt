@@ -35,9 +35,9 @@ class TuffGolemHeldItemFeatureRenderer(
             matrices.push()
             (this.contextModel as TuffGolemEntityModel).body.rotate(matrices)
             val scale = 0.625f
-            matrices.translate(0.0f, -0.34375f, -0.5f)
+            matrices.translate(0.0f, -0.50001f, -0.55f)
 //            matrices.rotate(Axis.Y_POSITIVE.rotationDegrees(180.0f))
-            matrices.scale(scale, -scale, -scale)
+            matrices.scale(-scale, -scale, scale)
             heldItemRenderer.renderItem(
                 tuffGolemEntity,
                 ItemStack(itemStack.item),

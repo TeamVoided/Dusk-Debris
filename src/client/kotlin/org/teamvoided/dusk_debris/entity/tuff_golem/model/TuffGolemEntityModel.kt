@@ -78,7 +78,7 @@ class TuffGolemEntityModel(private val root: ModelPart) : SinglePartEntityModel<
                     ModelPartBuilder.create()
                         .uv(0, 26)
                         .cuboid(-12f, 0f, -5f, 24f, 6f, 0f),
-                    ModelTransform.pivot(0f, 8f, 0f)
+                    ModelTransform.pivot(0f, -12f, 0f)
                 )
                 body.addChild(
                     "right_arm",

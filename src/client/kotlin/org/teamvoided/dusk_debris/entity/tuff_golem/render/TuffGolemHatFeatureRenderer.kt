@@ -40,8 +40,8 @@ class TuffGolemHatFeatureRenderer(
         ) {
             matrices.push()
             (this.contextModel as TuffGolemEntityModel).body.rotate(matrices)
-            val scale = 0.625f
-            matrices.translate(0.0f, -0.34375f, 0.0f)
+            val scale = 0.65f
+            matrices.translate(0.0f, -0.6f, 0.0f)
             matrices.rotate(Axis.Y_POSITIVE.rotationDegrees(180.0f))
             matrices.scale(scale, -scale, -scale)
             itemRenderer.renderItem(

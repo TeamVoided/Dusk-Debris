@@ -18,26 +18,26 @@ open class TuffGolemHome(
 
     override fun canStart(): Boolean =
         !golem.hasControllingPassenger() &&
-                golem.getStatueTicks() > 0 &&
-                golem.getSummonedPos() != null
+                golem.statueTicks > 0 &&
+                golem.summonedPos != null
 
     override fun start() {
-        if (golem.getSummonedPos() != null && golem.getStatueTicks() > 0) {
+        if (golem.summonedPos != null && golem.statueTicks > 0) {
             golem.navigation.stop()
-            val target = golem.getSummonedPos()!!.method_61082()
+            val target = golem.summonedPos!!.method_61082()
             golem.navigation.startMovingTo(target.x, target.y, target.z, 0, this.speed)
         }
     }
 
     override fun tick() {
-        if (golem.getSummonedPos() != null && golem.getStatueTicks() > 0) {
-            val summonPos = golem.squaredDistanceTo(golem.getSummonedPos()!!.method_61082())
+        if (golem.summonedPos != null && golem.statueTicks > 0) {
+            val summonPos = golem.squaredDistanceTo(golem.summonedPos!!.method_61082())
             if (summonPos < 0.5) {
                 if (golem.state != golem.statueState && summonPos < 0.1) {
                     golem.setStateStatue()
                     golem.yaw = (golem.yaw.toInt() / 90) * 90f
                 }
-                golem.move(MovementType.SELF, moveTo(golem.getSummonedPos()!!))
+                golem.move(MovementType.SELF, moveTo(golem.summonedPos!!))
             }
             super.tick()
         }
