@@ -19,6 +19,7 @@ import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.MathHelper
 import net.minecraft.world.World
 import org.joml.Vector3f
+import org.teamvoided.dusk_debris.init.DuskBlocks
 import org.teamvoided.dusk_debris.init.DuskEntities
 import org.teamvoided.dusk_debris.init.DuskItems
 import org.teamvoided.dusk_debris.particle.BonecallerParticleEffect
@@ -155,7 +156,7 @@ open class BonecallerEntity : AbstractThrwowableBombEntity {
     }
 
     override fun getDefaultItem(): Item {
-        return DuskItems.BONECALLER_ITEM
+        return DuskBlocks.BONECALLER_BLOCK.asItem()
     }
 
     open fun bandanaColors(): Int {

@@ -29,6 +29,6 @@ class SmokebombEntity : NethershroomThrowableEntity {
     }
 
     override fun getDefaultItem(): Item {
-        return DuskItems.SMOKEBOMB_ITEM
+        return DuskBlocks.SMOKEBOMB_BLOCK.asItem()
     }
 }

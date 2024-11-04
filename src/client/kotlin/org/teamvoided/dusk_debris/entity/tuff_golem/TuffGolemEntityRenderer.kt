@@ -26,7 +26,6 @@ class TuffGolemEntityRenderer(context: EntityRendererFactory.Context) :
         this.addFeature(TuffGolemHeldItemFeatureRenderer(this, context.heldItemRenderer))
         this.addFeature(TuffGolemCloakFeatureRenderer(this, context.modelLoader))
         this.addFeature(TuffGolemHatFeatureRenderer(this, context.itemRenderer))
-
     }
 
     override fun getTexture(tuffGolemEntity: TuffGolemEntity): Identifier {

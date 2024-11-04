@@ -3,6 +3,7 @@ package org.teamvoided.dusk_debris
 import net.minecraft.util.Identifier
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.teamvoided.dusk_debris.block.DuskBlockFamilies
 import org.teamvoided.dusk_debris.init.DuskEntities
 import org.teamvoided.dusk_debris.init.DuskWorldgen
 import org.teamvoided.dusk_debris.init.*
@@ -18,16 +19,18 @@ object DuskDebris {
 
     fun init() {
         log.info("Hello from Common")
-        DuskBlocks.init()
-        DuskBlockEntities.init()
         DuskItems.init()
-        DuskItemGroups.init()
+        DuskBlocks.init()
+        DuskBlockFamilies.init()
+
+        DuskBlockEntities.init()
         DuskEntities.init()
         DuskWorldgen.init()
         DuskBiomeModifications.init()
         DuskParticles.init()
         DuskSoundEvents.init()
         DuskGameRules.init()
+        DuskItemGroups.init()
     }
 
     fun id(path: String) = Identifier.of(MODID, path)

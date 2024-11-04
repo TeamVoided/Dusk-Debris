@@ -61,7 +61,7 @@ class TuffGolemEntity(entityType: EntityType<out TuffGolemEntity>, world: World)
         )
         goalSelector.add(4, LookAtEntityGoal(this, PlayerEntity::class.java, 6f))
         goalSelector.add(5, LookAroundGoal(this))
-        goalSelector.add(10, PickupAndDropItemGoal(this, canPickUpItem() || navigation.isIdle, 0.001))
+        goalSelector.add(10, PickupAndDropItemGoal(this, canPickUpItem() && navigation.isIdle, 0.001))
     }
 
     override fun initialize(
@@ -97,7 +97,7 @@ class TuffGolemEntity(entityType: EntityType<out TuffGolemEntity>, world: World)
         builder.add(STATUE_TICKS, 100)
         builder.add(SUMMON_POS, Optional.empty())
         builder.add(WAS_GIVEN_ITEM, false)
-        builder.add(EYE_BLOCK, "default")
+        builder.add(EYE_BLOCK, "water_bucket")
     }
 
     override fun writeCustomDataToNbt(nbt: NbtCompound) {
@@ -163,7 +163,7 @@ class TuffGolemEntity(entityType: EntityType<out TuffGolemEntity>, world: World)
 
     override fun updateGoalControls() {
         val bl = this.primaryPassenger !is MobEntity
-        val bl2 = state < 2
+        val bl2 = state < 1
         goalSelector.setControlEnabled(Goal.Control.MOVE, bl)
         goalSelector.setControlEnabled(Goal.Control.JUMP, bl && bl2)
         goalSelector.setControlEnabled(Goal.Control.LOOK, bl && bl2)
@@ -192,7 +192,7 @@ class TuffGolemEntity(entityType: EntityType<out TuffGolemEntity>, world: World)
                 playerHandStack.consume(1, player)
                 this.playSound(SoundEvents.ENTITY_ITEM_PICKUP, 1f, 1f)
                 return ActionResult.SUCCESS
-            } else if (playerHandStack.isIn(DuskItemTags.TUFF_GOLEM_CLOAK)) {
+            } else if (playerHandStack.isIn(DuskItemTags.TUFF_GOLEM_CLOAK) && playerHandStack != golemChestStack) {
                 //give golem cloak
                 this.spit(golemChestStack)
                 this.equipStack(EquipmentSlot.CHEST, playerHandStack.copyWithCount(1))

@@ -23,6 +23,7 @@ import net.minecraft.world.explosion.Explosion.DestructionType
 import net.minecraft.world.explosion.ExplosionBehavior
 import org.teamvoided.dusk_debris.data.tags.DuskBlockTags
 import org.teamvoided.dusk_debris.data.tags.DuskEntityTypeTags
+import org.teamvoided.dusk_debris.init.DuskBlocks
 import org.teamvoided.dusk_debris.init.DuskEntities
 import org.teamvoided.dusk_debris.init.DuskItems
 import org.teamvoided.dusk_debris.init.DuskParticles
@@ -148,7 +149,7 @@ class FirebombEntity : AbstractThrwowableBombEntity {
         }
     }
 
-    override fun getDefaultItem() = DuskItems.FIREBOMB_ITEM
+    override fun getDefaultItem() = DuskBlocks.FIREBOMB_BLOCK.asItem()
 
     override fun getTrailingParticle(): ParticleEffect = ParticleTypes.FLAME
     override fun getExplosionBehavior(): ExplosionBehavior = FirebombExplosionBehavior(DuskBlockTags.FIREBOMB_DESTROYS)

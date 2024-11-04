@@ -248,12 +248,12 @@ class GloomEntity(entityType: EntityType<out GloomEntity>, world: World) :
             } else {
                 this.equipStack(EquipmentSlot.MAINHAND, ItemStack(Items.IRON_SWORD))
             }
-        } else if (weaponMaterial > 0.85) {
-            if (weaponTypeAxe) {
-                this.equipStack(EquipmentSlot.MAINHAND, ItemStack(DuskItems.BLACKSTONE_AXE))
-            } else {
-                this.equipStack(EquipmentSlot.MAINHAND, ItemStack(DuskItems.BLACKSTONE_SWORD))
-            }
+//        } else if (weaponMaterial > 0.85) {
+//            if (weaponTypeAxe) {
+//                this.equipStack(EquipmentSlot.MAINHAND, ItemStack(DuskItems.BLACKSTONE_AXE))
+//            } else {
+//                this.equipStack(EquipmentSlot.MAINHAND, ItemStack(DuskItems.BLACKSTONE_SWORD))
+//            }
         } else if (weaponMaterial > 0.5) {
             if (weaponTypeAxe) {
                 this.equipStack(EquipmentSlot.MAINHAND, ItemStack(Items.STONE_AXE))

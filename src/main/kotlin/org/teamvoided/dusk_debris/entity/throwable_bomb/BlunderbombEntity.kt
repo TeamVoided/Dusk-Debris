@@ -14,6 +14,7 @@ import org.teamvoided.dusk_debris.init.DuskEntities
 import org.teamvoided.dusk_debris.block.throwable_bomb.AbstractThrwowableBombBlock
 import org.teamvoided.dusk_debris.data.tags.DuskBlockTags
 import org.teamvoided.dusk_debris.data.tags.DuskEntityTypeTags
+import org.teamvoided.dusk_debris.init.DuskBlocks
 import org.teamvoided.dusk_debris.init.DuskItems
 import org.teamvoided.dusk_debris.init.DuskParticles
 import org.teamvoided.dusk_debris.world.explosion.SpecialExplosionBehavior
@@ -82,7 +83,7 @@ open class BlunderbombEntity : AbstractThrwowableBombEntity {
     }
 
     override fun getDefaultItem(): Item {
-        return DuskItems.BLUNDERBOMB_ITEM
+        return DuskBlocks.BLUNDERBOMB_BLOCK.asItem()
     }
 
     override fun getHitDamage(): Float = 5f

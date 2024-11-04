@@ -17,12 +17,10 @@ import org.teamvoided.dusk_debris.entity.TuffGolemEntity
 import org.teamvoided.dusk_debris.entity.tuff_golem.model.TuffGolemCloakModel
 import org.teamvoided.dusk_debris.entity.tuff_golem.model.TuffGolemEntityModel
 
-@Environment(EnvType.CLIENT)
 class TuffGolemCloakFeatureRenderer(
     context: FeatureRendererContext<TuffGolemEntity, TuffGolemEntityModel>,
     loader: EntityModelLoader
-) :
-    FeatureRenderer<TuffGolemEntity, TuffGolemEntityModel>(context) {
+) : FeatureRenderer<TuffGolemEntity, TuffGolemEntityModel>(context) {
     private val model: TuffGolemCloakModel =
         TuffGolemCloakModel(loader.getModelPart(DuskEntityModelLayers.TUFF_GOLEM_ROBE))
 

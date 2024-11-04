@@ -16,6 +16,7 @@ import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.MathHelper
 import net.minecraft.world.World
 import org.teamvoided.dusk_debris.entity.throwable_bomb.BonecallerEntity
+import org.teamvoided.dusk_debris.init.DuskBlocks
 import org.teamvoided.dusk_debris.init.DuskEntities
 import org.teamvoided.dusk_debris.init.DuskItems
 import org.teamvoided.dusk_debris.particle.BonecallerParticleEffect
@@ -77,7 +78,7 @@ open class BonechillerEntity : BonecallerEntity {
     }
 
     override fun getDefaultItem(): Item {
-        return DuskItems.BONECHILLER_ITEM
+        return DuskBlocks.BONECHILLER_BLOCK.asItem()
     }
 
     override fun bandanaColors(): Int {

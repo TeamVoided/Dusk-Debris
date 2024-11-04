@@ -13,6 +13,7 @@ import net.minecraft.util.SpawnUtil
 import net.minecraft.world.World
 import org.teamvoided.dusk_debris.entity.GloomEntity
 import org.teamvoided.dusk_debris.entity.throwable_bomb.BonecallerEntity
+import org.teamvoided.dusk_debris.init.DuskBlocks
 import org.teamvoided.dusk_debris.init.DuskEntities
 import org.teamvoided.dusk_debris.init.DuskItems
 import org.teamvoided.dusk_debris.particle.BonecallerParticleEffect
@@ -70,6 +71,6 @@ open class ShadecallerEntity : BonecallerEntity {
     override val color1: Color = Color(0x2B2B2B)
     override val color2: Color = Color(0x0F0F0F)
     override fun getDefaultItem(): Item {
-        return DuskItems.BONEWITHER_ITEM
+        return DuskBlocks.SHADECALLER_BLOCK.asItem()
     }
 }

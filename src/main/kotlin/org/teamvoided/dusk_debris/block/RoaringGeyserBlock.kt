@@ -1,6 +1,7 @@
 package org.teamvoided.dusk_debris.block
 
 import com.mojang.serialization.MapCodec
+import net.minecraft.Bootstrap.println
 import net.minecraft.block.Block
 import net.minecraft.block.BlockState
 import net.minecraft.entity.Entity
@@ -124,7 +125,7 @@ class RoaringGeyserBlock(settings: Settings) :
             )
         ) { obj: Entity -> !obj.type.isIn(DuskEntityTypeTags.GEYSERS_DONT_PROPEL) }
         return entitiesInRange.forEach {
-            println(it.type)
+            println(it.type.toString())
             val vec3d = it.velocity
             it.setVelocity(vec3d.x, vec3d.y + 1.75, vec3d.z)
             it.velocityModified = true

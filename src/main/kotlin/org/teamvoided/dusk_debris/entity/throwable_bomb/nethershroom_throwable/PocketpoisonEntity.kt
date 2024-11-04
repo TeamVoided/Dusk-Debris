@@ -27,7 +27,7 @@ class PocketpoisonEntity : NethershroomThrowableEntity {
 
 
     override fun getDefaultItem(): Item {
-        return DuskItems.POCKETPOISON_ITEM
+        return DuskBlocks.POCKETPOISON_BLOCK.asItem()
     }
 
     override fun getTrailingParticle() = DuskBlocks.blueNethershroomSmoke

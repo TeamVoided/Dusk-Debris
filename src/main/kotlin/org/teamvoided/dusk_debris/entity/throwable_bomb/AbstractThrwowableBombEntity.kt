@@ -12,6 +12,7 @@ import net.minecraft.util.hit.EntityHitResult
 import net.minecraft.util.hit.HitResult
 import net.minecraft.world.World
 import net.minecraft.world.explosion.ExplosionBehavior
+import org.teamvoided.dusk_debris.init.DuskBlocks
 import org.teamvoided.dusk_debris.init.DuskItems
 
 open class AbstractThrwowableBombEntity : ThrownItemEntity {
@@ -83,7 +84,7 @@ open class AbstractThrwowableBombEntity : ThrownItemEntity {
 
     override fun getDefaultItem(): Item {
         println("this should not occur, please check that you override the getDefaultItem function")
-        return DuskItems.BLUNDERBOMB_ITEM
+        return DuskBlocks.BLUNDERBOMB_BLOCK.asItem()
     }
 
     open fun getTrailingParticle(): ParticleEffect = ParticleTypes.SMOKE

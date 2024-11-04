@@ -49,7 +49,7 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
         }
         gen.registerDustBlockFromRedstone(DuskBlocks.GUNPOWDER)
 
-        gen.registerItemModel(DuskItems.DEVELOPER_GUNPOWDER_ITEM)
+        gen.registerItemModel(DuskBlocks.GUNPOWDER)
 //        gen.registerBuiltin(ModelIds.getMinecraftNamespacedBlock("skull"), Blocks.SOUL_SAND)
 //            .includeWithItem(
 //                DuskBlocks.STRAY_SKULL,
@@ -92,11 +92,6 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
         gen.registerNethershroomBlock(DuskBlocks.BLUE_NETHERSHROOM_BLOCK)
         gen.registerNethershroomBlock(DuskBlocks.PURPLE_NETHERSHROOM_BLOCK)
         gen.registerNethershroomBlock(DuskBlocks.NETHERSHROOM_STEM)
-        gen.registerHandheldItem(DuskItems.BLACKSTONE_SWORD)
-        gen.registerHandheldItem(DuskItems.BLACKSTONE_PICKAXE)
-        gen.registerHandheldItem(DuskItems.BLACKSTONE_AXE)
-        gen.registerHandheldItem(DuskItems.BLACKSTONE_SHOVEL)
-        gen.registerHandheldItem(DuskItems.BLACKSTONE_HOE)
 
         gen.registerSimpleCubeAll(DuskBlocks.PAPER_BLOCK)
 
@@ -109,6 +104,11 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
         gen.registerLog(DuskBlocks.STRIPPED_CYPRESS_LOG)
             .log(DuskBlocks.STRIPPED_CYPRESS_LOG)
             .wood(DuskBlocks.STRIPPED_CYPRESS_WOOD)
+
+        gen.registerCopperFan(DuskBlocks.COPPER_FAN, DuskBlocks.WAXED_COPPER_FAN)
+        gen.registerCopperFan(DuskBlocks.EXPOSED_COPPER_FAN, DuskBlocks.WAXED_EXPOSED_COPPER_FAN)
+        gen.registerCopperFan(DuskBlocks.WEATHERED_COPPER_FAN, DuskBlocks.WAXED_WEATHERED_COPPER_FAN)
+        gen.registerCopperFan(DuskBlocks.OXIDIZED_COPPER_FAN, DuskBlocks.WAXED_OXIDIZED_COPPER_FAN)
 
         gen.registerGeyser(DuskBlocks.ROARING_GEYSER)
         gen.registerSimpleCubeAll(DuskBlocks.VOLCANIC_SAND)

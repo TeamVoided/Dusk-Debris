@@ -1,14 +1,11 @@
 package org.teamvoided.dusk_debris.entity.skeleton.render
 
-import net.fabricmc.api.EnvType
-import net.fabricmc.api.Environment
 import net.minecraft.client.model.*
 import net.minecraft.client.render.entity.model.SkeletonEntityModel
 import org.teamvoided.dusk_debris.entity.GloomEntity
 import org.teamvoided.dusk_debris.util.Utils.rotate225
 import org.teamvoided.dusk_debris.util.Utils.rotate315
 
-@Environment(EnvType.CLIENT)
 class GloomEntityModel(modelPart: ModelPart) : SkeletonEntityModel<GloomEntity>(modelPart) {
 //    private val mushrooms: ModelPart = modelPart.getChild("head").getChild("mushrooms")
 

@@ -5,8 +5,7 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "BlockEntityTypeMixin",
-    "PaintingEntityMixin",
-    "WitherSkeletonEntityMixin"
+    "PaintingEntityMixin"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -14,6 +14,7 @@ import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.SpawnUtil
 import net.minecraft.world.World
 import org.teamvoided.dusk_debris.entity.throwable_bomb.BonecallerEntity
+import org.teamvoided.dusk_debris.init.DuskBlocks
 import org.teamvoided.dusk_debris.init.DuskEntities
 import org.teamvoided.dusk_debris.init.DuskItems
 import org.teamvoided.dusk_debris.particle.BonecallerParticleEffect
@@ -76,7 +77,7 @@ open class BogcallerEntity : BonecallerEntity {
     }
 
     override fun getDefaultItem(): Item {
-        return DuskItems.BOGCALLER_ITEM
+        return DuskBlocks.BOGCALLER_BLOCK.asItem()
     }
 
     override fun bandanaColors(): Int {

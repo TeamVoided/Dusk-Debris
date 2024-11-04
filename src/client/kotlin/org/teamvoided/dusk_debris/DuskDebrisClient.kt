@@ -56,7 +56,7 @@ object DuskDebrisClient {
         )
         ColorProviderRegistry.ITEM.register(
             { _, _ -> FoliageColors.getDefaultColor() },
-            DuskItems.CYPRESS_LEAVES
+            DuskBlocks.CYPRESS_LEAVES
         )
         ColorProviderRegistry.BLOCK.register(
             { _, world, pos, _ ->

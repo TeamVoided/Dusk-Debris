@@ -18,9 +18,9 @@ class DuskDebrisData : DataGeneratorEntrypoint {
     override fun onInitializeDataGenerator(gen: FabricDataGenerator) {
         log.info("Hello from DataGen")
         val pack = gen.createPack()
+        val blockTags = pack.addProvider(::BlockTagsProvider)
+        pack.addProvider { o, r -> ItemTagsProvider(o, r, blockTags) }
         pack.addProvider(::BiomeTagsProvider)
-        pack.addProvider(::BlockTagsProvider)
-        pack.addProvider(::ItemTagsProvider)
         pack.addProvider(::EntityTypeTagsProvider)
         pack.addProvider(::DamageTypeTagsProvider)
         pack.addProvider(::ModelProvider)
