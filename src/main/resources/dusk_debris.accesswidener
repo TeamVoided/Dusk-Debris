@@ -16,3 +16,6 @@ accessible field net/minecraft/entity/ai/goal/SkeletonHorseTrapTriggerGoal skele
 accessible method net/minecraft/entity/ai/goal/SkeletonHorseTrapTriggerGoal getHorse (Lnet/minecraft/world/LocalDifficulty;)Lnet/minecraft/entity/passive/AbstractHorseEntity;
 accessible method net/minecraft/entity/ai/goal/SkeletonHorseTrapTriggerGoal getSkeleton (Lnet/minecraft/world/LocalDifficulty;Lnet/minecraft/entity/passive/AbstractHorseEntity;)Lnet/minecraft/entity/mob/SkeletonEntity;
 accessible method net/minecraft/entity/ai/goal/SkeletonHorseTrapTriggerGoal method_59939 (Lnet/minecraft/entity/mob/SkeletonEntity;Lnet/minecraft/entity/EquipmentSlot;Lnet/minecraft/world/LocalDifficulty;)V
+
+accessible method net/minecraft/client/particle/VibrationParticle <init> (Lnet/minecraft/client/world/ClientWorld;DDDLnet/minecraft/world/event/PositionSource;I)V
+accessible method net/minecraft/client/particle/Particle setColorAlpha (F)V

@@ -34,20 +34,17 @@ object DuskDebrisClient {
         DuskEntityModelLayers.init()
 
 
-        ParticleFactoryRegistry.getInstance()
-            .register(DuskParticles.TOXIC_SMOKE_PARTICLE, ToxicSmokeParticle::Factory)
+        ParticleFactoryRegistry.getInstance().register(DuskParticles.TOXIC_SMOKE_PARTICLE, ToxicSmokeParticle::Factory)
         ParticleFactoryRegistry.getInstance()
             .register(DuskParticles.GUNPOWDER_EXPLOSION_SMOKE, GunpowderExplosionSmokeParticle::Factory)
         ParticleFactoryRegistry.getInstance()
             .register(DuskParticles.GUNPOWDER_EXPLOSION_EMMITER, GunpowderExplosionEmitterParticle.Factory())
-        ParticleFactoryRegistry.getInstance()
-            .register(DuskParticles.BLUNDERBOMB, BlunderbombParticle.Factory())
-        ParticleFactoryRegistry.getInstance()
-            .register(DuskParticles.FIREBOMB, FirebombParticle.Factory())
-        ParticleFactoryRegistry.getInstance()
-            .register(DuskParticles.BONECALLER, BonecallerParticle::Factory)
-        ParticleFactoryRegistry.getInstance()
-            .register(DuskParticles.GEYSER, GeyserParticle::Factory)
+        ParticleFactoryRegistry.getInstance().register(DuskParticles.BLUNDERBOMB, BlunderbombParticle.Factory())
+        ParticleFactoryRegistry.getInstance().register(DuskParticles.FIREBOMB, FirebombParticle.Factory())
+        ParticleFactoryRegistry.getInstance().register(DuskParticles.BONECALLER, BonecallerParticle::Factory)
+        ParticleFactoryRegistry.getInstance().register(DuskParticles.GEYSER, GeyserParticle::Factory)
+
+        ParticleFactoryRegistry.getInstance().register(DuskParticles.WIND, WindParticle::Factory)
 
         ColorProviderRegistry.ITEM.register(
             { itemStack: ItemStack, i: Int ->

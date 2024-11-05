@@ -22,9 +22,12 @@ import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
 import net.minecraft.util.random.RandomGenerator
 import net.minecraft.world.World
+import net.minecraft.world.event.BlockPositionSource
+import net.minecraft.world.event.PositionSource
 import org.teamvoided.dusk_debris.block.entity.FanBlockEntity
 import org.teamvoided.dusk_debris.init.DuskBlockEntities
 import org.teamvoided.dusk_debris.init.DuskParticles
+import org.teamvoided.dusk_debris.particle.WindParticleEffect
 
 open class FanBlock(val strength: Int, settings: Settings) :
     BlockWithEntity(settings) {
@@ -75,6 +78,10 @@ open class FanBlock(val strength: Int, settings: Settings) :
         }
     }
 
+    fun getWindPower(): Double {
+        return strength * 0.33333 + 10
+    }
+
     fun setState(state: BlockState, world: ServerWorld, pos: BlockPos?) {
         val bl = world.isReceivingRedstonePower(pos)
         if (bl != state.get(POWERED)) {
@@ -123,23 +130,6 @@ open class FanBlock(val strength: Int, settings: Settings) :
 
     override fun getComparatorOutput(state: BlockState, world: World, pos: BlockPos): Int {
         return if (world.getBlockState(pos).get(ACTIVE)) 15 else 0
-    }
-
-    override fun randomDisplayTick(state: BlockState, world: World, pos: BlockPos, random: RandomGenerator) {
-//        if (state.get(ACTIVE)) {
-//            val centerPos = pos.add(state.get(FACING).vector).ofCenter()
-//            world.addParticle(
-//                ParticleTypes.CLOUD,
-//                true,
-//                centerPos.x,
-//                centerPos.y,
-//                centerPos.z,
-//                0.0,
-//                0.0,
-//                0.0
-//            )
-//        }
-        super.randomDisplayTick(state, world, pos, random)
     }
 
     companion object {

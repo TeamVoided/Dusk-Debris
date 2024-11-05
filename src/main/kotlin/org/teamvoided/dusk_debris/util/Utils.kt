@@ -18,6 +18,7 @@ object Utils {
     val rotate225 = 3.927f
     val rotate270 = 4.712f
     val rotate315 = 5.498f
+    val rotate360 = 6.284f
     fun setCount(x: Number, y: Number) = SetCountLootFunction.builder(uniformNum(x, y))
 
     fun uniformNum(x: Number, y: Number): UniformLootNumberProvider =
