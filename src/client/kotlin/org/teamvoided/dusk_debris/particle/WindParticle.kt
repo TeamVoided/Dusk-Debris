@@ -33,27 +33,33 @@ class WindParticle(
     private var rotationMultiplier = 0.0f
 
     init {
-        this.scale = 0.3f
+        this.scale = world.random.nextFloat() * 0.3f + 0.15f
         this.direction = Direction.byId(direction)
         this.maxAge = maxAge
         this.rotationOffset = MathHelper.nextFloat(random, 0f, rotate360)
-        this.rotationMultiplier = world.random.nextFloat() - world.random.nextFloat()
+        this.rotationMultiplier =
+            (world.random.nextFloat() - world.random.nextFloat()) * (distance.toFloat() / this.maxAge)
 
         val vec3d = this.direction.vector
         endPos = Vec3d(vec3d.x * distance + x, vec3d.y * distance + y, vec3d.z * distance + z)
-        val d = x - endPos.getX()
-        val e = y - endPos.getY()
-        val f = z - endPos.getZ()
-        this.rotation = MathHelper.atan2(d, f).toFloat()
+        //point means point towards, relative to current pos
+        val xPoint = this.direction.vector.x * -1.0
+        val yPoint = this.direction.vector.y * -1.0
+        val zPoint = this.direction.vector.z * -1.0
+        this.rotation = MathHelper.atan2(xPoint, zPoint).toFloat()
         this.prevRotation = this.rotation
-        this.pitch = MathHelper.atan2(e, sqrt(d * d + f * f)).toFloat()
+        this.pitch = MathHelper.atan2(yPoint, sqrt(xPoint * xPoint + zPoint * zPoint)).toFloat()
         this.prevPitch = this.pitch
         this.setSpriteForAge(this.spriteProvider)
     }
 
     override fun buildGeometry(vertexConsumer: VertexConsumer, camera: Camera, tickDelta: Float) {
-        val rotateY =
-            (rotationOffset + MathHelper.sin((this.age.toFloat() + tickDelta - 6.2831855f) * 0.05f) * 2.0f * rotationMultiplier)
+//        val rotateY =
+//            (rotationOffset + MathHelper.sin((this.age.toFloat() + tickDelta - 6.2831855f) * 0.05f) * 2.0f * rotationMultiplier)
+
+//        val rotateY = MathHelper.sin((age.toFloat() + tickDelta - 6.2831855f) * 0.05f) * 2.0f
+
+        val rotateY = (MathHelper.sin((age.toFloat() + tickDelta - 6.2831855f) * rotationMultiplier)) + rotationOffset
         val rotation = MathHelper.lerp(tickDelta, this.prevRotation, this.rotation)
         val pitch = MathHelper.lerp(tickDelta, this.prevPitch, this.pitch) + 1.5707964f
         val quaternionf = Quaternionf()
@@ -70,6 +76,7 @@ class WindParticle(
     override fun getType(): ParticleTextureSheet = ParticleTextureSheet.PARTICLE_SHEET_TRANSLUCENT
 
     override fun tick() {
+        val rand = world.random
         this.setSpriteForAge(this.spriteProvider)
         this.prevPosX = this.x
         this.prevPosY = this.y
@@ -79,10 +86,18 @@ class WindParticle(
         } else {
             val i: Int = this.maxAge - this.age
             val lerp = 1.0 / i.toDouble()
-            this.x = MathHelper.lerp(lerp, this.x, endPos.x)
-            this.y = MathHelper.lerp(lerp, this.y, endPos.y)
-            this.z = MathHelper.lerp(lerp, this.z, endPos.z)
-//            this.setColorAlpha(0.5f - 0.5f * lerp.toFloat())
+            this.x = MathHelper.lerp(lerp, this.x, endPos.x) + (rand.nextDouble() - rand.nextDouble()) / this.maxAge
+            this.y = MathHelper.lerp(lerp, this.y, endPos.y) + (rand.nextDouble() - rand.nextDouble()) / this.maxAge
+            this.z = MathHelper.lerp(lerp, this.z, endPos.z) + (rand.nextDouble() - rand.nextDouble()) / this.maxAge
+
+            val xPoint = this.direction.vector.x * -1.0
+            val yPoint = this.direction.vector.y * -1.0
+            val zPoint = this.direction.vector.z * -1.0
+            this.prevRotation = this.rotation
+            this.rotation = MathHelper.atan2(xPoint, zPoint).toFloat()
+            this.prevPitch = this.pitch
+            this.pitch = MathHelper.atan2(yPoint, sqrt(xPoint * xPoint + zPoint * zPoint)).toFloat()
+
         }
     }
 
@@ -108,7 +123,7 @@ class WindParticle(
                 particleEffect.arrivalTicks(),
                 spriteProvider
             )
-            windParticle.setColorAlpha(0.5f)
+            windParticle.setColorAlpha(world.random.nextFloat() * 0.25f + 0.5f)
             return windParticle
         }
     }

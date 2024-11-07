@@ -30,7 +30,7 @@ object DuskDebris {
         DuskParticles.init()
         DuskSoundEvents.init()
         DuskGameRules.init()
-        DuskItemGroups.init()
+        DuskTabs.init()
     }
 
     fun id(path: String) = Identifier.of(MODID, path)

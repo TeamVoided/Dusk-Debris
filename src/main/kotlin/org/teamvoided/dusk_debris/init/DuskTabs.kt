@@ -13,7 +13,7 @@ import org.teamvoided.dusk_debris.item.DuskItemLists
 import kotlin.jvm.optionals.getOrNull
 
 
-object DuskItemGroups {
+object DuskTabs {
     val DUSK_TAB: ItemGroup = register("dusk_items",
         FabricItemGroup.builder()
             .icon { ItemStack(DuskBlocks.GUNPOWDER_BARREL) }
@@ -82,6 +82,14 @@ object DuskItemGroups {
                     DuskBlocks.GUNPOWDER
                 )
             }
+            .build()
+    )
+
+    val EVERYTHING: ItemGroup = register("dusk_everything",
+        FabricItemGroup.builder()
+            .icon { ItemStack(DuskBlocks.OXIDIZED_COPPER_FAN.asItem()) }
+            .name(Text.translatable("Dusk Debris Debug"))
+            .entries { _, entries -> entries.addItem(DuskItems.ITEMS) }
             .build()
     )
 

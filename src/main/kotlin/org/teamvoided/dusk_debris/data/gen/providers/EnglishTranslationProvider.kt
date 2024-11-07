@@ -8,13 +8,10 @@ import net.minecraft.item.Item
 import net.minecraft.registry.HolderLookup
 import net.minecraft.registry.Registries
 import net.minecraft.util.Identifier
-import org.teamvoided.dusk_debris.block.DuskBlockLists
 import org.teamvoided.dusk_debris.entity.DuskEntityLists
-import org.teamvoided.dusk_debris.init.DuskBlocks
 import org.teamvoided.dusk_debris.init.DuskEntities
-import org.teamvoided.dusk_debris.item.DuskItemLists
-import org.teamvoided.dusk_debris.init.DuskItemGroups.DUSK_TAB
-import org.teamvoided.dusk_debris.init.DuskItemGroups.getKey
+import org.teamvoided.dusk_debris.init.DuskTabs
+import org.teamvoided.dusk_debris.init.DuskTabs.getKey
 import org.teamvoided.dusk_debris.init.DuskItems
 import java.util.concurrent.CompletableFuture
 
@@ -40,7 +37,8 @@ class EnglishTranslationProvider(o: FabricDataOutput, r: CompletableFuture<Holde
         gen.add("painting.dusk_debris.skeleton_appears.title", "The Skeleton")
         gen.add("painting.dusk_debris.skeleton_appears.author", "Appears")
 
-        getKey(DUSK_TAB)?.let { gen.add(it, "Dusk Items") }
+        getKey(DuskTabs.DUSK_TAB)?.let { gen.add(it, "Dusk Items") }
+        getKey(DuskTabs.EVERYTHING)?.let { gen.add(it, "Dusk Items") }
     }
 
     private fun genLang(identifier: Identifier): String =

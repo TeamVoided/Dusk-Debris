@@ -387,19 +387,30 @@ object DuskBlocks {
 
     val OXIDIZED_COPPER_FAN = register(
         "oxidized_copper_fan",
-        OxidizableFanBlock(OxidizationLevel.UNAFFECTED, 4, AbstractBlock.Settings.copy(OXIDIZED_CHISELED_COPPER))
+        OxidizableFanBlock(
+            OxidizationLevel.OXIDIZED, 4,
+            AbstractBlock.Settings.create().mapColor(OXIDIZED_COPPER.defaultMapColor).strength(3.0F, 6.0F)
+                .sounds(BlockSoundGroup.BLOCK_COPPER_BULB_BREAK).toolRequired().solidBlock(Blocks::nonSolid)
+        )
     )
     val WEATHERED_COPPER_FAN = register(
         "weathered_copper_fan",
-        OxidizableFanBlock(OxidizationLevel.EXPOSED, 8, AbstractBlock.Settings.copy(WEATHERED_CHISELED_COPPER))
+        OxidizableFanBlock(
+            OxidizationLevel.EXPOSED, 8,
+            AbstractBlock.Settings.copy(OXIDIZED_COPPER_FAN).mapColor(WEATHERED_COPPER.defaultMapColor)
+        )
     )
     val EXPOSED_COPPER_FAN = register(
         "exposed_copper_fan",
-        OxidizableFanBlock(OxidizationLevel.WEATHERED, 12, AbstractBlock.Settings.copy(EXPOSED_CHISELED_COPPER))
+        OxidizableFanBlock(
+            OxidizationLevel.WEATHERED, 12,
+            AbstractBlock.Settings.copy(WEATHERED_COPPER_FAN).mapColor(EXPOSED_COPPER.defaultMapColor)
+        )
     )
     val COPPER_FAN = register(
         "copper_fan",
-        OxidizableFanBlock(OxidizationLevel.UNAFFECTED, 15, AbstractBlock.Settings.copy(CHISELED_COPPER))
+        OxidizableFanBlock(OxidizationLevel.UNAFFECTED, 15,
+            AbstractBlock.Settings.copy(EXPOSED_COPPER_FAN).mapColor(COPPER_BLOCK.defaultMapColor))
     )
 
     val WAXED_OXIDIZED_COPPER_FAN =

@@ -78,10 +78,6 @@ open class FanBlock(val strength: Int, settings: Settings) :
         }
     }
 
-    fun getWindPower(): Double {
-        return strength * 0.33333 + 10
-    }
-
     fun setState(state: BlockState, world: ServerWorld, pos: BlockPos?) {
         val bl = world.isReceivingRedstonePower(pos)
         if (bl != state.get(POWERED)) {
@@ -100,6 +96,11 @@ open class FanBlock(val strength: Int, settings: Settings) :
         }
     }
 
+    override fun onSyncedBlockEvent(state: BlockState?, world: World, pos: BlockPos?, type: Int, data: Int): Boolean {
+        super.onSyncedBlockEvent(state, world, pos, type, data)
+        val blockEntity: BlockEntity? = world.getBlockEntity(pos)
+        return blockEntity?.onSyncedBlockEvent(type, data) ?: false
+    }
 
     override fun <T : BlockEntity> getTicker(
         world: World,
@@ -107,12 +108,7 @@ open class FanBlock(val strength: Int, settings: Settings) :
         type: BlockEntityType<T>
     ): BlockEntityTicker<T>? {
         return if (state.get(ACTIVE)) {
-            checkType(
-                type,
-                DuskBlockEntities.FAN_BLOCK,
-                if (world.isClient) FanBlockEntity::clientTick
-                else FanBlockEntity::serverTick
-            )
+            checkType(type, DuskBlockEntities.FAN_BLOCK, FanBlockEntity::tick)
         } else {
             null
         }
