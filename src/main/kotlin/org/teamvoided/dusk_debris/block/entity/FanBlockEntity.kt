@@ -48,13 +48,14 @@ class FanBlockEntity(pos: BlockPos, val state: BlockState) :
             } else {
                 serverTick(world, pos, state, blockEntity)
             }
-            if ((pos.asLong() + world.time) % (-blockEntity.strength() + 90) == 0L) {
+            val the90 = -blockEntity.strength() + 90
+            if ((pos.asLong() + world.time) % the90 == 0L) {
                 world.playSound(
                     null as PlayerEntity?,
                     pos,
                     SoundEvents.ENTITY_BREEZE_WHIRL,
                     SoundCategory.BLOCKS,
-                    (-blockEntity.strength() + 90) / 30f,
+                    the90 / 30f,
                     (blockEntity.strength() - 8) / 7f
                 )
             }
@@ -97,6 +98,8 @@ class FanBlockEntity(pos: BlockPos, val state: BlockState) :
                     val worldBlock = world.getBlockState(pos.offset(facing, it + 1))
                     if (
                         !worldBlock.materialReplaceable() &&
+                        worldBlock.isOpaque &&
+                        worldBlock.isSolid &&
                         (worldBlock.isSideSolidFullSquare(world, posCheck, facing) ||
                                 worldBlock.isSideSolidFullSquare(world, posCheck, facing.opposite))
                     ) {
@@ -141,12 +144,16 @@ class FanBlockEntity(pos: BlockPos, val state: BlockState) :
         }
 
         fun theee(velocity: Double, power: Double): Double {
-            val upperBound = power * 0.05
-            val newVelocity = velocity + power * 0.05
+            val upperBound = power * 0.1
+            val newVelocity = velocity + power * 0.025
             return if (power < 0)
-                max(upperBound, newVelocity)
+                if (upperBound < newVelocity) newVelocity else velocity
             else
-                min(upperBound, newVelocity)
+                if (upperBound > newVelocity) newVelocity else velocity
+//            return if (power < 0)
+//                max(upperBound, newVelocity)
+//            else
+//                min(upperBound, newVelocity)
         }
 
 //        fun exceedsMaxVelocity(entity: Entity, direction: Direction, blockEntity: FanBlockEntity): Boolean {

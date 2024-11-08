@@ -33,7 +33,7 @@ class WindParticle(
     private var rotationMultiplier = 0.0f
 
     init {
-        this.scale = world.random.nextFloat() * 0.3f + 0.15f
+        this.scale = world.random.nextFloat() * 0.2f + 0.1f
         this.direction = Direction.byId(direction)
         this.maxAge = maxAge
         this.rotationOffset = MathHelper.nextFloat(random, 0f, rotate360)

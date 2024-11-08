@@ -8,7 +8,6 @@ import net.minecraft.block.BlockWithEntity
 import net.minecraft.block.entity.*
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.ItemPlacementContext
-import net.minecraft.particle.ParticleTypes
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvents
@@ -20,14 +19,10 @@ import net.minecraft.util.BlockMirror
 import net.minecraft.util.BlockRotation
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
-import net.minecraft.util.random.RandomGenerator
 import net.minecraft.world.World
-import net.minecraft.world.event.BlockPositionSource
-import net.minecraft.world.event.PositionSource
+import net.minecraft.world.event.GameEvent
 import org.teamvoided.dusk_debris.block.entity.FanBlockEntity
 import org.teamvoided.dusk_debris.init.DuskBlockEntities
-import org.teamvoided.dusk_debris.init.DuskParticles
-import org.teamvoided.dusk_debris.particle.WindParticleEffect
 
 open class FanBlock(val strength: Int, settings: Settings) :
     BlockWithEntity(settings) {
@@ -84,6 +79,7 @@ open class FanBlock(val strength: Int, settings: Settings) :
             var blockState = state
             if (!state.get(POWERED)) {
                 blockState = state.cycle(ACTIVE)
+                world.emitGameEvent(null, GameEvent.BLOCK_CHANGE, pos)
                 world.playSound(
                     null as PlayerEntity?,
                     pos,
@@ -94,6 +90,13 @@ open class FanBlock(val strength: Int, settings: Settings) :
             }
             world.setBlockState(pos, blockState.with(POWERED, bl), 3)
         }
+    }
+
+    override fun hasComparatorOutput(state: BlockState): Boolean = true
+
+    override fun getComparatorOutput(state: BlockState, world: World, pos: BlockPos): Int {
+        val blockEntity: FanBlockEntity = world.getBlockEntity(pos) as FanBlockEntity
+        return if (world.getBlockState(pos).get(ACTIVE)) blockEntity.windLength else 0
     }
 
     override fun onSyncedBlockEvent(state: BlockState?, world: World, pos: BlockPos?, type: Int, data: Int): Boolean {
@@ -120,12 +123,6 @@ open class FanBlock(val strength: Int, settings: Settings) :
 
     override fun mirror(state: BlockState, mirror: BlockMirror): BlockState {
         return state.rotate(mirror.getRotation(state.get(FACING)))
-    }
-
-    override fun hasComparatorOutput(state: BlockState): Boolean = true
-
-    override fun getComparatorOutput(state: BlockState, world: World, pos: BlockPos): Int {
-        return if (world.getBlockState(pos).get(ACTIVE)) 15 else 0
     }
 
     companion object {
