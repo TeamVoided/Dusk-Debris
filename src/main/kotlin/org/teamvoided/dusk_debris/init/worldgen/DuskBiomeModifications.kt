@@ -5,6 +5,7 @@ import net.fabricmc.fabric.api.tag.convention.v2.ConventionalBiomeTags
 import net.minecraft.registry.RegistryKey
 import net.minecraft.registry.tag.TagKey
 import net.minecraft.world.biome.Biome
+import net.minecraft.world.biome.Biomes
 import net.minecraft.world.gen.GenerationStep
 import net.minecraft.world.gen.feature.PlacedFeature
 import org.teamvoided.dusk_debris.DuskDebris.id
@@ -37,6 +38,13 @@ object DuskBiomeModifications {
             DuskPlacedFeatures.CRIMSON_PURPLE_NETHERSHROOM_PATCH,
             DuskBiomeTags.CRIMSON
         )
+
+        addFeature(
+            "add_torus",
+            GenerationStep.Feature.LOCAL_MODIFICATIONS,
+            DuskPlacedFeatures.TORUS,
+            DuskBiomeTags.TEST
+        )
     }
 
     private fun addFeature(
@@ -51,6 +59,7 @@ object DuskBiomeModifications {
             context.generationSettings.addFeature(generationStep, placedFeature)
         }
     }
+
     private fun addFeature(
         id: String,
         generationStep: GenerationStep.Feature,
@@ -64,9 +73,11 @@ object DuskBiomeModifications {
             context.generationSettings.addFeature(generationStep, placedFeature)
         }
     }
+
     fun tagNo(tag: TagKey<Biome>): Predicate<BiomeSelectionContext> {
         return Predicate { context: BiomeSelectionContext -> !context.hasTag(tag) }
     }
+
     private fun addFeature(
         id: String,
         placedFeature: RegistryKey<PlacedFeature>,
@@ -74,6 +85,7 @@ object DuskBiomeModifications {
     ) {
         addFeature(id, GenerationStep.Feature.VEGETAL_DECORATION, placedFeature, biome)
     }
+
     private fun addFeature(
         id: String,
         placedFeature: RegistryKey<PlacedFeature>,

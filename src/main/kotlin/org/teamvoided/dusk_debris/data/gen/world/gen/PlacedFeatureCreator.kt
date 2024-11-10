@@ -27,17 +27,17 @@ object PlacedFeatureCreator {
 
         c.register(
             DuskPlacedFeatures.CYPRESS,
-            configuredFeatureProvider.getHolderOrThrow(DuskConfiguredFeatures.SWAMP_CYPRESS),
+            DuskConfiguredFeatures.SWAMP_CYPRESS,
             PlacedFeatureUtil.createWouldSurvivePlacementModifier(Blocks.OAK_SAPLING)
         )
         c.register(
             DuskPlacedFeatures.TALL_CYPRESS,
-            configuredFeatureProvider.getHolderOrThrow(DuskConfiguredFeatures.TALL_SWAMP_CYPRESS),
+            DuskConfiguredFeatures.TALL_SWAMP_CYPRESS,
             PlacedFeatureUtil.createWouldSurvivePlacementModifier(Blocks.OAK_SAPLING)
         )
         c.register(
             DuskPlacedFeatures.TREES_SWAMP,
-            configuredFeatureProvider.getHolderOrThrow(DuskConfiguredFeatures.SWAMP_CYPRESS),
+            DuskConfiguredFeatures.SWAMP_CYPRESS,
             PlacedFeatureUtil.createCountExtraModifier(2, 0.1f, 1),
             InSquarePlacementModifier.getInstance(),
             SurfaceWaterDepthFilterPlacementModifier.create(2),
@@ -49,7 +49,7 @@ object PlacedFeatureCreator {
         )
         c.register(
             DuskPlacedFeatures.TREES_SWAMP_EXTRA,
-            configuredFeatureProvider.getHolderOrThrow(DuskConfiguredFeatures.SWAMP_CYPRESS),
+            DuskConfiguredFeatures.SWAMP_CYPRESS,
             NoiseBasedCountPlacementModifier.create(20, 40.0, 0.0),
             InSquarePlacementModifier.getInstance(),
             SurfaceWaterDepthFilterPlacementModifier.create(2),
@@ -74,36 +74,52 @@ object PlacedFeatureCreator {
 
         c.registerNethershroomPlacement(
             DuskPlacedFeatures.BLUE_NETHERSHROOM_PATCH,
-            configuredFeatureProvider.getHolderOrThrow(DuskConfiguredFeatures.BLUE_NETHERSHROOM_PATCH),
-            10,
+            DuskConfiguredFeatures.BLUE_NETHERSHROOM_PATCH,
+            RarityFilterPlacementModifier.create(7),
         )
         c.registerNethershroomPlacement(
             DuskPlacedFeatures.WARPED_BLUE_NETHERSHROOM_PATCH,
-            configuredFeatureProvider.getHolderOrThrow(DuskConfiguredFeatures.LARGE_BLUE_NETHERSHROOM_PATCH),
-            5,
+            DuskConfiguredFeatures.LARGE_BLUE_NETHERSHROOM_PATCH,
+            CountPlacementModifier.create(1),
         )
         c.registerNethershroomPlacement(
             DuskPlacedFeatures.PURPLE_NETHERSHROOM_PATCH,
-            configuredFeatureProvider.getHolderOrThrow(DuskConfiguredFeatures.PURPLE_NETHERSHROOM_PATCH),
-            10,
+            DuskConfiguredFeatures.PURPLE_NETHERSHROOM_PATCH,
+            RarityFilterPlacementModifier.create(7),
         )
         c.registerNethershroomPlacement(
             DuskPlacedFeatures.CRIMSON_PURPLE_NETHERSHROOM_PATCH,
-            configuredFeatureProvider.getHolderOrThrow(DuskConfiguredFeatures.LARGE_PURPLE_NETHERSHROOM_PATCH),
-            5,
+            DuskConfiguredFeatures.LARGE_PURPLE_NETHERSHROOM_PATCH,
+            CountPlacementModifier.create(1),
         )
+
+        c.register(
+            DuskPlacedFeatures.TORUS,
+            DuskConfiguredFeatures.TORUS,
+            RarityFilterPlacementModifier.create(5),
+            InSquarePlacementModifier.getInstance(),
+            HeightRangePlacementModifier.createUniform(YOffset.aboveBottom(16), YOffset.fixed(106)),
+            EnvironmentScanPlacementModifier.create(
+                Direction.DOWN,
+                BlockPredicate.solid(),
+                BlockPredicate.matchingBlocks(Blocks.AIR, Blocks.LAVA),
+                12
+            ),
+            BiomePlacementModifier.getInstance()
+        )
+
     }
 
     private fun BootstrapContext<PlacedFeature>.registerNethershroomPlacement(
         registryKey: RegistryKey<PlacedFeature>,
-        configuredFeature: Holder<ConfiguredFeature<*, *>>,
-        count: Int
+        configuredFeature: RegistryKey<ConfiguredFeature<*, *>>,
+        count: PlacementModifier
     ) {
         this.register(
             registryKey,
-            configuredFeature,
+            this.getRegistryLookup(RegistryKeys.CONFIGURED_FEATURE).getHolderOrThrow(configuredFeature),
             listOf(
-                CountPlacementModifier.create(count),
+                count,
                 InSquarePlacementModifier.getInstance(),
                 HeightRangePlacementModifier.createUniform(YOffset.getBottom(), YOffset.fixed(128)),
                 EnvironmentScanPlacementModifier.create(
@@ -117,6 +133,18 @@ object PlacedFeatureCreator {
             )
         )
     }
+
+    fun BootstrapContext<PlacedFeature>.register(
+        registryKey: RegistryKey<PlacedFeature>,
+        configuredFeature: RegistryKey<ConfiguredFeature<*, *>>,
+        vararg placementModifiers: PlacementModifier
+    ): Any = this.register(
+        registryKey,
+        PlacedFeature(
+            this.getRegistryLookup(RegistryKeys.CONFIGURED_FEATURE).getHolderOrThrow(configuredFeature),
+            placementModifiers.toList()
+        )
+    )
 
     fun BootstrapContext<PlacedFeature>.register(
         registryKey: RegistryKey<PlacedFeature>,

@@ -1,5 +1,6 @@
 package org.teamvoided.dusk_debris
 
+import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.util.Identifier
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -33,7 +34,12 @@ object DuskDebris {
         DuskTabs.init()
     }
 
+
+
     fun id(path: String) = Identifier.of(MODID, path)
     fun mc(path: String) = Identifier.ofDefault(path)
     fun id(modId: String, path: String) = Identifier.of(modId, path)
+
+    @JvmStatic
+    fun isDev() = FabricLoader.getInstance().isDevelopmentEnvironment
 }

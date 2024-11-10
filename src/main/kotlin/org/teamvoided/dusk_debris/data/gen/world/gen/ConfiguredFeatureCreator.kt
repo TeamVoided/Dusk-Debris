@@ -9,8 +9,10 @@ import net.minecraft.registry.RegistryKeys
 import net.minecraft.registry.tag.BlockTags
 import net.minecraft.unmapped.C_cxbmzbuz
 import net.minecraft.util.collection.DataPool
+import net.minecraft.util.math.float_provider.UniformFloatProvider
 import net.minecraft.util.math.int_provider.ConstantIntProvider
 import net.minecraft.util.math.int_provider.UniformIntProvider
+import net.minecraft.util.math.noise.DoublePerlinNoiseSampler.NoiseParameters
 import net.minecraft.world.gen.blockpredicate.BlockPredicate
 import net.minecraft.world.gen.decorator.BlockPredicateFilterPlacementModifier
 import net.minecraft.world.gen.feature.*
@@ -19,6 +21,7 @@ import net.minecraft.world.gen.feature.util.ConfiguredFeatureUtil
 import net.minecraft.world.gen.feature.util.PlacedFeatureUtil
 import net.minecraft.world.gen.root.AboveRootPlacement
 import net.minecraft.world.gen.stateprovider.BlockStateProvider
+import net.minecraft.world.gen.stateprovider.NoiseBlockStateProvider
 import net.minecraft.world.gen.stateprovider.WeightedBlockStateProvider
 import net.minecraft.world.gen.treedecorator.LeavesVineTreeDecorator
 import net.minecraft.world.gen.treedecorator.TreeDecorator
@@ -28,7 +31,9 @@ import org.teamvoided.dusk_debris.data.DuskPlacedFeatures
 import org.teamvoided.dusk_debris.data.tags.DuskBlockTags
 import org.teamvoided.dusk_debris.init.DuskBlocks
 import org.teamvoided.dusk_debris.init.worldgen.DuskFeatures
+import org.teamvoided.dusk_debris.world.gen.configured_feature.config.GlassSpikeFeatureConfig
 import org.teamvoided.dusk_debris.world.gen.configured_feature.config.HugeNethershroomFeatureConfig
+import org.teamvoided.dusk_debris.world.gen.configured_feature.config.TorusFeatureConfig
 import org.teamvoided.dusk_debris.world.gen.foliage.CypressFoliagePlacer
 import org.teamvoided.dusk_debris.world.gen.root.CypressRootPlacer
 import org.teamvoided.dusk_debris.world.gen.root.config.CypressRootConfig
@@ -256,6 +261,62 @@ object ConfiguredFeatureCreator {
                 )
             )
         )
+        c.registerConfiguredFeature(
+            DuskConfiguredFeatures.GLASS_SPIKE,
+            DuskFeatures.GLASS_SPIKE,
+            GlassSpikeFeatureConfig(
+                BlockStateProvider.of(
+                    Blocks.TINTED_GLASS.defaultState
+                ),
+                BlockTags.REPLACEABLE,
+                UniformIntProvider.create(-3, 3),
+                UniformIntProvider.create(0, 10),
+                UniformIntProvider.create(3, 4),
+                UniformIntProvider.create(1, 2),
+                -16,
+                16,
+                0.05
+            )
+        )
+        c.registerConfiguredFeature(
+            DuskConfiguredFeatures.TORUS,
+            DuskFeatures.TORUS,
+            TorusFeatureConfig(
+                BlockStateProvider.of(
+                    Blocks.AMETHYST_BLOCK.defaultState
+                ),
+                BlockTags.REPLACEABLE,
+                UniformIntProvider.create(4, 13),
+                UniformIntProvider.create(2, 6),
+                UniformIntProvider.create(2, 6),
+                UniformFloatProvider.create(0f, 1f),
+                UniformFloatProvider.create(0f, 1f),
+                UniformFloatProvider.create(0.5f, 1.5f)
+            )
+        )
+        c.registerConfiguredFeature(
+            DuskConfiguredFeatures.OVERWORLD_TORUS,
+            DuskFeatures.TORUS,
+            TorusFeatureConfig(
+                NoiseBlockStateProvider(
+                    6789L,
+                    NoiseParameters(0, 1.0, *DoubleArray(0)),
+                    0.020833334f,
+                    listOf<BlockState>(
+                        Blocks.COBBLESTONE.defaultState,
+                        Blocks.MOSSY_COBBLESTONE.defaultState
+                    )
+                ),
+                BlockTags.REPLACEABLE,
+                UniformIntProvider.create(4, 13),
+                UniformIntProvider.create(2, 6),
+                UniformIntProvider.create(2, 6),
+                UniformFloatProvider.create(0.125f, 0.375f),
+                UniformFloatProvider.create(0f, 1f),
+                UniformFloatProvider.create(0.5f, 1.5f)
+            )
+        )
+
     }
 
     private fun <FC : FeatureConfig, F : Feature<FC>> BootstrapContext<ConfiguredFeature<*, *>>.registerConfiguredFeature(

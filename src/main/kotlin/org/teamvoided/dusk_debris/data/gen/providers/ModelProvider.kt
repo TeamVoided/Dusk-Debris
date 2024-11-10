@@ -111,7 +111,7 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
         gen.registerCopperFan(DuskBlocks.OXIDIZED_COPPER_FAN, DuskBlocks.WAXED_OXIDIZED_COPPER_FAN)
 
         gen.registerGeyser(DuskBlocks.ROARING_GEYSER)
-        gen.registerSimpleCubeAll(DuskBlocks.VOLCANIC_SAND)
+        gen.registerRotatable(DuskBlocks.VOLCANIC_SAND)
         gen.registerDustable(DuskBlocks.SUSPICIOUS_VOLCANIC_SAND)
         gen.registerLog(DuskBlocks.CHARRED_LOG)
             .log(DuskBlocks.CHARRED_LOG)

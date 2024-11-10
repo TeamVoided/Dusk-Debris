@@ -18,6 +18,8 @@ class BiomeTagsProvider(o: FabricDataOutput, r: CompletableFuture<HolderLookup.P
     }
 
     fun duskTags() {
+        getOrCreateTagBuilder(DuskBiomeTags.TEST)
+            .add(Biomes.SOUL_SAND_VALLEY)
         getOrCreateTagBuilder(DuskBiomeTags.CRIMSON)
             .add(Biomes.CRIMSON_FOREST)
         getOrCreateTagBuilder(DuskBiomeTags.WARPED)

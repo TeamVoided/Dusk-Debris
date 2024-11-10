@@ -2,19 +2,22 @@ package org.teamvoided.dusk_debris.init.worldgen
 
 import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
-import net.minecraft.world.gen.feature.Feature
-import net.minecraft.world.gen.feature.FeatureConfig
+import net.minecraft.world.gen.feature.*
 import org.teamvoided.dusk_debris.DuskDebris.id
-import net.minecraft.world.gen.feature.HugeMushroomFeatureConfig
-import net.minecraft.world.gen.feature.HugeRedMushroomFeature
+import org.teamvoided.dusk_debris.world.gen.configured_feature.GlassSpikeFeature
 import org.teamvoided.dusk_debris.world.gen.configured_feature.config.HugeNethershroomFeatureConfig
 import org.teamvoided.dusk_debris.world.gen.configured_feature.HugeBlueNethershroomFeature
 import org.teamvoided.dusk_debris.world.gen.configured_feature.HugePurpleNethershroomFeature
+import org.teamvoided.dusk_debris.world.gen.configured_feature.TorusFeature
+import org.teamvoided.dusk_debris.world.gen.configured_feature.config.GlassSpikeFeatureConfig
+import org.teamvoided.dusk_debris.world.gen.configured_feature.config.TorusFeatureConfig
 
 object DuskFeatures {
 
     val HUGE_BLUE_NETHERSHROOM = register("huge_blue_nethershroom", HugeBlueNethershroomFeature(HugeNethershroomFeatureConfig.CODEC))
     val HUGE_PURPLE_NETHERSHROOM = register("huge_purple_nethershroom", HugePurpleNethershroomFeature(HugeNethershroomFeatureConfig.CODEC))
+    val GLASS_SPIKE = register("glass_spike", GlassSpikeFeature(GlassSpikeFeatureConfig.CODEC))
+    val TORUS = register("torus", TorusFeature(TorusFeatureConfig.CODEC))
 
 
     fun init() {}

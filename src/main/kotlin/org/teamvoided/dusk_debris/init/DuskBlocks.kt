@@ -430,7 +430,7 @@ object DuskBlocks {
         )
     )
 
-    val BOG_MUD = register(
+    val BOG_MUD = registerNoItem(
         "bog_mud", BogMudBlock(
             AbstractBlock.Settings.variantOf(MUD).dynamicBounds()
                 .allowsSpawning(Blocks::spawnable)

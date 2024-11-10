@@ -22,6 +22,10 @@ object DuskConfiguredFeatures {
     val LARGE_PURPLE_NETHERSHROOM_PATCH = create("large_purple_nethershroom_patch")
     val PURPLE_NETHERSHROOM_PATCH = create("purple_nethershroom_patch")
 
+    val GLASS_SPIKE = create("glass_spike")
+    val OVERWORLD_TORUS = create("overworld_torus")
+    val TORUS = create("torus")
+
     fun create(id: String): RegistryKey<ConfiguredFeature<*, *>> =
         RegistryKey.of(RegistryKeys.CONFIGURED_FEATURE, id(id))
 
