@@ -18,7 +18,7 @@ class TorusFeatureConfig(
     val ringWidth: IntProvider,
     val ringHeight: IntProvider,
     val pitch: FloatProvider,
-    val yaw: FloatProvider,
+    val roll: FloatProvider,
     val noiseMultiplier: FloatProvider,
 ) :
     FeatureConfig {
@@ -51,8 +51,8 @@ class TorusFeatureConfig(
                         .fieldOf("pitch")
                         .forGetter { config: TorusFeatureConfig -> config.pitch },
                     FloatProvider.createValidatedCodec(0f,1f)
-                        .fieldOf("yaw")
-                        .forGetter { config: TorusFeatureConfig -> config.yaw },
+                        .fieldOf("roll")
+                        .forGetter { config: TorusFeatureConfig -> config.roll },
                     FloatProvider.createValidatedCodec(0f,10f)
                         .fieldOf("noise_multiplier")
                         .forGetter { config: TorusFeatureConfig -> config.noiseMultiplier }

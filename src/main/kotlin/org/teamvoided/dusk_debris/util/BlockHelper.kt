@@ -1,5 +1,6 @@
 package org.teamvoided.dusk_debris.util
 
+import net.fabricmc.fabric.api.registry.OxidizableBlocksRegistry
 import net.minecraft.block.*
 import net.minecraft.block.enums.NoteBlockInstrument
 import net.minecraft.block.piston.PistonBehavior
@@ -8,6 +9,31 @@ import net.minecraft.util.math.Direction
 import org.teamvoided.dusk_debris.block.RibbonBlock
 import org.teamvoided.dusk_debris.init.DuskBlocks
 
+
+fun Block.cutout(): Block {
+    DuskBlocks.CUTOUT_BLOCKS.add(this)
+    return this
+}
+
+fun Block.translucent(): Block {
+    DuskBlocks.TRANSLUCENT_BLOCKS.add(this)
+    return this
+}
+
+fun oxidizeCopperSet(copperList: List<Pair<Block, Block>>) {
+    copperList.forEachIndexed { idx, (regular: Block, waxed: Block) ->
+        if (idx < copperList.size - 1) {
+            OxidizableBlocksRegistry.registerOxidizableBlockPair(
+                regular,
+                copperList[idx + 1].first
+            )
+        }
+        OxidizableBlocksRegistry.registerWaxableBlockPair(
+            regular,
+            waxed
+        )
+    }
+}
 
 fun registerSkull(id: String, skullType: SkullBlock.SkullType, instrument: NoteBlockInstrument): Block {
     return DuskBlocks.register(

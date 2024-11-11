@@ -125,7 +125,6 @@ class RoaringGeyserBlock(settings: Settings) :
             )
         ) { obj: Entity -> !obj.type.isIn(DuskEntityTypeTags.GEYSERS_DONT_PROPEL) }
         return entitiesInRange.forEach {
-            println(it.type.toString())
             val vec3d = it.velocity
             it.setVelocity(vec3d.x, vec3d.y + 1.75, vec3d.z)
             it.velocityModified = true

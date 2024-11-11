@@ -14,7 +14,6 @@ import net.minecraft.client.render.entity.FlyingItemEntityRenderer
 import net.minecraft.component.type.DyedColorComponent
 import net.minecraft.item.ItemStack
 import org.teamvoided.dusk_debris.DuskDebris.log
-import org.teamvoided.dusk_debris.block.DuskBlockLists.CUTOUT_BLOCKS
 import org.teamvoided.dusk_debris.block.GunpowderBlock
 import org.teamvoided.dusk_debris.entity.DuskEntityLists.THROWABLE_BOMB_ENTITIES
 import org.teamvoided.dusk_debris.entity.DuskEntityModelLayers
@@ -67,6 +66,9 @@ object DuskDebrisClient {
             DuskBlocks.GUNPOWDER
         )
 
+        DuskBlocks.CUTOUT_BLOCKS.forEach { BlockRenderLayerMap.INSTANCE.putBlock(it, RenderLayer.getCutout()) }
+        DuskBlocks.TRANSLUCENT_BLOCKS.forEach { BlockRenderLayerMap.INSTANCE.putBlock(it, RenderLayer.getTranslucent()) }
+
         EntityRendererRegistry.register(DuskEntities.BOX_AREA_EFFECT_CLOUD, ::EmptyEntityRenderer)
         EntityRendererRegistry.register(DuskEntities.GUNPOWDER_BARREL, ::GunpowderBarrelEntityRenderer)
         EntityRendererRegistry.register(DuskEntities.GLOOM, ::GloomEntityRenderer)
@@ -83,12 +85,5 @@ object DuskDebrisClient {
         THROWABLE_BOMB_ENTITIES.forEach {
             EntityRendererRegistry.register(it, ::FlyingItemEntityRenderer)
         }
-
-        CUTOUT_BLOCKS.forEach {
-            BlockRenderLayerMap.INSTANCE.putBlock(it, RenderLayer.getCutout())
-        }
-//        translucentBlock.forEach {
-//            BlockRenderLayerMap.INSTANCE.putBlock(it, RenderLayer.getTranslucent())
-//        }
     }
 }

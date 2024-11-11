@@ -3,6 +3,7 @@ package org.teamvoided.dusk_debris.init.worldgen
 import net.fabricmc.fabric.api.biome.v1.*
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalBiomeTags
 import net.minecraft.registry.RegistryKey
+import net.minecraft.registry.tag.BiomeTags
 import net.minecraft.registry.tag.TagKey
 import net.minecraft.world.biome.Biome
 import net.minecraft.world.biome.Biomes
@@ -44,6 +45,13 @@ object DuskBiomeModifications {
             GenerationStep.Feature.LOCAL_MODIFICATIONS,
             DuskPlacedFeatures.TORUS,
             DuskBiomeTags.TEST
+        )
+
+        addFeature(
+            "add_overworld_torus",
+            GenerationStep.Feature.LOCAL_MODIFICATIONS,
+            DuskPlacedFeatures.OVERWORLD_TORUS,
+            BiomeTags.OVERWORLD
         )
     }
 

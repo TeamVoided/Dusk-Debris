@@ -3,6 +3,7 @@ package org.teamvoided.dusk_debris.data.gen.providers
 
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider
+import net.minecraft.block.Blocks
 import net.minecraft.data.client.ItemModelGenerator
 import net.minecraft.data.client.model.*
 import net.minecraft.util.Identifier
@@ -69,10 +70,22 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
         DuskBlockLists.COIN_STACK_BLOCK_LIST.forEach {
             gen.registerCoinStack(it)
         }
-        gen.registerGoldPileBlock(DuskBlocks.TREACHEROUS_GOLD_COIN_PILE, Texture.getSubId(DuskBlocks.TREACHEROUS_GOLD_COIN_STACK, "_side"))
-        gen.registerGoldPileBlock(DuskBlocks.TARNISHED_GOLD_COIN_PILE, Texture.getSubId(DuskBlocks.TARNISHED_GOLD_COIN_STACK, "_side"))
-        gen.registerGoldPileBlock(DuskBlocks.LOST_SILVER_COIN_PILE, Texture.getSubId(DuskBlocks.LOST_SILVER_COIN_STACK, "_side"))
-        gen.registerGoldPileBlock(DuskBlocks.SUNKEN_BRONZE_COIN_PILE, Texture.getSubId(DuskBlocks.SUNKEN_BRONZE_COIN_STACK, "_side"))
+        gen.registerGoldPileBlock(
+            DuskBlocks.TREACHEROUS_GOLD_COIN_PILE,
+            Texture.getSubId(DuskBlocks.TREACHEROUS_GOLD_COIN_STACK, "_side")
+        )
+        gen.registerGoldPileBlock(
+            DuskBlocks.TARNISHED_GOLD_COIN_PILE,
+            Texture.getSubId(DuskBlocks.TARNISHED_GOLD_COIN_STACK, "_side")
+        )
+        gen.registerGoldPileBlock(
+            DuskBlocks.LOST_SILVER_COIN_PILE,
+            Texture.getSubId(DuskBlocks.LOST_SILVER_COIN_STACK, "_side")
+        )
+        gen.registerGoldPileBlock(
+            DuskBlocks.SUNKEN_BRONZE_COIN_PILE,
+            Texture.getSubId(DuskBlocks.SUNKEN_BRONZE_COIN_STACK, "_side")
+        )
         DuskBlockLists.VESSEL_BLOCK_LIST.forEach {
             gen.registerDecorativeGoldBlock(it, "parent/mysterious_vessel", true)
         }
@@ -104,6 +117,14 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
         gen.registerLog(DuskBlocks.STRIPPED_CYPRESS_LOG)
             .log(DuskBlocks.STRIPPED_CYPRESS_LOG)
             .wood(DuskBlocks.STRIPPED_CYPRESS_WOOD)
+
+        gen.registerSimpleCubeAll(DuskBlocks.CRYSTAL_BLOCK)
+        gen.registerAxisRotated(
+            DuskBlocks.CRYSTAL_PILLAR_BLOCK,
+            TexturedModel.END_FOR_TOP_CUBE_COLUMN,
+            TexturedModel.END_FOR_TOP_CUBE_COLUMN_HORIZONTAL
+        )
+
 
         gen.registerCopperFan(DuskBlocks.COPPER_FAN, DuskBlocks.WAXED_COPPER_FAN)
         gen.registerCopperFan(DuskBlocks.EXPOSED_COPPER_FAN, DuskBlocks.WAXED_EXPOSED_COPPER_FAN)

@@ -23,6 +23,7 @@ object DuskPlacedFeatures {
     val PURPLE_NETHERSHROOM_PATCH = create("purple_nethershroom_patch")
 
     val TORUS = create("torus")
+    val OVERWORLD_TORUS = create("overworld_torus")
 
     fun create(id: String): RegistryKey<PlacedFeature> =
         RegistryKey.of(RegistryKeys.PLACED_FEATURE, id(id))

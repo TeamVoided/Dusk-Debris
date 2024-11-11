@@ -1,5 +1,6 @@
 package org.teamvoided.dusk_debris.init
 
+import net.fabricmc.fabric.api.registry.OxidizableBlocksRegistry
 import net.fabricmc.fabric.api.registry.StrippableBlockRegistry
 import net.minecraft.block.*
 import net.minecraft.block.Blocks.*
@@ -14,7 +15,6 @@ import net.minecraft.registry.Registry
 import net.minecraft.sound.BlockSoundGroup
 import net.minecraft.sound.SoundEvents
 import net.minecraft.util.Color
-import net.minecraft.util.math.Direction
 import org.teamvoided.dusk_debris.DuskDebris.id
 import org.teamvoided.dusk_debris.block.*
 import org.teamvoided.dusk_debris.block.throwable_bomb.BlunderbombBlock
@@ -33,12 +33,13 @@ import org.teamvoided.dusk_debris.block.voided.sign.VoidWallHangingSignBlock
 import org.teamvoided.dusk_debris.block.voided.sign.VoidWallSignBlock
 import org.teamvoided.dusk_debris.data.DuskConfiguredFeatures
 import org.teamvoided.dusk_debris.particle.NethershroomSporeParticleEffect
-import org.teamvoided.dusk_debris.util.charredLogOf
-import org.teamvoided.dusk_debris.util.registerRibbon
+import org.teamvoided.dusk_debris.util.*
 
 @Suppress("HasPlatformType", "MemberVisibilityCanBePrivate", "unused", "DEPRECATION")
 object DuskBlocks {
     val BLOCKS = mutableSetOf<Block>()
+    val CUTOUT_BLOCKS = mutableSetOf<Block>()
+    val TRANSLUCENT_BLOCKS = mutableSetOf<Block>()
 
     val charredLogColor = MapColor.BLACK
     val charredPlanksColor = MapColor.DEEPSLATE
@@ -76,7 +77,7 @@ object DuskBlocks {
             AbstractBlock.Settings.create().mapColor(MapColor.LIGHT_BLUE).strength(0.1F)
                 .sounds(BlockSoundGroup.FUNGUS).noCollision()
         )
-    )
+    ).cutout()
     val BLUE_NETHERSHROOM_BLOCK = register(
         "blue_nethershroom_block",
         NethershroomBlock(
@@ -99,7 +100,7 @@ object DuskBlocks {
             AbstractBlock.Settings.create().mapColor(MapColor.PURPLE).strength(0.1F)
                 .sounds(BlockSoundGroup.FUNGUS).noCollision()
         )
-    )
+    ).cutout()
     val PURPLE_NETHERSHROOM_BLOCK = register(
         "purple_nethershroom_block",
         NethershroomBlock(
@@ -122,10 +123,10 @@ object DuskBlocks {
     val GUNPOWDER = register(
         "gunpowder",
         GunpowderBlock(
-            AbstractBlock.Settings.create().mapColor(Blocks.FIRE.defaultMapColor).sounds(BlockSoundGroup.SAND)
+            AbstractBlock.Settings.create().mapColor(FIRE.defaultMapColor).sounds(BlockSoundGroup.SAND)
                 .lavaIgnitable().noCollision().breakInstantly().pistonBehavior(PistonBehavior.DESTROY)
         )
-    )
+    ).cutout()
     val GUNPOWDER_BARREL = register(
         "gunpowder_barrel",
         GunpowderBarrelBlock(
@@ -164,7 +165,7 @@ object DuskBlocks {
                 .strength(1f, 0.0f).sounds(BlockSoundGroup.GLASS).solidBlock(Blocks::nonSolid)
                 .pistonBehavior(PistonBehavior.DESTROY)
         )
-    )
+    ).cutout()
     val FIREBOMB_BLOCK = registerNoItem(
         "firebomb",
         FirebombBlock(
@@ -172,12 +173,12 @@ object DuskBlocks {
                 .strength(1f, 0.0f).sounds(BlockSoundGroup.GLASS).solidBlock(Blocks::nonSolid)
                 .pistonBehavior(PistonBehavior.DESTROY).luminance { _: BlockState -> 8 }
         )
-    )
-    val BONECALLER_BLOCK = registerNoItem("bonecaller", BonecallerBlock(bonecallerBlockSettings))
-    val BONECHILLER_BLOCK = registerNoItem("bonechiller", BonechillerBlock(bonecallerBlockSettings))
-    val BOGCALLER_BLOCK = registerNoItem("bogcaller", BogcallerBlock(bonecallerBlockSettings))
-    val BONEWITHER_BLOCK = registerNoItem("bonewither", BonewitherBlock(bonecallerBlockSettings))
-    val SHADECALLER_BLOCK = registerNoItem("shadecaller", ShadecallerBlock(bonecallerBlockSettings))
+    ).cutout()
+    val BONECALLER_BLOCK = registerNoItem("bonecaller", BonecallerBlock(bonecallerBlockSettings)).cutout()
+    val BONECHILLER_BLOCK = registerNoItem("bonechiller", BonechillerBlock(bonecallerBlockSettings)).cutout()
+    val BOGCALLER_BLOCK = registerNoItem("bogcaller", BogcallerBlock(bonecallerBlockSettings)).cutout()
+    val BONEWITHER_BLOCK = registerNoItem("bonewither", BonewitherBlock(bonecallerBlockSettings)).cutout()
+    val SHADECALLER_BLOCK = registerNoItem("shadecaller", ShadecallerBlock(bonecallerBlockSettings)).cutout()
     val SMOKEBOMB_BLOCK = registerNoItem(
         "smokebomb",
         SmokebombBlock(
@@ -185,7 +186,7 @@ object DuskBlocks {
                 .instrument(NoteBlockInstrument.HAT).strength(1f, 0.0f).solidBlock(Blocks::nonSolid)
                 .pistonBehavior(PistonBehavior.DESTROY)
         )
-    )
+    ).cutout()
     val POCKETPOISON_BLOCK = registerNoItem(
         "pocketpoison",
         PocketpoisonBlock(
@@ -193,7 +194,7 @@ object DuskBlocks {
                 .instrument(NoteBlockInstrument.HAT).strength(1f, 0.0f).solidBlock(Blocks::nonSolid)
                 .pistonBehavior(PistonBehavior.DESTROY)
         )
-    )
+    ).cutout()
     val BLINDBOMB_BLOCK = registerNoItem(
         "blindbomb",
         BlindbombBlock(
@@ -201,7 +202,7 @@ object DuskBlocks {
                 .instrument(NoteBlockInstrument.HAT).strength(1f, 0.0f).solidBlock(Blocks::nonSolid)
                 .pistonBehavior(PistonBehavior.DESTROY)
         )
-    )
+    ).cutout()
     val RED_RIBBON = register("red_ribbon", registerRibbon(RED_WOOL.defaultMapColor))
     val ORANGE_RIBBON = register("orange_ribbon", registerRibbon(ORANGE_WOOL.defaultMapColor))
     val YELLOW_RIBBON = register("yellow_ribbon", registerRibbon(YELLOW_WOOL.defaultMapColor))
@@ -245,25 +246,25 @@ object DuskBlocks {
     val TREACHEROUS_GOLD_COIN_STACK = registerNoItem(
         "treacherous_gold_coin_stack",
         CoinStackBlock(coin_stack_settings.mapColor(TREACHEROUS_GOLD_BLOCK.defaultMapColor))
-    )
+    ).cutout()
     val TREACHEROUS_GOLD_COIN_PILE = registerNoItem(
         "treacherous_gold_coin_pile", CoinPileBlock(coin_pile_settings.mapColor(TREACHEROUS_GOLD_BLOCK.defaultMapColor))
     )
     val TARNISHED_GOLD_COIN_STACK = registerNoItem(
         "tarnished_gold_coin_stack", CoinStackBlock(coin_stack_settings.mapColor(TARNISHED_GOLD_BLOCK.defaultMapColor))
-    )
+    ).cutout()
     val TARNISHED_GOLD_COIN_PILE = registerNoItem(
         "tarnished_gold_coin_pile", CoinPileBlock(coin_pile_settings.mapColor(TARNISHED_GOLD_BLOCK.defaultMapColor))
     )
     val LOST_SILVER_COIN_STACK = registerNoItem(
         "lost_silver_coin_stack", CoinStackBlock(coin_stack_settings.mapColor(LOST_SILVER_BLOCK.defaultMapColor))
-    )
+    ).cutout()
     val LOST_SILVER_COIN_PILE = registerNoItem(
         "lost_silver_coin_pile", CoinPileBlock(coin_pile_settings.mapColor(LOST_SILVER_BLOCK.defaultMapColor))
     )
     val SUNKEN_BRONZE_COIN_STACK = registerNoItem(
         "sunken_bronze_coin_stack", CoinStackBlock(coin_stack_settings.mapColor(SUNKEN_BRONZE_BLOCK.defaultMapColor))
-    )
+    ).cutout()
     val SUNKEN_BRONZE_COIN_PILE = registerNoItem(
         "sunken_bronze_coin_pile", CoinPileBlock(coin_pile_settings.mapColor(SUNKEN_BRONZE_BLOCK.defaultMapColor))
     )
@@ -273,28 +274,28 @@ object DuskBlocks {
             AbstractBlock.Settings.create().mapColor(TREACHEROUS_GOLD_BLOCK.defaultMapColor)
                 .pistonBehavior(PistonBehavior.DESTROY)
         )
-    )
+    ).cutout()
     val DROWNED_VESSEL = register(
         "drowned_vessel", 16,
         MysteriousVesselBlock(
             AbstractBlock.Settings.create().mapColor(TARNISHED_GOLD_BLOCK.defaultMapColor)
                 .pistonBehavior(PistonBehavior.DESTROY)
         )
-    )
+    ).cutout()
     val PURE_VESSEL = register(
         "pure_vessel", 16,
         MysteriousVesselBlock(
             AbstractBlock.Settings.create().mapColor(LOST_SILVER_BLOCK.defaultMapColor)
                 .pistonBehavior(PistonBehavior.DESTROY)
         )
-    )
+    ).cutout()
     val DARKENED_VESSEL = register(
         "darkened_vessel", 16,
         MysteriousVesselBlock(
             AbstractBlock.Settings.create().mapColor(SUNKEN_BRONZE_BLOCK.defaultMapColor)
                 .pistonBehavior(PistonBehavior.DESTROY)
         )
-    )
+    ).cutout()
     val GILDED_CHALICE = register(
         "gilded_chalice", 16, GildedChaliceBlock(
             AbstractBlock.Settings.create().mapColor(TREACHEROUS_GOLD_BLOCK.defaultMapColor)
@@ -323,31 +324,31 @@ object DuskBlocks {
         "lapis_relic", 16, PerculiarRelicBlock(
             AbstractBlock.Settings.create().mapColor(LAPIS_BLOCK.defaultMapColor).pistonBehavior(PistonBehavior.DESTROY)
         )
-    )
+    ).cutout()
     val GOLDEN_RUBY_CROWN = register(
         "golden_ruby_crown", 16, RoyalCrownBlock(
             AbstractBlock.Settings.create().mapColor(REDSTONE_BLOCK.defaultMapColor)
                 .pistonBehavior(PistonBehavior.DESTROY)
         )
-    )
+    ).cutout()
     val GOLDEN_SAPPHIRE_CROWN = register(
         "golden_sapphire_crown", 16, RoyalCrownBlock(
             AbstractBlock.Settings.create().mapColor(LAPIS_BLOCK.defaultMapColor).pistonBehavior(PistonBehavior.DESTROY)
         )
-    )
+    ).cutout()
     val GOLDEN_QUARTZ_CROWN = register(
         "golden_quartz_crown", 16, RoyalCrownBlock(
             AbstractBlock.Settings.create().mapColor(QUARTZ_BLOCK.defaultMapColor)
                 .pistonBehavior(PistonBehavior.DESTROY)
         )
-    )
+    ).cutout()
 
     val LEGENDARY_CRYSTAL_CROWN = register(
         "legendary_crystal_crown", 16, RoyalCrownBlock(
             AbstractBlock.Settings.create().mapColor(DIAMOND_BLOCK.defaultMapColor)
                 .pistonBehavior(PistonBehavior.DESTROY)
         )
-    )
+    ).cutout()
     val FORGOTTEN_CHEST = register(
         "forgotten_chest",
         TreasureChestBlock(
@@ -385,42 +386,69 @@ object DuskBlocks {
 //        BOGGED_SKULL
 //    )
 
+    val CRYSTAL_BLOCK = register(
+        "crystal_block",
+        Block(AbstractBlock.Settings.copy(AMETHYST_BLOCK))
+    )
+    val CRYSTAL_PILLAR_BLOCK = register(
+        "crystal_pillar_block",
+        PillarBlock(AbstractBlock.Settings.copy(CRYSTAL_BLOCK))
+    )
+
+    val WAXED_OXIDIZED_COPPER_FAN = register(
+        "waxed_oxidized_copper_fan", FanBlock(
+            4,
+            AbstractBlock.Settings.create().mapColor(OXIDIZED_COPPER.defaultMapColor).strength(3.0F, 6.0F)
+                .sounds(BlockSoundGroup.BLOCK_COPPER_BULB_BREAK).toolRequired().solidBlock(Blocks::nonSolid)
+        )
+    )
+    val WAXED_WEATHERED_COPPER_FAN = register(
+        "waxed_weathered_copper_fan",
+        FanBlock(
+            8,
+            AbstractBlock.Settings.copy(WAXED_OXIDIZED_COPPER_FAN).mapColor(WEATHERED_COPPER.defaultMapColor)
+        )
+    )
+    val WAXED_EXPOSED_COPPER_FAN = register(
+        "waxed_exposed_copper_fan",
+        FanBlock(
+            12,
+            AbstractBlock.Settings.copy(WAXED_WEATHERED_COPPER_FAN).mapColor(EXPOSED_COPPER.defaultMapColor)
+        )
+    )
+    val WAXED_COPPER_FAN = register(
+        "waxed_copper_fan",
+        FanBlock(15, AbstractBlock.Settings.copy(WAXED_EXPOSED_COPPER_FAN).mapColor(COPPER_BLOCK.defaultMapColor))
+    )
+
     val OXIDIZED_COPPER_FAN = register(
         "oxidized_copper_fan",
         OxidizableFanBlock(
             OxidizationLevel.OXIDIZED, 4,
-            AbstractBlock.Settings.create().mapColor(OXIDIZED_COPPER.defaultMapColor).strength(3.0F, 6.0F)
-                .sounds(BlockSoundGroup.BLOCK_COPPER_BULB_BREAK).toolRequired().solidBlock(Blocks::nonSolid)
+            AbstractBlock.Settings.copy(WAXED_OXIDIZED_COPPER_FAN).ticksRandomly()
         )
     )
     val WEATHERED_COPPER_FAN = register(
         "weathered_copper_fan",
         OxidizableFanBlock(
             OxidizationLevel.EXPOSED, 8,
-            AbstractBlock.Settings.copy(OXIDIZED_COPPER_FAN).mapColor(WEATHERED_COPPER.defaultMapColor)
+            AbstractBlock.Settings.copy(WAXED_WEATHERED_COPPER_FAN).ticksRandomly()
         )
     )
     val EXPOSED_COPPER_FAN = register(
         "exposed_copper_fan",
         OxidizableFanBlock(
             OxidizationLevel.WEATHERED, 12,
-            AbstractBlock.Settings.copy(WEATHERED_COPPER_FAN).mapColor(EXPOSED_COPPER.defaultMapColor)
+            AbstractBlock.Settings.copy(WAXED_EXPOSED_COPPER_FAN).ticksRandomly()
         )
     )
     val COPPER_FAN = register(
         "copper_fan",
-        OxidizableFanBlock(OxidizationLevel.UNAFFECTED, 15,
-            AbstractBlock.Settings.copy(EXPOSED_COPPER_FAN).mapColor(COPPER_BLOCK.defaultMapColor))
+        OxidizableFanBlock(
+            OxidizationLevel.UNAFFECTED, 15,
+            AbstractBlock.Settings.copy(WAXED_COPPER_FAN).ticksRandomly()
+        )
     )
-
-    val WAXED_OXIDIZED_COPPER_FAN =
-        register("waxed_oxidized_copper_fan", FanBlock(4, AbstractBlock.Settings.copy(OXIDIZED_COPPER_FAN)))
-    val WAXED_WEATHERED_COPPER_FAN =
-        register("waxed_weathered_copper_fan", FanBlock(8, AbstractBlock.Settings.copy(WEATHERED_COPPER_FAN)))
-    val WAXED_EXPOSED_COPPER_FAN =
-        register("waxed_exposed_copper_fan", FanBlock(12, AbstractBlock.Settings.copy(EXPOSED_COPPER_FAN)))
-    val WAXED_COPPER_FAN =
-        register("waxed_copper_fan", FanBlock(15, AbstractBlock.Settings.copy(COPPER_FAN)))
 
 
     val PAPER_BLOCK = register(
@@ -440,9 +468,9 @@ object DuskBlocks {
         )
     )
 
-    val CYPRESS_LEAVES = register("cypress_leaves", Blocks.leavesOf(BlockSoundGroup.GRASS))
-    val CYPRESS_LOG = register("cypress_log", Blocks.logOf(charredPlanksColor, charredLogColor))
-    val STRIPPED_CYPRESS_LOG = register("stripped_cypress_log", Blocks.logOf(charredPlanksColor, charredPlanksColor))
+    val CYPRESS_LEAVES = register("cypress_leaves", leavesOf(BlockSoundGroup.GRASS)).cutout()
+    val CYPRESS_LOG = register("cypress_log", logOf(charredPlanksColor, charredLogColor))
+    val STRIPPED_CYPRESS_LOG = register("stripped_cypress_log", logOf(charredPlanksColor, charredPlanksColor))
     val CYPRESS_WOOD = register(
         "cypress_wood",
         PillarBlock(
@@ -481,14 +509,14 @@ object DuskBlocks {
             AbstractBlock.Settings.create().mapColor(charredPlanksColor).instrument(NoteBlockInstrument.BASS)
                 .strength(3.0f).nonOpaque().pistonBehavior(PistonBehavior.DESTROY).lavaIgnitable()
         )
-    )
+    ).cutout()
     val CYPRESS_TRAPDOOR = register(
         "cypress_trapdoor", TrapdoorBlock(
             DuskBlockSetType.CYPRESS_BLOCK_SET_TYPE,
             AbstractBlock.Settings.create().mapColor(charredPlanksColor).instrument(NoteBlockInstrument.BASS)
                 .strength(3.0f).nonOpaque().allowsSpawning(Blocks::nonSpawnable).lavaIgnitable()
         )
-    )
+    ).cutout()
     val CYPRESS_SIGN = registerNoItem(
         "cypress_sign",
         VoidSignBlock(
@@ -523,10 +551,10 @@ object DuskBlocks {
             DuskBlockSetType.CYPRESS_SIGN_TYPE,
             AbstractBlock.Settings.create().mapColor(charredLogColor).solid()
                 .instrument(NoteBlockInstrument.BASS).noCollision().strength(1.0f).lavaIgnitable()
-                .dropsLike(Blocks.OAK_HANGING_SIGN)
+                .dropsLike(OAK_HANGING_SIGN)
         )
     )
-    val CYPRESS_BUTTON = register("cypress_button", Blocks.buttonOf(DuskBlockSetType.CYPRESS_BLOCK_SET_TYPE))
+    val CYPRESS_BUTTON = register("cypress_button", buttonOf(DuskBlockSetType.CYPRESS_BLOCK_SET_TYPE))
     val CYPRESS_FENCE = register(
         "cypress_fence",
         FenceBlock(
@@ -669,14 +697,14 @@ object DuskBlocks {
             AbstractBlock.Settings.create().mapColor(charredPlanksColor)
                 .instrument(NoteBlockInstrument.BASS).strength(3.0f).nonOpaque().pistonBehavior(PistonBehavior.DESTROY)
         )
-    )
+    ).cutout()
     val CHARRED_TRAPDOOR = register(
         "charred_trapdoor", TrapdoorBlock(
             DuskBlockSetType.CHARRED_BLOCK_SET_TYPE,
             AbstractBlock.Settings.create().mapColor(charredPlanksColor)
                 .instrument(NoteBlockInstrument.BASS).strength(3.0f).nonOpaque().allowsSpawning(Blocks::nonSpawnable)
         )
-    )
+    ).cutout()
     val CHARRED_SIGN = registerNoItem(
         "charred_sign",
         VoidSignBlock(
@@ -711,10 +739,10 @@ object DuskBlocks {
             DuskBlockSetType.CHARRED_SIGN_TYPE,
             AbstractBlock.Settings.create().mapColor(charredLogColor).solid()
                 .instrument(NoteBlockInstrument.BASS).noCollision().strength(1.0f).lavaIgnitable()
-                .dropsLike(Blocks.OAK_HANGING_SIGN)
+                .dropsLike(OAK_HANGING_SIGN)
         )
     )
-    val CHARRED_BUTTON = register("charred_button", Blocks.buttonOf(DuskBlockSetType.CHARRED_BLOCK_SET_TYPE))
+    val CHARRED_BUTTON = register("charred_button", buttonOf(DuskBlockSetType.CHARRED_BLOCK_SET_TYPE))
     val CHARRED_FENCE = register(
         "charred_fence",
         FenceBlock(
@@ -746,6 +774,8 @@ object DuskBlocks {
         StrippableBlockRegistry.register(CHARRED_WOOD, STRIPPED_CHARRED_WOOD)
         StrippableBlockRegistry.register(CYPRESS_LOG, STRIPPED_CYPRESS_LOG)
         StrippableBlockRegistry.register(CYPRESS_WOOD, STRIPPED_CYPRESS_WOOD)
+
+        oxidizeCopperSet(DuskBlockLists.copperFans)
     }
 
     fun register(id: String, block: Block): Block {

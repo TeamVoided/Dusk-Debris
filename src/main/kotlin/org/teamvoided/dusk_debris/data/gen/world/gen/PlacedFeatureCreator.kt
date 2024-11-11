@@ -107,7 +107,14 @@ object PlacedFeatureCreator {
             ),
             BiomePlacementModifier.getInstance()
         )
-
+        c.register(
+            DuskPlacedFeatures.OVERWORLD_TORUS,
+            DuskConfiguredFeatures.OVERWORLD_TORUS,
+            RarityFilterPlacementModifier.create(100),
+            InSquarePlacementModifier.getInstance(),
+            PlacedFeatureUtil.OCEAN_FLOOR_WG_HEIGHTMAP,
+            BiomePlacementModifier.getInstance()
+        )
     }
 
     private fun BootstrapContext<PlacedFeature>.registerNethershroomPlacement(

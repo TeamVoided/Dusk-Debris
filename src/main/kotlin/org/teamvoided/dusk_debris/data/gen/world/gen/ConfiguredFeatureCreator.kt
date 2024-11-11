@@ -2,10 +2,7 @@ package org.teamvoided.dusk_debris.data.gen.world.gen
 
 import com.google.common.collect.ImmutableList
 import net.minecraft.block.*
-import net.minecraft.registry.BootstrapContext
-import net.minecraft.registry.HolderSet
-import net.minecraft.registry.RegistryKey
-import net.minecraft.registry.RegistryKeys
+import net.minecraft.registry.*
 import net.minecraft.registry.tag.BlockTags
 import net.minecraft.unmapped.C_cxbmzbuz
 import net.minecraft.util.collection.DataPool
@@ -38,8 +35,6 @@ import org.teamvoided.dusk_debris.world.gen.foliage.CypressFoliagePlacer
 import org.teamvoided.dusk_debris.world.gen.root.CypressRootPlacer
 import org.teamvoided.dusk_debris.world.gen.root.config.CypressRootConfig
 import java.util.*
-import java.util.List
-import kotlin.collections.listOf
 
 @Suppress("DEPRECATION")
 object ConfiguredFeatureCreator {
@@ -283,7 +278,7 @@ object ConfiguredFeatureCreator {
             DuskFeatures.TORUS,
             TorusFeatureConfig(
                 BlockStateProvider.of(
-                    Blocks.AMETHYST_BLOCK.defaultState
+                    DuskBlocks.CRYSTAL_BLOCK.defaultState
                 ),
                 BlockTags.REPLACEABLE,
                 UniformIntProvider.create(4, 13),
@@ -293,30 +288,58 @@ object ConfiguredFeatureCreator {
                 UniformFloatProvider.create(0f, 1f),
                 UniformFloatProvider.create(0.5f, 1.5f)
             )
+        )
+        c.createOverworldTorus(
+            DuskConfiguredFeatures.COBBLESTONE_TORUS,
+            NoiseBlockStateProvider(
+                6789L,
+                NoiseParameters(0, 1.0, *DoubleArray(0)),
+                0.5f,
+                listOf<BlockState>(
+                    Blocks.COBBLESTONE.defaultState,
+                    Blocks.MOSSY_COBBLESTONE.defaultState
+                )
+            )
+        )
+        c.createOverworldTorus(
+            DuskConfiguredFeatures.STONE_TORUS,
+            BlockStateProvider.of(Blocks.STONE)
         )
         c.registerConfiguredFeature(
             DuskConfiguredFeatures.OVERWORLD_TORUS,
+            Feature.RANDOM_BOOLEAN_SELECTOR,
+            RandomBooleanFeatureConfig(
+                c.emptyPlaceInLine(DuskConfiguredFeatures.COBBLESTONE_TORUS),
+                c.emptyPlaceInLine(DuskConfiguredFeatures.STONE_TORUS),
+            )
+        )
+    }
+
+    fun BootstrapContext<ConfiguredFeature<*, *>>.emptyPlaceInLine(registryKey: RegistryKey<ConfiguredFeature<*, *>>): Holder<PlacedFeature> {
+        return PlacedFeatureUtil.placedInline(
+            this.getRegistryLookup(RegistryKeys.CONFIGURED_FEATURE)
+                .getHolderOrThrow(registryKey), *arrayOfNulls<PlacementModifier>(0)
+        )
+    }
+
+    fun BootstrapContext<ConfiguredFeature<*, *>>.createOverworldTorus(
+        registryKey: RegistryKey<ConfiguredFeature<*, *>>,
+        blockStateProvider: BlockStateProvider
+    ) {
+        this.registerConfiguredFeature(
+            registryKey,
             DuskFeatures.TORUS,
             TorusFeatureConfig(
-                NoiseBlockStateProvider(
-                    6789L,
-                    NoiseParameters(0, 1.0, *DoubleArray(0)),
-                    0.020833334f,
-                    listOf<BlockState>(
-                        Blocks.COBBLESTONE.defaultState,
-                        Blocks.MOSSY_COBBLESTONE.defaultState
-                    )
-                ),
+                blockStateProvider,
                 BlockTags.REPLACEABLE,
                 UniformIntProvider.create(4, 13),
                 UniformIntProvider.create(2, 6),
                 UniformIntProvider.create(2, 6),
-                UniformFloatProvider.create(0.125f, 0.375f),
+                UniformFloatProvider.create(0.175f, 0.325f),
                 UniformFloatProvider.create(0f, 1f),
                 UniformFloatProvider.create(0.5f, 1.5f)
             )
         )
-
     }
 
     private fun <FC : FeatureConfig, F : Feature<FC>> BootstrapContext<ConfiguredFeature<*, *>>.registerConfiguredFeature(

@@ -23,6 +23,8 @@ object DuskConfiguredFeatures {
     val PURPLE_NETHERSHROOM_PATCH = create("purple_nethershroom_patch")
 
     val GLASS_SPIKE = create("glass_spike")
+    val COBBLESTONE_TORUS = create("cobblestone_torus")
+    val STONE_TORUS = create("stone_torus")
     val OVERWORLD_TORUS = create("overworld_torus")
     val TORUS = create("torus")
 

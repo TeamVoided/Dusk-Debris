@@ -36,12 +36,6 @@ object DuskBlockLists {
         DuskBlocks.LOST_SILVER_COIN_STACK,
         DuskBlocks.SUNKEN_BRONZE_COIN_STACK
     )
-    val COIN_PILE_BLOCK_LIST = listOf(
-        DuskBlocks.TREACHEROUS_GOLD_COIN_PILE,
-        DuskBlocks.TARNISHED_GOLD_COIN_PILE,
-        DuskBlocks.LOST_SILVER_COIN_PILE,
-        DuskBlocks.SUNKEN_BRONZE_COIN_PILE
-    )
     val VESSEL_BLOCK_LIST = listOf(
         DuskBlocks.GOLDEN_VESSEL,
         DuskBlocks.DROWNED_VESSEL,
@@ -62,29 +56,14 @@ object DuskBlockLists {
         DuskBlocks.GOLDEN_SAPPHIRE_CROWN,
         DuskBlocks.GOLDEN_QUARTZ_CROWN
     )
-
-    val DECORATIVE_WHATEVER_BLOCK_LIST =
-        COIN_STACK_BLOCK_LIST +
-                COIN_PILE_BLOCK_LIST +
-                VESSEL_BLOCK_LIST +
-                CHALICE_BLOCK_LIST +
-                RELIC_BLOCK_LIST +
-                CROWN_BLOCK_LIST +
-                DuskBlocks.LEGENDARY_CRYSTAL_CROWN
     val PAPER_BLOCKS_LIST = listOf(
         DuskBlocks.PAPER_BLOCK
     )
-    val CUTOUT_BLOCKS = listOf(
-        DuskBlocks.GUNPOWDER,
-        DuskBlocks.BLUE_NETHERSHROOM,
-        DuskBlocks.PURPLE_NETHERSHROOM,
-        DuskBlocks.CYPRESS_LEAVES,
-        DuskBlocks.CYPRESS_DOOR,
-        DuskBlocks.CYPRESS_TRAPDOOR,
-        DuskBlocks.CHARRED_DOOR,
-        DuskBlocks.CHARRED_TRAPDOOR,
-    ) + THROWABLE_BOMB_BLOCK_LIST +
-            RIBBON_BLOCKS_LIST +
-            DECORATIVE_WHATEVER_BLOCK_LIST
-//    val translucentBlock = listOf()
+
+    val copperFans = listOf(
+        (DuskBlocks.COPPER_FAN to DuskBlocks.WAXED_COPPER_FAN),
+        (DuskBlocks.EXPOSED_COPPER_FAN to DuskBlocks.WAXED_EXPOSED_COPPER_FAN),
+        (DuskBlocks.WEATHERED_COPPER_FAN to DuskBlocks.WAXED_WEATHERED_COPPER_FAN),
+        (DuskBlocks.OXIDIZED_COPPER_FAN to DuskBlocks.WAXED_OXIDIZED_COPPER_FAN)
+    )
 }
