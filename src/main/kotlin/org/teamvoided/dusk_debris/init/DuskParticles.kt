@@ -17,6 +17,8 @@ object DuskParticles {
     val FIREBOMB: DefaultParticleType = FabricParticleTypes.simple()
     val BONECALLER = FabricParticleTypes.complex(BonecallerParticleEffect.CODEC, BonecallerParticleEffect.PACKET_CODEC)
     val GEYSER: DefaultParticleType = FabricParticleTypes.simple()
+    val GODHOME = FabricParticleTypes.complex(GodhomeParticleEffect.CODEC, GodhomeParticleEffect.PACKET_CODEC)
+
 
     val WIND = FabricParticleTypes.complex(WindParticleEffect.CODEC, WindParticleEffect.PACKET_CODEC)
 
@@ -28,6 +30,7 @@ object DuskParticles {
         Registry.register(Registries.PARTICLE_TYPE, id("firebomb"), FIREBOMB)
         Registry.register(Registries.PARTICLE_TYPE, id("bonecaller"), BONECALLER)
         Registry.register(Registries.PARTICLE_TYPE, id("geyser"), GEYSER)
+        Registry.register(Registries.PARTICLE_TYPE, id("godhome"), GODHOME)
 
         Registry.register(Registries.PARTICLE_TYPE, id("wind"), WIND)
     }

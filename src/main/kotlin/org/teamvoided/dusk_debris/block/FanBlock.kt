@@ -2,12 +2,9 @@ package org.teamvoided.dusk_debris.block
 
 import com.mojang.serialization.MapCodec
 import net.minecraft.block.Block
-import net.minecraft.block.BlockRenderType
 import net.minecraft.block.BlockState
-import net.minecraft.block.BlockWithEntity
-import net.minecraft.block.entity.*
+import net.minecraft.entity.Entity
 import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.item.ItemPlacementContext
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvents
@@ -15,20 +12,20 @@ import net.minecraft.state.StateManager
 import net.minecraft.state.property.BooleanProperty
 import net.minecraft.state.property.DirectionProperty
 import net.minecraft.state.property.Properties
-import net.minecraft.util.BlockMirror
-import net.minecraft.util.BlockRotation
 import net.minecraft.util.math.BlockPos
+import net.minecraft.util.math.Box
 import net.minecraft.util.math.Direction
+import net.minecraft.util.math.Vec3d
+import net.minecraft.util.random.RandomGenerator
 import net.minecraft.world.World
+import net.minecraft.world.WorldAccess
 import net.minecraft.world.event.GameEvent
-import org.teamvoided.dusk_debris.block.entity.FanBlockEntity
-import org.teamvoided.dusk_debris.init.DuskBlockEntities
+import org.teamvoided.dusk_debris.data.tags.DuskEntityTypeTags
+import org.teamvoided.dusk_debris.particle.WindParticleEffect
+import org.teamvoided.dusk_debris.util.spawnParticles
 
 open class FanBlock(val strength: Int, settings: Settings) :
-    BlockWithEntity(settings) {
-    public override fun getCodec(): MapCodec<FanBlock> {
-        return CODEC
-    }
+    SixWayFacingBlock(settings) {
 
     init {
         this.defaultState = stateManager.defaultState
@@ -39,19 +36,7 @@ open class FanBlock(val strength: Int, settings: Settings) :
 
     override fun appendProperties(builder: StateManager.Builder<Block, BlockState>) {
         super.appendProperties(builder)
-        builder.add(ACTIVE, POWERED, FACING)
-    }
-
-    override fun createBlockEntity(pos: BlockPos, state: BlockState): BlockEntity? {
-        return FanBlockEntity(pos, state)
-    }
-
-    override fun getRenderType(state: BlockState): BlockRenderType {
-        return BlockRenderType.MODEL
-    }
-
-    override fun getPlacementState(ctx: ItemPlacementContext): BlockState {
-        return defaultState.with(FACING, ctx.side)
+        builder.add(ACTIVE, POWERED)
     }
 
     override fun onBlockAdded(state: BlockState, world: World, pos: BlockPos, oldState: BlockState, notify: Boolean) {
@@ -71,9 +56,12 @@ open class FanBlock(val strength: Int, settings: Settings) :
         if (world is ServerWorld) {
             this.setState(state, world, pos)
         }
+        if (state.get(ACTIVE)) {
+            world.scheduleBlockTick(pos, this, 1)
+        }
     }
 
-    fun setState(state: BlockState, world: ServerWorld, pos: BlockPos?) {
+    private fun setState(state: BlockState, world: ServerWorld, pos: BlockPos?) {
         val bl = world.isReceivingRedstonePower(pos)
         if (bl != state.get(POWERED)) {
             var blockState = state
@@ -87,42 +75,188 @@ open class FanBlock(val strength: Int, settings: Settings) :
                     else SoundEvents.BLOCK_COPPER_BULB_TURN_OFF,
                     SoundCategory.BLOCKS
                 )
+                if (blockState.get(ACTIVE))
+                    world.scheduleBlockTick(pos, this, 1)
             }
             world.setBlockState(pos, blockState.with(POWERED, bl), 3)
         }
     }
 
-    override fun hasComparatorOutput(state: BlockState): Boolean = true
+    override fun hasComparatorOutput(state: BlockState): Boolean = state.get(ACTIVE)
 
     override fun getComparatorOutput(state: BlockState, world: World, pos: BlockPos): Int {
-        val blockEntity: FanBlockEntity = world.getBlockEntity(pos) as FanBlockEntity
-        return if (world.getBlockState(pos).get(ACTIVE)) blockEntity.windLength else 0
+        return if (world.getBlockState(pos).get(ACTIVE)) getWindLength(world, pos, state) else 0
     }
 
-    override fun onSyncedBlockEvent(state: BlockState?, world: World, pos: BlockPos?, type: Int, data: Int): Boolean {
-        super.onSyncedBlockEvent(state, world, pos, type, data)
-        val blockEntity: BlockEntity? = world.getBlockEntity(pos)
-        return blockEntity?.onSyncedBlockEvent(type, data) ?: false
-    }
-
-    override fun <T : BlockEntity> getTicker(
-        world: World,
-        state: BlockState,
-        type: BlockEntityType<T>
-    ): BlockEntityTicker<T>? {
-        return if (state.get(ACTIVE)) {
-            checkType(type, DuskBlockEntities.FAN_BLOCK, FanBlockEntity::tick)
-        } else {
-            null
+    override fun scheduledTick(state: BlockState, world: ServerWorld, pos: BlockPos, random: RandomGenerator) {
+        if (state.get(ACTIVE)) {
+            val windLength = getWindLength(world, pos, state)
+            if (windLength > 0) {
+                moveEntities(world, pos, state, windLength)
+                particles(world, pos, state, windLength)
+                val the90 = -strength + 90
+                if ((pos.asLong() + world.time) % the90 == 0L) {
+                    world.playSound(
+                        null as PlayerEntity?,
+                        pos,
+                        SoundEvents.ENTITY_BREEZE_WHIRL,
+                        SoundCategory.BLOCKS,
+                        the90 / 30f,
+                        (strength - 8) / 7f
+                    )
+                }
+            }
+            world.scheduleBlockTick(pos, this, 1)
         }
     }
 
-    override fun rotate(state: BlockState, rotation: BlockRotation): BlockState {
-        return state.with(FACING, rotation.rotate(state.get(FACING)))
+    fun power(): Double {
+        return strength * 0.33333 + 10
     }
 
-    override fun mirror(state: BlockState, mirror: BlockMirror): BlockState {
-        return state.rotate(mirror.getRotation(state.get(FACING)))
+    fun getWindLength(world: World, pos: BlockPos, state: BlockState): Int {
+        val facing = state.get(Properties.FACING)
+        var windLength = power().toInt()
+        for (it in 0 until power().toInt()) {
+            val posCheck = pos.offset(facing, it + 1)
+            val worldBlock = world.getBlockState(pos.offset(facing, it + 1))
+            if (
+                !worldBlock.materialReplaceable() &&
+                worldBlock.isOpaque &&
+                worldBlock.isSolid &&
+                (worldBlock.isSideSolidFullSquare(world, posCheck, facing) ||
+                        worldBlock.isSideSolidFullSquare(world, posCheck, facing.opposite))
+            ) {
+                windLength = it
+                break
+            }
+        }
+        return windLength
+    }
+
+    fun particles(world: ServerWorld, pos: BlockPos, state: BlockState, windLength: Int) {
+        val rand = world.random
+        if (rand.nextDouble() < (windLength + strength) / 30.0) {
+            val limitor = rand.nextDouble()
+            val maxAge = (((20 - strength) * windLength / 4) * limitor).toInt()
+            if (maxAge > 0) {
+                val facing = state.get(Properties.FACING)
+                val particlePos = pos.offset(facing)
+                world.spawnParticles(
+                    WindParticleEffect(
+                        windLength * limitor,
+                        facing.id,
+                        maxAge
+                    ),
+                    Vec3d(
+                        particlePos.x + rand.nextDouble(),
+                        particlePos.y + rand.nextDouble(),
+                        particlePos.z + rand.nextDouble(),
+                    ),
+                    Vec3d.ZERO,
+                    128.0
+                )
+            }
+        }
+    }
+
+    private fun moveEntities(world: World, pos: BlockPos, state: BlockState, windLength: Int) {
+        val facing = state.get(Properties.FACING)
+        val entitiesInRange =
+            world.getOtherEntities(null, getBox(facing, windLength.toDouble()).offset(pos.ofCenter()))
+            { !it.type.isIn(DuskEntityTypeTags.FANS_DONT_AFFECT) }
+        if (entitiesInRange.isNotEmpty()) {
+            entitiesInRange.forEach {
+                it.resetFallDistance()
+                addEntitySpeed(it, facing)
+                it.velocityModified = true
+            }
+        }
+    }
+
+    private fun addEntitySpeed(entity: Entity, direction: Direction) {
+        val power: Double = strength.toDouble()
+        var velocity: Vec3d = entity.velocity
+        velocity = when (direction) {
+            Direction.UP -> Vec3d(velocity.x, theee(velocity.y, power), velocity.z)
+            Direction.DOWN -> Vec3d(velocity.x, theee(velocity.y, -power), velocity.z)
+            Direction.SOUTH -> Vec3d(velocity.x, velocity.y, theee(velocity.z, power))
+            Direction.NORTH -> Vec3d(velocity.x, velocity.y, theee(velocity.z, -power))
+            Direction.EAST -> Vec3d(theee(velocity.x, power), velocity.y, velocity.z)
+            Direction.WEST -> Vec3d(theee(velocity.x, -power), velocity.y, velocity.z)
+        }
+
+        entity.velocity = velocity
+    }
+
+    private fun theee(velocity: Double, power: Double): Double {
+        val upperBound = power * 0.1
+        val newVelocity = velocity + power * 0.025
+        return if (power < 0)
+            if (upperBound < newVelocity) newVelocity else velocity
+        else
+            if (upperBound > newVelocity) newVelocity else velocity
+    }
+
+    private fun getBox(direction: Direction, windLength: Double): Box {
+        val horizRange = 0.5
+        val vertRange = windLength
+        val vertRangeBottom = -0.5
+        return when (direction) {
+            Direction.UP -> Box(
+                -horizRange,
+                -vertRangeBottom,
+                -horizRange,
+                horizRange,
+                vertRange,
+                horizRange
+            )
+
+            Direction.DOWN -> Box(
+                -horizRange,
+                -vertRange,
+                -horizRange,
+                horizRange,
+                vertRangeBottom,
+                horizRange
+            )
+
+            Direction.NORTH -> Box(
+                -horizRange,
+                -horizRange,
+                -vertRange,
+                horizRange,
+                horizRange,
+                vertRangeBottom
+            )
+
+            Direction.SOUTH -> Box(
+                -horizRange,
+                -horizRange,
+                -vertRangeBottom,
+                horizRange,
+                horizRange,
+                vertRange
+            )
+
+            Direction.EAST -> Box(
+                -vertRangeBottom,
+                -horizRange,
+                -horizRange,
+                vertRange,
+                horizRange,
+                horizRange
+            )
+
+            Direction.WEST -> Box(
+                -vertRange,
+                -horizRange,
+                -horizRange,
+                vertRangeBottom,
+                horizRange,
+                horizRange
+            )
+        }
     }
 
     companion object {

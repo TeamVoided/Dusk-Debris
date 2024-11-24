@@ -1,8 +1,8 @@
 package org.teamvoided.dusk_debris.init
 
-import net.fabricmc.fabric.api.registry.OxidizableBlocksRegistry
 import net.fabricmc.fabric.api.registry.StrippableBlockRegistry
 import net.minecraft.block.*
+import net.minecraft.block.AbstractBlock.Settings.copy
 import net.minecraft.block.Blocks.*
 import net.minecraft.block.Oxidizable.OxidizationLevel
 import net.minecraft.block.enums.NoteBlockInstrument
@@ -32,7 +32,6 @@ import org.teamvoided.dusk_debris.block.voided.sign.VoidSignBlock
 import org.teamvoided.dusk_debris.block.voided.sign.VoidWallHangingSignBlock
 import org.teamvoided.dusk_debris.block.voided.sign.VoidWallSignBlock
 import org.teamvoided.dusk_debris.data.DuskConfiguredFeatures
-import org.teamvoided.dusk_debris.particle.NethershroomSporeParticleEffect
 import org.teamvoided.dusk_debris.util.*
 
 @Suppress("HasPlatformType", "MemberVisibilityCanBePrivate", "unused", "DEPRECATION")
@@ -41,30 +40,37 @@ object DuskBlocks {
     val CUTOUT_BLOCKS = mutableSetOf<Block>()
     val TRANSLUCENT_BLOCKS = mutableSetOf<Block>()
 
-    val charredLogColor = MapColor.BLACK
-    val charredPlanksColor = MapColor.DEEPSLATE
 
-    val charredSignId = id("entity/signs/charred")
-    val cypressSignId = id("entity/signs/cypress")
-    val charredHangingSignId = id("entity/signs/hanging/charred")
-    val cypressHangingSignId = id("entity/signs/hanging/cypress")
-
-    val blueNethershroomSmoke = NethershroomSporeParticleEffect(0x39A2DB)
-    val purpleNethershroomSmoke = NethershroomSporeParticleEffect(0x573AD8)
-    val smokebombSmoke = NethershroomSporeParticleEffect(0x7F7F7F)
-    val gunpowderBarrelColor = 0xF7C53B
-    val gunpowderBarrelBlueColor = 0x7FD4FF
-    val bonecallerBlockSettings =
-        AbstractBlock.Settings.create().mapColor(BONE_BLOCK.defaultMapColor).sounds(BlockSoundGroup.GLASS)
-            .instrument(NoteBlockInstrument.HAT).strength(1f, 0.0f).solidBlock(Blocks::nonSolid)
-            .pistonBehavior(PistonBehavior.DESTROY)
-    val coin_stack_settings = AbstractBlock.Settings.create().nonSolid().strength(0.2f)
-        .pistonBehavior(PistonBehavior.DESTROY)
-    val coin_pile_settings = AbstractBlock.Settings.create().nonSolid()
-        .strength(0.2f).sounds(BlockSoundGroup.METAL).blockVision { state: BlockState, _, _ ->
-            state.get(CoinPileBlock.LAYERS) >= CoinPileBlock.MAX_LAYERS
-        }.pistonBehavior(PistonBehavior.DESTROY)
-
+    val BRONZE_BLOCK = register(
+        "bronze_block", Block(
+            AbstractBlock.Settings.create().mapColor(MapColor.BROWN).toolRequired().strength(3.0F, 6.0F)
+                .sounds(BlockSoundGroup.COPPER)
+        )
+    )
+    val CUT_BRONZE = register("cut_bronze", Block(copy(BRONZE_BLOCK)))
+    val CUT_BRONZE_STAIRS =
+        register("cut_bronze_stairs", StairsBlock(CUT_BRONZE.defaultState, copy(CUT_BRONZE)))
+    val CUT_BRONZE_SLAB = register("cut_bronze_slab", SlabBlock(copy(CUT_BRONZE)))
+    val CUT_BRONZE_WALL = register("cut_bronze_wall", WallBlock(copy(CUT_BRONZE)))
+    val BRONZE_TRAPDOOR = register(
+        "bronze_trapdoor", TrapdoorBlock(
+            DuskBlockSetType.BRONZE, copy(BRONZE_BLOCK).nonOpaque().allowsSpawning(Blocks::nonSpawnable)
+        )
+    ).cutout()
+    val BRONZE_GRATE = register(
+        "bronze_grate", WaxedCopperGrateBlock(
+            copy(BRONZE_BLOCK).sounds(BlockSoundGroup.BLOCK_COPPER_GRATE_BREAK).nonOpaque().toolRequired()
+                .allowsSpawning(Blocks::nonSpawnable).solidBlock(Blocks::nonSolid).suffocates(Blocks::nonSolid)
+                .blockVision(Blocks::nonSolid)
+        )
+    ).cutout()
+    val BRONZE_BULB = register(
+        "bronze_bulb", BronzeBulbBlock(
+            copy(BRONZE_BLOCK).sounds(BlockSoundGroup.BLOCK_COPPER_BULB_BREAK).toolRequired()
+                .solidBlock(Blocks::nonSolid).luminance(godhomeLuminanceOf())
+        )
+    )
+    val BRONZE_SHIFT_BLOCK = register("bronze_shift_block", ShiftBlock(copy(BRONZE_BLOCK)))
 
     val BLUE_NETHERSHROOM = register(
         "blue_nethershroom",
@@ -439,17 +445,16 @@ object DuskBlocks {
         "exposed_copper_fan",
         OxidizableFanBlock(
             OxidizationLevel.WEATHERED, 12,
-            AbstractBlock.Settings.copy(WAXED_EXPOSED_COPPER_FAN).ticksRandomly()
+            copy(WAXED_EXPOSED_COPPER_FAN).ticksRandomly()
         )
     )
     val COPPER_FAN = register(
         "copper_fan",
         OxidizableFanBlock(
             OxidizationLevel.UNAFFECTED, 15,
-            AbstractBlock.Settings.copy(WAXED_COPPER_FAN).ticksRandomly()
+            copy(WAXED_COPPER_FAN).ticksRandomly()
         )
     )
-
 
     val PAPER_BLOCK = register(
         "paper_block",

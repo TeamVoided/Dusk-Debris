@@ -3,10 +3,10 @@ package org.teamvoided.dusk_debris.data.gen.providers
 
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider
-import net.minecraft.block.Blocks
 import net.minecraft.data.client.ItemModelGenerator
 import net.minecraft.data.client.model.*
 import net.minecraft.util.Identifier
+import org.teamvoided.dusk_debris.block.DuskBlockFamilies
 import org.teamvoided.dusk_debris.block.DuskBlockLists
 import org.teamvoided.dusk_debris.init.DuskBlocks
 import org.teamvoided.dusk_debris.init.DuskItems
@@ -32,9 +32,10 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
                 texture.put(TextureKey.SIDE, Texture.getId(DuskBlocks.CHISELED_VOLCANIC_SANDSTONE))
             }
         )
-        DuskBlockLists.blockFamily.forEach {
+        DuskBlockFamilies.blockFamilies.forEach {
             gen.registerCubeAllModelTexturePool(it.baseBlock).family(it)
         }
+
 
         DuskItemLists.SPAWN_EGGS_ITEM_LIST.forEach {
             gen.registerParentedItemModel(it, Identifier.ofDefault("item/template_spawn_egg"))
@@ -48,6 +49,12 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
         DuskBlockLists.GUNPOWDER_BARREL_BLOCK_LIST.forEach {
             gen.gunpowderBarrelBlock(it)
         }
+
+        gen.registerSimpleCubeAll(DuskBlocks.BRONZE_BLOCK)
+        gen.wallOffset(DuskBlocks.CUT_BRONZE_WALL, DuskBlocks.CUT_BRONZE)
+        gen.registerTrapdoor(DuskBlocks.BRONZE_TRAPDOOR)
+        gen.godhomeShiftBlock(DuskBlocks.BRONZE_SHIFT_BLOCK)
+
         gen.registerDustBlockFromRedstone(DuskBlocks.GUNPOWDER)
 
         gen.registerItemModel(DuskBlocks.GUNPOWDER)

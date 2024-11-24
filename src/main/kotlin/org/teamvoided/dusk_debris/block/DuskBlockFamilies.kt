@@ -5,6 +5,12 @@ import net.minecraft.data.family.BlockFamily
 import org.teamvoided.dusk_debris.init.DuskBlocks
 
 object DuskBlockFamilies {
+    val CUT_BRONZE_FAMILY: BlockFamily =
+        BlockFamilies.register(DuskBlocks.CUT_BRONZE)
+            .stairs(DuskBlocks.CUT_BRONZE_STAIRS)
+            .slab(DuskBlocks.CUT_BRONZE_SLAB)
+            .build()
+
     val VOLCANIC_SANDSTONE_FAMILY: BlockFamily =
         BlockFamilies.register(DuskBlocks.VOLCANIC_SANDSTONE)
             .stairs(DuskBlocks.VOLCANIC_SANDSTONE_STAIRS)
@@ -54,6 +60,15 @@ object DuskBlockFamilies {
             .group("wooden")
             .unlockCriterionName("has_planks")
             .build()
+
+    val blockFamilies = listOf(
+        CUT_BRONZE_FAMILY,
+        VOLCANIC_SANDSTONE_FAMILY,
+        CUT_VOLCANIC_SANDSTONE_FAMILY,
+        SMOOTH_VOLCANIC_SANDSTONE_FAMILY,
+        CYPRESS_FAMILY,
+        CHARRED_FAMILY
+    )
 
     fun init() {}
 }

@@ -9,6 +9,24 @@ import net.minecraft.util.Identifier
 import org.teamvoided.dusk_debris.DuskDebris.id
 
 object DuskBlockSetType {
+    val BRONZE: BlockSetType =
+        BlockSetTypeBuilder()
+            .openableByHand(true)
+            .openableByWindCharge(true)
+            .buttonActivatedByArrows(true)
+            .soundGroup(BlockSoundGroup.COPPER)
+            .doorOpenSound(SoundEvents.BLOCK_COPPER_DOOR_OPEN)
+            .doorCloseSound(SoundEvents.BLOCK_COPPER_DOOR_CLOSE)
+            .trapdoorOpenSound(SoundEvents.BLOCK_COPPER_TRAPDOOR_OPEN)
+            .trapdoorCloseSound(SoundEvents.BLOCK_COPPER_TRAPDOOR_CLOSE)
+            .pressurePlateClickOnSound(SoundEvents.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON)
+            .pressurePlateClickOffSound(SoundEvents.BLOCK_METAL_PRESSURE_PLATE_CLICK_OFF)
+            .buttonClickOnSound(SoundEvents.BLOCK_STONE_BUTTON_CLICK_ON)
+            .buttonClickOffSound(SoundEvents.BLOCK_STONE_BUTTON_CLICK_OFF)
+            .pressurePlateActivationRule(BlockSetType.PressurePlateSensitivity.EVERYTHING)
+            .register(id("copper"))
+
+
     val CYPRESS_BLOCK_SET_TYPE: BlockSetType =
         BlockSetTypeBuilder()
             .openableByHand(true)

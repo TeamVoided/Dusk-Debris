@@ -14,12 +14,25 @@ import org.teamvoided.dusk_debris.block.FanBlock
 import org.teamvoided.dusk_debris.block.GildedChaliceBlock
 import org.teamvoided.dusk_debris.block.NethershroomPlantBlock
 import org.teamvoided.dusk_debris.block.RoaringGeyserBlock
+import org.teamvoided.dusk_debris.block.not_blocks.GodhomeBronzePhase
 import java.util.*
 import java.util.stream.IntStream
 
 
 val ALL_KRY: TextureKey = TextureKey.of("all")
 
+val OFFSET_WALL_POST = block("parent/offset_wall_post", "_post", TextureKey.WALL)
+val OFFSET_WALL_INVENTORY = block("parent/offset_wall_inventory", "_inventory", TextureKey.WALL)
+fun BlockStateModelGenerator.wallOffset(block: Block) = wallOffset(block, block.model())
+fun BlockStateModelGenerator.wallOffset(block: Block, texture: Block) = wallOffset(block, texture.model())
+fun BlockStateModelGenerator.wallOffset(wallBlock: Block, inId: Identifier) {
+    val texture = Texture.texture(wallBlock.model()).put(TextureKey.WALL, inId)
+    val id = OFFSET_WALL_POST.upload(wallBlock, texture, this.modelCollector)
+    val id2 = Models.TEMPLATE_WALL_SIDE.upload(wallBlock, texture, this.modelCollector)
+    val id3 = Models.TEMPLATE_WALL_SIDE_TALL.upload(wallBlock, texture, this.modelCollector)
+    this.blockStateCollector.accept(BlockStateModelGenerator.createWallBlockState(wallBlock, id, id2, id3))
+    this.registerParentedItemModel(wallBlock, OFFSET_WALL_INVENTORY.upload(wallBlock, texture, this.modelCollector))
+}
 fun BlockStateModelGenerator.sixDirectionalBlock(block: Block) {
     this.blockStateCollector.accept(
         VariantsBlockStateSupplier.create(
@@ -57,6 +70,70 @@ fun BlockStateModelGenerator.rollableBlock(block: Block) {
                 BlockStateVariant.create()
             )
         })
+    )
+}
+
+fun BlockStateModelGenerator.godhomeShiftBlock(block: Block) {
+    val textureSomber = Texture()
+        .put(TextureKey.FRONT, Texture.getSubId(block, "_somber_front"))
+        .put(TextureKey.TOP, Texture.getSubId(block, "_somber_top"))
+        .put(TextureKey.SIDE, Texture.getSubId(block, "_somber_side"))
+        .put(TextureKey.BACK, Texture.getSubId(block, "_somber_back"))
+    val textureShining = Texture()
+        .put(TextureKey.FRONT, Texture.getSubId(block, "_shining_front"))
+        .put(TextureKey.TOP, Texture.getSubId(block, "_shining_top"))
+        .put(TextureKey.SIDE, Texture.getSubId(block, "_shining_side"))
+        .put(TextureKey.BACK, Texture.getSubId(block, "_shining_back"))
+    val textureRadiant = Texture()
+        .put(TextureKey.FRONT, Texture.getSubId(block, "_radiant_front"))
+        .put(TextureKey.TOP, Texture.getSubId(block, "_radiant_top"))
+        .put(TextureKey.SIDE, Texture.getSubId(block, "_radiant_side"))
+        .put(TextureKey.BACK, Texture.getSubId(block, "_radiant_back"))
+    val somberModel = block(
+        "parent/front_top_side_back",
+        TextureKey.FRONT,
+        TextureKey.TOP,
+        TextureKey.SIDE,
+        TextureKey.BACK
+    ).upload(block, "_somber", textureSomber, this.modelCollector)
+    val shiningModel = block(
+        "parent/front_top_side_back",
+        TextureKey.FRONT,
+        TextureKey.TOP,
+        TextureKey.SIDE,
+        TextureKey.BACK
+    ).upload(block, "_shining", textureShining, this.modelCollector)
+    val radiantModel = block(
+        "parent/front_top_side_back",
+        TextureKey.FRONT,
+        TextureKey.TOP,
+        TextureKey.SIDE,
+        TextureKey.BACK
+    ).upload(block, "_radiant", textureRadiant, this.modelCollector)
+    this.blockStateCollector.accept(
+        VariantsBlockStateSupplier.create(block)
+            .coordinate(BlockStateVariantMap.create(
+                Properties.ORIENTATION
+            ).register { orientation: JigsawOrientation? ->
+                this.addJigsawOrientationToVariant(
+                    orientation,
+                    BlockStateVariant.create()
+                )
+            }).coordinate(
+                BlockStateVariantMap.create(GodhomeBronzePhase.GODHOME_BRONZE_PHASE)
+                    .register(
+                        GodhomeBronzePhase.SOMBER,
+                        BlockStateVariant.create().put(VariantSettings.MODEL, somberModel)
+                    )
+                    .register(
+                        GodhomeBronzePhase.SHINING,
+                        BlockStateVariant.create().put(VariantSettings.MODEL, shiningModel)
+                    )
+                    .register(
+                        GodhomeBronzePhase.RADIANT,
+                        BlockStateVariant.create().put(VariantSettings.MODEL, radiantModel)
+                    )
+            )
     )
 }
 
@@ -426,7 +503,7 @@ fun BlockStateModelGenerator.makeRibbonModel(block: Block, variant: Int): Identi
         "parent/ribbon_$variant",
         TextureKey.PARTICLE,
         TextureKey.ALL
-    ).upload(block.modelSuffix("_$variant"), texture, this.modelCollector)
+    ).upload(block.model("_$variant"), texture, this.modelCollector)
 }
 
 fun BlockStateModelGenerator.registerGeyser(block: Block) {
@@ -435,14 +512,14 @@ fun BlockStateModelGenerator.registerGeyser(block: Block) {
         .put(TextureKey.SIDE, Texture.getSubId(block, "_side"))
 
     val modelActive: Identifier = Models.CUBE_BOTTOM_TOP.upload(
-        block.modelSuffix("_active"),
+        block.model("_active"),
         texture
             .put(TextureKey.TOP, Texture.getSubId(block, "_active"))
             .put(TextureKey.BOTTOM, Texture.getSubId(block, "_inactive")),
         this.modelCollector
     )
     val modelInctive: Identifier = Models.CUBE_COLUMN.upload(
-        block.modelSuffix("_inactive"),
+        block.model("_inactive"),
         texture.put(TextureKey.END, Texture.getSubId(block, "_inactive")),
         this.modelCollector
     )
@@ -503,9 +580,9 @@ fun copperFan(id: Identifier): Texture {
 
 fun copperFan(block: Block, suffix: String, powered: String = ""): Texture {
     return Texture()
-        .put(TextureKey.TOP, block.modelSuffix(suffix + powered + "_top"))
-        .put(TextureKey.SIDE, block.modelSuffix(powered + "_side"))
-        .put(TextureKey.BOTTOM, block.modelSuffix(powered + "_bottom"))
+        .put(TextureKey.TOP, block.model(suffix + powered + "_top"))
+        .put(TextureKey.SIDE, block.model(powered + "_side"))
+        .put(TextureKey.BOTTOM, block.model(powered + "_bottom"))
 }
 
 fun BlockStateModelGenerator.createCopperFanBlockState(
@@ -567,7 +644,7 @@ fun BlockStateModelGenerator.parentedModel(
 private
 val <T : Any?> T.myb get() = Optional.ofNullable(this)
 
-fun Block.modelSuffix(str: String) = this.model().suffix(str)
+fun Block.model(str: String) = this.model().suffix(str)
 
 fun Identifier.suffix(str: String) = Identifier(this.namespace, "${this.path}$str")
 fun Block.model(): Identifier = ModelIds.getBlockModelId(this)

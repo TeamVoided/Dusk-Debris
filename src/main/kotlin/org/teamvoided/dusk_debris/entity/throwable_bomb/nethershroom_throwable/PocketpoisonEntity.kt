@@ -14,6 +14,7 @@ import org.teamvoided.dusk_debris.entity.throwable_bomb.NethershroomThrowableEnt
 import org.teamvoided.dusk_debris.init.DuskBlocks
 import org.teamvoided.dusk_debris.init.DuskEntities
 import org.teamvoided.dusk_debris.init.DuskItems
+import org.teamvoided.dusk_debris.util.blueNethershroomSmoke
 
 class PocketpoisonEntity : NethershroomThrowableEntity {
     constructor(entityType: EntityType<out PocketpoisonEntity>, world: World) : super(entityType, world)
@@ -30,5 +31,5 @@ class PocketpoisonEntity : NethershroomThrowableEntity {
         return DuskBlocks.POCKETPOISON_BLOCK.asItem()
     }
 
-    override fun getTrailingParticle() = DuskBlocks.blueNethershroomSmoke
+    override fun getTrailingParticle() = blueNethershroomSmoke
 }

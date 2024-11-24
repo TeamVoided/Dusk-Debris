@@ -7,7 +7,10 @@ import net.minecraft.entity.EntityType
 import net.minecraft.particle.ColoredParticleEffect
 import net.minecraft.particle.ParticleTypes
 import net.minecraft.util.math.MathHelper
+import net.minecraft.util.math.Vec3d
 import net.minecraft.world.World
+import org.teamvoided.dusk_debris.block.ShiftBlock
+import org.teamvoided.dusk_debris.util.normalize
 import kotlin.math.sqrt
 
 class BoxAreaEffectCloud(entityType: EntityType<out BoxAreaEffectCloud>, world: World) :
@@ -38,38 +41,37 @@ class BoxAreaEffectCloud(entityType: EntityType<out BoxAreaEffectCloud>, world: 
             }
 
             for (j in 0 until i) {
-                val randInRadius = MathHelper.sqrt(random.nextFloat()) * radius * 1.25
-                var inSphereX = (random.nextDouble() - random.nextDouble())
-                var inSphereY = (random.nextDouble() - random.nextDouble())
-                var inSphereZ = (random.nextDouble() - random.nextDouble())
-                val theSphereFunction = sqrt(inSphereX * inSphereX + inSphereY * inSphereY + inSphereZ * inSphereZ)
-                inSphereX = this.x + (randInRadius * inSphereX) / theSphereFunction
-                inSphereY = this.y + (randInRadius * inSphereY) / theSphereFunction + radius
-                inSphereZ = this.z + (randInRadius * inSphereZ) / theSphereFunction
+                val randInRadius = MathHelper.sqrt(random.nextFloat()) * radius * 1.5f
+                val inSphere = Vec3d(
+                    random.nextDouble() - random.nextDouble(),
+                    random.nextDouble() - random.nextDouble(),
+                    random.nextDouble() - random.nextDouble()
+                ).normalize(randInRadius).add(x, y + setRadius / 2, z)
                 if (particleEffect.type === ParticleTypes.ENTITY_EFFECT) {
                     if (isWaiting && random.nextBoolean()) {
                         world.addParticle(
                             ColoredParticleEffect.create(ParticleTypes.ENTITY_EFFECT, -1),
-                            inSphereX,
-                            inSphereY,
-                            inSphereZ,
+                            inSphere.x,
+                            inSphere.y,
+                            inSphere.z,
                             0.0,
                             0.0,
                             0.0
                         )
                     } else {
-                        world.addParticle(particleEffect, inSphereX, inSphereY, inSphereZ, 0.0, 0.0, 0.0)
+                        world.addParticle(particleEffect, inSphere.x, inSphere.y, inSphere.z, 0.0, 0.0, 0.0)
                     }
                 } else if (isWaiting) {
-                    world.addParticle(particleEffect, inSphereX, inSphereY, inSphereZ, 0.0, 0.0, 0.0)
+                    world.addParticle(particleEffect, inSphere.x, inSphere.y, inSphere.z, 0.0, 0.0, 0.0)
                 } else {
-                    if (j <= 3){
-                        world.addImportantParticle(particleEffect, inSphereX, inSphereY, inSphereZ, 0.0, 0.0, 0.0)}
+                    if (j <= 3) {
+                        world.addImportantParticle(particleEffect, inSphere.x, inSphere.y, inSphere.z, 0.0, 0.0, 0.0)
+                    }
                     world.addParticle(
                         particleEffect,
-                        inSphereX,
-                        inSphereY,
-                        inSphereZ,
+                        inSphere.x,
+                        inSphere.y,
+                        inSphere.z,
                         0.0,
                         0.0,
                         0.0
