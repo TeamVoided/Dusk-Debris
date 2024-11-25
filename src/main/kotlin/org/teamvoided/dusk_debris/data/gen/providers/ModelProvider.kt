@@ -54,6 +54,7 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
         gen.wallOffset(DuskBlocks.CUT_BRONZE_WALL, DuskBlocks.CUT_BRONZE)
         gen.registerTrapdoor(DuskBlocks.BRONZE_TRAPDOOR)
         gen.godhomeShiftBlock(DuskBlocks.BRONZE_SHIFT_BLOCK)
+        gen.vesselLantern(DuskBlocks.PALE_SOUL_VESSEL)
 
         gen.registerDustBlockFromRedstone(DuskBlocks.GUNPOWDER)
 

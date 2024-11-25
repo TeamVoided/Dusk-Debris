@@ -33,6 +33,7 @@ fun BlockStateModelGenerator.wallOffset(wallBlock: Block, inId: Identifier) {
     this.blockStateCollector.accept(BlockStateModelGenerator.createWallBlockState(wallBlock, id, id2, id3))
     this.registerParentedItemModel(wallBlock, OFFSET_WALL_INVENTORY.upload(wallBlock, texture, this.modelCollector))
 }
+
 fun BlockStateModelGenerator.sixDirectionalBlock(block: Block) {
     this.blockStateCollector.accept(
         VariantsBlockStateSupplier.create(
@@ -73,6 +74,22 @@ fun BlockStateModelGenerator.rollableBlock(block: Block) {
     )
 }
 
+fun BlockStateModelGenerator.vesselLantern(block: Block) {
+    val side = Texture.getId(block)
+    val end = Texture.getSubId(block, "_end")
+    val texture = Texture()
+        .put(TextureKey.SIDE, side)
+        .put(TextureKey.END, end)
+    val model = block(
+        "parent/vessel_lantern",
+        TextureKey.SIDE,
+        TextureKey.END
+    ).upload(block, texture, this.modelCollector)
+    this.registerItemModel(block)
+    this.blockStateCollector.accept(BlockStateModelGenerator.createAxisRotatedBlockState(block, model))
+}
+
+
 fun BlockStateModelGenerator.godhomeShiftBlock(block: Block) {
     val textureSomber = Texture()
         .put(TextureKey.FRONT, Texture.getSubId(block, "_somber_front"))
@@ -110,6 +127,7 @@ fun BlockStateModelGenerator.godhomeShiftBlock(block: Block) {
         TextureKey.SIDE,
         TextureKey.BACK
     ).upload(block, "_radiant", textureRadiant, this.modelCollector)
+    this.registerParentedItemModel(block.asItem(), somberModel)
     this.blockStateCollector.accept(
         VariantsBlockStateSupplier.create(block)
             .coordinate(BlockStateVariantMap.create(

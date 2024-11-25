@@ -10,6 +10,7 @@ import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Vec3d
+import net.minecraft.util.math.Vec3i
 import net.minecraft.util.shape.VoxelShape
 import net.minecraft.util.shape.VoxelShapes
 import net.minecraft.world.TestableWorld
@@ -18,6 +19,10 @@ import kotlin.math.sqrt
 
 fun ServerWorld.spawnParticles(particle: ParticleEffect, pos: Vec3d, velocity: Vec3d) =
     this.spawnParticles(particle, pos.x, pos.y, pos.z, 0, velocity.x, velocity.y, velocity.z, 1.0)
+
+fun World.addParticle(parameters: ParticleEffect, pos: Vec3d, velocity: Vec3d) {
+    this.addParticle(parameters, false, pos.x, pos.y, pos.z, velocity.x, velocity.y, velocity.z)
+}
 
 fun World.addParticle(parameters: ParticleEffect, alwaysSpawn: Boolean, pos: Vec3d, velocity: Vec3d) {
     this.addParticle(parameters, alwaysSpawn, pos.x, pos.y, pos.z, velocity.x, velocity.y, velocity.z)
@@ -67,6 +72,10 @@ fun ServerWorld.sendToPlayerIfNearby(
             return false
         }
     }
+}
+
+fun createCuboidShape(minXZ: Double, minY: Double, maxXZ: Double, maxY: Double): VoxelShape {
+    return Block.createCuboidShape(minXZ, minY, minXZ, maxXZ, maxY, maxXZ)
 }
 
 fun Vec3d.normalize(range: Float): Vec3d {

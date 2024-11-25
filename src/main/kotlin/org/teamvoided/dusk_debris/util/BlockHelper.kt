@@ -5,6 +5,7 @@ import net.minecraft.block.*
 import net.minecraft.block.enums.NoteBlockInstrument
 import net.minecraft.block.piston.PistonBehavior
 import net.minecraft.sound.BlockSoundGroup
+import net.minecraft.sound.SoundEvents
 import net.minecraft.state.property.Properties
 import net.minecraft.util.math.Direction
 import org.teamvoided.dusk_debris.DuskDebris
@@ -25,6 +26,17 @@ fun Block.translucent(): Block {
     DuskBlocks.TRANSLUCENT_BLOCKS.add(this)
     return this
 }
+
+
+val vesselBlockSound = BlockSoundGroup(
+    1f,
+    2f,
+    SoundEvents.BLOCK_TRIAL_SPAWNER_BREAK,
+    SoundEvents.BLOCK_TRIAL_SPAWNER_STEP,
+    SoundEvents.BLOCK_TRIAL_SPAWNER_PLACE,
+    SoundEvents.BLOCK_TRIAL_SPAWNER_HIT,
+    SoundEvents.BLOCK_TRIAL_SPAWNER_FALL
+)
 
 val charredLogColor = MapColor.BLACK
 val charredPlanksColor = MapColor.DEEPSLATE
@@ -49,6 +61,10 @@ val coin_pile_settings = AbstractBlock.Settings.create().nonSolid()
     .strength(0.2f).sounds(BlockSoundGroup.METAL).blockVision { state: BlockState, _, _ ->
         state.get(CoinPileBlock.LAYERS) >= CoinPileBlock.MAX_LAYERS
     }.pistonBehavior(PistonBehavior.DESTROY)
+
+fun light(lightLevel: Int): ToIntFunction<BlockState> {
+    return ToIntFunction { lightLevel }
+}
 
 fun godhomeLuminanceOf(mult: Int = 4, add: Int = 7): ToIntFunction<BlockState> {
     return ToIntFunction { state: BlockState -> state.get(GodhomeBronzePhase.GODHOME_BRONZE_PHASE).id * mult + add }

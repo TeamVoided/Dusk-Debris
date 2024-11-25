@@ -13,15 +13,16 @@ import net.minecraft.sound.SoundEvents
 import net.minecraft.state.StateManager
 import net.minecraft.state.property.EnumProperty
 import net.minecraft.state.property.Properties
-import net.minecraft.unmapped.C_zbvyjshu
 import net.minecraft.util.BlockMirror
 import net.minecraft.util.BlockRotation
 import net.minecraft.util.hit.BlockHitResult
 import net.minecraft.util.math.*
 import net.minecraft.util.random.RandomGenerator
+import net.minecraft.world.DimensionTransition
 import net.minecraft.world.World
 import org.teamvoided.dusk_debris.block.not_blocks.GodhomeBronzePhase
 import org.teamvoided.dusk_debris.data.tags.DuskEntityTypeTags
+import org.teamvoided.dusk_debris.init.DuskParticles
 import org.teamvoided.dusk_debris.module.DuskGameRules
 import org.teamvoided.dusk_debris.particle.GodhomeParticleEffect
 import org.teamvoided.dusk_debris.util.Utils.rotate90
@@ -169,12 +170,12 @@ class ShiftBlock(settings: Settings) : Block(settings) {
             }
             val facing = rotate(entity.yaw, startOrientation, endOrientation)
             entity.moveToWorld(
-                C_zbvyjshu(
+                DimensionTransition(
                     world,
                     entityPos,
                     entity.velocity,
                     facing, entity.pitch,
-                    C_zbvyjshu.field_52245
+                    DimensionTransition.NO_OP
                 )
             )
 

@@ -50,7 +50,7 @@ open class EnterDarknessGoal(protected val mob: PathAwareEntity, private val spe
     }
 
     protected fun locateDarkPos(): Vec3d? {
-        val randomGenerator = mob.method_59922()
+        val randomGenerator = mob.getRandom()
         val blockPos = mob.blockPos
 
         for (i in 0..9) {

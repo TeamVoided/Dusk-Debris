@@ -231,8 +231,8 @@ class GloomEntity(entityType: EntityType<out GloomEntity>, world: World) :
         }
     }
 
-    override fun method_6996(itemStack: ItemStack, f: Float, itemStack2: ItemStack?): PersistentProjectileEntity {
-        val persistentProjectileEntity = super.method_6996(itemStack, f, itemStack2)
+    override fun createArrowProjectile(itemStack: ItemStack, f: Float, itemStack2: ItemStack?): PersistentProjectileEntity {
+        val persistentProjectileEntity = super.createArrowProjectile(itemStack, f, itemStack2)
         if (persistentProjectileEntity is ArrowEntity) {
             persistentProjectileEntity.addEffect(StatusEffectInstance(statusEffect, 600))
         }

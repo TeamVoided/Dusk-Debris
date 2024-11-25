@@ -58,9 +58,9 @@ class GodhomeParticle(
         if (this.age++ >= this.maxAge) {
             this.markDead()
         } else {
-            velocityX *= 0.975
+            velocityX *= velocityMultiplier
             velocityY *= gravityStrength
-            velocityZ *= 0.975
+            velocityZ *= velocityMultiplier
 
             this.x += this.velocityX
             this.y += this.velocityY

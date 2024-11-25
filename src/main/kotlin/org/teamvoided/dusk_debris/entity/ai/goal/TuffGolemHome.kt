@@ -24,14 +24,14 @@ open class TuffGolemHome(
     override fun start() {
         if (golem.summonedPos != null && golem.statueTicks > 0) {
             golem.navigation.stop()
-            val target = golem.summonedPos!!.method_61082()
+            val target = golem.summonedPos!!.ofBottomCenter()
             golem.navigation.startMovingTo(target.x, target.y, target.z, 0, this.speed)
         }
     }
 
     override fun tick() {
         if (golem.summonedPos != null && golem.statueTicks > 0) {
-            val summonPos = golem.squaredDistanceTo(golem.summonedPos!!.method_61082())
+            val summonPos = golem.squaredDistanceTo(golem.summonedPos!!.ofBottomCenter())
             if (summonPos < 0.5) {
                 if (golem.state != golem.statueState && summonPos < 0.1) {
                     golem.setStateStatue()

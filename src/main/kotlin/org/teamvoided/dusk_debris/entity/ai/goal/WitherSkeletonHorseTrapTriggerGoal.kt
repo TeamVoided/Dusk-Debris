@@ -3,6 +3,7 @@ package org.teamvoided.dusk_debris.entity.ai.goal
 import net.minecraft.component.DataComponentTypes
 import net.minecraft.component.type.ItemEnchantmentsComponent
 import net.minecraft.enchantment.EnchantmentHelper
+import net.minecraft.enchantment.provider.EnchantmentProviders
 import net.minecraft.entity.EntityData
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.EquipmentSlot
@@ -13,7 +14,6 @@ import net.minecraft.entity.passive.AbstractHorseEntity
 import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
 import net.minecraft.server.world.ServerWorld
-import net.minecraft.unmapped.C_hzfgfhbe
 import net.minecraft.world.LocalDifficulty
 import org.teamvoided.dusk_debris.entity.WitherSkeletonHorseEntity
 import org.teamvoided.dusk_debris.init.DuskEntities
@@ -48,8 +48,8 @@ class WitherSkeletonHorseTrapTriggerGoal(witherSkeletonHorse: WitherSkeletonHors
                         if (skeletonEntity2 != null) {
                             skeletonEntity2.startRiding(abstractHorseEntity)
                             abstractHorseEntity.addVelocity(
-                                skeletonHorse.method_59922().nextTriangular(0.0, 1.1485), 0.0,
-                                skeletonHorse.method_59922().nextTriangular(0.0, 1.1485)
+                                skeletonHorse.getRandom().nextTriangular(0.0, 1.1485), 0.0,
+                                skeletonHorse.getRandom().nextTriangular(0.0, 1.1485)
                             )
                             serverWorld.spawnEntityAndPassengers(abstractHorseEntity)
                         }
@@ -105,19 +105,19 @@ class WitherSkeletonHorseTrapTriggerGoal(witherSkeletonHorse: WitherSkeletonHors
     }
 
     fun enchantHelmetAndSword(
-        witherSkeletonEntity: WitherSkeletonEntity,
-        equipmentSlot: EquipmentSlot?,
-        difficulty: LocalDifficulty?
+        witherSkeleton: WitherSkeletonEntity,
+        equipmentSlot: EquipmentSlot,
+        difficulty: LocalDifficulty
     ) {
-        val itemStack = witherSkeletonEntity.getEquippedStack(equipmentSlot)
+        val itemStack = witherSkeleton.getEquippedStack(equipmentSlot)
         itemStack.set(DataComponentTypes.ENCHANTMENTS, ItemEnchantmentsComponent.DEFAULT)
         EnchantmentHelper.enchantFromProvider(
             itemStack,
-            witherSkeletonEntity.world.registryManager,
-            C_hzfgfhbe.MOB_SPAWN_EQUIPMENT,
+            witherSkeleton.world.registryManager,
+            EnchantmentProviders.MOB_SPAWN_EQUIPMENT,
             difficulty,
-            witherSkeletonEntity.method_59922()
+            witherSkeleton.getRandom()
         )
-        witherSkeletonEntity.equipStack(equipmentSlot, itemStack)
+        witherSkeleton.equipStack(equipmentSlot, itemStack)
     }
 }

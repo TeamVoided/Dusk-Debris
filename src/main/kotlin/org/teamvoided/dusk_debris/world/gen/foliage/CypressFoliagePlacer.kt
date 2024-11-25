@@ -16,9 +16,9 @@ class CypressFoliagePlacer(intProvider: IntProvider?, intProvider2: IntProvider?
         return DuskWorldgen.CYPRESS_FOLIAGE_PLACER
     }
 
-    override fun method_23448(
+    override fun createFoliage(
         world: TestableWorld,
-        c_pwcqvmho: C_pwcqvmho,
+        placer: Placer,
         random: RandomGenerator,
         treeFeatureConfig: TreeFeatureConfig,
         i: Int,
@@ -31,7 +31,7 @@ class CypressFoliagePlacer(intProvider: IntProvider?, intProvider2: IntProvider?
         val blockPos = treeNode.center.up(l)
         this.generateSquare(
             world,
-            c_pwcqvmho,
+            placer,
             random,
             treeFeatureConfig,
             blockPos,
@@ -39,10 +39,10 @@ class CypressFoliagePlacer(intProvider: IntProvider?, intProvider2: IntProvider?
             -1 - j,
             bl
         )
-        this.generateSquare(world, c_pwcqvmho, random, treeFeatureConfig, blockPos, k - 1, -j, bl)
+        this.generateSquare(world, placer, random, treeFeatureConfig, blockPos, k - 1, -j, bl)
         this.generateSquare(
             world,
-            c_pwcqvmho,
+            placer,
             random,
             treeFeatureConfig,
             blockPos,

@@ -106,7 +106,7 @@ class RoaringGeyserBlock(settings: Settings) :
         repeat(random.range(10, 23)) {
             world.spawnParticles(
                 DuskParticles.GEYSER,
-                pos.up().method_61082(),
+                pos.up().ofBottomCenter(),
                 Vec3d(
                     (random.nextDouble() - random.nextDouble()) * 0.15,
                     random.nextDouble() + 0.6,

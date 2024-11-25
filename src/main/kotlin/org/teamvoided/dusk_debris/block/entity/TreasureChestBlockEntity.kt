@@ -75,8 +75,8 @@ class TreasureChestBlockEntity : LootableContainerBlockEntity, ChestAnimationPro
         }
     }
 
-    override fun method_11014(nbt: NbtCompound, lookupProvider: HolderLookup.Provider) {
-        super.method_11014(nbt, lookupProvider)
+    override fun readNbtImpl(nbt: NbtCompound, lookupProvider: HolderLookup.Provider) {
+        super.readNbtImpl(nbt, lookupProvider)
         this.inventory = DefaultedList.ofSize(this.size(), ItemStack.EMPTY)
         if (!this.readLootTableNbt(nbt)) {
             Inventories.readNbt(nbt, this.inventory, lookupProvider)
@@ -104,9 +104,9 @@ class TreasureChestBlockEntity : LootableContainerBlockEntity, ChestAnimationPro
 
     override fun getContainerName(): Text = Text.translatable("container.treasure_chest")
 
-    override fun method_11282(): DefaultedList<ItemStack> = this.inventory
+    override fun getInventory(): DefaultedList<ItemStack> = this.inventory
 
-    override fun method_11281(defaultedList: DefaultedList<ItemStack>) {
+    override fun setInventory(defaultedList: DefaultedList<ItemStack>) {
         this.inventory = defaultedList
     }
 

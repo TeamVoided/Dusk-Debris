@@ -9,8 +9,8 @@ import net.minecraft.nbt.NbtCompound
 import net.minecraft.nbt.NbtHelper
 import net.minecraft.particle.ParticleTypes
 import net.minecraft.registry.RegistryKeys
-import net.minecraft.unmapped.C_zbvyjshu
 import net.minecraft.util.math.Box
+import net.minecraft.world.DimensionTransition
 import net.minecraft.world.World
 import net.minecraft.world.World.ExplosionSourceType
 import net.minecraft.world.explosion.Explosion
@@ -85,7 +85,7 @@ class GunpowderBarrelEntity(entityType: EntityType<out GunpowderBarrelEntity>, w
     }
 
     override fun tick() {
-        this.method_60698()
+        this.tickPortalTeleportation()
         this.applyGravity()
         this.move(MovementType.SELF, this.velocity)
         this.velocity = velocity.multiply(0.98)
@@ -224,8 +224,8 @@ class GunpowderBarrelEntity(entityType: EntityType<out GunpowderBarrelEntity>, w
         this.passedThoughPortal = bl
     }
 
-    override fun moveToWorld(c_zbvyjshu: C_zbvyjshu): Entity? {
-        val entity = super.moveToWorld(c_zbvyjshu)
+    override fun moveToWorld(dimensionTransition: DimensionTransition): Entity? {
+        val entity = super.moveToWorld(dimensionTransition)
         if (entity is GunpowderBarrelEntity) {
             entity.hasTraveledDimensions(true)
         }

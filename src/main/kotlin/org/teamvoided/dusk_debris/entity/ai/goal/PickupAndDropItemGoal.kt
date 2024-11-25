@@ -27,7 +27,7 @@ open class PickupAndDropItemGoal(
         if (!requirement) {
             return false
         } else if (mob.target == null && mob.attacker == null) {
-            if (mob.method_59922().nextFloat() <= probability) {
+            if (mob.random.nextFloat() <= probability) {
                 return false
             } else {
                 val list: List<ItemEntity> = mob.world.getEntitiesByClass(

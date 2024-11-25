@@ -81,13 +81,6 @@ open class SkeletonWolfEntity(entityType: EntityType<out SkeletonWolfEntity>, wo
 //        this.equipStack(EquipmentSlot.BODY, ItemStack(Items.BOW))
     }
 
-    override fun method_6110(): Int {
-        if (this.isBaby) {
-            this.experiencePoints = (experiencePoints.toDouble() * 2.5).toInt()
-        }
-        return super.method_6110()
-    }
-
     public override fun interactMob(player: PlayerEntity, hand: Hand): ActionResult {
         val itemStack = player.getStackInHand(hand)
         if (isEdibleItem(itemStack)) {

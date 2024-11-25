@@ -29,7 +29,7 @@ open class ShowOffGoal(
         if (!requirement) {
             return false
         } else if (mob.target == null && mob.attacker == null) {
-            if (mob.method_59922().nextFloat() <= probability) {
+            if (mob.random.nextFloat() <= probability) {
                 return false
             } else {
                 val list: List<LivingEntity> = mob.world.getEntitiesByClass(
