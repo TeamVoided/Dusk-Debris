@@ -55,6 +55,7 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
         gen.registerTrapdoor(DuskBlocks.BRONZE_TRAPDOOR)
         gen.godhomeShiftBlock(DuskBlocks.BRONZE_SHIFT_BLOCK)
         gen.vesselLantern(DuskBlocks.PALE_SOUL_VESSEL)
+        gen.registerLantern(DuskBlocks.PALE_SOUL_LANTERN)
 
         gen.registerDustBlockFromRedstone(DuskBlocks.GUNPOWDER)
 

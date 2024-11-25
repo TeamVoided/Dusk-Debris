@@ -74,7 +74,7 @@ object DuskBlocks {
 
     val PALE_SOUL_LANTERN = register(
         "pale_soul_lantern",
-        SoulVesselBlock(copy(SOUL_LANTERN).luminance(light(5)))
+        LanternBlock(copy(SOUL_LANTERN).luminance(light(5)))
     )
     val PALE_SOUL_VESSEL = register(
         "pale_soul_vessel",
