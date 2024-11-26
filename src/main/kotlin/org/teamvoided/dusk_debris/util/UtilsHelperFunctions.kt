@@ -9,8 +9,8 @@ import net.minecraft.registry.tag.TagKey
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.math.BlockPos
+import net.minecraft.util.math.Direction
 import net.minecraft.util.math.Vec3d
-import net.minecraft.util.math.Vec3i
 import net.minecraft.util.shape.VoxelShape
 import net.minecraft.util.shape.VoxelShapes
 import net.minecraft.world.TestableWorld
@@ -76,6 +76,14 @@ fun ServerWorld.sendToPlayerIfNearby(
 
 fun createCuboidShape(minXZ: Double, minY: Double, maxXZ: Double, maxY: Double): VoxelShape {
     return Block.createCuboidShape(minXZ, minY, minXZ, maxXZ, maxY, maxXZ)
+}
+
+fun createCuboidShape(min1: Double, min2: Double, max1: Double, max2: Double, axis: Direction.Axis): VoxelShape {
+    return when (axis) {
+        Direction.Axis.Y -> createCuboidShape(min1, min2, max1, max2)
+        Direction.Axis.X -> Block.createCuboidShape(min2, min1, min1, max2, max1, max1)
+        Direction.Axis.Z -> Block.createCuboidShape(min1, min1, min2, max1, max1, max2)
+    }
 }
 
 fun Vec3d.normalize(range: Float): Vec3d {

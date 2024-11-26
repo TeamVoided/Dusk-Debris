@@ -12,6 +12,7 @@ import net.minecraft.state.property.EnumProperty
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.random.RandomGenerator
 import net.minecraft.world.World
+import org.teamvoided.dusk_debris.block.not_blocks.DuskProperties
 import org.teamvoided.dusk_debris.block.not_blocks.GodhomeBronzePhase
 
 open class BronzeBulbBlock(settings: Settings?) : Block(settings) {
@@ -76,6 +77,6 @@ open class BronzeBulbBlock(settings: Settings?) : Block(settings) {
 
     companion object {
         val CODEC: MapCodec<BronzeBulbBlock> = createCodec(::BronzeBulbBlock)
-        val PHASE: EnumProperty<GodhomeBronzePhase> = GodhomeBronzePhase.GODHOME_BRONZE_PHASE
+        val PHASE: EnumProperty<GodhomeBronzePhase> = DuskProperties.GODHOME_BRONZE_PHASE
     }
 }

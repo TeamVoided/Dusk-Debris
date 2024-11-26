@@ -23,6 +23,7 @@ import net.minecraft.world.GameRules
 import net.minecraft.world.World
 import net.minecraft.world.WorldView
 import net.minecraft.world.gen.feature.ConfiguredFeature
+import org.teamvoided.dusk_debris.block.not_blocks.DuskProperties
 import org.teamvoided.dusk_debris.data.tags.DuskBlockTags
 import org.teamvoided.dusk_debris.data.tags.DuskEntityTypeTags
 import org.teamvoided.dusk_debris.init.DuskEntities
@@ -244,6 +245,6 @@ class NethershroomPlantBlock(
         }
 
         private val SHAPE: VoxelShape = createCuboidShape(5.0, 0.0, 5.0, 11.0, 6.0, 11.0)
-        var SQUISHED: BooleanProperty = BooleanProperty.of("squished")
+        var SQUISHED: BooleanProperty = DuskProperties.SQUISHED
     }
 }

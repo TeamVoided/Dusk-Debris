@@ -20,6 +20,7 @@ import net.minecraft.util.random.RandomGenerator
 import net.minecraft.world.World
 import net.minecraft.world.WorldAccess
 import net.minecraft.world.event.GameEvent
+import org.teamvoided.dusk_debris.block.not_blocks.DuskProperties
 import org.teamvoided.dusk_debris.data.tags.DuskEntityTypeTags
 import org.teamvoided.dusk_debris.particle.WindParticleEffect
 import org.teamvoided.dusk_debris.util.spawnParticles
@@ -267,7 +268,7 @@ open class FanBlock(val strength: Int, settings: Settings) :
             )
         }
         val POWERED: BooleanProperty = Properties.POWERED
-        val ACTIVE: BooleanProperty = BooleanProperty.of("active")
+        val ACTIVE: BooleanProperty = DuskProperties.ACTIVE
         val FACING: DirectionProperty = Properties.FACING
     }
 }

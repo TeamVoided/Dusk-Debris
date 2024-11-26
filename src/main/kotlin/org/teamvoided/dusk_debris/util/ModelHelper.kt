@@ -14,6 +14,7 @@ import org.teamvoided.dusk_debris.block.FanBlock
 import org.teamvoided.dusk_debris.block.GildedChaliceBlock
 import org.teamvoided.dusk_debris.block.NethershroomPlantBlock
 import org.teamvoided.dusk_debris.block.RoaringGeyserBlock
+import org.teamvoided.dusk_debris.block.not_blocks.DuskProperties
 import org.teamvoided.dusk_debris.block.not_blocks.GodhomeBronzePhase
 import java.util.*
 import java.util.stream.IntStream
@@ -138,7 +139,7 @@ fun BlockStateModelGenerator.godhomeShiftBlock(block: Block) {
                     BlockStateVariant.create()
                 )
             }).coordinate(
-                BlockStateVariantMap.create(GodhomeBronzePhase.GODHOME_BRONZE_PHASE)
+                BlockStateVariantMap.create(DuskProperties.GODHOME_BRONZE_PHASE)
                     .register(
                         GodhomeBronzePhase.SOMBER,
                         BlockStateVariant.create().put(VariantSettings.MODEL, somberModel)

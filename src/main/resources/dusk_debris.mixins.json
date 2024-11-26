@@ -5,6 +5,7 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "BlockEntityTypeMixin",
+    "FreezeTopLayerFeatureMixin",
     "PaintingEntityMixin"
   ],
   "injectors": {

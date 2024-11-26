@@ -3,11 +3,12 @@ package org.teamvoided.dusk_debris.block
 import com.mojang.serialization.MapCodec
 import net.minecraft.block.*
 import net.minecraft.entity.ai.pathing.NavigationType
+import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.entity.projectile.ProjectileEntity
 import net.minecraft.fluid.FluidState
 import net.minecraft.fluid.Fluids
 import net.minecraft.item.ItemPlacementContext
-import net.minecraft.particle.ParticleTypes
+import net.minecraft.server.world.ServerWorld
 import net.minecraft.state.StateManager
 import net.minecraft.state.property.Properties
 import net.minecraft.util.hit.BlockHitResult
@@ -24,6 +25,7 @@ import net.minecraft.world.WorldView
 import org.teamvoided.dusk_debris.init.DuskParticles
 import org.teamvoided.dusk_debris.util.addParticle
 import org.teamvoided.dusk_debris.util.createCuboidShape
+import org.teamvoided.dusk_debris.util.spawnParticles
 
 class SoulVesselBlock(settings: Settings) : PillarBlock(settings), Waterloggable {
 
@@ -54,6 +56,18 @@ class SoulVesselBlock(settings: Settings) : PillarBlock(settings), Waterloggable
             projectile.canBreakBlocks(world) &&
             projectile.velocity.length() > 0.75f
         ) {
+            val random = world.random
+            repeat(20) {
+                (world as ServerWorld).spawnParticles(
+                    DuskParticles.DRAINED_SOUL,
+                    blockPos.ofCenter(),
+                    Vec3d(
+                        (random.nextDouble() - 0.5),
+                        (random.nextDouble() - 0.5),
+                        (random.nextDouble() - 0.5)
+                    ).normalize().multiply(0.3)
+                )
+            }
             world.breakBlock(blockPos, true, projectile)
         }
     }
@@ -66,11 +80,7 @@ class SoulVesselBlock(settings: Settings) : PillarBlock(settings), Waterloggable
     ): VoxelShape {
         return VoxelShapes.union(
             ORB,
-            when (state.get(AXIS)) {
-                Direction.Axis.Y -> Y_SHAPE
-                Direction.Axis.X -> X_SHAPE
-                Direction.Axis.Z -> Z_SHAPE
-            }
+            createCuboidShape(4.0, 0.0, 12.0, 16.0, state.get(AXIS))
         )
     }
 
@@ -89,18 +99,16 @@ class SoulVesselBlock(settings: Settings) : PillarBlock(settings), Waterloggable
     }
 
     override fun randomDisplayTick(state: BlockState, world: World, pos: BlockPos, random: RandomGenerator) {
+        val particlePosOffset = Vec3d(
+            (random.nextDouble() - 0.5) * 0.6,
+            (random.nextDouble() - 0.5) * 0.6,
+            (random.nextDouble() - 0.5) * 0.6
+        )
+        val particleVelocity = particlePosOffset.multiply(-0.2)
         world.addParticle(
             DuskParticles.DRAINED_SOUL,
-            pos.ofCenter().add(
-                (random.nextDouble() - random.nextDouble()) * 0.3,
-                (random.nextDouble() - random.nextDouble()) * 0.3,
-                (random.nextDouble() - random.nextDouble()) * 0.3
-            ),
-            Vec3d(
-                (random.nextDouble() - random.nextDouble()) * 0.01,
-                (random.nextDouble() - random.nextDouble()) * 0.01,
-                (random.nextDouble() - random.nextDouble()) * 0.01
-            )
+            pos.ofCenter().add(particlePosOffset),
+            particleVelocity
         )
         super.randomDisplayTick(state, world, pos, random)
     }
@@ -125,8 +133,5 @@ class SoulVesselBlock(settings: Settings) : PillarBlock(settings), Waterloggable
             )
         }
         val ORB = createCuboidShape(2.0, 2.0, 14.0, 14.0)
-        val Y_SHAPE: VoxelShape = createCuboidShape(4.0, 0.0, 12.0, 16.0)
-        val X_SHAPE: VoxelShape = createCuboidShape(0.0, 4.0, 4.0, 16.0, 12.0, 12.0)
-        val Z_SHAPE: VoxelShape = createCuboidShape(4.0, 4.0, 0.0, 12.0, 12.0, 16.0)
     }
 }

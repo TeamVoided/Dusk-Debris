@@ -5,6 +5,8 @@ import net.fabricmc.api.Environment
 import net.minecraft.client.particle.*
 import net.minecraft.client.world.ClientWorld
 import net.minecraft.particle.DefaultParticleType
+import org.teamvoided.dusk_debris.util.Utils
+import org.teamvoided.dusk_debris.util.Utils.pi
 import org.teamvoided.dusk_debris.util.Utils.rotate90
 
 class DrainedSoulParticle(
@@ -17,12 +19,15 @@ class DrainedSoulParticle(
     velZ: Double,
     private val spriteProvider: SpriteProvider
 ) : SpriteBillboardParticle(world, posX, posY, posZ, velX, velY, velZ) {
+    val spinSpeed: Float
+
     init {
         this.setSpriteForAge(spriteProvider)
         this.maxAge = 12 + random.nextInt(8)
-        this.scale = random.nextFloat() * 0.2f + 0.05f
-        this.angle = (random.nextInt(3)) * rotate90
+        this.scale = random.nextFloat() * 0.667f + 0.333f
+        this.angle = (random.nextFloat()) * Utils.rotate360
         this.prevAngle = angle
+        this.spinSpeed = (random.nextFloat() - 0.5f) * 0.2f * pi
         this.velocityMultiplier = 0.9f
         this.velocityX = velX
         this.velocityY = velY
@@ -41,6 +46,8 @@ class DrainedSoulParticle(
         if (age++ >= this.maxAge) {
             this.markDead()
         } else {
+            this.prevAngle = angle
+            this.angle += spinSpeed()
             this.prevPosX = this.x
             this.prevPosY = this.y
             this.prevPosZ = this.z
@@ -54,10 +61,18 @@ class DrainedSoulParticle(
         }
     }
 
+    private fun spinSpeed(): Float {
+        var value = age / maxAge.toFloat()
+        value = 1f - 2 * value
+        value *= value
+        value = 1f - value
+        return this.spinSpeed * value
+    }
+
     @Environment(EnvType.CLIENT)
     class SmallFactory(private val spriteProvider: SpriteProvider) : ParticleFactory<DefaultParticleType> {
         override fun createParticle(
-            defaultParticleType: DefaultParticleType?,
+            defaultParticleType: DefaultParticleType,
             world: ClientWorld,
             posX: Double,
             posY: Double,
@@ -75,7 +90,7 @@ class DrainedSoulParticle(
     @Environment(EnvType.CLIENT)
     class Factory(private val spriteProvider: SpriteProvider) : ParticleFactory<DefaultParticleType> {
         override fun createParticle(
-            defaultParticleType: DefaultParticleType?,
+            defaultParticleType: DefaultParticleType,
             world: ClientWorld,
             posX: Double,
             posY: Double,
@@ -84,7 +99,9 @@ class DrainedSoulParticle(
             velY: Double,
             velZ: Double,
         ): Particle {
-            return DrainedSoulParticle(world, posX, posY, posZ, velX, velY, velZ, this.spriteProvider)
+            val particle: Particle = DrainedSoulParticle(world, posX, posY, posZ, velX, velY, velZ, this.spriteProvider)
+            particle.scale(0.5f)
+            return particle
         }
     }
 }

@@ -17,8 +17,6 @@ enum class GodhomeBronzePhase(val phaseName: String, val id: Int) : StringIdenti
     }
 
     companion object {
-        val GODHOME_BRONZE_PHASE = EnumProperty.of("godhome_bronze_phase", GodhomeBronzePhase::class.java)
-
         fun fromInt(int: Int): GodhomeBronzePhase {
             return when (int) {
                 0 -> SOMBER

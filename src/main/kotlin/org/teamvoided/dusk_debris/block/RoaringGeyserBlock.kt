@@ -18,6 +18,7 @@ import net.minecraft.util.math.Vec3d
 import net.minecraft.util.random.RandomGenerator
 import net.minecraft.world.World
 import net.minecraft.world.WorldAccess
+import org.teamvoided.dusk_debris.block.not_blocks.DuskProperties
 import org.teamvoided.dusk_debris.data.tags.DuskBlockTags
 import org.teamvoided.dusk_debris.data.tags.DuskEntityTypeTags
 import org.teamvoided.dusk_debris.init.DuskBlocks
@@ -138,6 +139,6 @@ class RoaringGeyserBlock(settings: Settings) :
             )
         }
         val PERSISTENT: BooleanProperty = Properties.PERSISTENT
-        val ACTIVE: BooleanProperty = BooleanProperty.of("active")
+        val ACTIVE: BooleanProperty = DuskProperties.ACTIVE
     }
 }

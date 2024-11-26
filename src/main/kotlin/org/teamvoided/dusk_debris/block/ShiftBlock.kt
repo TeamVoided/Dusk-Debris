@@ -20,6 +20,7 @@ import net.minecraft.util.math.*
 import net.minecraft.util.random.RandomGenerator
 import net.minecraft.world.DimensionTransition
 import net.minecraft.world.World
+import org.teamvoided.dusk_debris.block.not_blocks.DuskProperties
 import org.teamvoided.dusk_debris.block.not_blocks.GodhomeBronzePhase
 import org.teamvoided.dusk_debris.data.tags.DuskEntityTypeTags
 import org.teamvoided.dusk_debris.init.DuskParticles
@@ -238,7 +239,7 @@ class ShiftBlock(settings: Settings) : Block(settings) {
     companion object {
         val CODEC: MapCodec<ShiftBlock> = createCodec(::ShiftBlock)
         val ORIENTATION: EnumProperty<JigsawOrientation> = Properties.ORIENTATION
-        val PHASE: EnumProperty<GodhomeBronzePhase> = GodhomeBronzePhase.GODHOME_BRONZE_PHASE
+        val PHASE: EnumProperty<GodhomeBronzePhase> = DuskProperties.GODHOME_BRONZE_PHASE
 
         val travelDistance = 40
         val range = 15.0

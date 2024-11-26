@@ -11,6 +11,7 @@ import net.minecraft.util.math.Direction
 import org.teamvoided.dusk_debris.DuskDebris
 import org.teamvoided.dusk_debris.block.CoinPileBlock
 import org.teamvoided.dusk_debris.block.RibbonBlock
+import org.teamvoided.dusk_debris.block.not_blocks.DuskProperties
 import org.teamvoided.dusk_debris.block.not_blocks.GodhomeBronzePhase
 import org.teamvoided.dusk_debris.init.DuskBlocks
 import org.teamvoided.dusk_debris.particle.NethershroomSporeParticleEffect
@@ -67,7 +68,7 @@ fun light(lightLevel: Int): ToIntFunction<BlockState> {
 }
 
 fun godhomeLuminanceOf(mult: Int = 4, add: Int = 7): ToIntFunction<BlockState> {
-    return ToIntFunction { state: BlockState -> state.get(GodhomeBronzePhase.GODHOME_BRONZE_PHASE).id * mult + add }
+    return ToIntFunction { state: BlockState -> state.get(DuskProperties.GODHOME_BRONZE_PHASE).id * mult + add }
 }
 
 fun oxidizeCopperSet(copperList: List<Pair<Block, Block>>) {

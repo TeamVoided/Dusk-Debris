@@ -23,6 +23,7 @@ import org.teamvoided.dusk_debris.entity.GunpowderBarrelEntity
 import org.teamvoided.dusk_debris.item.BonecallerBandanaItem
 import org.teamvoided.dusk_debris.item.DuskItemLists
 import org.teamvoided.dusk_debris.item.EquipableBlockItemItem
+import org.teamvoided.dusk_debris.item.ThrowableItem
 import org.teamvoided.dusk_debris.item.throwable_bomb.BlunderbombItem
 import org.teamvoided.dusk_debris.item.throwable_bomb.BonecallerItem
 import org.teamvoided.dusk_debris.item.throwable_bomb.FirebombItem
@@ -38,6 +39,8 @@ import org.teamvoided.dusk_debris.item.throwable_bomb.nethershroom_throwable_ite
 @Suppress("unused", "MemberVisibilityCanBePrivate")
 object DuskItems {
     val ITEMS = mutableListOf<Item>()
+
+    val TWISTING_SOUL_CHARGE = register("twisting_soul_charge", ThrowableItem(Item.Settings()))
 
     val BLUNDERBOMB_ITEM =
         register("blunderbomb", BlunderbombItem(DuskBlocks.BLUNDERBOMB_BLOCK, Item.Settings().maxCount(16)))

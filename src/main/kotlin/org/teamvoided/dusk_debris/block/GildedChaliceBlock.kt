@@ -13,6 +13,7 @@ import net.minecraft.util.math.Direction
 import net.minecraft.util.shape.VoxelShape
 import net.minecraft.util.shape.VoxelShapes
 import net.minecraft.world.BlockView
+import org.teamvoided.dusk_debris.block.not_blocks.DuskProperties
 import org.teamvoided.dusk_debris.util.rotate
 
 class GildedChaliceBlock(settings: Settings) : MysteriousVesselBlock(settings) {
@@ -90,6 +91,6 @@ class GildedChaliceBlock(settings: Settings) : MysteriousVesselBlock(settings) {
             createCuboidShape(4.0, 0.0, 2.0, 8.0, 9.0, 6.0),
             createCuboidShape(9.0, 0.0, 3.0, 13.0, 9.0, 7.0)
         )
-        val CHALICES: IntProperty = IntProperty.of("chalices", 1, 4);
+        val CHALICES: IntProperty = DuskProperties.CHALICES
     }
 }
