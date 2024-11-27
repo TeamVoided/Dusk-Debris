@@ -28,9 +28,7 @@ class TuffGolemEntityRenderer(context: EntityRendererFactory.Context) :
         this.addFeature(TuffGolemHatFeatureRenderer(this, context.itemRenderer))
     }
 
-    override fun getTexture(tuffGolemEntity: TuffGolemEntity): Identifier {
-        return TEXTURE
-    }
+    override fun getTexture(tuffGolemEntity: TuffGolemEntity): Identifier = TEXTURE
 
     override fun isShaking(tuffGolemEntity: TuffGolemEntity): Boolean {
         return super.isShaking(tuffGolemEntity) ||

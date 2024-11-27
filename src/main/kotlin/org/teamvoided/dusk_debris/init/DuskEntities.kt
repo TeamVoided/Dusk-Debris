@@ -6,7 +6,6 @@ import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.SpawnGroup
 import net.minecraft.entity.passive.AbstractHorseEntity
-import net.minecraft.entity.projectile.ArrowEntity
 import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
 import net.minecraft.util.math.Vec3d
@@ -52,14 +51,7 @@ object DuskEntities {
     val BLINDBOMB = throwableBomb("blindbomb", ::BlindbombEntity)
     val SMOKEBOMB = throwableBomb("smokebomb", ::SmokebombEntity)
 
-    val TWISTING_SOUL_CHARGE = register(
-        "twisting_soul_charge", EntityType.Builder.create(::TwistingSoulChargeEntity, SpawnGroup.MISC)
-            .setDimensions(0.5F, 0.5F)
-            .setEyeHeight(0.13F)
-            .maxTrackingRange(4)
-            .trackingTickInterval(20)
-            .makeFireImmune()
-    )
+    val GLOOM = skeleton("gloomed", ::GloomEntity)
 
     val SKELETON_WOLF = register(
         "skeleton_wolf",
@@ -96,8 +88,22 @@ object DuskEntities {
             .maxTrackingRange(10)
     )
 
+    val TWISTING_SOUL_CHARGE = register(
+        "twisting_soul_charge", EntityType.Builder.create(::TwistingSoulChargeEntity, SpawnGroup.MISC)
+            .setDimensions(0.5F, 0.5F)
+            .setEyeHeight(0.13F)
+            .maxTrackingRange(4)
+            .trackingTickInterval(20)
+            .makeFireImmune()
+    )
 
-    val GLOOM = skeleton("gloomed", ::GloomEntity)
+    val VOLAPHYRA = register(
+        "volaphyra", EntityType.Builder.create(::VolaphyraEntity, SpawnGroup.MONSTER)
+            .setDimensions(1f, 1f)
+            .setEyeHeight(0.33333f)
+            .passengerAttachments(1f)
+            .maxTrackingRange(8)
+    )
 
 
     fun <T : Entity> throwableBomb(id: String, factory: EntityType.EntityFactory<T>): EntityType<T> {
@@ -122,6 +128,7 @@ object DuskEntities {
 
     fun init() {
 //        FabricDefaultAttributeRegistry.register(CRAB, CrabEntity.createAttributes().build())
+        FabricDefaultAttributeRegistry.register(GLOOM, GloomEntity.createAttributes().build())
         FabricDefaultAttributeRegistry.register(SKELETON_WOLF, SkeletonWolfEntity.createAttributes().build())
         FabricDefaultAttributeRegistry.register(WITHER_SKELETON_WOLF, SkeletonWolfEntity.createAttributes().build())
         FabricDefaultAttributeRegistry.register(
@@ -129,7 +136,7 @@ object DuskEntities {
             AbstractHorseEntity.createBaseAttributes().build()
         )
         FabricDefaultAttributeRegistry.register(TUFF_GOLEM, TuffGolemEntity.createAttributes().build())
-        FabricDefaultAttributeRegistry.register(GLOOM, GloomEntity.createAttributes().build())
+        FabricDefaultAttributeRegistry.register(VOLAPHYRA, VolaphyraEntity.createAttributes().build())
     }
 
     fun <T : Entity> register(id: String, entityType: EntityType.Builder<T>): EntityType<T> =

@@ -1,21 +1,19 @@
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by FernFlower decompiler)
-//
 package org.teamvoided.dusk_debris.entity
 
-import net.minecraft.entity.Entity
-import net.minecraft.entity.EntityType
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.Ownable
+import net.minecraft.entity.*
 import net.minecraft.entity.data.DataTracker
+import net.minecraft.entity.projectile.ProjectileEntity
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.server.world.ServerWorld
+import net.minecraft.text.Text
+import net.minecraft.util.hit.EntityHitResult
+import net.minecraft.util.math.Box
 import net.minecraft.util.math.MathHelper
 import net.minecraft.util.math.Vec3d
 import net.minecraft.world.World
 import org.teamvoided.dusk_debris.init.DuskEntities
 import org.teamvoided.dusk_debris.init.DuskParticles
+import org.teamvoided.dusk_debris.util.Utils.degToRad
 import org.teamvoided.dusk_debris.util.Utils.radToDeg
 import org.teamvoided.dusk_debris.util.addParticle
 import java.util.*
@@ -25,20 +23,8 @@ import kotlin.math.sqrt
 
 class TwistingSoulChargeEntity : Entity, Ownable {
     constructor (entityType: EntityType<out TwistingSoulChargeEntity>, world: World) : super(entityType, world)
-
-    constructor(entityType: EntityType<out TwistingSoulChargeEntity>, world: World, owner: LivingEntity) :
-            super(entityType, world) {
-        this.owner = owner
-    }
-
-
-    constructor(world: World, x: Double, y: Double, z: Double) : super(DuskEntities.TWISTING_SOUL_CHARGE, world) {
-        this.setPosition(x, y, z)
-    }
-
     constructor(world: World, owner: LivingEntity) : super(DuskEntities.TWISTING_SOUL_CHARGE, world) {
-        this.setPosition(x, y, z)
-        this.owner = owner
+        this.setOwner(owner)
     }
 
     private var ownerUuid: UUID? = null
@@ -64,9 +50,7 @@ class TwistingSoulChargeEntity : Entity, Ownable {
         if (world.isClient) {
             this.spawnParticles()
         }
-        if (targetUuid == null) {
-
-        } else if (this.owner != null) {
+        if (this.owner != null) {
             val orbitOffset = (owner!!.width) + 2
             val targetPos = Vec3d(
                 orbitOffset * sin(age.toDouble() / 20),
@@ -74,7 +58,14 @@ class TwistingSoulChargeEntity : Entity, Ownable {
                 orbitOffset * cos(age.toDouble() / 20)
             ).add(this.owner!!.pos).subtract(pos)
             val vel2 = velocity.add(targetPos).multiply(0.1)
-            addVelocityInternal(vel2)
+            setVelocityClient(vel2.x, vel2.y, vel2.z)
+
+            val h = this.x + this.velocity.x
+            val j = this.y + this.velocity.y
+            val k = this.z + this.velocity.z
+
+            this.setPosition(h, j, k)
+            this.checkBlockCollision()
         }
     }
 
@@ -137,6 +128,18 @@ class TwistingSoulChargeEntity : Entity, Ownable {
         )
     }
 
+    override fun setVelocityClient(x: Double, y: Double, z: Double) {
+        this.setVelocity(x, y, z)
+        if (this.prevPitch == 0.0f && this.prevYaw == 0.0f) {
+            val d = sqrt(x * x + z * z)
+            this.pitch = (MathHelper.atan2(y, d) * 57.2957763671875).toFloat()
+            this.yaw = (MathHelper.atan2(x, z) * 57.2957763671875).toFloat()
+            this.prevPitch = this.pitch
+            this.prevYaw = this.yaw
+            this.refreshPositionAndAngles(this.x, this.y, this.z, this.yaw, this.pitch)
+        }
+    }
+
     var target: UUID?
         get() = targetUuid
         set(target) {
@@ -164,7 +167,7 @@ class TwistingSoulChargeEntity : Entity, Ownable {
     fun setOwner(entity: Entity?) {
         if (entity != null) {
             this.ownerUuid = entity.uuid
-            this.owner = entity;
+            this.owner = entity
         }
     }
 

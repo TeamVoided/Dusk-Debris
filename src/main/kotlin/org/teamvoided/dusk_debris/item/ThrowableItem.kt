@@ -31,11 +31,9 @@ open class ThrowableItem(settings: Settings) : Item(settings) {
             0.5f,
             0.4f / (world.getRandom().nextFloat() * 0.4f + 0.8f)
         )
-        if (!world.isClient) {
-            val throwableEntity = TwistingSoulChargeEntity(DuskEntities.TWISTING_SOUL_CHARGE, world, user)
-            throwableEntity.setPosition(user.eyePos)
-            world.spawnEntity(throwableEntity)
-        }
+        val throwableEntity = TwistingSoulChargeEntity(world, user)
+        throwableEntity.setPosition(user.eyePos)
+        world.spawnEntity(throwableEntity)
 
         user.incrementStat(Stats.USED.getOrCreateStat(this))
         itemStack.consume(1, user)

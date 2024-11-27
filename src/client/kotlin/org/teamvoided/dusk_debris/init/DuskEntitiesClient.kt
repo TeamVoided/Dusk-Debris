@@ -10,6 +10,7 @@ import org.teamvoided.dusk_debris.entity.skeleton.SkeletonWolfEntityRenderer
 import org.teamvoided.dusk_debris.entity.skeleton.WitherSkeletonHorseEntityRenderer
 import org.teamvoided.dusk_debris.entity.skeleton.WitherSkeletonWolfEntityRenderer
 import org.teamvoided.dusk_debris.entity.tuff_golem.TuffGolemEntityRenderer
+import org.teamvoided.dusk_debris.entity.volaphyra.VolaphyraEntityRenderer
 
 object DuskEntitiesClient {
     fun init() {
@@ -21,6 +22,7 @@ object DuskEntitiesClient {
         EntityRendererRegistry.register(DuskEntities.WITHER_SKELETON_HORSE, ::WitherSkeletonHorseEntityRenderer)
         EntityRendererRegistry.register(DuskEntities.TUFF_GOLEM, ::TuffGolemEntityRenderer)
         EntityRendererRegistry.register(DuskEntities.TWISTING_SOUL_CHARGE, ::EmptyEntityRenderer)
+        EntityRendererRegistry.register(DuskEntities.VOLAPHYRA, ::VolaphyraEntityRenderer)
 
         DuskEntityLists.THROWABLE_BOMB_ENTITIES.forEach {
             EntityRendererRegistry.register(it, ::FlyingItemEntityRenderer)

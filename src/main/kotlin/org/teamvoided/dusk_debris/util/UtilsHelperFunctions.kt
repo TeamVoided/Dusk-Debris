@@ -9,6 +9,7 @@ import net.minecraft.registry.tag.TagKey
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.math.BlockPos
+import net.minecraft.util.math.Box
 import net.minecraft.util.math.Direction
 import net.minecraft.util.math.Vec3d
 import net.minecraft.util.shape.VoxelShape
@@ -84,6 +85,18 @@ fun createCuboidShape(min1: Double, min2: Double, max1: Double, max2: Double, ax
         Direction.Axis.X -> Block.createCuboidShape(min2, min1, min1, max2, max1, max1)
         Direction.Axis.Z -> Block.createCuboidShape(min1, min1, min2, max1, max1, max2)
     }
+}
+
+fun Vec3d.getSquaredDistanceToCenter(vec: Vec3d): Double {
+    val d: Double = this.x - vec.x
+    val e: Double = this.y - vec.y
+    val f: Double = this.z - vec.z
+    return d * d + e * e + f * f
+}
+
+
+fun box(double: Double): Box {
+    return Box(-double, -double, -double, double, double, double)
 }
 
 fun Vec3d.normalize(range: Float): Vec3d {
