@@ -8,7 +8,6 @@ import net.minecraft.client.particle.ParticleFactory
 import net.minecraft.client.world.ClientWorld
 import net.minecraft.util.math.MathHelper
 import net.minecraft.util.math.Vec3d
-import org.teamvoided.dusk_debris.util.normalize
 import java.awt.Color
 import kotlin.math.sqrt
 
@@ -34,7 +33,7 @@ class GunpowderExplosionEmitterParticle(
                 random.nextDouble() - random.nextDouble(),
                 random.nextDouble() - random.nextDouble(),
                 random.nextDouble() - random.nextDouble()
-            ).normalize(randInRadius).add(x, y, z)
+            ).normalize().multiply(randInRadius.toDouble()).add(x, y, z)
             world.addParticle(
                 GunpowderExplosionSmokeParticleEffect(color),
                 xyz.x,

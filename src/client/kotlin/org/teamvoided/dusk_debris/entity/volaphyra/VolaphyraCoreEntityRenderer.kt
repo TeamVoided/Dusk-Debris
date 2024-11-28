@@ -7,23 +7,20 @@ import org.teamvoided.dusk_debris.DuskDebris
 import org.teamvoided.dusk_debris.entity.AbstractVolaphyraEntity
 import org.teamvoided.dusk_debris.entity.DuskEntityModelLayers
 import org.teamvoided.dusk_debris.entity.VolaphyraEntity
+import org.teamvoided.dusk_debris.entity.volaphyra.model.VolaphyraCoreModel
 import org.teamvoided.dusk_debris.entity.volaphyra.model.VolaphyraEntityModel
 import org.teamvoided.dusk_debris.entity.volaphyra.render.VolaphyraCoreFeatureRenderer
 
-class VolaphyraEntityRenderer(context: EntityRendererFactory.Context) :
-    MobEntityRenderer<AbstractVolaphyraEntity, VolaphyraEntityModel>(
+class VolaphyraCoreEntityRenderer(context: EntityRendererFactory.Context) :
+    MobEntityRenderer<AbstractVolaphyraEntity, VolaphyraCoreModel>(
         context,
-        VolaphyraEntityModel(context.getPart(DuskEntityModelLayers.VOLAPHYRA)),
-        0.5f
+        VolaphyraCoreModel(context.getPart(DuskEntityModelLayers.VOLAPHYRA_CORE)),
+        0.25f
     ) {
-
-    init {
-        this.addFeature(VolaphyraCoreFeatureRenderer(this, context.modelLoader))
-    }
 
     override fun getTexture(entity: AbstractVolaphyraEntity): Identifier = TEXTURE
 
     companion object {
-        private val TEXTURE: Identifier = DuskDebris.id("textures/entity/volaphyra/volaphyra.png")
+        val TEXTURE: Identifier = DuskDebris.id("textures/entity/volaphyra/volaphyra_core.png")
     }
 }

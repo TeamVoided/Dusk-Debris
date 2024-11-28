@@ -105,6 +105,14 @@ object DuskEntities {
             .maxTrackingRange(8)
     )
 
+    val VOLAPHYRA_CORE = register(
+        "volaphyra_core", EntityType.Builder.create(::VolaphyraCoreEntity, SpawnGroup.MONSTER)
+            .setDimensions(0.5f, 0.5f)
+            .setEyeHeight(0.25f)
+            .passengerAttachments(0.25f)
+            .maxTrackingRange(8)
+    )
+
 
     fun <T : Entity> throwableBomb(id: String, factory: EntityType.EntityFactory<T>): EntityType<T> {
         return register(
@@ -137,6 +145,7 @@ object DuskEntities {
         )
         FabricDefaultAttributeRegistry.register(TUFF_GOLEM, TuffGolemEntity.createAttributes().build())
         FabricDefaultAttributeRegistry.register(VOLAPHYRA, VolaphyraEntity.createAttributes().build())
+        FabricDefaultAttributeRegistry.register(VOLAPHYRA_CORE, VolaphyraCoreEntity.createAttributes().build())
     }
 
     fun <T : Entity> register(id: String, entityType: EntityType.Builder<T>): EntityType<T> =

@@ -94,14 +94,12 @@ fun Vec3d.getSquaredDistanceToCenter(vec: Vec3d): Double {
     return d * d + e * e + f * f
 }
 
+fun Vec3d.toBlockPos(): BlockPos {
+    return BlockPos(this.x.toInt(), this.y.toInt(), this.z.toInt())
+}
 
 fun box(double: Double): Box {
     return Box(-double, -double, -double, double, double, double)
-}
-
-fun Vec3d.normalize(range: Float): Vec3d {
-    val d = sqrt(this.x * this.x + (this.y * this.y) + (this.z * this.z))
-    return if (d < 1.0E-4) Vec3d.ZERO else Vec3d((x * range) / d, (y * range) / d, (z * range) / d)
 }
 
 fun TestableWorld.isInSet(pos: BlockPos, tag: HolderSet<Block>): Boolean = this.testBlockState(pos) { it.isIn(tag) }

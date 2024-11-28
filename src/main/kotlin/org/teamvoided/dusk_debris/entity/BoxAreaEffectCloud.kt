@@ -9,8 +9,6 @@ import net.minecraft.particle.ParticleTypes
 import net.minecraft.util.math.MathHelper
 import net.minecraft.util.math.Vec3d
 import net.minecraft.world.World
-import org.teamvoided.dusk_debris.block.ShiftBlock
-import org.teamvoided.dusk_debris.util.normalize
 import kotlin.math.sqrt
 
 class BoxAreaEffectCloud(entityType: EntityType<out BoxAreaEffectCloud>, world: World) :
@@ -46,7 +44,7 @@ class BoxAreaEffectCloud(entityType: EntityType<out BoxAreaEffectCloud>, world: 
                     random.nextDouble() - random.nextDouble(),
                     random.nextDouble() - random.nextDouble(),
                     random.nextDouble() - random.nextDouble()
-                ).normalize(randInRadius).add(x, y + setRadius / 2, z)
+                ).normalize().multiply(randInRadius.toDouble()).add(x, y + setRadius / 2, z)
                 if (particleEffect.type === ParticleTypes.ENTITY_EFFECT) {
                     if (isWaiting && random.nextBoolean()) {
                         world.addParticle(

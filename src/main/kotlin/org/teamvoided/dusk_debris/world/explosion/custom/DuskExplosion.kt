@@ -10,20 +10,35 @@ import org.teamvoided.dusk_debris.util.getSquaredDistanceToCenter
 import org.teamvoided.dusk_debris.util.box
 import org.teamvoided.dusk_debris.util.spawnParticles
 
-class DuskExplosion(
-    world: ServerWorld,
-    radius: Double,
-    damage: Float,
-    source: DamageSource,
-    particle: ParticleEffect? = null
-) {
-    init {
-        damageEntities(world, radius, damage, source)
+class DuskExplosion {
+    constructor(
+        world: ServerWorld,
+        radius: Double,
+        damage: Float,
+        source: DamageSource,
+        originPos: Vec3d,
+        particle: ParticleEffect
+    ) {
+        damageEntities(world, originPos, radius, damage, source)
+        particles(world, radius, originPos, particle)
+    }
+
+    constructor(
+        world: ServerWorld,
+        radius: Double,
+        damage: Float,
+        source: DamageSource,
+        particle: ParticleEffect? = null
+    ) {
         val origin = source.position
-        if (origin != null && particle != null) {
-            particles(world, radius, origin, particle)
+        if (origin != null) {
+            damageEntities(world, origin, radius, damage, source)
+            if (particle != null) {
+                particles(world, radius, origin, particle)
+            }
         }
     }
+
 
 //    fun destroyBlocks(world: ServerWorld, radius: Double, source: DamageSource) {
 //        val originVec = source.position
@@ -108,24 +123,19 @@ class DuskExplosion(
 //        }
 //    }
 
-    fun damageEntities(world: ServerWorld, radius: Double, damage: Float, source: DamageSource) {
-        val origin = source.position
-        if (origin != null) {
-            val entitiesInRange =
-                world.getOtherEntities(null, box(radius).offset(origin))
-                {
+    fun damageEntities(world: ServerWorld, origin: Vec3d, radius: Double, damage: Float, source: DamageSource) {
+        val entitiesInRange =
+            world.getOtherEntities(null, box(radius).offset(origin))
+            {
 //                !it.type.isIn(EntityTypeTags.EXPL)
-                    it.isAlive
-                    it.squaredDistanceTo(origin) <= radius * radius
-                }
-            entitiesInRange.sortBy { it.pos.add(0.0, it.height / 2.0, 0.0).squaredDistanceTo(origin) }
-            entitiesInRange.forEach {
-                val position = it.pos.add(0.0, it.height / 2.0, 0.0)
-                val distance = position.getSquaredDistanceToCenter(origin)
-                if (position.getSquaredDistanceToCenter(origin) < radius) {
-                    it.damage(source, damageDistance(damage, distance, radius))
-                }
+                it.isAlive
+                it.squaredDistanceTo(origin) <= radius * radius
             }
+        entitiesInRange.sortBy { it.pos.add(0.0, it.height / 2.0, 0.0).squaredDistanceTo(origin) }
+        entitiesInRange.forEach {
+            val position = it.pos.add(0.0, it.height / 2.0, 0.0)
+            val distance = position.subtract(origin).length()
+            it.damage(source, damageDistance(damage, distance, radius))
         }
     }
 

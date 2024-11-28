@@ -1,12 +1,15 @@
 package org.teamvoided.dusk_debris.entity.volaphyra.model
 
 import net.minecraft.client.model.*
+import net.minecraft.client.render.RenderLayer
 import net.minecraft.client.render.entity.model.SinglePartEntityModel
 import net.minecraft.util.math.Direction
 import net.minecraft.util.math.MathHelper
+import org.teamvoided.dusk_debris.entity.AbstractVolaphyraEntity
 import org.teamvoided.dusk_debris.entity.VolaphyraEntity
 
-class VolaphyraEntityModel(private val root: ModelPart) : SinglePartEntityModel<VolaphyraEntity>() {
+class VolaphyraEntityModel(private val root: ModelPart) :
+    SinglePartEntityModel<AbstractVolaphyraEntity>(RenderLayer::getEntityTranslucent) {
     val membrane: ModelPart = root.getChild("membrane")
     val membraneLower: ModelPart = membrane.getChild("membrane_lower")
     val tendrilsNorth: ModelPart = membrane.getChild("tendrils_north")
@@ -17,12 +20,13 @@ class VolaphyraEntityModel(private val root: ModelPart) : SinglePartEntityModel<
     val tendrilsSouthLower: ModelPart = tendrilsSouth.getChild("tendrils_south_lower")
     val tendrilsEastLower: ModelPart = tendrilsEast.getChild("tendrils_east_lower")
     val tendrilsWestLower: ModelPart = tendrilsWest.getChild("tendrils_west_lower")
+
     override fun getPart(): ModelPart {
         return this.root
     }
 
     override fun setAngles(
-        entity: VolaphyraEntity,
+        entity: AbstractVolaphyraEntity,
         limbAngle: Float, //f
         limbDistance: Float, //g
         animationProgress: Float, //h
@@ -67,9 +71,7 @@ class VolaphyraEntityModel(private val root: ModelPart) : SinglePartEntityModel<
             }
 
         private fun ModelPartData.tendrils(
-            tendril: String,
-            direction: Direction = Direction.NORTH,
-            bottom: Boolean = false
+            tendril: String, direction: Direction = Direction.NORTH, bottom: Boolean = false
         ): ModelPartData {
             val modelPart = if (direction.axis == Direction.Axis.Z) {
                 ModelPartBuilder.create()
@@ -85,11 +87,7 @@ class VolaphyraEntityModel(private val root: ModelPart) : SinglePartEntityModel<
             } else {
                 ModelTransform.pivot(direction.vector.x * 4f, 0f, direction.vector.z * 4f)
             }
-            return this.addChild(
-                tendril,
-                modelPart,
-                pivot
-            )
+            return this.addChild(tendril, modelPart, pivot)
         }
     }
 }

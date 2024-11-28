@@ -12,6 +12,7 @@ import org.teamvoided.dusk_debris.entity.skeleton.render.GloomEntityModel
 import org.teamvoided.dusk_debris.entity.skeleton.render.SkeletonWolfEntityModel.Companion.texturedModelData
 import org.teamvoided.dusk_debris.entity.tuff_golem.model.TuffGolemCloakModel
 import org.teamvoided.dusk_debris.entity.tuff_golem.model.TuffGolemEntityModel
+import org.teamvoided.dusk_debris.entity.volaphyra.model.VolaphyraCoreModel
 import org.teamvoided.dusk_debris.entity.volaphyra.model.VolaphyraEntityModel
 
 object DuskEntityModelLayers {
@@ -28,6 +29,8 @@ object DuskEntityModelLayers {
     val TUFF_GOLEM_ROBE: EntityModelLayer = register("tuff_golem", "robe")
 
     val VOLAPHYRA: EntityModelLayer = registerMain("volaphyra")
+    val VOLAPHYRA_INNER: EntityModelLayer = register("volaphyra", "core")
+    val VOLAPHYRA_CORE: EntityModelLayer = registerMain("volaphyra_core")
 
 
     fun init() {
@@ -43,16 +46,21 @@ object DuskEntityModelLayers {
         EntityModelLayerRegistry.registerModelLayer(TUFF_GOLEM, TuffGolemEntityModel::texturedModelData)
         EntityModelLayerRegistry.registerModelLayer(TUFF_GOLEM_ROBE, TuffGolemCloakModel::texturedModelData)
 
+        EntityModelLayerRegistry.registerModelLayer(VOLAPHYRA_CORE, VolaphyraCoreModel::texturedModelData)
+        EntityModelLayerRegistry.registerModelLayer(VOLAPHYRA_INNER, VolaphyraCoreModel::texturedModelData)
         EntityModelLayerRegistry.registerModelLayer(VOLAPHYRA, VolaphyraEntityModel::texturedModelData)
 
     }
 
     private fun createInnerArmor(): TexturedModelData =
         TexturedModelData.of(BipedArmorEntityModel.getModelData(Dilation(0.5F)), 64, 32)
+
     private fun createOuterArmor(): TexturedModelData =
         TexturedModelData.of(BipedArmorEntityModel.getModelData(Dilation(1.0F)), 64, 32)
+
     private fun createSkeletonOuterLayer(): TexturedModelData =
         TexturedModelData.of(BipedEntityModel.getModelData(Dilation(0.25f), 0.0f), 64, 32)
+
     private fun createHorseLayer(): TexturedModelData =
         TexturedModelData.of(HorseEntityModel.getModelData(Dilation.NONE), 64, 64)
 

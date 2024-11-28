@@ -23,12 +23,10 @@ import net.minecraft.world.World
 import org.teamvoided.dusk_debris.block.not_blocks.DuskProperties
 import org.teamvoided.dusk_debris.block.not_blocks.GodhomeBronzePhase
 import org.teamvoided.dusk_debris.data.tags.DuskEntityTypeTags
-import org.teamvoided.dusk_debris.init.DuskParticles
 import org.teamvoided.dusk_debris.module.DuskGameRules
 import org.teamvoided.dusk_debris.particle.GodhomeParticleEffect
 import org.teamvoided.dusk_debris.util.Utils.rotate90
 import org.teamvoided.dusk_debris.util.addParticle
-import org.teamvoided.dusk_debris.util.normalize
 import org.teamvoided.dusk_debris.util.spawnParticles
 import kotlin.math.cos
 import kotlin.math.sin
@@ -251,12 +249,12 @@ class ShiftBlock(settings: Settings) : Block(settings) {
         fun godhomeStrongParticles(world: World, pos: BlockPos, repeat: Int = 5) {
             val rand = world.random
             repeat(repeat) {
-                val randInRadius = MathHelper.sqrt(rand.nextFloat()) * range.toFloat()
+                val randInRadius = MathHelper.sqrt(rand.nextFloat()) * range
                 val particlePos = Vec3d(
                     rand.nextDouble() - rand.nextDouble(),
                     rand.nextDouble() - rand.nextDouble(),
                     rand.nextDouble() - rand.nextDouble()
-                ).normalize(randInRadius).add(pos.ofCenter())
+                ).normalize().multiply(randInRadius).add(pos.ofCenter())
                 val particleVel = Vec3d(
                     0.0,
                     world.random.nextDouble() * 0.5 + 0.01,
