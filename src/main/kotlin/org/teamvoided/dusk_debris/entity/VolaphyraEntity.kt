@@ -10,11 +10,13 @@ import net.minecraft.entity.damage.DamageSource
 import net.minecraft.entity.data.DataTracker
 import net.minecraft.entity.data.TrackedData
 import net.minecraft.entity.data.TrackedDataHandlerRegistry
+import net.minecraft.entity.projectile.ProjectileEntity
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.sound.SoundEvent
 import net.minecraft.util.Identifier
 import net.minecraft.util.TimeHelper
 import net.minecraft.util.math.BlockPos
+import net.minecraft.util.math.MathHelper
 import net.minecraft.util.math.Vec3d
 import net.minecraft.util.math.int_provider.UniformIntProvider
 import net.minecraft.world.LocalDifficulty
@@ -99,7 +101,7 @@ class VolaphyraEntity(entityType: EntityType<out VolaphyraEntity>, world: World)
     }
 
     override fun shouldRender(distance: Double): Boolean {
-        var averageSideLength = this.bounds.averageSideLength * 3
+        var averageSideLength = this.bounds.averageSideLength
         if (java.lang.Double.isNaN(averageSideLength)) {
             averageSideLength = 1.0
         }
@@ -132,17 +134,24 @@ class VolaphyraEntity(entityType: EntityType<out VolaphyraEntity>, world: World)
     }
 
     override fun setFlying(source: DamageSource, amount: Float) {
-        velocity = Vec3d.ZERO
-        val sourcePos = source.position
-        val velocity = if (sourcePos != null) {
-            pos.subtract(sourcePos).toVector3f()
-        } else {
-            Vector3f(0.0f, 1.0f, 0.0f)
+        if (amount >= 0) {
+            velocity = Vec3d.ZERO
+            val sourceEntity = source.source
+            val sourcePos = source.position
+            val velocity: Vec3d = if (source.source is ProjectileEntity) {
+                sourceEntity!!.velocity
+            } else if (sourcePos != null) {
+                sourcePos.subtract(pos)
+            } else {
+                Vec3d(0.0, 1.0, 0.0)
+            }
+            take3DKnockback(MathHelper.sqrt(5f * amount) + 1.0, velocity.x, velocity.y, velocity.z)
         }
+    }
+
+    override fun take3DKnockback(strengthInput: Double, xInput: Double, yInput: Double, zInput: Double) {
         isLaunched = true
-        this.velocityDirty = true
-        val vec3d2 = Vec3d(velocity).normalize().multiply(5.0)
-        this.velocity = vec3d2
+        super.take3DKnockback(strengthInput, xInput, yInput, zInput)
     }
 
     override fun onDestroyed() {
@@ -257,14 +266,13 @@ class VolaphyraEntity(entityType: EntityType<out VolaphyraEntity>, world: World)
             GRAVITY_VALUE,
             EntityAttributeModifier.Operation.ADD_VALUE
         )
-        private const val MIN_ANGER_LOSS_TIME = 600
         private val LAUNCHED: TrackedData<Boolean> =
             DataTracker.registerData(VolaphyraEntity::class.java, TrackedDataHandlerRegistry.BOOLEAN)
         private val HOVER_POS: TrackedData<BlockPos> =
             DataTracker.registerData(VolaphyraEntity::class.java, TrackedDataHandlerRegistry.BLOCK_POS)
 
         private val ANGER_TIME_RANGE: UniformIntProvider = TimeHelper.betweenSeconds(10, 30)
-        fun createAttributes(): DefaultAttributeContainer.Builder{
+        fun createAttributes(): DefaultAttributeContainer.Builder {
             return AbstractVolaphyraEntity.createAttributes()
         }
     }

@@ -1,15 +1,20 @@
 package org.teamvoided.dusk_debris.entity.volaphyra.render
 
-import org.teamvoided.dusk_debris.entity.volaphyra.model.VolaphyraCoreModel
+import net.minecraft.client.render.OverlayTexture
 import net.minecraft.client.render.VertexConsumerProvider
+import net.minecraft.client.render.entity.ParrotEntityRenderer
 import net.minecraft.client.render.entity.feature.FeatureRenderer
 import net.minecraft.client.render.entity.feature.FeatureRendererContext
 import net.minecraft.client.render.entity.model.EntityModelLoader
 import net.minecraft.client.util.math.MatrixStack
+import net.minecraft.entity.EntityType
+import net.minecraft.entity.passive.ParrotEntity
+import net.minecraft.nbt.NbtCompound
 import net.minecraft.util.Identifier
 import org.teamvoided.dusk_debris.DuskDebris
 import org.teamvoided.dusk_debris.entity.AbstractVolaphyraEntity
 import org.teamvoided.dusk_debris.entity.DuskEntityModelLayers
+import org.teamvoided.dusk_debris.entity.volaphyra.model.VolaphyraCoreModel
 import org.teamvoided.dusk_debris.entity.volaphyra.model.VolaphyraEntityModel
 
 class VolaphyraCoreFeatureRenderer(
@@ -30,6 +35,8 @@ class VolaphyraCoreFeatureRenderer(
         headYaw: Float,
         headPitch: Float
     ) {
+        matrices.push()
+        matrices.translate(0f, 0.2f, 0f)
         render(
             this.contextModel,
             this.model,
@@ -46,6 +53,7 @@ class VolaphyraCoreFeatureRenderer(
             tickDelta,
             -1
         )
+        matrices.pop()
     }
 
     companion object {

@@ -18,6 +18,7 @@ import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.function.BooleanBiFunction
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Box
+import net.minecraft.util.math.MathHelper
 import net.minecraft.util.math.Vec3d
 import net.minecraft.util.shape.VoxelShapes
 import net.minecraft.world.World
@@ -106,6 +107,33 @@ abstract class AbstractVolaphyraEntity(entityType: EntityType<out AbstractVolaph
     override fun travel(movementInput: Vec3d?) {}
 
     open fun setFlying(source: DamageSource, amount: Float) {}
+
+  open  fun take3DKnockback(strengthInput: Double, xInput: Double, yInput: Double, zInput: Double) {
+        var strength = strengthInput
+        var x = xInput
+        var y = yInput
+        var z = zInput
+        strength *= 1.0 - this.getAttributeValue(EntityAttributes.GENERIC_KNOCKBACK_RESISTANCE)
+        if (!(strength <= 0.0)) {
+            this.velocityDirty = true
+            this.velocityDirty = true
+            val vec3d = velocity
+            while (x * x + y * y + z * z < 9.999999747378752E-6) {
+                x = (Math.random() - Math.random()) * 0.01
+                y = (Math.random() - Math.random()) * 0.01
+                z = (Math.random() - Math.random()) * 0.01
+            }
+
+            val vec3d2 = Vec3d(x, y, z).normalize().multiply(strength)
+            this.setVelocity(
+                vec3d.x / 2.0 - vec3d2.x,
+                vec3d.y / 2.0 - vec3d2.y,
+                vec3d.z / 2.0 - vec3d2.z
+            )
+        }
+    }
+
+
 
     override fun damage(source: DamageSource, amount: Float): Boolean {
         this.despawnCounter = 0

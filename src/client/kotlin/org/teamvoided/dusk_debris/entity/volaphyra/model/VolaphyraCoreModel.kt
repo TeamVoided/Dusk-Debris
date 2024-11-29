@@ -8,6 +8,8 @@ import net.minecraft.client.model.ModelTransform
 import net.minecraft.client.model.TexturedModelData
 import net.minecraft.client.render.entity.model.SinglePartEntityModel
 import org.teamvoided.dusk_debris.entity.AbstractVolaphyraEntity
+import org.teamvoided.dusk_debris.util.Utils.rotate360
+import org.teamvoided.dusk_debris.util.Utils.rotate90
 
 class VolaphyraCoreModel(val root: ModelPart) : SinglePartEntityModel<AbstractVolaphyraEntity>() {
     val core = root.getChild("core")
@@ -29,6 +31,12 @@ class VolaphyraCoreModel(val root: ModelPart) : SinglePartEntityModel<AbstractVo
         headPitch: Float //j
     ) {
         this.part.traverse().forEach(ModelPart::resetTransform)
+//        val velocity = entity.velocity.normalize().multiply(rotate360.toDouble()).toVector3f()
+//        core.pitch = velocity.x
+//        core.roll = velocity.y
+//        core.yaw = velocity.z
+//        definitelySomethingElse.visible =
+//            tuffGolemEntity.hasCustomName() && "hon hon hon" == tuffGolemEntity.name.string.lowercase()
     }
 
     companion object {

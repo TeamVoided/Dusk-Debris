@@ -14,7 +14,7 @@ class VolaphyraEntityRenderer(context: EntityRendererFactory.Context) :
     MobEntityRenderer<AbstractVolaphyraEntity, VolaphyraEntityModel>(
         context,
         VolaphyraEntityModel(context.getPart(DuskEntityModelLayers.VOLAPHYRA)),
-        0.5f
+        0.45f
     ) {
 
     init {
