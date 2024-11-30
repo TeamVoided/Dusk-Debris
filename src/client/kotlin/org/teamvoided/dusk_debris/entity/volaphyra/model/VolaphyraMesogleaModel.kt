@@ -6,20 +6,19 @@ import net.minecraft.client.render.entity.model.SinglePartEntityModel
 import net.minecraft.util.math.Direction
 import net.minecraft.util.math.MathHelper
 import org.teamvoided.dusk_debris.entity.AbstractVolaphyraEntity
-import org.teamvoided.dusk_debris.entity.VolaphyraEntity
 
-class VolaphyraEntityModel(private val root: ModelPart) :
+class VolaphyramesogleaModel(private val root: ModelPart) :
     SinglePartEntityModel<AbstractVolaphyraEntity>(RenderLayer::getEntityTranslucent) {
-    val membrane: ModelPart = root.getChild("membrane")
-    val membraneLower: ModelPart = membrane.getChild("membrane_lower")
-    val tendrilsNorth: ModelPart = membrane.getChild("tendrils_north")
-    val tendrilsSouth: ModelPart = membrane.getChild("tendrils_south")
-    val tendrilsEast: ModelPart = membrane.getChild("tendrils_east")
-    val tendrilsWest: ModelPart = membrane.getChild("tendrils_west")
-    val tendrilsNorthLower: ModelPart = tendrilsNorth.getChild("tendrils_north_lower")
-    val tendrilsSouthLower: ModelPart = tendrilsSouth.getChild("tendrils_south_lower")
-    val tendrilsEastLower: ModelPart = tendrilsEast.getChild("tendrils_east_lower")
-    val tendrilsWestLower: ModelPart = tendrilsWest.getChild("tendrils_west_lower")
+    val mesoglea: ModelPart = root.getChild("mesoglea")
+    val mesogleaLower: ModelPart = mesoglea.getChild("mesoglea_lower")
+    val armsNorth: ModelPart = mesoglea.getChild("arms_north")
+    val armsSouth: ModelPart = mesoglea.getChild("arms_south")
+    val armsEast: ModelPart = mesoglea.getChild("arms_east")
+    val armsWest: ModelPart = mesoglea.getChild("arms_west")
+    val armsNorthLower: ModelPart = armsNorth.getChild("arms_north_lower")
+    val armsSouthLower: ModelPart = armsSouth.getChild("arms_south_lower")
+    val armsEastLower: ModelPart = armsEast.getChild("arms_east_lower")
+    val armsWestLower: ModelPart = armsWest.getChild("arms_west_lower")
 
     override fun getPart(): ModelPart {
         return this.root
@@ -34,43 +33,68 @@ class VolaphyraEntityModel(private val root: ModelPart) :
         headPitch: Float //j
     ) {
         this.part.traverse().forEach(ModelPart::resetTransform)
+        animatearms(
+            limbAngle,
+            limbDistance,
+            animationProgress,
+            armsNorth,
+            armsSouth,
+            armsEast,
+            armsWest
+        )
 //        val l: Float = animationProgress * 0.1f + limbAngle * 0.5f
-//        this.membrane.roll = l * 0.01f
-
+//        this.mesoglea.roll = l * 0.01f
     }
 
     companion object {
+        fun animatearms(
+            limbAngle: Float,
+            limbDistance: Float,
+            animationProgress: Float,
+            north: ModelPart,
+            south: ModelPart,
+            east: ModelPart,
+            west: ModelPart
+        ) {
+            val value: Float = animationProgress * 0.1f + limbAngle * 0.5f
+            val mult: Float = 0.08f + limbDistance * 0.4f
+            north.pitch = -MathHelper.cos(value * 0.1f) * mult
+            south.pitch = MathHelper.cos(value * 0.15f) * mult
+            east.roll = MathHelper.cos(value * 0.2f) * mult
+            west.roll = -MathHelper.cos(value * 0.25f) * mult
+        }
+
         val texturedModelData: TexturedModelData
             get() {
                 val modelData = ModelData()
                 val modelPartData = modelData.root
-                val membrane = modelPartData.addChild(
-                    "membrane",
+                val mesoglea = modelPartData.addChild(
+                    "mesoglea",
                     ModelPartBuilder.create()
                         .uv(0, 0)
                         .cuboid(-8f, -16f, -8f, 16f, 16f, 16f),
                     ModelTransform.pivot(0f, 24f, 0f)
                 )
-                membrane.addChild(
-                    "membrane_lower",
+                mesoglea.addChild(
+                    "mesoglea_lower",
                     ModelPartBuilder.create()
                         .uv(1, 32)
                         .cuboid(-7f, 0f, -7f, 14f, 4f, 14f),
                     ModelTransform.pivot(0f, 0f, 0f)
                 )
 
-                val tendrilsNorth = membrane.tendrils("tendrils_north")
-                val tendrilsSouth = membrane.tendrils("tendrils_south", Direction.SOUTH)
-                val tendrilsEast = membrane.tendrils("tendrils_east", Direction.EAST)
-                val tendrilsWest = membrane.tendrils("tendrils_west", Direction.WEST)
-                tendrilsNorth.tendrils("tendrils_north_lower", Direction.NORTH, true)
-                tendrilsSouth.tendrils("tendrils_south_lower", Direction.SOUTH, true)
-                tendrilsEast.tendrils("tendrils_east_lower", Direction.EAST, true)
-                tendrilsWest.tendrils("tendrils_west_lower", Direction.WEST, true)
+                val armsNorth = mesoglea.arms("arms_north")
+                val armsSouth = mesoglea.arms("arms_south", Direction.SOUTH)
+                val armsEast = mesoglea.arms("arms_east", Direction.EAST)
+                val armsWest = mesoglea.arms("arms_west", Direction.WEST)
+                armsNorth.arms("arms_north_lower", Direction.NORTH, true)
+                armsSouth.arms("arms_south_lower", Direction.SOUTH, true)
+                armsEast.arms("arms_east_lower", Direction.EAST, true)
+                armsWest.arms("arms_west_lower", Direction.WEST, true)
                 return TexturedModelData.of(modelData, 64, 128)
             }
 
-        private fun ModelPartData.tendrils(
+        private fun ModelPartData.arms(
             tendril: String, direction: Direction = Direction.NORTH, bottom: Boolean = false
         ): ModelPartData {
             val modelPart = if (direction.axis == Direction.Axis.Z) {
