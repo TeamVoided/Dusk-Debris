@@ -16,7 +16,6 @@ import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.registry.Registries
-import net.minecraft.registry.tag.ItemTags
 import net.minecraft.sound.SoundEvent
 import net.minecraft.sound.SoundEvents
 import net.minecraft.util.ActionResult
@@ -32,7 +31,6 @@ import org.teamvoided.dusk_debris.entity.ai.goal.PickupAndDropItemGoal
 import org.teamvoided.dusk_debris.entity.ai.goal.ShowOffGoal
 import org.teamvoided.dusk_debris.entity.ai.goal.TuffGolemHome
 import java.util.*
-import kotlin.jvm.optionals.getOrNull
 
 
 class TuffGolemEntity(entityType: EntityType<out TuffGolemEntity>, world: World) : GolemEntity(entityType, world) {
@@ -95,7 +93,7 @@ class TuffGolemEntity(entityType: EntityType<out TuffGolemEntity>, world: World)
         super.initDataTracker(builder)
         builder.add(GOLEM_STATE, statueState)
         builder.add(STATUE_TICKS, 100)
-        builder.add(SUMMON_POS, Optional.empty())
+        builder.add(SUMMON_POS, BlockPos.ORIGIN)
         builder.add(WAS_GIVEN_ITEM, false)
         builder.add(EYE_BLOCK, "water_bucket")
     }
@@ -104,11 +102,9 @@ class TuffGolemEntity(entityType: EntityType<out TuffGolemEntity>, world: World)
         super.writeCustomDataToNbt(nbt)
         nbt.putInt("StatueTicks", this.statueTicks)
         nbt.putInt("GolemState", this.state)
-//        if (this.getSummonedPos() != null) {
-//            val posCompound = NbtCompound()
-//            BlockPos.CODEC.encode(this.getSummonedPos(), NbtOps.INSTANCE, posCompound)
-//            nbt.put("SummonedPos", posCompound)
-//        }
+        nbt.putInt("SummonedPosX", this.summonedPos.x)
+        nbt.putInt("SummonedPosY", this.summonedPos.y)
+        nbt.putInt("SummonedPosZ", this.summonedPos.z)
         nbt.putBoolean("WasGivenItem", this.wasGivenItem)
         nbt.putString("EyeBlock", this.eyeBlock)
     }
@@ -121,10 +117,12 @@ class TuffGolemEntity(entityType: EntityType<out TuffGolemEntity>, world: World)
         if (nbt.contains("StatueTicks")) {
             this.statueTicks = nbt.getInt("StatueTicks")
         }
-//        if (nbt.contains("SummonedPos")) {
-//            val posCompound = nbt.get("SummonedPos")
-//            this.setNewCoordinate(BlockPos.CODEC.decode(NbtOps.INSTANCE, posCompound).getOrThrow().first)
-//        }
+        if (nbt.contains("SummonedPosX") && nbt.contains("SummonedPosY") && nbt.contains("SummonedPosZ")) {
+            val summonX = nbt.getInt("SummonedPosX")
+            val summonY = nbt.getInt("SummonedPosY")
+            val summonZ = nbt.getInt("SummonedPosZ")
+            summonedPos = BlockPos(summonX, summonY, summonZ)
+        }
         if (nbt.contains("WasGivenItem")) {
             this.wasGivenItem = nbt.getBoolean("WasGivenItem")
         }
@@ -286,10 +284,10 @@ class TuffGolemEntity(entityType: EntityType<out TuffGolemEntity>, world: World)
         return this.hasStackEquipped(EquipmentSlot.MAINHAND)
     }
 
-    var summonedPos: BlockPos?
-        get() = dataTracker[SUMMON_POS].getOrNull()
+    var summonedPos: BlockPos
+        get() = dataTracker[SUMMON_POS]
         set(summonedPos) {
-            dataTracker[SUMMON_POS] = Optional.ofNullable(summonedPos)
+            dataTracker[SUMMON_POS] = summonedPos
         }
 
     var wasGivenItem: Boolean
@@ -389,8 +387,8 @@ class TuffGolemEntity(entityType: EntityType<out TuffGolemEntity>, world: World)
 
         private val STATUE_TICKS: TrackedData<Int> =
             DataTracker.registerData(TuffGolemEntity::class.java, TrackedDataHandlerRegistry.INTEGER)
-        private val SUMMON_POS: TrackedData<Optional<BlockPos>> =
-            DataTracker.registerData(TuffGolemEntity::class.java, TrackedDataHandlerRegistry.OPTIONAL_BLOCK_POS)
+        private val SUMMON_POS: TrackedData<BlockPos> =
+            DataTracker.registerData(TuffGolemEntity::class.java, TrackedDataHandlerRegistry.BLOCK_POS)
         private val WAS_GIVEN_ITEM: TrackedData<Boolean> =
             DataTracker.registerData(TuffGolemEntity::class.java, TrackedDataHandlerRegistry.BOOLEAN)
         private val EYE_BLOCK: TrackedData<String> =

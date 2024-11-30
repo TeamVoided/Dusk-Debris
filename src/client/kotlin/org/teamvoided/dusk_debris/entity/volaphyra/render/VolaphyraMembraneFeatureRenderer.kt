@@ -1,62 +1,52 @@
 package org.teamvoided.dusk_debris.entity.volaphyra.render
 
-import net.minecraft.client.render.OverlayTexture
+import net.minecraft.client.MinecraftClient
+import net.minecraft.client.render.RenderLayer
 import net.minecraft.client.render.VertexConsumerProvider
-import net.minecraft.client.render.entity.ParrotEntityRenderer
+import net.minecraft.client.render.entity.LivingEntityRenderer
 import net.minecraft.client.render.entity.feature.FeatureRenderer
 import net.minecraft.client.render.entity.feature.FeatureRendererContext
 import net.minecraft.client.render.entity.model.EntityModelLoader
 import net.minecraft.client.util.math.MatrixStack
-import net.minecraft.entity.EntityType
-import net.minecraft.entity.passive.ParrotEntity
-import net.minecraft.nbt.NbtCompound
 import net.minecraft.util.Identifier
 import org.teamvoided.dusk_debris.DuskDebris
 import org.teamvoided.dusk_debris.entity.AbstractVolaphyraEntity
 import org.teamvoided.dusk_debris.entity.DuskEntityModelLayers
+import org.teamvoided.dusk_debris.entity.volaphyra.VolaphyraEntityRenderer.Companion.TEXTURE_MESOGLEA
 import org.teamvoided.dusk_debris.entity.volaphyra.model.VolaphyraCoreModel
-import org.teamvoided.dusk_debris.entity.volaphyra.model.VolaphyraEntityModel
+import org.teamvoided.dusk_debris.entity.volaphyra.model.VolaphyraMesogleaModel
 
-class VolaphyraCoreFeatureRenderer(
-    context: FeatureRendererContext<AbstractVolaphyraEntity, VolaphyraEntityModel>,
+class VolaphyraMembraneFeatureRenderer(
+    context: FeatureRendererContext<AbstractVolaphyraEntity, VolaphyraCoreModel>,
     loader: EntityModelLoader
-) : FeatureRenderer<AbstractVolaphyraEntity, VolaphyraEntityModel>(context) {
-    private val model = VolaphyraCoreModel(loader.getModelPart(DuskEntityModelLayers.VOLAPHYRA_INNER))
+) : FeatureRenderer<AbstractVolaphyraEntity, VolaphyraCoreModel>(context) {
+    private val model = VolaphyraMesogleaModel(loader.getModelPart(DuskEntityModelLayers.VOLAPHYRA_MESOGLEA))
 
     override fun render(
         matrices: MatrixStack,
         vertexConsumers: VertexConsumerProvider,
-        light: Int,
+        light: Int, //i
         entity: AbstractVolaphyraEntity,
-        limbAngle: Float,
-        limbDistance: Float,
-        tickDelta: Float,
-        age: Float,
-        headYaw: Float,
-        headPitch: Float
+        limbAngle: Float, //f
+        limbDistance: Float, //g
+        tickDelta: Float, //h
+        age: Float, //j
+        headYaw: Float, //k
+        headPitch: Float //l
     ) {
-        matrices.push()
-        matrices.translate(0f, 0.2f, 0f)
-        render(
-            this.contextModel,
-            this.model,
-            TEXTURE,
-            matrices,
-            vertexConsumers,
-            light,
-            entity,
-            limbAngle,
-            limbDistance,
-            age,
-            headYaw,
-            headPitch,
-            tickDelta,
-            -1
-        )
-        matrices.pop()
-    }
+        val minecraftClient = MinecraftClient.getInstance()
+        val bl = minecraftClient.hasOutline(entity) && entity.isInvisible
+        if (!entity.isInvisible || bl) {
+            val vertexConsumer = if (bl) {
+                vertexConsumers.getBuffer(RenderLayer.getOutline(TEXTURE_MESOGLEA))
+            } else {
+                vertexConsumers.getBuffer(RenderLayer.getEntityTranslucent(TEXTURE_MESOGLEA))
+            }
 
-    companion object {
-        val TEXTURE: Identifier = DuskDebris.id("textures/entity/volaphyra/volaphyra_core.png")
+            this.contextModel.copyStateTo(this.model)
+            model.animateModel(entity, limbAngle, limbDistance, tickDelta)
+            model.setAngles(entity, limbAngle, limbDistance, age, headYaw, headPitch)
+            model.method_60879(matrices, vertexConsumer, light, LivingEntityRenderer.getOverlay(entity, 0.0f))
+        }
     }
 }

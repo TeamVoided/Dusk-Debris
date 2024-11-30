@@ -48,7 +48,7 @@ class TuffGolemEntityModel(private val root: ModelPart) : SinglePartEntityModel<
 //        this.animate(tuffGolemEntity.scaredState, ArmadilloEntityAnimations.SCARED, h, 1.0f)
     }
 
-//    override fun animateModel(tuffGolemEntity: TuffGolemEntity, f: Float, g: Float, h: Float) {
+    //    override fun animateModel(tuffGolemEntity: TuffGolemEntity, f: Float, g: Float, h: Float) {
 //        val j = tuffGolemEntity.lookingAtVillagerTicks
 //        if (j > 0) {
 //            rightArm.pitch = -0.8f + 0.025f * MathHelper.wrap(j.toFloat(), 70.0f)

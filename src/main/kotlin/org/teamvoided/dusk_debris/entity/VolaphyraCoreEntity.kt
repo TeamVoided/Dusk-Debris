@@ -10,10 +10,13 @@ import net.minecraft.entity.attribute.EntityAttributes
 import net.minecraft.entity.mob.CreeperEntity
 import net.minecraft.entity.mob.Monster
 import net.minecraft.entity.player.PlayerEntity
+import net.minecraft.particle.ParticleTypes
+import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.math.MathHelper
 import net.minecraft.util.math.Vec3d
 import net.minecraft.world.World
 import org.teamvoided.dusk_debris.util.Utils.radToDeg
+import org.teamvoided.dusk_debris.world.explosion.custom.DuskExplosion
 
 class VolaphyraCoreEntity(entityType: EntityType<out VolaphyraCoreEntity>, world: World) :
     AbstractVolaphyraEntity(entityType, world) {
@@ -75,19 +78,19 @@ class VolaphyraCoreEntity(entityType: EntityType<out VolaphyraCoreEntity>, world
     }
 
     override fun onDestroyed() {
-//        super.onDestroyed()
-//        val world = world
-//        if (world is ServerWorld) {
-//            val attackDamage = this.getAttributeInstance(EntityAttributes.GENERIC_ATTACK_DAMAGE)?.value!!.toFloat()
-//            DuskExplosion(
-//                world,
-//                9.0,
-//                attackDamage,
-//                this.damageSources.sonicBoom(this),
-//                this.pos,
-//                ParticleTypes.GUST_EMITTER_SMALL
-//            )
-//        }
+        super.onDestroyed()
+        val world = world
+        if (world is ServerWorld) {
+            val attackDamage = this.getAttributeInstance(EntityAttributes.GENERIC_ATTACK_DAMAGE)?.value!!.toFloat()
+            DuskExplosion(
+                world,
+                9.0,
+                attackDamage,
+                this.damageSources.sonicBoom(this),
+                this.pos,
+                ParticleTypes.GUST_EMITTER_SMALL
+            )
+        }
     }
 
     override fun chooseRandomAngerTime() {}

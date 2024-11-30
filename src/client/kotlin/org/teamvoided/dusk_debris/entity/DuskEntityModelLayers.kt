@@ -13,7 +13,7 @@ import org.teamvoided.dusk_debris.entity.skeleton.render.SkeletonWolfEntityModel
 import org.teamvoided.dusk_debris.entity.tuff_golem.model.TuffGolemCloakModel
 import org.teamvoided.dusk_debris.entity.tuff_golem.model.TuffGolemEntityModel
 import org.teamvoided.dusk_debris.entity.volaphyra.model.VolaphyraCoreModel
-import org.teamvoided.dusk_debris.entity.volaphyra.model.VolaphyraEntityModel
+import org.teamvoided.dusk_debris.entity.volaphyra.model.VolaphyraMesogleaModel
 
 object DuskEntityModelLayers {
     val GLOOM: EntityModelLayer = registerMain("gloomed")
@@ -29,7 +29,7 @@ object DuskEntityModelLayers {
     val TUFF_GOLEM_ROBE: EntityModelLayer = register("tuff_golem", "robe")
 
     val VOLAPHYRA: EntityModelLayer = registerMain("volaphyra")
-    val VOLAPHYRA_INNER: EntityModelLayer = register("volaphyra", "core")
+    val VOLAPHYRA_MESOGLEA: EntityModelLayer = register("volaphyra", "mesoglea")
     val VOLAPHYRA_CORE: EntityModelLayer = registerMain("volaphyra_core")
 
 
@@ -46,10 +46,9 @@ object DuskEntityModelLayers {
         EntityModelLayerRegistry.registerModelLayer(TUFF_GOLEM, TuffGolemEntityModel::texturedModelData)
         EntityModelLayerRegistry.registerModelLayer(TUFF_GOLEM_ROBE, TuffGolemCloakModel::texturedModelData)
 
+        EntityModelLayerRegistry.registerModelLayer(VOLAPHYRA, VolaphyraCoreModel::texturedModelData)
+        EntityModelLayerRegistry.registerModelLayer(VOLAPHYRA_MESOGLEA, VolaphyraMesogleaModel::texturedModelData)
         EntityModelLayerRegistry.registerModelLayer(VOLAPHYRA_CORE, VolaphyraCoreModel::texturedModelData)
-        EntityModelLayerRegistry.registerModelLayer(VOLAPHYRA_INNER, VolaphyraCoreModel::texturedModelData)
-        EntityModelLayerRegistry.registerModelLayer(VOLAPHYRA, VolaphyraEntityModel::texturedModelData)
-
     }
 
     private fun createInnerArmor(): TexturedModelData =

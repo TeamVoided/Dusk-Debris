@@ -1,6 +1,7 @@
 package org.teamvoided.dusk_debris.entity
 
 import net.minecraft.block.BlockState
+import net.minecraft.entity.AnimationState
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.MovementType
@@ -12,13 +13,13 @@ import net.minecraft.entity.mob.Angerable
 import net.minecraft.entity.mob.HostileEntity
 import net.minecraft.entity.passive.WolfEntity
 import net.minecraft.entity.player.PlayerEntity
+import net.minecraft.nbt.NbtCompound
 import net.minecraft.registry.tag.DamageTypeTags
 import net.minecraft.registry.tag.EntityTypeTags
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.function.BooleanBiFunction
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Box
-import net.minecraft.util.math.MathHelper
 import net.minecraft.util.math.Vec3d
 import net.minecraft.util.shape.VoxelShapes
 import net.minecraft.world.World
@@ -28,9 +29,33 @@ abstract class AbstractVolaphyraEntity(entityType: EntityType<out AbstractVolaph
     HostileEntity(entityType, world), Angerable {
     var angerTicks = 0
     var targetUuid: UUID? = null
+    var propulsionTicks: Int = 0
+    val propulsionAnimationState: AnimationState = AnimationState()
 
     init {
         this.setNoGravity(true)
+    }
+
+    override fun tick() {
+        if (world.isClient()) {
+            this.updateAnimationStates()
+        }
+        super.tick()
+        this.propulsionTicks++
+    }
+
+//    override fun initDataTracker(builder: DataTracker.Builder) {
+//        super.initDataTracker(builder)
+//    }
+
+    override fun writeCustomDataToNbt(nbt: NbtCompound) {
+        super.writeCustomDataToNbt(nbt)
+        this.writeAngerToNbt(nbt)
+    }
+
+    override fun readCustomDataFromNbt(nbt: NbtCompound) {
+        super.readCustomDataFromNbt(nbt)
+        this.readAngerFromNbt(this.world, nbt)
     }
 
     override fun move(movementType: MovementType, movement: Vec3d) {
@@ -54,21 +79,21 @@ abstract class AbstractVolaphyraEntity(entityType: EntityType<out AbstractVolaph
         }
     }
 
-    fun checkCollisionForPathing(): Boolean { //returns false if there is a collision box below
+    fun checkCollisionForPathing(): Boolean { //returns true if there is a collision box below
         val box = this.bounds.expand(0.0, this.height * 2.0, 0.0).offset(0.0, this.height * -4.0, 0.0)
         val blockPos = BlockPos.create(box.minX + 1.0E-7, box.minY + 1.0E-7, box.minZ + 1.0E-7)
         val blockPos2 = BlockPos.create(box.maxX - 1.0E-7, box.maxY - 1.0E-7, box.maxZ - 1.0E-7)
         if (!this.isInvulnerable && !world.isClient && world.isRegionLoaded(blockPos, blockPos2)) {
             if (this.noClip || !this.isAlive) {
-                return true
+                return false
             } else {
                 val belowNotAir = checkBlockBoxes(box)
                 if (belowNotAir) {
-                    return false
+                    return true
                 }
             }
         }
-        return true
+        return false
     }
 
     private fun checkBlockBoxes(box: Box): Boolean {
@@ -108,21 +133,28 @@ abstract class AbstractVolaphyraEntity(entityType: EntityType<out AbstractVolaph
 
     open fun setFlying(source: DamageSource, amount: Float) {}
 
-  open  fun take3DKnockback(strengthInput: Double, xInput: Double, yInput: Double, zInput: Double) {
+    fun updateAnimationStates() {
+        if (propulsionTicks <= 0) {
+            propulsionAnimationState.stop()
+        } else {
+            propulsionAnimationState.start(this.age)
+        }
+    }
+
+    override fun handleStatus(status: Byte) {
+        if (status.toInt() == 19) {
+            this.propulsionTicks = 0
+        } else {
+            super.handleStatus(status)
+        }
+    }
+
+    open fun take3DKnockback(strengthInput: Double, x: Double, y: Double, z: Double) {
         var strength = strengthInput
-        var x = xInput
-        var y = yInput
-        var z = zInput
         strength *= 1.0 - this.getAttributeValue(EntityAttributes.GENERIC_KNOCKBACK_RESISTANCE)
         if (!(strength <= 0.0)) {
             this.velocityDirty = true
-            this.velocityDirty = true
             val vec3d = velocity
-            while (x * x + y * y + z * z < 9.999999747378752E-6) {
-                x = (Math.random() - Math.random()) * 0.01
-                y = (Math.random() - Math.random()) * 0.01
-                z = (Math.random() - Math.random()) * 0.01
-            }
 
             val vec3d2 = Vec3d(x, y, z).normalize().multiply(strength)
             this.setVelocity(
@@ -132,7 +164,6 @@ abstract class AbstractVolaphyraEntity(entityType: EntityType<out AbstractVolaph
             )
         }
     }
-
 
 
     override fun damage(source: DamageSource, amount: Float): Boolean {
@@ -175,8 +206,7 @@ abstract class AbstractVolaphyraEntity(entityType: EntityType<out AbstractVolaph
 
     open fun onDestroyed() {
         this.dead = true
-        this.onRemoval(RemovalReason.KILLED)
-        this.kill()
+        this.discard()
     }
 
     override fun isClimbing(): Boolean = false
@@ -204,6 +234,7 @@ abstract class AbstractVolaphyraEntity(entityType: EntityType<out AbstractVolaph
 
     companion object {
         const val GRAVITY_VALUE = 0.003
+
         fun createAttributes(): DefaultAttributeContainer.Builder {
             return HostileEntity.createAttributes()
                 .add(EntityAttributes.GENERIC_MAX_HEALTH, 1.0)

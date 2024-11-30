@@ -14,7 +14,7 @@ object Utils {
     const val pi = 3.1415927f
     const val degToRad = 0.017453292f
     const val radToDeg = 57.295776f
-    const val rotate45 = 0.785f
+    const val rotate45 = 0.7854f
     const val rotate90 = 1.571f
     const val rotate135 = 2.356f
     const val rotate180 = 3.142f

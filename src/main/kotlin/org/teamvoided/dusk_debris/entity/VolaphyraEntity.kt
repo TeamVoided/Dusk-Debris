@@ -4,7 +4,6 @@ import net.minecraft.entity.*
 import net.minecraft.entity.ai.goal.RevengeGoal
 import net.minecraft.entity.ai.goal.UniversalAngerGoal
 import net.minecraft.entity.attribute.DefaultAttributeContainer
-import net.minecraft.entity.attribute.EntityAttributeModifier
 import net.minecraft.entity.attribute.EntityAttributes
 import net.minecraft.entity.damage.DamageSource
 import net.minecraft.entity.data.DataTracker
@@ -13,17 +12,13 @@ import net.minecraft.entity.data.TrackedDataHandlerRegistry
 import net.minecraft.entity.projectile.ProjectileEntity
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.sound.SoundEvent
-import net.minecraft.util.Identifier
 import net.minecraft.util.TimeHelper
 import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.MathHelper
 import net.minecraft.util.math.Vec3d
 import net.minecraft.util.math.int_provider.UniformIntProvider
 import net.minecraft.world.LocalDifficulty
 import net.minecraft.world.ServerWorldAccess
 import net.minecraft.world.World
-import org.joml.Vector3f
-import org.teamvoided.dusk_debris.DuskDebris.id
 import org.teamvoided.dusk_debris.init.DuskEntities
 
 class VolaphyraEntity(entityType: EntityType<out VolaphyraEntity>, world: World) :
@@ -79,25 +74,40 @@ class VolaphyraEntity(entityType: EntityType<out VolaphyraEntity>, world: World)
         if (this.isAlive)
             if (!this.isLaunched) {
                 if (this.canAiMove()) {
-                    val gravity = this.getAttributeInstance(EntityAttributes.GENERIC_GRAVITY)?.value
+                    this.velocity = velocity.multiply(0.9)
+                    if (this.hoverPos != BlockPos.ORIGIN) {
+                        if (this.propulsionTicks == 10) {
+                            propulse()
+                        } else if ((this.propulsionTicks >= 40 && checkCollisionForPathing()) || this.propulsionTicks >= 60) {
+                            world.sendEntityStatus(this, 19.toByte())
+                        }
+                    }
                     this.updateVelocity(0.01f, movementInput)
                     this.move(MovementType.SELF, this.velocity)
-                    this.velocity = velocity.multiply(0.9)
-                    if (this.hoverPos != BlockPos.ORIGIN && (this.age % 60 == 0 || checkCollisionForPathing())) {
-                        val distance = this.hoverPos.ofCenter().subtract(this.pos)
-                        var moveDirection = distance.normalize().multiply(0.25)
-                        if (moveDirection.y < 0)
-                            moveDirection = moveDirection.multiply(1.0, -0.5, 1.0)
-                        this.velocity = this.velocity.add(moveDirection)
-                    }
-                    this.velocity = velocity.add(0.0, -gravity!!, 0.0)
+                    gravity()
                 } else {
                     this.velocity = Vec3d.ZERO
                 }
             } else {
-                this.updateVelocity(1f, movementInput)
+                this.updateVelocity(0.01f, movementInput)
                 this.move(MovementType.SELF, this.velocity)
             }
+    }
+
+    fun propulse() {
+        val direction = this.hoverPos.ofCenter().subtract(this.pos)
+        var moveDirection = direction.normalize()
+        moveDirection = moveDirection.multiply(0.25)
+        if (moveDirection.y < 0)
+            moveDirection = moveDirection.multiply(1.0, 0.0, 1.0)
+        if (direction.horizontalLength() < 1)
+            moveDirection.multiply(0.5, 1.0, 0.5)
+        this.velocity = this.velocity.add(moveDirection)
+    }
+
+    fun gravity() {
+        val gravity = this.getAttributeInstance(EntityAttributes.GENERIC_GRAVITY)?.value
+        this.velocity = velocity.add(0.0, -gravity!!, 0.0)
     }
 
     override fun shouldRender(distance: Double): Boolean {
@@ -118,7 +128,6 @@ class VolaphyraEntity(entityType: EntityType<out VolaphyraEntity>, world: World)
 
     override fun writeCustomDataToNbt(nbt: NbtCompound) {
         super.writeCustomDataToNbt(nbt)
-        this.writeAngerToNbt(nbt)
         nbt.putInt("HoverPosX", hoverPos.x)
         nbt.putInt("HoverPosY", hoverPos.y)
         nbt.putInt("HoverPosZ", hoverPos.z)
@@ -126,7 +135,6 @@ class VolaphyraEntity(entityType: EntityType<out VolaphyraEntity>, world: World)
 
     override fun readCustomDataFromNbt(nbt: NbtCompound) {
         super.readCustomDataFromNbt(nbt)
-        this.readAngerFromNbt(this.world, nbt)
         val hoverX = nbt.getInt("HoverPosX")
         val hoverY = nbt.getInt("HoverPosY")
         val hoverZ = nbt.getInt("HoverPosZ")
@@ -139,31 +147,28 @@ class VolaphyraEntity(entityType: EntityType<out VolaphyraEntity>, world: World)
             val sourceEntity = source.source
             val sourcePos = source.position
             val velocity: Vec3d = if (source.source is ProjectileEntity) {
-                sourceEntity!!.velocity
+                sourceEntity!!.velocity.multiply(-1.0)
             } else if (sourcePos != null) {
                 sourcePos.subtract(pos)
             } else {
                 Vec3d(0.0, 1.0, 0.0)
             }
-            take3DKnockback(MathHelper.sqrt(5f * amount) + 1.0, velocity.x, velocity.y, velocity.z)
+            take3DKnockback(5.0, velocity.x, velocity.y, velocity.z)
         }
     }
 
-    override fun take3DKnockback(strengthInput: Double, xInput: Double, yInput: Double, zInput: Double) {
+    override fun take3DKnockback(strengthInput: Double, x: Double, y: Double, z: Double) {
         isLaunched = true
-        super.take3DKnockback(strengthInput, xInput, yInput, zInput)
+        super.take3DKnockback(strengthInput, x, y, z)
     }
 
     override fun onDestroyed() {
-        super.onDestroyed()
-        val text = this.customName
-        val disabledAI = this.isAiDisabled
         val bombEntity = DuskEntities.VOLAPHYRA_CORE.create(this.world) as VolaphyraCoreEntity
         if (this.isPersistent) {
             bombEntity.setPersistent()
         }
-        bombEntity.customName = text
-        bombEntity.isAiDisabled = disabledAI
+        bombEntity.customName = this.customName
+        bombEntity.isAiDisabled = this.isAiDisabled
         bombEntity.isInvulnerable = this.isInvulnerable
         bombEntity.target = target
         bombEntity.targetUuid = targetUuid
@@ -172,22 +177,12 @@ class VolaphyraEntity(entityType: EntityType<out VolaphyraEntity>, world: World)
             random.nextFloat() * 360.0f, 0.0f
         )
         world.spawnEntity(bombEntity)
+        super.onDestroyed()
     }
 
     var isLaunched: Boolean
         get() = dataTracker.get(LAUNCHED)
-        set(boolean) {
-            val entityAttributeInstance = this.getAttributeInstance(EntityAttributes.GENERIC_GRAVITY)
-            if (boolean) {
-                dataTracker.set(LAUNCHED, true)
-                entityAttributeInstance!!.removeModifier(LAUNCH_GRAVITY_MODIFIER_ID)
-            } else {
-                dataTracker.set(LAUNCHED, false)
-                if (!entityAttributeInstance!!.hasModifier(LAUNCH_GRAVITY_MODIFIER_ID)) {
-                    entityAttributeInstance.addTemporaryModifier(LAUNCH_GRAVITY_MODIFIER)
-                }
-            }
-        }
+        set(boolean) = dataTracker.set(LAUNCHED, boolean)
 
     var hoverPos: BlockPos
         get() = dataTracker.get(HOVER_POS)
@@ -260,12 +255,6 @@ class VolaphyraEntity(entityType: EntityType<out VolaphyraEntity>, world: World)
 
 
     companion object {
-        private val LAUNCH_GRAVITY_MODIFIER_ID: Identifier = id("launch_gravity")
-        private val LAUNCH_GRAVITY_MODIFIER = EntityAttributeModifier(
-            LAUNCH_GRAVITY_MODIFIER_ID,
-            GRAVITY_VALUE,
-            EntityAttributeModifier.Operation.ADD_VALUE
-        )
         private val LAUNCHED: TrackedData<Boolean> =
             DataTracker.registerData(VolaphyraEntity::class.java, TrackedDataHandlerRegistry.BOOLEAN)
         private val HOVER_POS: TrackedData<BlockPos> =
