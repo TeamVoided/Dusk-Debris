@@ -4,6 +4,7 @@
   "package": "org.teamvoided.dusk_debris.mixin",
   "compatibilityLevel": "JAVA_21",
   "client": [
+    "BackgroundRendererMixin",
     "ExampleMixin"
   ],
   "injectors": {
