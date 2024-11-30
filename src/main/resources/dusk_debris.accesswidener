@@ -19,3 +19,6 @@ accessible method net/minecraft/entity/ai/goal/SkeletonHorseTrapTriggerGoal meth
 
 accessible method net/minecraft/client/particle/VibrationParticle <init> (Lnet/minecraft/client/world/ClientWorld;DDDLnet/minecraft/world/event/PositionSource;I)V
 accessible method net/minecraft/client/particle/Particle setColorAlpha (F)V
+
+accessible class net/minecraft/client/render/BackgroundRenderer$FogEffect
+accessible class net/minecraft/client/render/BackgroundRenderer$FogParameters

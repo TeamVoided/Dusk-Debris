@@ -25,6 +25,7 @@ object DuskDebris {
         DuskBlockFamilies.init()
 
         DuskBlockEntities.init()
+        DuskEffects.init()
         DuskEntities.init()
         DuskWorldgen.init()
         DuskBiomeModifications.init()
@@ -33,7 +34,6 @@ object DuskDebris {
         DuskGameRules.init()
         DuskTabs.init()
     }
-
 
 
     fun id(path: String) = Identifier.of(MODID, path)
