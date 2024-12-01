@@ -33,6 +33,7 @@ class BiomeTagsProvider(o: FabricDataOutput, r: CompletableFuture<HolderLookup.P
         getOrCreateTagBuilder(DuskBiomeTags.FOG_0_50)
             .add(Biomes.DEEP_DARK)
         getOrCreateTagBuilder(DuskBiomeTags.FOG_0_10)
+            .add(Biomes.DRIPSTONE_CAVES)
         getOrCreateTagBuilder(DuskBiomeTags.FOG_20_100)
             .add(Biomes.DARK_FOREST)
 //            .add(Biomes.PALE_GARDEN)

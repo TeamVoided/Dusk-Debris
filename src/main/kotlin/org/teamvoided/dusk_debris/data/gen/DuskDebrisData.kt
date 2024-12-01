@@ -19,6 +19,7 @@ class DuskDebrisData : DataGeneratorEntrypoint {
         log.info("Hello from DataGen")
         val pack = gen.createPack()
         val blockTags = pack.addProvider(::BlockTagsProvider)
+        pack.addProvider(::FluidTagsProvider)
         pack.addProvider { o, r -> ItemTagsProvider(o, r, blockTags) }
         pack.addProvider(::BiomeTagsProvider)
         pack.addProvider(::EntityTypeTagsProvider)

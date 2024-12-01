@@ -40,7 +40,7 @@ object DuskBlocks {
     val CUTOUT_BLOCKS = mutableSetOf<Block>()
     val TRANSLUCENT_BLOCKS = mutableSetOf<Block>()
 
-    val ENTITY_TEST_PARTICLE_BLOCK = register("entity_test_particle_block", EntityTestParticleBlock(copy(STONE))    )
+    val ENTITY_TEST_PARTICLE_BLOCK = register("entity_test_particle_block", EntityTestParticleBlock(copy(STONE)))
 
     val BRONZE_BLOCK = register(
         "bronze_block", Block(
@@ -782,6 +782,7 @@ object DuskBlocks {
                 .pistonBehavior(PistonBehavior.DESTROY)
         )
     )
+
 
     fun init() {
         DuskBlockSetType.init()

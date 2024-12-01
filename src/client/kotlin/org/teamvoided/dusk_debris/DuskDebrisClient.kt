@@ -11,6 +11,7 @@ object DuskDebrisClient {
 
         DuskEntityModelLayers.init()
         DuskBlocksClient.init()
+        DuskFluidsClient.init()
         DuskItemsClient.init()
         DuskParticlesClient.init()
         DuskEntitiesClient.init()

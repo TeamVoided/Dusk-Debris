@@ -20,20 +20,21 @@ fun customizeFog(
     viewDistance: Float,
     thickFog: Boolean,
     tickDelta: Float,
-    exsistingParams: BackgroundRenderer.FogParameters
+    exsistingParams: BackgroundRenderer.FogParameters,
+    fogEffect: BackgroundRenderer.FogEffect?
 ) {
+    if (fogEffect != null) return
+
     val submergeType = camera.submersionType
     if (submergeType != CameraSubmersionType.NONE) return
-    var world = entity.world
-    if (!world.isClient) return
 
-    world = world as ClientWorld
+    val world = entity.world as ClientWorld
     val biomeAccess: BiomeAccess = world.biomeAccess
     val position: Vec3d = camera.pos.subtract(2.0, 2.0, 2.0).multiply(0.25)
     val sampler = CubicSampler.sampleVec3d(position) { x: Int, y: Int, z: Int ->
         getFogRange(biomeAccess.getBiomeForNoiseGen(x, y, z))
     }
-    if (sampler.x >= 1 && sampler.y >= 1) return
+    if (sampler.x == 1.0 && sampler.y == 1.0) return
 
     var start = RenderSystem.getShaderFogStart() * sampler.x.toFloat()
     var end = RenderSystem.getShaderFogEnd() * sampler.y.toFloat()
@@ -44,7 +45,6 @@ fun customizeFog(
     }
     RenderSystem.setShaderFogStart(start)
     RenderSystem.setShaderFogEnd(end)
-//    !world.getBiome(entity.blockPos).value().hasPrecipitation()
 }
 
 fun getFogRange(biome: Holder<Biome>): Vec3d {

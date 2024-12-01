@@ -22,6 +22,7 @@ object DuskDebris {
         log.info("Hello from Common")
         DuskItems.init()
         DuskBlocks.init()
+        DuskFluids.init()
         DuskBlockFamilies.init()
 
         DuskBlockEntities.init()
