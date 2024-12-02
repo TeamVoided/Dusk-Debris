@@ -10,7 +10,7 @@ import org.teamvoided.dusk_debris.data.tags.DuskPaintingVariantTags
 import org.teamvoided.dusk_debris.data.DuskPaintingVariants
 import java.util.concurrent.CompletableFuture
 
-class PaintingVariantProvider(o: FabricDataOutput, r: CompletableFuture<HolderLookup.Provider>) :
+class PaintingVariantTagsProvider(o: FabricDataOutput, r: CompletableFuture<HolderLookup.Provider>) :
     FabricTagProvider<PaintingVariant>(o, RegistryKeys.PAINTING_VARIANT, r) {
     override fun configure(arg: HolderLookup.Provider) {
         duskTags()

@@ -5,10 +5,7 @@ import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator
 import net.minecraft.registry.RegistryKeys
 import net.minecraft.registry.RegistrySetBuilder
 import org.teamvoided.dusk_debris.DuskDebris.log
-import org.teamvoided.dusk_debris.data.gen.providers.EnglishTranslationProvider
-import org.teamvoided.dusk_debris.data.gen.providers.ModelProvider
-import org.teamvoided.dusk_debris.data.gen.providers.EntityLootTableProvider
-import org.teamvoided.dusk_debris.data.gen.providers.PaintingVariants
+import org.teamvoided.dusk_debris.data.gen.providers.*
 import org.teamvoided.dusk_debris.data.gen.tags.*
 import org.teamvoided.dusk_debris.data.gen.world.gen.ConfiguredFeatureCreator
 import org.teamvoided.dusk_debris.data.gen.world.gen.PlacedFeatureCreator
@@ -30,7 +27,7 @@ class DuskDebrisData : DataGeneratorEntrypoint {
 //        pack.addProvider(::RecipesProvider)
 //        pack.addProvider(::BlockLootTableProvider)
         pack.addProvider(::EntityLootTableProvider)
-        pack.addProvider(::PaintingVariantProvider)
+        pack.addProvider(::PaintingVariantTagsProvider)
     }
 
     override fun buildRegistry(gen: RegistrySetBuilder) {
@@ -38,5 +35,6 @@ class DuskDebrisData : DataGeneratorEntrypoint {
         gen.add(RegistryKeys.CONFIGURED_FEATURE, ConfiguredFeatureCreator::bootstrap)
         gen.add(RegistryKeys.PLACED_FEATURE, PlacedFeatureCreator::bootstrap)
         gen.add(RegistryKeys.PAINTING_VARIANT, PaintingVariants::bootstrap)
+        gen.add(RegistryKeys.ENCHANTMENT, Enchantments::bootstrap)
     }
 }
