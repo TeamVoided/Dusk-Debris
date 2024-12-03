@@ -6,7 +6,7 @@ import net.minecraft.registry.HolderLookup
 import net.minecraft.registry.RegistryKeys
 import java.util.concurrent.CompletableFuture
 
-class WorldgenProvider(o: FabricDataOutput, r: CompletableFuture<HolderLookup.Provider>) :
+class DynamicRegistryProvider(o: FabricDataOutput, r: CompletableFuture<HolderLookup.Provider>) :
     FabricDynamicRegistryProvider(o, r) {
 
     override fun getName(): String = "dusk-debris"

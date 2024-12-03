@@ -23,7 +23,7 @@ class DuskDebrisData : DataGeneratorEntrypoint {
         pack.addProvider(::DamageTypeTagsProvider)
         pack.addProvider(::ModelProvider)
         pack.addProvider(::EnglishTranslationProvider)
-        pack.addProvider(::WorldgenProvider)
+        pack.addProvider(::DynamicRegistryProvider)
 //        pack.addProvider(::RecipesProvider)
 //        pack.addProvider(::BlockLootTableProvider)
         pack.addProvider(::EntityLootTableProvider)

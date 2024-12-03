@@ -14,3 +14,8 @@ fun Enchantment.treasure(): Enchantment {
     return this
 }
 
+fun Enchantment.particle(): Enchantment {
+    Enchantments.ENCHANTMENT_PARTICLE.add(this)
+    return this
+}
+
