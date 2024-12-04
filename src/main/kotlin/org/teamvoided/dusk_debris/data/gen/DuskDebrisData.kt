@@ -21,6 +21,7 @@ class DuskDebrisData : DataGeneratorEntrypoint {
         pack.addProvider(::BiomeTagsProvider)
         pack.addProvider(::EntityTypeTagsProvider)
         pack.addProvider(::DamageTypeTagsProvider)
+        pack.addProvider(::EnchantmentTagsProvider)
         pack.addProvider(::ModelProvider)
         pack.addProvider(::EnglishTranslationProvider)
         pack.addProvider(::DynamicRegistryProvider)
@@ -35,6 +36,6 @@ class DuskDebrisData : DataGeneratorEntrypoint {
         gen.add(RegistryKeys.CONFIGURED_FEATURE, ConfiguredFeatureCreator::bootstrap)
         gen.add(RegistryKeys.PLACED_FEATURE, PlacedFeatureCreator::bootstrap)
         gen.add(RegistryKeys.PAINTING_VARIANT, PaintingVariants::bootstrap)
-        gen.add(RegistryKeys.ENCHANTMENT, Enchantments::bootstrap)
+        gen.add(RegistryKeys.ENCHANTMENT, EnchantmentsProvider::bootstrap)
     }
 }
