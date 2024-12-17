@@ -12,7 +12,9 @@ import net.minecraft.util.math.int_provider.ConstantIntProvider
 import net.minecraft.world.gen.YOffset
 import net.minecraft.world.gen.blockpredicate.BlockPredicate
 import net.minecraft.world.gen.decorator.*
-import net.minecraft.world.gen.feature.*
+import net.minecraft.world.gen.feature.ConfiguredFeature
+import net.minecraft.world.gen.feature.PlacedFeature
+import net.minecraft.world.gen.feature.PlacementModifier
 import net.minecraft.world.gen.feature.util.PlacedFeatureUtil
 import org.teamvoided.dusk_debris.data.DuskConfiguredFeatures
 import org.teamvoided.dusk_debris.data.DuskPlacedFeatures
@@ -113,6 +115,15 @@ object PlacedFeatureCreator {
             RarityFilterPlacementModifier.create(100),
             InSquarePlacementModifier.getInstance(),
             PlacedFeatureUtil.OCEAN_FLOOR_WG_HEIGHTMAP,
+            BiomePlacementModifier.getInstance()
+        )
+
+        c.register(
+            DuskPlacedFeatures.FREEZING_WOODS_VEGETATION, DuskConfiguredFeatures.FREEZING_WOODS_VEGETATION,
+            CountPlacementModifier.create(16),
+            InSquarePlacementModifier.getInstance(),
+            SurfaceWaterDepthFilterPlacementModifier.create(0),
+            PlacedFeatureUtil.OCEAN_FLOOR_HEIGHTMAP,
             BiomePlacementModifier.getInstance()
         )
     }

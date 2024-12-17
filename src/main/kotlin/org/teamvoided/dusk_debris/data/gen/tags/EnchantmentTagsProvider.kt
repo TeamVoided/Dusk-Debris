@@ -5,6 +5,7 @@ import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider
 import net.minecraft.enchantment.Enchantment
 import net.minecraft.enchantment.Enchantments
 import net.minecraft.registry.HolderLookup
+import net.minecraft.registry.RegistryKey
 import net.minecraft.registry.RegistryKeys
 import net.minecraft.registry.tag.EnchantmentTags
 import org.teamvoided.dusk_debris.data.DuskEnchantments
@@ -21,7 +22,7 @@ class EnchantmentTagsProvider(o: FabricDataOutput, r: CompletableFuture<HolderLo
 
     fun duskTags() {
         getOrCreateTagBuilder(DuskEnchantmentTags.PARTICLE_EXCLUSIVE_SET)
-            .add(EnchantmentsProvider.ENCHANTMENT_PARTICLE)
+            .add(DuskEnchantments.ENCHANTMENT_PARTICLE)
 
         getOrCreateTagBuilder(DuskEnchantmentTags.MENDING_EXCLUSIVE_SET)
             .add(Enchantments.MENDING)
@@ -33,16 +34,21 @@ class EnchantmentTagsProvider(o: FabricDataOutput, r: CompletableFuture<HolderLo
 
     fun vanillaTags() {
         getOrCreateTagBuilder(EnchantmentTags.CURSE)
-            .add(EnchantmentsProvider.CURSES)
+            .add(DuskEnchantments.CURSES)
         getOrCreateTagBuilder(EnchantmentTags.TREASURE)
-            .add(EnchantmentsProvider.TREASURE)
+            .add(DuskEnchantments.TREASURE)
         getOrCreateTagBuilder(EnchantmentTags.NON_TREASURE)
-            .add(EnchantmentsProvider.ENCHANTMENTS.filterNot(EnchantmentsProvider.TREASURE::contains))
+            .add(DuskEnchantments.ENCHANTMENTS.filterNot(DuskEnchantments.TREASURE::contains))
     }
 
     fun conventionTags() {}
 
-    fun <T> FabricTagProvider<T>.FabricTagBuilder.add(list: Collection<T>): FabricTagProvider<T>.FabricTagBuilder {
+    fun <T> FabricTagProvider<T>.FabricTagBuilder.addList(list: Collection<T>): FabricTagProvider<T>.FabricTagBuilder {
+        list.forEach { this.add(it) }
+        return this
+    }
+
+    fun FabricTagProvider<Enchantment>.FabricTagBuilder.add(list: Collection<RegistryKey<Enchantment>>): FabricTagProvider<Enchantment>.FabricTagBuilder {
         list.forEach { this.add(it) }
         return this
     }

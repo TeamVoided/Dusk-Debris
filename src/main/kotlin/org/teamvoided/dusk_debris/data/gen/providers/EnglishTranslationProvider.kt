@@ -10,6 +10,7 @@ import net.minecraft.registry.HolderLookup
 import net.minecraft.registry.Registries
 import net.minecraft.util.Identifier
 import net.minecraft.util.Util
+import org.teamvoided.dusk_debris.data.DuskEnchantments
 import org.teamvoided.dusk_debris.entity.DuskEntityLists
 import org.teamvoided.dusk_debris.init.*
 import org.teamvoided.dusk_debris.init.DuskTabs.getKey

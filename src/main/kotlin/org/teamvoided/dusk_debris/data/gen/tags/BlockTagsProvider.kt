@@ -2,6 +2,7 @@ package org.teamvoided.dusk_debris.data.gen.tags
 
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider
+import net.fabricmc.fabric.api.tag.convention.v2.ConventionalBlockTags
 import net.minecraft.block.Blocks
 import net.minecraft.registry.HolderLookup
 import net.minecraft.registry.tag.BlockTags
@@ -68,6 +69,29 @@ class BlockTagsProvider(output: FabricDataOutput, registriesFuture: CompletableF
             .forceAddTag(DuskBlockTags.NETHERSHROOM_GROWABLE_ON)
             .forceAddTag(DuskBlockTags.NETHERSHROOM_REPLACEABLE)
             .add(DuskBlocks.NETHERSHROOM_STEM)
+
+        getOrCreateTagBuilder(DuskBlockTags.MIDAS_DEEPSLATE_GOLD_ORE)
+            .forceAddTag(DuskBlockTags.CONVENTIONAL_DEEPSLATE_ORES)
+        getOrCreateTagBuilder(DuskBlockTags.MIDAS_GOLD_ORE)
+            .forceAddTag(DuskBlockTags.CONVENTIONAL_STONE_ORES)
+        getOrCreateTagBuilder(DuskBlockTags.MIDAS_NETHER_GOLD_ORE)
+            .forceAddTag(DuskBlockTags.CONVENTIONAL_NETHERRACK_ORES)
+        getOrCreateTagBuilder(DuskBlockTags.MIDAS_RAW_GOLD_BLOCK)
+            .forceAddTag(DuskBlockTags.CONVENTIONAL_RAW_ORE_BLOCKS)
+        getOrCreateTagBuilder(DuskBlockTags.MIDAS_GOLD_BLOCK)
+            .forceAddTag(ConventionalBlockTags.STORAGE_BLOCKS_COAL)
+            .forceAddTag(ConventionalBlockTags.STORAGE_BLOCKS_COPPER)
+            .forceAddTag(ConventionalBlockTags.STORAGE_BLOCKS_IRON)
+            .forceAddTag(ConventionalBlockTags.STORAGE_BLOCKS_REDSTONE)
+            .forceAddTag(ConventionalBlockTags.STORAGE_BLOCKS_LAPIS)
+            .forceAddTag(ConventionalBlockTags.STORAGE_BLOCKS_DIAMOND)
+            .forceAddTag(ConventionalBlockTags.STORAGE_BLOCKS_EMERALD)
+            .forceAddTag(ConventionalBlockTags.STORAGE_BLOCKS_NETHERITE)
+        getOrCreateTagBuilder(DuskBlockTags.MIDAS_GOLD_PRESSURE_PLATE)
+            .add(Blocks.HEAVY_WEIGHTED_PRESSURE_PLATE)
+        getOrCreateTagBuilder(DuskBlockTags.MIDAS_GILDED_BLACKSTONE)
+            .forceAddTag(ConventionalBlockTags.NETHERITE_SCRAP_ORES)
+
     }
 
     private fun vanillaTags() {
@@ -116,5 +140,27 @@ class BlockTagsProvider(output: FabricDataOutput, registriesFuture: CompletableF
             .add(DuskBlocks.CHARRED_FENCE_GATE)
     }
 
-    private fun conventionTags() {}
+    private fun conventionTags() {
+        getOrCreateTagBuilder(DuskBlockTags.CONVENTIONAL_DEEPSLATE_ORES)
+            .add(Blocks.DEEPSLATE_COAL_ORE)
+            .add(Blocks.DEEPSLATE_COPPER_ORE)
+            .add(Blocks.DEEPSLATE_IRON_ORE)
+            .add(Blocks.DEEPSLATE_REDSTONE_ORE)
+            .add(Blocks.DEEPSLATE_LAPIS_ORE)
+            .add(Blocks.DEEPSLATE_DIAMOND_ORE)
+            .add(Blocks.DEEPSLATE_EMERALD_ORE)
+        getOrCreateTagBuilder(DuskBlockTags.CONVENTIONAL_STONE_ORES)
+            .add(Blocks.COAL_ORE)
+            .add(Blocks.COPPER_ORE)
+            .add(Blocks.IRON_ORE)
+            .add(Blocks.REDSTONE_ORE)
+            .add(Blocks.LAPIS_ORE)
+            .add(Blocks.DIAMOND_ORE)
+            .add(Blocks.EMERALD_ORE)
+        getOrCreateTagBuilder(DuskBlockTags.CONVENTIONAL_NETHERRACK_ORES)
+            .add(Blocks.NETHER_QUARTZ_ORE)
+        getOrCreateTagBuilder(DuskBlockTags.CONVENTIONAL_RAW_ORE_BLOCKS)
+            .add(Blocks.RAW_IRON_BLOCK)
+            .add(Blocks.RAW_COPPER_BLOCK)
+    }
 }

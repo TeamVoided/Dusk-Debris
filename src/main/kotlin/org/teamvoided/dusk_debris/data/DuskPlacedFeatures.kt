@@ -8,22 +8,24 @@ import org.teamvoided.dusk_debris.DuskDebris.id
 @Suppress("MemberVisibilityCanBePrivate")
 object DuskPlacedFeatures {
 
-    val CYPRESS= create("cypress")
-    val TALL_CYPRESS = create("tall_cypress")
-    val TREES_SWAMP = create("trees_swamp")
-    val TREES_SWAMP_EXTRA = create("trees_swamp_extra")
+    val CYPRESS= create("swamp/cypress")
+    val TALL_CYPRESS = create("swamp/tall_cypress")
+    val TREES_SWAMP = create("swamp/trees_swamp")
+    val TREES_SWAMP_EXTRA = create("swamp/trees_swamp_extra")
 
 
-    val HUGE_BLUE_NETHERSHROOM = create("huge_blue_nethershroom")
-    val WARPED_BLUE_NETHERSHROOM_PATCH = create("warped_blue_nethershroom_patch")
-    val BLUE_NETHERSHROOM_PATCH = create("blue_nethershroom_patch")
+    val HUGE_BLUE_NETHERSHROOM = create("nether/huge_blue_nethershroom")
+    val WARPED_BLUE_NETHERSHROOM_PATCH = create("nether/warped_blue_nethershroom_patch")
+    val BLUE_NETHERSHROOM_PATCH = create("nether/blue_nethershroom_patch")
 
-    val HUGE_PURPLE_NETHERSHROOM = create("huge_purple_nethershroom")
-    val CRIMSON_PURPLE_NETHERSHROOM_PATCH = create("crimson_purple_nethershroom_patch")
-    val PURPLE_NETHERSHROOM_PATCH = create("purple_nethershroom_patch")
+    val HUGE_PURPLE_NETHERSHROOM = create("nether/huge_purple_nethershroom")
+    val CRIMSON_PURPLE_NETHERSHROOM_PATCH = create("nether/crimson_purple_nethershroom_patch")
+    val PURPLE_NETHERSHROOM_PATCH = create("nether/purple_nethershroom_patch")
 
     val TORUS = create("torus")
     val OVERWORLD_TORUS = create("overworld_torus")
+
+    val FREEZING_WOODS_VEGETATION = create("freezing_woods/freezing_woods_vegetation")
 
     fun create(id: String): RegistryKey<PlacedFeature> =
         RegistryKey.of(RegistryKeys.PLACED_FEATURE, id(id))

@@ -28,8 +28,10 @@ import org.teamvoided.dusk_debris.data.DuskPlacedFeatures
 import org.teamvoided.dusk_debris.data.tags.DuskBlockTags
 import org.teamvoided.dusk_debris.init.DuskBlocks
 import org.teamvoided.dusk_debris.init.worldgen.DuskFeatures
+import org.teamvoided.dusk_debris.world.gen.configured_feature.ThresholdPlacedFeature
 import org.teamvoided.dusk_debris.world.gen.configured_feature.config.GlassSpikeFeatureConfig
 import org.teamvoided.dusk_debris.world.gen.configured_feature.config.HugeNethershroomFeatureConfig
+import org.teamvoided.dusk_debris.world.gen.configured_feature.config.NoiseFeatureConfig
 import org.teamvoided.dusk_debris.world.gen.configured_feature.config.TorusFeatureConfig
 import org.teamvoided.dusk_debris.world.gen.foliage.CypressFoliagePlacer
 import org.teamvoided.dusk_debris.world.gen.root.CypressRootPlacer
@@ -311,6 +313,26 @@ object ConfiguredFeatureCreator {
             RandomBooleanFeatureConfig(
                 c.emptyPlaceInLine(DuskConfiguredFeatures.COBBLESTONE_TORUS),
                 c.emptyPlaceInLine(DuskConfiguredFeatures.STONE_TORUS),
+            )
+        )
+
+        c.registerConfiguredFeature(
+            DuskConfiguredFeatures.FREEZING_WOODS_VEGETATION,
+            DuskFeatures.RANDOM_NOISE_SELECTOR,
+            NoiseFeatureConfig(
+                -6,
+                listOf(1.25, 2.0, 0.0, -2.0),
+                listOf(
+                    ThresholdPlacedFeature(
+                        placedFeatures.getHolderOrThrow(TreePlacedFeatures.DARK_OAK_CHECKED),
+                        -0.25f
+                    ),
+                    ThresholdPlacedFeature(
+                        placedFeatures.getHolderOrThrow(TreePlacedFeatures.MEGA_SPRUCE_CHECKED),
+                        0.25f
+                    )
+                ),
+                placedFeatures.getHolderOrThrow(TreePlacedFeatures.SPRUCE_CHECKED)
             )
         )
     }

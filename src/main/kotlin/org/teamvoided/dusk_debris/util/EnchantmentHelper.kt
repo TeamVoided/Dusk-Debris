@@ -26,76 +26,25 @@ import net.minecraft.registry.RegistryKeys
 import net.minecraft.registry.tag.ItemTags
 import net.minecraft.registry.tag.TagKey
 import net.minecraft.util.math.float_provider.ConstantFloatProvider
+import org.teamvoided.dusk_debris.data.DuskEnchantments
 import org.teamvoided.dusk_debris.data.gen.providers.EnchantmentsProvider
 import org.teamvoided.dusk_debris.data.gen.providers.EnchantmentsProvider.register
 import org.teamvoided.dusk_debris.data.tags.DuskEnchantmentTags
 
 
-fun Enchantment.curse(): Enchantment {
-    EnchantmentsProvider.CURSES.add(this)
+fun RegistryKey<Enchantment>.curse(): RegistryKey<Enchantment> {
+    DuskEnchantments.CURSES.add(this)
     return this
 }
 
-fun Enchantment.treasure(): Enchantment {
-    EnchantmentsProvider.TREASURE.add(this)
+fun RegistryKey<Enchantment>.treasure(): RegistryKey<Enchantment> {
+    DuskEnchantments.TREASURE.add(this)
     return this
 }
 
-fun Enchantment.particle(): Enchantment {
-    EnchantmentsProvider.ENCHANTMENT_PARTICLE.add(this)
+fun RegistryKey<Enchantment>.particle(): RegistryKey<Enchantment> {
+    DuskEnchantments.ENCHANTMENT_PARTICLE.add(this)
     return this
-}
-
-fun BootstrapContext<Enchantment>.particleEnchantment(
-    registryKey: RegistryKey<Enchantment>,
-    particle: ParticleEffect,
-    chance: Float,
-    tag: TagKey<Item> = ItemTags.ARMOR_ENCHANTABLE,
-    horizontalPosition: SpawnParticles.PositionSource = SpawnParticles.inBoundingBox(),
-    verticalPosition: SpawnParticles.PositionSource = SpawnParticles.inBoundingBox(),
-    horizontalVelocity: SpawnParticles.VelocitySource = SpawnParticles.VelocitySource(0f, ConstantFloatProvider.ZERO),
-    verticalVelocity: SpawnParticles.VelocitySource = SpawnParticles.VelocitySource(0f, ConstantFloatProvider.ZERO)
-): Enchantment {
-    val enchantment: HolderProvider<Enchantment> = this.getRegistryLookup(RegistryKeys.ENCHANTMENT)
-    val item: HolderProvider<Item> = this.getRegistryLookup(RegistryKeys.ITEM)
-    return this.register(
-        registryKey,
-        Enchantment.builder(
-            Enchantment.createProperties(
-                item.getTagOrThrow(tag),
-                1,
-                1,
-                Enchantment.cost(1),
-                Enchantment.cost(1),
-                1,
-                EquipmentSlotGroup.ANY
-            )
-        )
-            .withExclusiveSet(enchantment.getTagOrThrow(DuskEnchantmentTags.PARTICLE_EXCLUSIVE_SET))
-            .addEffect(
-                EnchantmentEffectComponentTypes.TICK,
-                SpawnParticles(
-                    particle,
-                    horizontalPosition,
-                    verticalPosition,
-                    horizontalVelocity,
-                    verticalVelocity,
-                    ConstantFloatProvider.create(1f)
-                ),
-                AllOfLootCondition.builder(
-                    RandomChanceLootCondition.method_932(chance),
-                    InvertedLootCondition.builder(
-                        EntityPropertiesLootCondition.builder(
-                            LootContext.EntityTarget.THIS,
-                            EntityPredicate.Builder.create().equipment(
-                                EntityEquipmentPredicate.Builder.create()
-                                    .mainhand(itemIsInTag(ItemTags.ARMOR_ENCHANTABLE))
-                            )
-                        )
-                    )
-                )
-            )
-    ).particle().treasure()
 }
 
 

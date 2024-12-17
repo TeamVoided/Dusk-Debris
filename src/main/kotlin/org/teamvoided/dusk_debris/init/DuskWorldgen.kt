@@ -11,6 +11,7 @@ import net.minecraft.world.gen.root.RootPlacerType
 import net.minecraft.world.gen.trunk.TrunkPlacer
 import net.minecraft.world.gen.trunk.TrunkPlacerType
 import org.teamvoided.dusk_debris.DuskDebris.id
+import org.teamvoided.dusk_debris.init.worldgen.DuskBiomes
 import org.teamvoided.dusk_debris.init.worldgen.DuskFeatures
 import org.teamvoided.dusk_debris.world.gen.foliage.CypressFoliagePlacer
 
@@ -21,6 +22,7 @@ object DuskWorldgen {
 
 
     fun init() {
+        DuskBiomes.init()
         DuskFeatures.init()
     }
 

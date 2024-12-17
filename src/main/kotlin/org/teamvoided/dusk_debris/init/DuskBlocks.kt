@@ -604,6 +604,7 @@ object DuskBlocks {
                 .sounds(BlockSoundGroup.SAND)
         )
     )
+    @JvmStatic
     val SUSPICIOUS_VOLCANIC_SAND = register(
         "suspicious_volcanic_sand",
         BrushableBlock(

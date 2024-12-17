@@ -12,6 +12,7 @@ class DynamicRegistryProvider(o: FabricDataOutput, r: CompletableFuture<HolderLo
     override fun getName(): String = "dusk-debris"
 
     override fun configure(reg: HolderLookup.Provider, e: Entries) {
+        e.addAll(reg.getLookupOrThrow(RegistryKeys.BIOME))
         e.addAll(reg.getLookupOrThrow(RegistryKeys.PLACED_FEATURE))
         e.addAll(reg.getLookupOrThrow(RegistryKeys.CONFIGURED_FEATURE))
         e.addAll(reg.getLookupOrThrow(RegistryKeys.PAINTING_VARIANT))

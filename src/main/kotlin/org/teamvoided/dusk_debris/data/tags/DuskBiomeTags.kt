@@ -15,5 +15,7 @@ object DuskBiomeTags {
     val FOG_0_10 = create("fog/0_10")
     val FOG_20_100 = create("fog/20_100")
 
+    val FOG_FREEZING_FOREST = create("fog/special/freezing_forest")
+
     fun create(id: String): TagKey<Biome> = TagKey.of(RegistryKeys.BIOME, id(id))
 }

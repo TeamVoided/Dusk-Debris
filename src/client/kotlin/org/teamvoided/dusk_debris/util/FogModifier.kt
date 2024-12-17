@@ -12,6 +12,7 @@ import net.minecraft.util.math.Vec3d
 import net.minecraft.world.biome.Biome
 import net.minecraft.world.biome.source.BiomeAccess
 import org.teamvoided.dusk_debris.data.tags.DuskBiomeTags
+import kotlin.math.cos
 
 fun customizeFog(
     camera: Camera,
@@ -32,7 +33,7 @@ fun customizeFog(
     val biomeAccess: BiomeAccess = world.biomeAccess
     val position: Vec3d = camera.pos.subtract(2.0, 2.0, 2.0).multiply(0.25)
     val sampler = CubicSampler.sampleVec3d(position) { x: Int, y: Int, z: Int ->
-        getFogRange(biomeAccess.getBiomeForNoiseGen(x, y, z))
+        getFogRange(biomeAccess.getBiomeForNoiseGen(x, y, z), world)
     }
     if (sampler.x == 1.0 && sampler.y == 1.0) return
 
@@ -47,9 +48,9 @@ fun customizeFog(
     RenderSystem.setShaderFogEnd(end)
 }
 
-fun getFogRange(biome: Holder<Biome>): Vec3d {
+fun getFogRange(biome: Holder<Biome>, world: ClientWorld): Vec3d {
     val start: Double
-    val end: Double
+    var end: Double
     if (biome.isIn(DuskBiomeTags.FOG_0_100)) {
         start = 0.0
         end = 1.0
@@ -65,6 +66,9 @@ fun getFogRange(biome: Holder<Biome>): Vec3d {
     } else {
         start = 1.0
         end = 1.0
+    }
+    if (biome.isIn(DuskBiomeTags.FOG_FREEZING_FOREST)) {
+        end *= 0.66667 + (cos(0.02f * world.time) / 3)
     }
     return Vec3d(start, end, 0.0)
 }

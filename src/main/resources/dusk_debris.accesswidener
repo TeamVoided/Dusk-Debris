@@ -22,3 +22,5 @@ accessible method net/minecraft/client/particle/Particle setColorAlpha (F)V
 
 accessible class net/minecraft/client/render/BackgroundRenderer$FogEffect
 accessible class net/minecraft/client/render/BackgroundRenderer$FogParameters
+
+accessible method net/minecraft/world/biome/OverworldBiomeCreator addBasicFeatures (Lnet/minecraft/world/biome/GenerationSettings$Builder;)V
