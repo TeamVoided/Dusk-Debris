@@ -317,23 +317,28 @@ object ConfiguredFeatureCreator {
         )
 
         c.registerConfiguredFeature(
-            DuskConfiguredFeatures.FREEZING_WOODS_VEGETATION,
+            DuskConfiguredFeatures.BOREAL_VALLEY_VEGETATION,
             DuskFeatures.RANDOM_NOISE_SELECTOR,
             NoiseFeatureConfig(
                 -6,
                 listOf(1.25, 2.0, 0.0, -2.0),
                 listOf(
                     ThresholdPlacedFeature(
-                        placedFeatures.getHolderOrThrow(TreePlacedFeatures.DARK_OAK_CHECKED),
-                        -0.25f
-                    ),
-                    ThresholdPlacedFeature(
                         placedFeatures.getHolderOrThrow(TreePlacedFeatures.MEGA_SPRUCE_CHECKED),
                         0.25f
+                    ),
+                    ThresholdPlacedFeature(
+                        placedFeatures.getHolderOrThrow(TreePlacedFeatures.DARK_OAK_CHECKED),
+                        -0.25f
                     )
                 ),
                 placedFeatures.getHolderOrThrow(TreePlacedFeatures.SPRUCE_CHECKED)
             )
+        )
+        c.registerConfiguredFeature(
+            DuskConfiguredFeatures.SEQUOIA_TREE,
+            DuskFeatures.SEQUOIA_TREE,
+            DefaultFeatureConfig()
         )
     }
 

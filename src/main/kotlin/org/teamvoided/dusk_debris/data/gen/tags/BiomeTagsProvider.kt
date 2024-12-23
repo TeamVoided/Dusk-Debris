@@ -8,6 +8,7 @@ import net.minecraft.registry.RegistryKeys
 import net.minecraft.world.biome.Biome
 import net.minecraft.world.biome.Biomes
 import org.teamvoided.dusk_debris.data.tags.DuskBiomeTags
+import org.teamvoided.dusk_debris.init.worldgen.DuskBiomes
 import java.util.concurrent.CompletableFuture
 
 class BiomeTagsProvider(o: FabricDataOutput, r: CompletableFuture<HolderLookup.Provider>) :
@@ -27,16 +28,22 @@ class BiomeTagsProvider(o: FabricDataOutput, r: CompletableFuture<HolderLookup.P
             .add(Biomes.WARPED_FOREST)
 
 
-        getOrCreateTagBuilder(DuskBiomeTags.FOG_0_100)
+        getOrCreateTagBuilder(DuskBiomeTags.FOG_START_0)
             .forceAddTag(ConventionalBiomeTags.IS_SWAMP)
             .add(Biomes.LUSH_CAVES)
-        getOrCreateTagBuilder(DuskBiomeTags.FOG_0_50)
             .add(Biomes.DEEP_DARK)
-        getOrCreateTagBuilder(DuskBiomeTags.FOG_0_10)
             .add(Biomes.DRIPSTONE_CAVES)
-        getOrCreateTagBuilder(DuskBiomeTags.FOG_20_100)
+            .add(DuskBiomes.BOREAL_VALLEY)
+        getOrCreateTagBuilder(DuskBiomeTags.FOG_START_20)
             .add(Biomes.DARK_FOREST)
 //            .add(Biomes.PALE_GARDEN)
+
+        getOrCreateTagBuilder(DuskBiomeTags.FOG_END_20)
+            .add(Biomes.DRIPSTONE_CAVES)
+        getOrCreateTagBuilder(DuskBiomeTags.FOG_END_80)
+            .add(DuskBiomes.BOREAL_VALLEY)
+        getOrCreateTagBuilder(DuskBiomeTags.FOG_BOREAL_VALLEY)
+            .add(DuskBiomes.BOREAL_VALLEY)
     }
 
     fun vanillaTags() {

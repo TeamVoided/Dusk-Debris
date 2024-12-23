@@ -119,7 +119,7 @@ object PlacedFeatureCreator {
         )
 
         c.register(
-            DuskPlacedFeatures.FREEZING_WOODS_VEGETATION, DuskConfiguredFeatures.FREEZING_WOODS_VEGETATION,
+            DuskPlacedFeatures.BOREAL_VALLEY_VEGETATION, DuskConfiguredFeatures.BOREAL_VALLEY_VEGETATION,
             CountPlacementModifier.create(16),
             InSquarePlacementModifier.getInstance(),
             SurfaceWaterDepthFilterPlacementModifier.create(0),

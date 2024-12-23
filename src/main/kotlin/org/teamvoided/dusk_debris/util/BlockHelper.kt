@@ -7,6 +7,7 @@ import net.minecraft.block.piston.PistonBehavior
 import net.minecraft.sound.BlockSoundGroup
 import net.minecraft.sound.SoundEvents
 import net.minecraft.state.property.Properties
+import net.minecraft.util.Identifier
 import net.minecraft.util.math.Direction
 import org.teamvoided.dusk_debris.DuskDebris
 import org.teamvoided.dusk_debris.block.CoinPileBlock
@@ -39,13 +40,15 @@ val vesselBlockSound = BlockSoundGroup(
     SoundEvents.BLOCK_TRIAL_SPAWNER_FALL
 )
 
-val charredLogColor = MapColor.BLACK
-val charredPlanksColor = MapColor.DEEPSLATE
+val charredLogColor: MapColor = MapColor.BLACK
+val charredPlanksColor: MapColor = MapColor.DEEPSLATE
 
-val charredSignId = DuskDebris.id("entity/signs/charred")
-val cypressSignId = DuskDebris.id("entity/signs/cypress")
-val charredHangingSignId = DuskDebris.id("entity/signs/hanging/charred")
-val cypressHangingSignId = DuskDebris.id("entity/signs/hanging/cypress")
+val charredSignId : Identifier= DuskDebris.id("entity/signs/charred")
+val charredHangingSignId: Identifier = DuskDebris.id("entity/signs/hanging/charred")
+val cypressSignId : Identifier= DuskDebris.id("entity/signs/cypress")
+val cypressHangingSignId : Identifier= DuskDebris.id("entity/signs/hanging/cypress")
+val sequoiaSignId: Identifier = DuskDebris.id("entity/signs/sequoia")
+val sequoiaHangingSignId : Identifier= DuskDebris.id("entity/signs/hanging/sequoia")
 
 val blueNethershroomSmoke = NethershroomSporeParticleEffect(0x39A2DB)
 val purpleNethershroomSmoke = NethershroomSporeParticleEffect(0x573AD8)

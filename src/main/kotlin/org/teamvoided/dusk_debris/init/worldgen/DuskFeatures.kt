@@ -21,6 +21,8 @@ object DuskFeatures {
 
     val RANDOM_NOISE_SELECTOR = register("random_noise_selector", RandomNoiseFeature(NoiseFeatureConfig.CODEC))
 
+    val SEQUOIA_TREE = register("sequoia_tree", SequoiaTreeFeature(DefaultFeatureConfig.CODEC))
+
     fun init() {}
     private fun <C : FeatureConfig?, F : Feature<C>> register(name: String, feature: F): F =
         Registry.register(Registries.FEATURE, id(name), feature)

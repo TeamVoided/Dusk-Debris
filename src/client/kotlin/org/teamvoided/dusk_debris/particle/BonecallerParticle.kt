@@ -34,7 +34,7 @@ open class BonecallerParticle(
         this.gravityStrength = 0f
         chooseColor()
         this.scale = random.nextFloat() * 0.3f + 0.3f
-        this.maxAge = ((random.nextFloat() * 80).toInt() + 60) + 3000
+        this.maxAge = (random.nextFloat() * 80).toInt() + 60
     }
 
     private fun chooseColor() {

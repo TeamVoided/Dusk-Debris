@@ -121,6 +121,20 @@ object DuskItems {
         )
     )
 
+    val SEQUOIA_DOOR = register("sequoia_door", TallBlockItem(DuskBlocks.SEQUOIA_DOOR, Item.Settings()))
+    val SEQUOIA_SIGN = register(
+        "sequoia_sign",
+        SignItem((Item.Settings()).maxCount(16), DuskBlocks.SEQUOIA_SIGN, DuskBlocks.SEQUOIA_WALL_SIGN)
+    )
+    val SEQUOIA_HANGING_SIGN = register(
+        "sequoia_hanging_sign",
+        HangingSignItem(
+            DuskBlocks.SEQUOIA_HANGING_SIGN,
+            DuskBlocks.SEQUOIA_WALL_HANGING_SIGN,
+            Item.Settings().maxCount(16)
+        )
+    )
+
     val CHARRED_DOOR = register("charred_door", TallBlockItem(DuskBlocks.CHARRED_DOOR, Item.Settings()))
     val CHARRED_SIGN = register(
         "charred_sign",

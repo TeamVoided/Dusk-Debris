@@ -49,26 +49,30 @@ fun customizeFog(
 }
 
 fun getFogRange(biome: Holder<Biome>, world: ClientWorld): Vec3d {
-    val start: Double
-    var end: Double
-    if (biome.isIn(DuskBiomeTags.FOG_0_100)) {
+    var start = 1.0
+    var end = 1.0
+    if (biome.isIn(DuskBiomeTags.FOG_START_0)) {
         start = 0.0
-        end = 1.0
-    } else if (biome.isIn(DuskBiomeTags.FOG_0_50)) {
-        start = 0.0
-        end = 0.5
-    } else if (biome.isIn(DuskBiomeTags.FOG_0_10)) {
-        start = 0.0
-        end = 0.1
-    } else if (biome.isIn(DuskBiomeTags.FOG_20_100)) {
+    } else if (biome.isIn(DuskBiomeTags.FOG_START_20)) {
         start = 0.2
-        end = 1.0
-    } else {
-        start = 1.0
-        end = 1.0
+    } else if (biome.isIn(DuskBiomeTags.FOG_START_50)) {
+        start = 0.5
+    } else if (biome.isIn(DuskBiomeTags.FOG_START_80)) {
+        start = 0.8
     }
-    if (biome.isIn(DuskBiomeTags.FOG_FREEZING_FOREST)) {
-        end *= 0.66667 + (cos(0.02f * world.time) / 3)
+    if (biome.isIn(DuskBiomeTags.FOG_END_0)) {
+        end = 0.0
+    } else if (biome.isIn(DuskBiomeTags.FOG_END_20)) {
+        end = 0.2
+    } else if (biome.isIn(DuskBiomeTags.FOG_END_50)) {
+        end = 0.5
+    } else if (biome.isIn(DuskBiomeTags.FOG_END_80)) {
+        end = 0.8
+    }
+    if (biome.isIn(DuskBiomeTags.FOG_BOREAL_VALLEY)) {
+        val mult = 0.33333 + ((cos(0.005f * world.time) + 1) * 0.33333)
+        start *= mult
+        end *= mult
     }
     return Vec3d(start, end, 0.0)
 }

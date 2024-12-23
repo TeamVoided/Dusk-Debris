@@ -25,7 +25,7 @@ object DuskPlacedFeatures {
     val TORUS = create("torus")
     val OVERWORLD_TORUS = create("overworld_torus")
 
-    val FREEZING_WOODS_VEGETATION = create("freezing_woods/freezing_woods_vegetation")
+    val BOREAL_VALLEY_VEGETATION = create("boreal_valley/boreal_valley_vegetation")
 
     fun create(id: String): RegistryKey<PlacedFeature> =
         RegistryKey.of(RegistryKeys.PLACED_FEATURE, id(id))

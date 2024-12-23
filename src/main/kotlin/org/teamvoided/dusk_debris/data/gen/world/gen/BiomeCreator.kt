@@ -15,7 +15,7 @@ import org.teamvoided.dusk_debris.init.worldgen.DuskBiomes
 
 object BiomeCreator {
     fun boostrap(context: BootstrapContext<Biome>) {
-        context.register(DuskBiomes.FREEZING_WOODS, createFreezingForest(context))
+        context.register(DuskBiomes.BOREAL_VALLEY, createFreezingForest(context))
     }
 
     fun createFreezingForest(c: BootstrapContext<Biome>): Biome {
@@ -38,7 +38,7 @@ object BiomeCreator {
         DefaultBiomeFeatures.addDefaultDisks(generationSettings)
         generationSettings.feature(
             GenerationStep.Feature.VEGETAL_DECORATION,
-            DuskPlacedFeatures.FREEZING_WOODS_VEGETATION
+            DuskPlacedFeatures.BOREAL_VALLEY_VEGETATION
         )
         DefaultBiomeFeatures.addDefaultFlowers(generationSettings)
         DefaultBiomeFeatures.addGiantTaigaGrass(generationSettings)

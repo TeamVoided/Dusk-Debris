@@ -6,7 +6,7 @@ import net.minecraft.world.biome.Biome
 import org.teamvoided.dusk_debris.DuskDebris.id
 
 object DuskBiomes {
-    val FREEZING_WOODS = create("freezing_woods")
+    val BOREAL_VALLEY = create("boreal_valley")
 
     fun init() {}
 

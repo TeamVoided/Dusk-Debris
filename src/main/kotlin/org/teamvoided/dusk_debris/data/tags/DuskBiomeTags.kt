@@ -10,12 +10,17 @@ object DuskBiomeTags {
     val CRIMSON = create("crimson")
     val WARPED = create("warped")
 
-    val FOG_0_100 = create("fog/0_100")
-    val FOG_0_50 = create("fog/0_50")
-    val FOG_0_10 = create("fog/0_10")
-    val FOG_20_100 = create("fog/20_100")
+    val FOG_START_0 = create("fog/start/0")
+    val FOG_START_20 = create("fog/start/20")
+    val FOG_START_50 = create("fog/start/50")
+    val FOG_START_80 = create("fog/start/80")
 
-    val FOG_FREEZING_FOREST = create("fog/special/freezing_forest")
+    val FOG_END_0 = create("fog/end/0")
+    val FOG_END_20 = create("fog/end/20")
+    val FOG_END_50 = create("fog/end/50")
+    val FOG_END_80 = create("fog/end/80")
+
+    val FOG_BOREAL_VALLEY = create("fog/special/boreal_valley")
 
     fun create(id: String): TagKey<Biome> = TagKey.of(RegistryKeys.BIOME, id(id))
 }

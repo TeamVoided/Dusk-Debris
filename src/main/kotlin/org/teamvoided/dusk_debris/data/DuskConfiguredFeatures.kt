@@ -28,7 +28,8 @@ object DuskConfiguredFeatures {
     val OVERWORLD_TORUS = create("overworld_torus")
     val TORUS = create("torus")
 
-    val FREEZING_WOODS_VEGETATION = create("freezing/freezing_woods_vegetation")
+    val BOREAL_VALLEY_VEGETATION = create("boreal_valley/boreal_valley_vegetation")
+    val SEQUOIA_TREE = create("boreal_valley/sequoia_tree")
 
     fun create(id: String): RegistryKey<ConfiguredFeature<*, *>> =
         RegistryKey.of(RegistryKeys.CONFIGURED_FEATURE, id(id))

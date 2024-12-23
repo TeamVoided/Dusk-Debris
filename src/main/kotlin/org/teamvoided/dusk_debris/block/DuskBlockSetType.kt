@@ -1,6 +1,7 @@
 package org.teamvoided.dusk_debris.block
 
 import net.fabricmc.fabric.api.`object`.builder.v1.block.type.BlockSetTypeBuilder
+import net.fabricmc.fabric.api.`object`.builder.v1.block.type.WoodTypeBuilder
 import net.minecraft.block.BlockSetType
 import net.minecraft.block.WoodType
 import net.minecraft.sound.BlockSoundGroup
@@ -43,8 +44,10 @@ object DuskBlockSetType {
             .buttonClickOffSound(SoundEvents.BLOCK_CHERRY_WOOD_BUTTON_CLICK_OFF)
             .pressurePlateActivationRule(BlockSetType.PressurePlateSensitivity.EVERYTHING)
             .register(id("cypress"))
-    val CYPRESS_SIGN_TYPE: WoodType = WoodType.register(WoodType(id("cypress"), CYPRESS_BLOCK_SET_TYPE))
+    val CYPRESS_WOOD_TYPE: WoodType = WoodType.register(WoodType(id("cypress"), CYPRESS_BLOCK_SET_TYPE))
 
+    val SEQUOIA_BLOCK_SET_TYPE: BlockSetType = BlockSetTypeBuilder().register(id("sequoia"))
+    val SEQUOIA_WOOD_TYPE = WoodType("sequoia", WoodType.SPRUCE, SEQUOIA_BLOCK_SET_TYPE)
 
     val CHARRED_BLOCK_SET_TYPE: BlockSetType =
         BlockSetTypeBuilder()
@@ -62,11 +65,14 @@ object DuskBlockSetType {
             .buttonClickOffSound(SoundEvents.BLOCK_WOODEN_BUTTON_CLICK_OFF)
             .pressurePlateActivationRule(BlockSetType.PressurePlateSensitivity.EVERYTHING)
             .register(id("charred"))
-    val CHARRED_SIGN_TYPE: WoodType = WoodType.register(WoodType(id("charred"), CHARRED_BLOCK_SET_TYPE))
+    val CHARRED_WOOD_TYPE: WoodType = WoodType.register(WoodType(id("charred"), CHARRED_BLOCK_SET_TYPE))
 
 
-    fun WoodType(id: Identifier, blockSetType: BlockSetType): WoodType =
+    private fun WoodType(id: Identifier, blockSetType: BlockSetType): WoodType =
         WoodType.register(WoodType(id.toString(), blockSetType))
+
+    private fun WoodType(id: String, woodType: WoodType, blockSet: BlockSetType): WoodType =
+        WoodTypeBuilder.copyOf(woodType).register(id(id), blockSet)
 
     fun init() {}
 

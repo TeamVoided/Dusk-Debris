@@ -126,6 +126,24 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
         gen.registerLog(DuskBlocks.STRIPPED_CYPRESS_LOG)
             .log(DuskBlocks.STRIPPED_CYPRESS_LOG)
             .wood(DuskBlocks.STRIPPED_CYPRESS_WOOD)
+        gen.registerHangingSign(
+            DuskBlocks.STRIPPED_CYPRESS_LOG,
+            DuskBlocks.CYPRESS_HANGING_SIGN,
+            DuskBlocks.CYPRESS_WALL_HANGING_SIGN
+        )
+
+        gen.registerSingleton(DuskBlocks.SEQUOIA_LEAVES, TexturedModel.LEAVES)
+        gen.registerLog(DuskBlocks.SEQUOIA_LOG)
+            .log(DuskBlocks.SEQUOIA_LOG)
+            .wood(DuskBlocks.SEQUOIA_WOOD)
+        gen.registerLog(DuskBlocks.STRIPPED_SEQUOIA_LOG)
+            .log(DuskBlocks.STRIPPED_SEQUOIA_LOG)
+            .wood(DuskBlocks.STRIPPED_SEQUOIA_WOOD)
+        gen.registerHangingSign(
+            DuskBlocks.STRIPPED_SEQUOIA_LOG,
+            DuskBlocks.SEQUOIA_HANGING_SIGN,
+            DuskBlocks.SEQUOIA_WALL_HANGING_SIGN
+        )
 
         gen.registerSimpleCubeAll(DuskBlocks.CRYSTAL_BLOCK)
         gen.registerAxisRotated(
@@ -153,11 +171,6 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
             DuskBlocks.STRIPPED_CHARRED_LOG,
             DuskBlocks.CHARRED_HANGING_SIGN,
             DuskBlocks.CHARRED_WALL_HANGING_SIGN
-        )
-        gen.registerHangingSign(
-            DuskBlocks.STRIPPED_CYPRESS_LOG,
-            DuskBlocks.CYPRESS_HANGING_SIGN,
-            DuskBlocks.CYPRESS_WALL_HANGING_SIGN
         )
 //        gen.registerSingleton(DuskBlocks.SMOOTH_VOLCANIC_SANDSTONE) {
 //            TexturedModel.getCubeAll(Texture.getSubId(DuskBlocks.VOLCANIC_SANDSTONE, "_top"))

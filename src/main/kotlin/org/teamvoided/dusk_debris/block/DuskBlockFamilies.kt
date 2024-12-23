@@ -44,11 +44,26 @@ object DuskBlockFamilies {
             .group("wooden")
             .unlockCriterionName("has_planks")
             .build()
+
+    val SEQUOIA_FAMILY: BlockFamily =
+        BlockFamilies.register(DuskBlocks.SEQUOIA_PLANKS)
+            .stairs(DuskBlocks.SEQUOIA_STAIRS)
+            .slab(DuskBlocks.SEQUOIA_SLAB)
+            .fence(DuskBlocks.SEQUOIA_FENCE)
+            .door(DuskBlocks.SEQUOIA_DOOR)
+            .trapdoor(DuskBlocks.SEQUOIA_TRAPDOOR)
+            .fenceGate(DuskBlocks.SEQUOIA_FENCE_GATE)
+            .button(DuskBlocks.SEQUOIA_BUTTON)
+            .pressurePlate(DuskBlocks.SEQUOIA_PRESSURE_PLATE)
+            .sign(DuskBlocks.SEQUOIA_SIGN, DuskBlocks.SEQUOIA_WALL_SIGN)
+            .group("wooden")
+            .unlockCriterionName("has_planks")
+            .build()
+
     val CHARRED_FAMILY: BlockFamily =
         BlockFamilies.register(DuskBlocks.CHARRED_PLANKS)
             .stairs(DuskBlocks.CHARRED_STAIRS)
             .slab(DuskBlocks.CHARRED_SLAB)
-
             .fence(DuskBlocks.CHARRED_FENCE)
             .door(DuskBlocks.CHARRED_DOOR)
             .trapdoor(DuskBlocks.CHARRED_TRAPDOOR)
@@ -56,7 +71,6 @@ object DuskBlockFamilies {
             .button(DuskBlocks.CHARRED_BUTTON)
             .pressurePlate(DuskBlocks.CHARRED_PRESSURE_PLATE)
             .sign(DuskBlocks.CHARRED_SIGN, DuskBlocks.CHARRED_WALL_SIGN)
-
             .group("wooden")
             .unlockCriterionName("has_planks")
             .build()
@@ -67,6 +81,7 @@ object DuskBlockFamilies {
         CUT_VOLCANIC_SANDSTONE_FAMILY,
         SMOOTH_VOLCANIC_SANDSTONE_FAMILY,
         CYPRESS_FAMILY,
+        SEQUOIA_FAMILY,
         CHARRED_FAMILY
     )
 

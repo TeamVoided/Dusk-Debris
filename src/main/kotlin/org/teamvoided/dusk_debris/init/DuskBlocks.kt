@@ -494,34 +494,21 @@ object DuskBlocks {
                 .sounds(BlockSoundGroup.WOOD).lavaIgnitable()
         )
     )
-    val STRIPPED_CYPRESS_WOOD = register(
-        "stripped_cypress_wood",
-        PillarBlock(
-            AbstractBlock.Settings.create().mapColor(charredPlanksColor).instrument(NoteBlockInstrument.BASS)
-                .strength(2.0f)
-                .sounds(BlockSoundGroup.WOOD).lavaIgnitable()
-        )
-    )
+    val STRIPPED_CYPRESS_WOOD = register("stripped_cypress_wood", PillarBlock(copy(CYPRESS_WOOD)))
     val CYPRESS_PLANKS = register(
-        "cypress_planks",
-        Block(
-            AbstractBlock.Settings.create().mapColor(charredPlanksColor).instrument(NoteBlockInstrument.BASS)
+        "cypress_planks", Block(
+            AbstractBlock.Settings.create().mapColor(MapColor.RED).instrument(NoteBlockInstrument.BASS)
                 .strength(2.0f, 3.0f).sounds(BlockSoundGroup.WOOD).lavaIgnitable()
         )
     )
     val CYPRESS_STAIRS = register("cypress_stairs", legacyStairsOf(CYPRESS_PLANKS))
-    val CYPRESS_SLAB = register(
-        "cypress_slab",
-        SlabBlock(
-            AbstractBlock.Settings.create().mapColor(charredPlanksColor).instrument(NoteBlockInstrument.BASS)
-                .strength(2.0f, 3.0f).sounds(BlockSoundGroup.WOOD).lavaIgnitable()
-        )
-    )
+    val CYPRESS_SLAB = register("cypress_slab", SlabBlock(copy(CYPRESS_PLANKS)))
     val CYPRESS_DOOR = registerNoItem(
         "cypress_door",
         DoorBlock(
             DuskBlockSetType.CYPRESS_BLOCK_SET_TYPE,
-            AbstractBlock.Settings.create().mapColor(charredPlanksColor).instrument(NoteBlockInstrument.BASS)
+            AbstractBlock.Settings.create().mapColor(CYPRESS_PLANKS.defaultMapColor)
+                .instrument(NoteBlockInstrument.BASS)
                 .strength(3.0f).nonOpaque().pistonBehavior(PistonBehavior.DESTROY).lavaIgnitable()
         )
     ).cutout()
@@ -536,7 +523,7 @@ object DuskBlocks {
         "cypress_sign",
         VoidSignBlock(
             cypressSignId,
-            DuskBlockSetType.CYPRESS_SIGN_TYPE,
+            DuskBlockSetType.CYPRESS_WOOD_TYPE,
             AbstractBlock.Settings.create().mapColor(charredPlanksColor).solid().instrument(NoteBlockInstrument.BASS)
                 .noCollision().strength(1.0f).lavaIgnitable()
         )
@@ -545,7 +532,7 @@ object DuskBlocks {
         "cypress_wall_sign",
         VoidWallSignBlock(
             cypressSignId,
-            DuskBlockSetType.CYPRESS_SIGN_TYPE,
+            DuskBlockSetType.CYPRESS_WOOD_TYPE,
             AbstractBlock.Settings.create().mapColor(charredPlanksColor).solid().instrument(NoteBlockInstrument.BASS)
                 .noCollision().strength(1.0f).dropsLike(CYPRESS_SIGN).lavaIgnitable()
         )
@@ -554,7 +541,7 @@ object DuskBlocks {
         "cypress_hanging_sign",
         VoidCeilingHangingSignBlock(
             cypressHangingSignId,
-            DuskBlockSetType.CYPRESS_SIGN_TYPE,
+            DuskBlockSetType.CYPRESS_WOOD_TYPE,
             AbstractBlock.Settings.create().mapColor(charredLogColor).solid().instrument(NoteBlockInstrument.BASS)
                 .noCollision().strength(1.0f).lavaIgnitable()
         )
@@ -563,7 +550,7 @@ object DuskBlocks {
         "cypress_wall_hanging_sign",
         VoidWallHangingSignBlock(
             cypressHangingSignId,
-            DuskBlockSetType.CYPRESS_SIGN_TYPE,
+            DuskBlockSetType.CYPRESS_WOOD_TYPE,
             AbstractBlock.Settings.create().mapColor(charredLogColor).solid()
                 .instrument(NoteBlockInstrument.BASS).noCollision().strength(1.0f).lavaIgnitable()
                 .dropsLike(OAK_HANGING_SIGN)
@@ -580,7 +567,7 @@ object DuskBlocks {
     val CYPRESS_FENCE_GATE = register(
         "cypress_fence_gate",
         FenceGateBlock(
-            DuskBlockSetType.CYPRESS_SIGN_TYPE,
+            DuskBlockSetType.CYPRESS_WOOD_TYPE,
             AbstractBlock.Settings.create().mapColor(charredPlanksColor).solid()
                 .instrument(NoteBlockInstrument.BASS).strength(2.0f, 3.0f)
         )
@@ -595,6 +582,91 @@ object DuskBlocks {
         )
     )
 
+    val SEQUOIA_LEAVES = register("sequoia_leaves", leavesOf(BlockSoundGroup.GRASS)).cutout()
+    val SEQUOIA_LOG = register("sequoia_log", logOf(charredPlanksColor, charredLogColor))
+    val STRIPPED_SEQUOIA_LOG = register("stripped_sequoia_log", logOf(charredPlanksColor, charredPlanksColor))
+    val SEQUOIA_WOOD = register(
+        "sequoia_wood", PillarBlock(
+            AbstractBlock.Settings.create().mapColor(charredLogColor).instrument(NoteBlockInstrument.BASS)
+                .strength(2.0f)
+                .sounds(BlockSoundGroup.WOOD).lavaIgnitable()
+        )
+    )
+    val STRIPPED_SEQUOIA_WOOD = register("stripped_sequoia_wood", PillarBlock(copy(SEQUOIA_WOOD)))
+    val SEQUOIA_PLANKS = register(
+        "sequoia_planks", Block(
+            AbstractBlock.Settings.create().mapColor(charredPlanksColor).instrument(NoteBlockInstrument.BASS)
+                .strength(2.0f, 3.0f).sounds(BlockSoundGroup.WOOD).lavaIgnitable()
+        )
+    )
+    val SEQUOIA_STAIRS = register("sequoia_stairs", legacyStairsOf(SEQUOIA_PLANKS))
+    val SEQUOIA_SLAB = register("sequoia_slab", SlabBlock(copy(SEQUOIA_PLANKS)))
+    val SEQUOIA_DOOR = registerNoItem(
+        "sequoia_door", DoorBlock(
+            DuskBlockSetType.SEQUOIA_BLOCK_SET_TYPE,
+            AbstractBlock.Settings.create().mapColor(charredPlanksColor).instrument(NoteBlockInstrument.BASS)
+                .strength(3.0f).nonOpaque().pistonBehavior(PistonBehavior.DESTROY).lavaIgnitable()
+        )
+    ).cutout()
+    val SEQUOIA_TRAPDOOR = register(
+        "sequoia_trapdoor", TrapdoorBlock(
+            DuskBlockSetType.SEQUOIA_BLOCK_SET_TYPE,
+            AbstractBlock.Settings.create().mapColor(charredPlanksColor).instrument(NoteBlockInstrument.BASS)
+                .strength(3.0f).nonOpaque().allowsSpawning(Blocks::nonSpawnable).lavaIgnitable()
+        )
+    ).cutout()
+    val SEQUOIA_SIGN = registerNoItem(
+        "sequoia_sign", VoidSignBlock(
+            sequoiaSignId,
+            DuskBlockSetType.SEQUOIA_WOOD_TYPE,
+            AbstractBlock.Settings.create().mapColor(charredPlanksColor).solid().instrument(NoteBlockInstrument.BASS)
+                .noCollision().strength(1.0f).lavaIgnitable()
+        )
+    )
+    val SEQUOIA_WALL_SIGN = registerNoItem(
+        "sequoia_wall_sign", VoidWallSignBlock(
+            sequoiaSignId,
+            DuskBlockSetType.SEQUOIA_WOOD_TYPE,
+            copy(SEQUOIA_SIGN).dropsLike(SEQUOIA_SIGN)
+        )
+    )
+    val SEQUOIA_HANGING_SIGN = registerNoItem(
+        "sequoia_hanging_sign", VoidCeilingHangingSignBlock(
+            sequoiaHangingSignId,
+            DuskBlockSetType.SEQUOIA_WOOD_TYPE,
+            copy(SEQUOIA_SIGN)
+        )
+    )
+    val SEQUOIA_WALL_HANGING_SIGN = registerNoItem(
+        "sequoia_wall_hanging_sign", VoidWallHangingSignBlock(
+            sequoiaHangingSignId,
+            DuskBlockSetType.SEQUOIA_WOOD_TYPE,
+            copy(SEQUOIA_HANGING_SIGN).dropsLike(SEQUOIA_HANGING_SIGN)
+        )
+    )
+    val SEQUOIA_BUTTON = register("sequoia_button", buttonOf(DuskBlockSetType.SEQUOIA_BLOCK_SET_TYPE))
+    val SEQUOIA_FENCE = register(
+        "sequoia_fence", FenceBlock(
+            copy(SEQUOIA_PLANKS)
+        )
+    )
+    val SEQUOIA_FENCE_GATE = register(
+        "sequoia_fence_gate",
+        FenceGateBlock(
+            DuskBlockSetType.SEQUOIA_WOOD_TYPE,
+            copy(SEQUOIA_FENCE).solid()
+        )
+    )
+    val SEQUOIA_PRESSURE_PLATE = register(
+        "sequoia_pressure_plate",
+        PressurePlateBlock(
+            DuskBlockSetType.SEQUOIA_BLOCK_SET_TYPE,
+            AbstractBlock.Settings.create().mapColor(SEQUOIA_PLANKS.defaultMapColor).solid()
+                .instrument(NoteBlockInstrument.BASS).noCollision().strength(0.5f)
+                .pistonBehavior(PistonBehavior.DESTROY)
+        )
+    )
+
     val VOLCANIC_SAND = register(
         "volcanic_sand",
         GravelBlock(
@@ -604,6 +676,7 @@ object DuskBlocks {
                 .sounds(BlockSoundGroup.SAND)
         )
     )
+
     @JvmStatic
     val SUSPICIOUS_VOLCANIC_SAND = register(
         "suspicious_volcanic_sand",
@@ -725,7 +798,7 @@ object DuskBlocks {
         "charred_sign",
         VoidSignBlock(
             charredSignId,
-            DuskBlockSetType.CHARRED_SIGN_TYPE,
+            DuskBlockSetType.CHARRED_WOOD_TYPE,
             AbstractBlock.Settings.create().mapColor(charredPlanksColor).solid().instrument(NoteBlockInstrument.BASS)
                 .noCollision().strength(1.0f)
         )
@@ -734,7 +807,7 @@ object DuskBlocks {
         "charred_wall_sign",
         VoidWallSignBlock(
             charredSignId,
-            DuskBlockSetType.CHARRED_SIGN_TYPE,
+            DuskBlockSetType.CHARRED_WOOD_TYPE,
             AbstractBlock.Settings.create().mapColor(charredPlanksColor).solid().instrument(NoteBlockInstrument.BASS)
                 .noCollision().strength(1.0f).dropsLike(CHARRED_SIGN)
         )
@@ -743,7 +816,7 @@ object DuskBlocks {
         "charred_hanging_sign",
         VoidCeilingHangingSignBlock(
             charredHangingSignId,
-            DuskBlockSetType.CHARRED_SIGN_TYPE,
+            DuskBlockSetType.CHARRED_WOOD_TYPE,
             AbstractBlock.Settings.create().mapColor(charredLogColor).solid()
                 .instrument(NoteBlockInstrument.BASS).noCollision().strength(1.0f)
         )
@@ -752,7 +825,7 @@ object DuskBlocks {
         "charred_wall_hanging_sign",
         VoidWallHangingSignBlock(
             charredHangingSignId,
-            DuskBlockSetType.CHARRED_SIGN_TYPE,
+            DuskBlockSetType.CHARRED_WOOD_TYPE,
             AbstractBlock.Settings.create().mapColor(charredLogColor).solid()
                 .instrument(NoteBlockInstrument.BASS).noCollision().strength(1.0f).lavaIgnitable()
                 .dropsLike(OAK_HANGING_SIGN)
@@ -769,7 +842,7 @@ object DuskBlocks {
     val CHARRED_FENCE_GATE = register(
         "charred_fence_gate",
         FenceGateBlock(
-            DuskBlockSetType.CHARRED_SIGN_TYPE,
+            DuskBlockSetType.CHARRED_WOOD_TYPE,
             AbstractBlock.Settings.create().mapColor(charredPlanksColor).solid()
                 .instrument(NoteBlockInstrument.BASS).strength(2.0f, 3.0f)
         )
@@ -791,6 +864,8 @@ object DuskBlocks {
         StrippableBlockRegistry.register(CHARRED_WOOD, STRIPPED_CHARRED_WOOD)
         StrippableBlockRegistry.register(CYPRESS_LOG, STRIPPED_CYPRESS_LOG)
         StrippableBlockRegistry.register(CYPRESS_WOOD, STRIPPED_CYPRESS_WOOD)
+        StrippableBlockRegistry.register(SEQUOIA_LOG, STRIPPED_SEQUOIA_LOG)
+        StrippableBlockRegistry.register(SEQUOIA_WOOD, STRIPPED_SEQUOIA_WOOD)
 
         oxidizeCopperSet(DuskBlockLists.copperFans)
     }

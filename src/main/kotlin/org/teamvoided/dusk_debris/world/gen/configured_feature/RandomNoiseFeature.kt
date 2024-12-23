@@ -24,7 +24,7 @@ class RandomNoiseFeature(codec: Codec<NoiseFeatureConfig>) : Feature<NoiseFeatur
         val sample = dps.sample(pos.x.toDouble(), 0.0, pos.z.toDouble())
 
         for (features in cfg.features) {
-            if (sample < features.threshold)
+            if (sample >= features.threshold)
                 return features.generate(world, gen, random, pos)
         }
 
