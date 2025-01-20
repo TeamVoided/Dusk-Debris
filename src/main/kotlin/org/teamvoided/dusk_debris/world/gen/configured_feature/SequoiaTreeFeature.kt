@@ -1,26 +1,28 @@
 package org.teamvoided.dusk_debris.world.gen.configured_feature
 
-import com.google.common.collect.Lists
 import com.mojang.serialization.Codec
+import net.minecraft.block.Blocks
 import net.minecraft.registry.tag.BlockTags
-import net.minecraft.state.property.Properties
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
-import net.minecraft.util.math.MathHelper
+import net.minecraft.util.math.noise.DoublePerlinNoiseSampler
+import net.minecraft.util.random.LegacySimpleRandom
+import net.minecraft.util.random.RandomGenerator
+import net.minecraft.world.StructureWorldAccess
+import net.minecraft.world.gen.ChunkRandom
 import net.minecraft.world.gen.feature.DefaultFeatureConfig
 import net.minecraft.world.gen.feature.Feature
 import net.minecraft.world.gen.feature.util.FeatureContext
 import net.minecraft.world.gen.stateprovider.SimpleBlockStateProvider
 import org.teamvoided.dusk_debris.init.DuskBlocks
-import net.minecraft.util.random.RandomGenerator
-import net.minecraft.world.StructureWorldAccess
-import org.teamvoided.dusk_debris.util.Utils.pi
-import org.teamvoided.dusk_debris.util.Utils.rotate135
-import org.teamvoided.dusk_debris.util.Utils.rotate360
-import org.teamvoided.dusk_debris.util.Utils.rotate45
-import org.teamvoided.dusk_debris.util.Utils.rotate90
+import org.teamvoided.dusk_debris.util.sample
+import kotlin.math.abs
+import kotlin.math.min
+
+typealias ShapePredicate = (dx: Int, dz: Int) -> Boolean
 
 class SequoiaTreeFeature(codec: Codec<DefaultFeatureConfig>) : Feature<DefaultFeatureConfig>(codec) {
+
     override fun place(context: FeatureContext<DefaultFeatureConfig>): Boolean {
         val origin = context.origin
         val random = context.random
@@ -89,48 +91,121 @@ class SequoiaTreeFeature(codec: Codec<DefaultFeatureConfig>) : Feature<DefaultFe
         }
 
         setTrunkBlocks(config, world, random, logPositions)
-        branch(config, world, random, origin, width, height)
-
+        setLeavesBlocks(config, world, random, origin, height, width)
 //                this.setBlockState(world, mutable, logBlock.getBlockState(random, pos))
         return true
     }
 
-    fun branch(
+    fun setLeavesBlocks(
         config: DefaultFeatureConfig,
         world: StructureWorldAccess,
         random: RandomGenerator,
         origin: BlockPos,
-        width: Int,
-        height: Int
+        trunkHeight: Int,
+        trunkWidth: Int
     ) {
-        val logBlock = SimpleBlockStateProvider.of(DuskBlocks.SEQUOIA_LOG.defaultState)
-        var posY = height - width - random.nextInt(width)
-        while (posY > height / 3) {
-            val rotation = random.nextFloat() * rotate360
-//            val axis = ((rotation - rotate45) * (180 / pi)) / 90f
-            val axis = if ((rotation + rotate45) % pi > rotate90) {
-                Direction.Axis.Z
-            } else {
-                Direction.Axis.X
-            }
+        val blockPos: BlockPos = origin
+        val foliageRadius = (trunkWidth * (1.25 + random.nextDouble() * 0.5)) + 4
+        val foliageHeight = trunkHeight
+        val isEven = trunkWidth % 2 == 0
 
-            var rotX = 0
-            var rotY = 0
-            val angleY = random.nextInt(4)
-            for (offset in 0..(0.4 * (height - posY)).toInt()) {
-                rotX = (1.5f + MathHelper.cos(rotation) * offset).toInt()
-                rotY = (1.5f + MathHelper.sin(rotation) * offset).toInt()
-                val blockPos = origin.add(rotX, posY - offset / angleY, rotY)
-//                this.placeTrunkBlock(world, replacer, random, blockPos, config)
-                this.setBlockState(
-                    world,
-                    blockPos,
-                    logBlock.getBlockState(random, blockPos).withIfExists(Properties.AXIS, axis)
-                )
-            }
-            posY -= 1 + random.nextInt(3)
+
+        val chunkRandom = ChunkRandom(LegacySimpleRandom(world.seed))
+        val dps = DoublePerlinNoiseSampler.create(chunkRandom, -2, *doubleArrayOf(1.0, 2.0))
+
+        for (j in blockPos.y - foliageHeight..blockPos.y) {
+            val k: Int = (blockPos.y - j)
+
+            val heightBasedRadius = (1 + foliageRadius *
+                    if (k > foliageHeight * 0.66666)
+                        ((foliageHeight - k) * (1.0 / foliageHeight) * 3)
+                    else
+                        ((foliageHeight - k) * (1.0 / foliageHeight) * -1.5 + 1.5)
+                    ).toInt()
+            var foliagePos = BlockPos(blockPos.x, j + trunkHeight, blockPos.z)
+            if (!isEven) foliagePos = foliagePos.add(1, 0, 1)
+            predicate1(
+                world,
+                random,
+                foliagePos,
+                isEven,
+                trunkWidth,
+                heightBasedRadius,
+                foliageHeight,
+                dps
+            )
         }
     }
+
+
+    fun predicate2(
+        world: StructureWorldAccess,
+        random: RandomGenerator,
+        centerPos: BlockPos,
+        isEven: Boolean,
+        y: Int,
+        radius: Int,
+        dps: DoublePerlinNoiseSampler,
+        predicate: ShapePredicate
+    ) {
+        val i = if (isEven) 1 else 0
+        val mutable = BlockPos.Mutable()
+        val leafBlock = SimpleBlockStateProvider.of(Blocks.GREEN_CONCRETE.defaultState)
+        val leafBlock2 = SimpleBlockStateProvider.of(Blocks.RED_STAINED_GLASS.defaultState)
+        val radiu = Math.min(radius, 16)
+        for (x in -radiu..radiu + i) {
+            for (z in -radiu..radiu + i) {
+                if (predicate(x, z)) {
+                    mutable[centerPos, x, y] = z
+                    if (world.getBlockState(mutable).isIn(BlockTags.REPLACEABLE)) {
+                        val tre = (x.toDouble() * x + z * z)
+                        if (2 * tre >= radiu * radiu) {
+                            val noiser = dps.sample(mutable)
+                            if (noiser > abs(tre - 2 * tre)) {
+                                this.setBlockState(
+                                    world, mutable,
+                                    leafBlock.getBlockState(random, mutable)
+                                )
+                            }
+                            else this.setBlockState(
+                                world, mutable,
+                                leafBlock2.getBlockState(random, mutable)
+                            )
+                        } else
+                            this.setBlockState(
+                                world, mutable,
+                                leafBlock.getBlockState(random, mutable)
+                            )
+                    }
+                }
+            }
+        }
+    }
+
+    fun predicate1(
+        world: StructureWorldAccess,
+        random: RandomGenerator,
+        centerPos: BlockPos,
+        isEven: Boolean,
+        y: Int,
+        radius: Int,
+        height: Int,
+        dps: DoublePerlinNoiseSampler
+    ) {
+        return predicate2(world, random, centerPos, isEven, y, radius, dps)
+        { x, z ->
+            val dx = if (isEven) min(abs(x), abs(x - 1)) else abs(x)
+            val dz = if (isEven) min(abs(z), abs(z - 1)) else abs(z)
+//            val d = (height / radius) * (2 / 3f)
+            (dx * dx + dz * dz) < radius * radius
+//            !(if (dx + dz >= radius) true
+//            else if (y > -height * 2 / 3f)
+//                (d * 0.5 * sqrt((dx * dx + dz * dz).toDouble()) - height) > radius
+//            else
+//                -d * sqrt((dx * dx + dz * dz).toDouble()) > radius)
+        }
+    }
+
 
     fun setTrunkBlocks(
         config: DefaultFeatureConfig,
@@ -138,7 +213,7 @@ class SequoiaTreeFeature(codec: Codec<DefaultFeatureConfig>) : Feature<DefaultFe
         random: RandomGenerator,
         positions: MutableList<BlockPos>
     ) {
-        val logBlock = SimpleBlockStateProvider.of(DuskBlocks.SEQUOIA_LOG.defaultState)
+        val logBlock = SimpleBlockStateProvider.of(Blocks.BLACKSTONE.defaultState)
         positions.forEach {
             this.setBlockState(world, it, logBlock.getBlockState(random, it))
         }
