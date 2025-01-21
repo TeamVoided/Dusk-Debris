@@ -582,7 +582,7 @@ object DuskBlocks {
         )
     )
 
-    val SEQUOIA_LEAVES = register("sequoia_leaves", leavesOf(BlockSoundGroup.GRASS)).cutout()
+    val SEQUOIA_LEAVES = register("sequoia_leaves", LongLeavesBlock(copy(SPRUCE_LEAVES))).cutout()
     val SEQUOIA_LOG = register("sequoia_log", logOf(charredPlanksColor, charredLogColor))
     val STRIPPED_SEQUOIA_LOG = register("stripped_sequoia_log", logOf(charredPlanksColor, charredPlanksColor))
     val SEQUOIA_WOOD = register(

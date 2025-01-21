@@ -144,11 +144,7 @@ class BogMudBlock
     }
 
     companion object {
-        val CODEC: MapCodec<BogMudBlock> = createCodec { settings: Settings ->
-            BogMudBlock(
-                settings
-            )
-        }
+        val CODEC: MapCodec<BogMudBlock> = createCodec(::BogMudBlock)
         private const val HORIZONTAL_PARTICLE_MOMENTUM = 0.083333336f
         private const val HORIZONTAL_SPEED_MULTIPLIER = 0.2
         private const val VERTICAL_SPEED_MULTIPLIER = 2.5

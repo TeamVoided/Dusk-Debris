@@ -3,8 +3,10 @@ package org.teamvoided.dusk_debris.world.gen.configured_feature
 import com.mojang.serialization.Codec
 import net.minecraft.block.Blocks
 import net.minecraft.registry.tag.BlockTags
+import net.minecraft.state.property.Properties
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
+import net.minecraft.util.math.MathHelper
 import net.minecraft.util.math.noise.DoublePerlinNoiseSampler
 import net.minecraft.util.random.LegacySimpleRandom
 import net.minecraft.util.random.RandomGenerator
@@ -15,9 +17,15 @@ import net.minecraft.world.gen.feature.Feature
 import net.minecraft.world.gen.feature.util.FeatureContext
 import net.minecraft.world.gen.stateprovider.SimpleBlockStateProvider
 import org.teamvoided.dusk_debris.init.DuskBlocks
-import org.teamvoided.dusk_debris.util.sample
+import org.teamvoided.dusk_debris.util.Utils.pi
+import org.teamvoided.dusk_debris.util.Utils.rotate135
+import org.teamvoided.dusk_debris.util.Utils.rotate315
+import org.teamvoided.dusk_debris.util.Utils.rotate360
+import org.teamvoided.dusk_debris.util.Utils.rotate45
+import org.teamvoided.dusk_debris.util.Utils.rotate90
 import kotlin.math.abs
 import kotlin.math.min
+import kotlin.math.sqrt
 
 typealias ShapePredicate = (dx: Int, dz: Int) -> Boolean
 
@@ -45,53 +53,78 @@ class SequoiaTreeFeature(codec: Codec<DefaultFeatureConfig>) : Feature<DefaultFe
 
         val logBlock = SimpleBlockStateProvider.of(DuskBlocks.SEQUOIA_LOG.defaultState)
 
-        val offsetXZ = -(width / 2) + 1
+        val cone = 10 * width //10 * width * width
+
+        val isEven = width % 2 == 0
+        val funWidth1 = width / 2 + 1
+        val funWidth2 = -width / 2 + if (isEven) 1 else 0
+        println("lala")
+        println(funWidth1)
+        println(funWidth2)
+
         for (y in 0 until height) {
-            for (x in 0 until width) {
-                for (z in 0 until width) {
-                    if (width <= 2 ||
-                        (!isTopEdge(x, y, z, width - 1, height - 1) &&
-                                isCornerAndActive(x, z, width - 1, cornerNW, cornerNE, cornerSW, cornerSE))
+            for (x in funWidth2 until funWidth1) {
+                for (z in funWidth2 until funWidth1) {
+                    if (
+                        width < 3 ||
+                        isCornerAndActive(
+                            x, z,
+                            funWidth1 - 1,
+                            funWidth2,
+                            cornerNW, cornerNE, cornerSW, cornerSE
+                        )
                     ) {
-                        if (width > 2 && isCorner(x, z, width - 1)) {
-                            val the = y.toDouble() / height
+                        if (width > 2 && isCorner(x, z, funWidth1 - 1, funWidth2)) {
+                            val the = y / 2.0 / height
                             if (random.nextDouble() < the * the) {
-                                if (x == 0) {
-                                    if (z == 0) {
+                                if (x == funWidth1 - 1) {
+                                    if (z == funWidth1 - 1) {
                                         cornerNW = false
-                                    } else if (z == width - 1) {
+                                    } else if (z == funWidth2) {
                                         cornerSW = false
                                     }
-                                } else if (x == width - 1) {
-                                    if (z == 0) {
+                                } else if (x == funWidth2) {
+                                    if (z == funWidth1 - 1) {
                                         cornerNE = false
-                                    } else if (z == width - 1) {
+                                    } else if (z == funWidth2) {
                                         cornerSE = false
                                     }
                                 }
                             }
                         }
-
                         val pos = origin
                             .offset(Direction.UP, y)
-                            .offset(Direction.EAST, x + offsetXZ)
-                            .offset(Direction.SOUTH, z + offsetXZ)
+                            .offset(Direction.EAST, x)
+                            .offset(Direction.SOUTH, z)
                         mutable.set(pos)
-                        if (world.getBlockState(mutable).isIn(BlockTags.REPLACEABLE)) {
-                            logPositions.add(pos)
-//                            this.setBlockState(world, mutable, logBlock.getBlockState(random, pos))
+                        if (width <= 2 || (x == 0 && z == 0)) {
+                            if (world.getBlockState(mutable).isIn(BlockTags.REPLACEABLE)) {
+                                logPositions.add(pos)
+                            } else return false
                         } else {
-                            println(mutable)
-                            println(world.getBlockState(mutable))
-                            return false
+                            val dx = x - if (isEven) 0.5 else 0.0
+                            val dz = z - if (isEven) 0.5 else 0.0
+                            val the = -(sqrt((cone * (dx * dx + dz * dz))) - height)
+                            if (the >= y) {
+                                if (world.getBlockState(mutable).isIn(BlockTags.REPLACEABLE)) {
+                                    logPositions.add(pos)
+                                } else return false
+                            }
                         }
                     }
                 }
             }
         }
+        if (width == 2) {
+            mutable.set(origin.add(0, height, 0))
+            if (world.getBlockState(mutable).isIn(BlockTags.REPLACEABLE)) {
+                logPositions.add(mutable)
+            }
+        }
 
         setTrunkBlocks(config, world, random, logPositions)
-        setLeavesBlocks(config, world, random, origin, height, width)
+//        setLeavesBlocks(config, world, random, origin, height, width)
+        branch(config, world, random, origin.add(-1, 0, -1), width, height)
 //                this.setBlockState(world, mutable, logBlock.getBlockState(random, pos))
         return true
     }
@@ -105,7 +138,7 @@ class SequoiaTreeFeature(codec: Codec<DefaultFeatureConfig>) : Feature<DefaultFe
         trunkWidth: Int
     ) {
         val blockPos: BlockPos = origin
-        val foliageRadius = (trunkWidth * (1.25 + random.nextDouble() * 0.5)) + 4
+        val foliageRadius = (trunkWidth * (1.5 + random.nextDouble() * 0.5)) + 2
         val foliageHeight = trunkHeight
         val isEven = trunkWidth % 2 == 0
 
@@ -124,86 +157,108 @@ class SequoiaTreeFeature(codec: Codec<DefaultFeatureConfig>) : Feature<DefaultFe
                     ).toInt()
             var foliagePos = BlockPos(blockPos.x, j + trunkHeight, blockPos.z)
             if (!isEven) foliagePos = foliagePos.add(1, 0, 1)
-            predicate1(
+            coneLeaves(
                 world,
                 random,
                 foliagePos,
                 isEven,
-                trunkWidth,
+                trunkWidth + 2,
                 heightBasedRadius,
-                foliageHeight,
                 dps
             )
         }
     }
 
 
-    fun predicate2(
+    fun coneLeaves(
         world: StructureWorldAccess,
         random: RandomGenerator,
         centerPos: BlockPos,
         isEven: Boolean,
         y: Int,
         radius: Int,
-        dps: DoublePerlinNoiseSampler,
-        predicate: ShapePredicate
+        dps: DoublePerlinNoiseSampler
     ) {
         val i = if (isEven) 1 else 0
         val mutable = BlockPos.Mutable()
-        val leafBlock = SimpleBlockStateProvider.of(Blocks.GREEN_CONCRETE.defaultState)
+        val leafBlock = SimpleBlockStateProvider.of(Blocks.GREEN_STAINED_GLASS.defaultState)
         val leafBlock2 = SimpleBlockStateProvider.of(Blocks.RED_STAINED_GLASS.defaultState)
         val radiu = Math.min(radius, 16)
         for (x in -radiu..radiu + i) {
             for (z in -radiu..radiu + i) {
-                if (predicate(x, z)) {
-                    mutable[centerPos, x, y] = z
-                    if (world.getBlockState(mutable).isIn(BlockTags.REPLACEABLE)) {
-                        val tre = (x.toDouble() * x + z * z)
-                        if (2 * tre >= radiu * radiu) {
-                            val noiser = dps.sample(mutable)
-                            if (noiser > abs(tre - 2 * tre)) {
-                                this.setBlockState(
-                                    world, mutable,
-                                    leafBlock.getBlockState(random, mutable)
-                                )
-                            }
-                            else this.setBlockState(
-                                world, mutable,
-                                leafBlock2.getBlockState(random, mutable)
-                            )
-                        } else
-                            this.setBlockState(
-                                world, mutable,
-                                leafBlock.getBlockState(random, mutable)
-                            )
-                    }
+                val dx = if (isEven) min(abs(x), abs(x - 1)) else abs(x)
+                val dz = if (isEven) min(abs(z), abs(z - 1)) else abs(z)
+                val tre = (dx * dx + dz * dz)
+                if (tre < radius * radius) {
+                    mutable.set(centerPos, x, y, z)
+                    if (world.getBlockState(mutable).isIn(BlockTags.REPLACEABLE))
+                        this.setBlockState(
+                            world, mutable,
+                            leafBlock.getBlockState(random, mutable)
+                        )
                 }
             }
         }
     }
 
-    fun predicate1(
+    fun branch(
+        config: DefaultFeatureConfig,
         world: StructureWorldAccess,
         random: RandomGenerator,
-        centerPos: BlockPos,
-        isEven: Boolean,
-        y: Int,
-        radius: Int,
-        height: Int,
-        dps: DoublePerlinNoiseSampler
+        origin: BlockPos,
+        trunkWidth: Int,
+        trunkHeight: Int
     ) {
-        return predicate2(world, random, centerPos, isEven, y, radius, dps)
-        { x, z ->
-            val dx = if (isEven) min(abs(x), abs(x - 1)) else abs(x)
-            val dz = if (isEven) min(abs(z), abs(z - 1)) else abs(z)
-//            val d = (height / radius) * (2 / 3f)
-            (dx * dx + dz * dz) < radius * radius
-//            !(if (dx + dz >= radius) true
-//            else if (y > -height * 2 / 3f)
-//                (d * 0.5 * sqrt((dx * dx + dz * dz).toDouble()) - height) > radius
-//            else
-//                -d * sqrt((dx * dx + dz * dz).toDouble()) > radius)
+        val logBlock = SimpleBlockStateProvider.of(DuskBlocks.SEQUOIA_LOG.defaultState)
+        val logBlock2 = SimpleBlockStateProvider.of(Blocks.RED_CONCRETE.defaultState)
+        val isEven = trunkWidth % 2 == 0
+        var posY = trunkHeight
+        val height3 = trunkHeight / 3
+        while (posY > height3) {
+            var rotation = random.nextFloat() * rotate90
+//            val axis = ((rotation - rotate45) * (180 / pi)) / 90f
+
+            var rotX = 0
+            var rotZ = 0
+            var posY2 = 0
+            val angleY = 2 + random.nextInt(3)
+            for (side in 0..3) {
+                val axis = if ((rotation + rotate45) % pi > rotate90) {
+                    Direction.Axis.Z
+                } else {
+                    Direction.Axis.X
+                }
+                val start = if (isEven || (rotation >= rotate135 && rotation < rotate315)) 2 else 1
+                if (posY + trunkWidth < trunkHeight) {
+                    for (offset in start..start + (trunkWidth / 2) + (0.3 * (trunkHeight - posY)).toInt()) {
+                        rotX = (1.5f + MathHelper.cos(rotation) * offset).toInt()
+                        rotZ = (1.5f + MathHelper.sin(rotation) * offset).toInt()
+
+                        val blockPos = origin.add(rotX, posY - (offset / angleY) + posY2, rotZ)
+                        if (origin.x - blockPos.x > 15 ||
+                            origin.z - blockPos.z > 15 ||
+                            origin.x - blockPos.x < -15 ||
+                            origin.z - blockPos.z < -15
+                        ) {
+                            this.setBlockState(
+                                world, blockPos,
+                                logBlock2.getBlockState(random, blockPos)
+                            )
+                        } else
+                            this.setBlockState(
+                                world, blockPos,
+                                logBlock.getBlockState(random, blockPos)
+                                    .withIfExists(Properties.AXIS, axis)
+                            )
+//                this.placeTrunkBlock(world, replacer, random, blockPos, config)
+                    }
+                }
+                rotation += rotate90
+                posY2 = random.nextInt(4) - 2
+            }
+            posY -= 1 + random.nextInt(2)
         }
+//        println(" ")
     }
 
 
@@ -213,7 +268,7 @@ class SequoiaTreeFeature(codec: Codec<DefaultFeatureConfig>) : Feature<DefaultFe
         random: RandomGenerator,
         positions: MutableList<BlockPos>
     ) {
-        val logBlock = SimpleBlockStateProvider.of(Blocks.BLACKSTONE.defaultState)
+        val logBlock = SimpleBlockStateProvider.of(DuskBlocks.SEQUOIA_LOG.defaultState)
         positions.forEach {
             this.setBlockState(world, it, logBlock.getBlockState(random, it))
         }
@@ -226,22 +281,23 @@ class SequoiaTreeFeature(codec: Codec<DefaultFeatureConfig>) : Feature<DefaultFe
     private fun isCornerAndActive(
         x: Int,
         z: Int,
-        width: Int,
+        min: Int,
+        max: Int,
         cornerNW: Boolean,
         cornerNE: Boolean,
         cornerSW: Boolean,
         cornerSE: Boolean
     ): Boolean {
-        if (x == 0) {
-            if (z == 0) {
+        if (x == min) {
+            if (z == min) {
                 return cornerNW
-            } else if (z == width) {
+            } else if (z == max) {
                 return cornerSW
             }
-        } else if (x == width) {
-            if (z == 0) {
+        } else if (x == max) {
+            if (z == min) {
                 return cornerNE
-            } else if (z == width) {
+            } else if (z == max) {
                 return cornerSE
             }
         }
@@ -255,8 +311,9 @@ class SequoiaTreeFeature(codec: Codec<DefaultFeatureConfig>) : Feature<DefaultFe
     private fun isCorner(
         x: Int,
         z: Int,
-        width: Int
+        min: Int,
+        max: Int,
     ): Boolean {
-        return (x == 0 || x == width) && (z == 0 || z == width)
+        return (x == min || x == max) && (z == min || z == max)
     }
 }

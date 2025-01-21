@@ -10,6 +10,7 @@ object DuskProperties {
 
 
     val CHALICES: IntProperty = IntProperty.of("chalices", 1, 4)
+    val DISTANCE_1_15: IntProperty = IntProperty.of("distance", 1, 15)
 
 
     val GODHOME_BRONZE_PHASE = EnumProperty.of("godhome_bronze_phase", GodhomeBronzePhase::class.java)
