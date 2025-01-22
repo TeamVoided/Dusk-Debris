@@ -45,7 +45,7 @@ object SnifferVariants {
         registryKey: RegistryKey<SnifferVariant>,
         biomes: TagKey<Biome>
     ): Holder.Reference<SnifferVariant> {
-        return return this.register(registryKey, getRegistryLookup(RegistryKeys.BIOME).getTagOrThrow(biomes))
+        return this.register(registryKey, getRegistryLookup(RegistryKeys.BIOME).getTagOrThrow(biomes))
     }
 
     fun BootstrapContext<SnifferVariant>.register(
