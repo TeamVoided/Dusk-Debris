@@ -34,9 +34,11 @@ class DuskDebrisData : DataGeneratorEntrypoint {
 //        pack.addProvider(::RecipesProvider)
 //        pack.addProvider(::BlockLootTableProvider)
         pack.addProvider(::EntityLootTableProvider)
+        println("Goodbye from Datagen")
     }
 
     override fun buildRegistry(gen: RegistrySetBuilder) {
+        println("Start build registry")
         gen.add(RegistryKeys.BIOME, BiomeCreator::boostrap)
         gen.add(RegistryKeys.CONFIGURED_FEATURE, ConfiguredFeatureCreator::bootstrap)
         gen.add(RegistryKeys.PLACED_FEATURE, PlacedFeatureCreator::bootstrap)
@@ -45,5 +47,6 @@ class DuskDebrisData : DataGeneratorEntrypoint {
 
         gen.add(RegistryKeys.PAINTING_VARIANT, PaintingVariants::bootstrap)
         gen.add(DuskRegistries.SNIFFER_VARIANT, SnifferVariants::bootstrap)
+        println("End build registry")
     }
 }
