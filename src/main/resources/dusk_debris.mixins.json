@@ -6,7 +6,8 @@
   "mixins": [
     "BlockEntityTypeMixin",
     "FreezeTopLayerFeatureMixin",
-    "PaintingEntityMixin"
+    "PaintingEntityMixin",
+    "SnifferEntityMixin"
   ],
   "injectors": {
     "defaultRequire": 1

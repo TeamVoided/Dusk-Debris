@@ -17,6 +17,9 @@ object SnifferVariants {
 
     val defaultOverlay = texture("default")
 
+    @JvmField
+    val DEFAULT = DuskSnifferVariants.DEFAULT
+
     fun bootstrap(c: BootstrapContext<SnifferVariant>) {
         println("sniffer")
         println(" ")

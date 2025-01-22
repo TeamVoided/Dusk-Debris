@@ -11,6 +11,7 @@ object DuskRegistries {
         DynamicRegistries.registerSynced(SNIFFER_VARIANT, SnifferVariant.CODEC)
     }
 
+    @JvmField
     val SNIFFER_VARIANT: RegistryKey<Registry<SnifferVariant>> = createRegistryKey("sniffer_variant")
 
     private fun <T> createRegistryKey(id: String): RegistryKey<Registry<T>> {
