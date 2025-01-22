@@ -7,7 +7,7 @@ import net.minecraft.entity.decoration.painting.PaintingVariants
 import net.minecraft.registry.HolderLookup
 import net.minecraft.registry.RegistryKeys
 import org.teamvoided.dusk_debris.data.tags.DuskPaintingVariantTags
-import org.teamvoided.dusk_debris.data.DuskPaintingVariants
+import org.teamvoided.dusk_debris.data.variants.DuskPaintingVariants
 import java.util.concurrent.CompletableFuture
 
 class PaintingVariantTagsProvider(o: FabricDataOutput, r: CompletableFuture<HolderLookup.Provider>) :

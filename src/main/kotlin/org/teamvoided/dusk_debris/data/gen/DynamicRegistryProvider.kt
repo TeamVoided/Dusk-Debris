@@ -4,6 +4,7 @@ import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricDynamicRegistryProvider
 import net.minecraft.registry.HolderLookup
 import net.minecraft.registry.RegistryKeys
+import org.teamvoided.dusk_debris.init.DuskRegistries
 import java.util.concurrent.CompletableFuture
 
 class DynamicRegistryProvider(o: FabricDataOutput, r: CompletableFuture<HolderLookup.Provider>) :
@@ -15,7 +16,10 @@ class DynamicRegistryProvider(o: FabricDataOutput, r: CompletableFuture<HolderLo
         e.addAll(reg.getLookupOrThrow(RegistryKeys.BIOME))
         e.addAll(reg.getLookupOrThrow(RegistryKeys.PLACED_FEATURE))
         e.addAll(reg.getLookupOrThrow(RegistryKeys.CONFIGURED_FEATURE))
-        e.addAll(reg.getLookupOrThrow(RegistryKeys.PAINTING_VARIANT))
+
         e.addAll(reg.getLookupOrThrow(RegistryKeys.ENCHANTMENT))
+
+        e.addAll(reg.getLookupOrThrow(RegistryKeys.PAINTING_VARIANT))
+        e.addAll(reg.getLookupOrThrow(DuskRegistries.SNIFFER_VARIANT))
     }
 }

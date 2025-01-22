@@ -28,7 +28,7 @@ import org.teamvoided.dusk_debris.data.tags.DuskBlockTags
 import org.teamvoided.dusk_debris.data.tags.DuskEntityTypeTags
 import org.teamvoided.dusk_debris.init.DuskEntities
 import org.teamvoided.dusk_debris.init.DuskSoundEvents
-import org.teamvoided.dusk_debris.data.DuskConfiguredFeatures
+import org.teamvoided.dusk_debris.data.worldgen.DuskConfiguredFeatures
 import org.teamvoided.dusk_debris.particle.NethershroomSporeParticleEffect
 import java.util.*
 import kotlin.random.Random

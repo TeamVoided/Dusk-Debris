@@ -10,7 +10,7 @@ import net.minecraft.sound.SoundEvents
 import net.minecraft.world.biome.*
 import net.minecraft.world.gen.GenerationStep
 import net.minecraft.world.gen.feature.DefaultBiomeFeatures
-import org.teamvoided.dusk_debris.data.DuskPlacedFeatures
+import org.teamvoided.dusk_debris.data.worldgen.DuskPlacedFeatures
 import org.teamvoided.dusk_debris.init.worldgen.DuskBiomes
 
 object BiomeCreator {

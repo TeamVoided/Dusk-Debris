@@ -16,8 +16,8 @@ import net.minecraft.world.gen.feature.ConfiguredFeature
 import net.minecraft.world.gen.feature.PlacedFeature
 import net.minecraft.world.gen.feature.PlacementModifier
 import net.minecraft.world.gen.feature.util.PlacedFeatureUtil
-import org.teamvoided.dusk_debris.data.DuskConfiguredFeatures
-import org.teamvoided.dusk_debris.data.DuskPlacedFeatures
+import org.teamvoided.dusk_debris.data.worldgen.DuskConfiguredFeatures
+import org.teamvoided.dusk_debris.data.worldgen.DuskPlacedFeatures
 import org.teamvoided.dusk_debris.data.tags.DuskBlockTags
 
 @Suppress("MagicNumber")

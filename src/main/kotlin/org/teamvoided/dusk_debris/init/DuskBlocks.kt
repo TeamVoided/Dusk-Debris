@@ -31,7 +31,7 @@ import org.teamvoided.dusk_debris.block.voided.sign.VoidCeilingHangingSignBlock
 import org.teamvoided.dusk_debris.block.voided.sign.VoidSignBlock
 import org.teamvoided.dusk_debris.block.voided.sign.VoidWallHangingSignBlock
 import org.teamvoided.dusk_debris.block.voided.sign.VoidWallSignBlock
-import org.teamvoided.dusk_debris.data.DuskConfiguredFeatures
+import org.teamvoided.dusk_debris.data.worldgen.DuskConfiguredFeatures
 import org.teamvoided.dusk_debris.util.*
 
 @Suppress("HasPlatformType", "MemberVisibilityCanBePrivate", "unused", "DEPRECATION")

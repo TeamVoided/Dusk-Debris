@@ -23,8 +23,8 @@ import net.minecraft.world.gen.stateprovider.WeightedBlockStateProvider
 import net.minecraft.world.gen.treedecorator.LeavesVineTreeDecorator
 import net.minecraft.world.gen.treedecorator.TreeDecorator
 import net.minecraft.world.gen.trunk.StraightTrunkPlacer
-import org.teamvoided.dusk_debris.data.DuskConfiguredFeatures
-import org.teamvoided.dusk_debris.data.DuskPlacedFeatures
+import org.teamvoided.dusk_debris.data.worldgen.DuskConfiguredFeatures
+import org.teamvoided.dusk_debris.data.worldgen.DuskPlacedFeatures
 import org.teamvoided.dusk_debris.data.tags.DuskBlockTags
 import org.teamvoided.dusk_debris.init.DuskBlocks
 import org.teamvoided.dusk_debris.init.worldgen.DuskFeatures

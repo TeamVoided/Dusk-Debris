@@ -20,6 +20,7 @@ object DuskDebris {
 
     fun init() {
         log.info("Hello from Common")
+
         DuskItems.init()
         DuskBlocks.init()
         DuskFluids.init()
@@ -34,6 +35,8 @@ object DuskDebris {
         DuskSoundEvents.init()
         DuskGameRules.init()
         DuskTabs.init()
+
+        DuskRegistries.init()
     }
 
 

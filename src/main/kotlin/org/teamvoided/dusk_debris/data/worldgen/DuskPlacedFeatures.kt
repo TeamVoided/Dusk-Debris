@@ -1,4 +1,4 @@
-package org.teamvoided.dusk_debris.data
+package org.teamvoided.dusk_debris.data.worldgen
 
 import net.minecraft.registry.RegistryKey
 import net.minecraft.registry.RegistryKeys

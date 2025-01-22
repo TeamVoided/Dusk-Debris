@@ -1,4 +1,4 @@
-package org.teamvoided.dusk_debris.data.gen.providers
+package org.teamvoided.dusk_debris.data.gen.providers.loot_table
 
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.SimpleFabricLootTableProvider
