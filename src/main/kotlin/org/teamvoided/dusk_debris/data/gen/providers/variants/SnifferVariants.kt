@@ -37,7 +37,7 @@ object SnifferVariants {
         c.register(DuskSnifferVariants.PINK, DuskBiomeTags.SNIFFER_PINK, 0xFCCBE7)
         c.register(DuskSnifferVariants.CHERRY, DuskBiomeTags.SNIFFER_CHERRY, Biomes.CHERRY_GROVE)
         c.register(DuskSnifferVariants.SNOW, DuskBiomeTags.SNIFFER_SNOW, Biomes.SNOWY_SLOPES)
-        c.register(DuskSnifferVariants.FROZEN, DuskBiomeTags.SNIFFER_FROZEN, 0xFFFFFF)
+        c.register(DuskSnifferVariants.FROZEN, DuskBiomeTags.SNIFFER_FROZEN, 0xF9FEFE)
         c.register(DuskSnifferVariants.DEEP_DARK, DuskBiomeTags.SNIFFER_DEEP_DARK, texture("sculk"))
         println("boot 2")
     }
@@ -47,7 +47,7 @@ object SnifferVariants {
         biomes: TagKey<Biome>
     ): Holder.Reference<SnifferVariant> {
         println("1")
-        return this.register(registryKey, getRegistryLookup(RegistryKeys.BIOME).getTagOrThrow(biomes))
+        return this.register(registryKey,biomes)
     }
 
     fun BootstrapContext<SnifferVariant>.register(
@@ -56,28 +56,16 @@ object SnifferVariants {
         biomeColor: RegistryKey<Biome>
     ): Holder.Reference<SnifferVariant> {
         println("2")
-        return this.register(
-            registryKey,
-            getRegistryLookup(RegistryKeys.BIOME).getTagOrThrow(biomes),
-            null,
-            biomeColor,
-            defaultOverlay
-        )
+        return this.register(registryKey, biomes, null, biomeColor, defaultOverlay)
     }
 
     fun BootstrapContext<SnifferVariant>.register(
         registryKey: RegistryKey<SnifferVariant>,
-        biomes: HolderSet<Biome>,
+        biomes: TagKey<Biome>,
         color: Int
     ): Holder.Reference<SnifferVariant> {
         println("3")
-        return this.register(
-            registryKey,
-            biomes,
-            color,
-            null,
-            defaultOverlay
-        )
+        return this.register(registryKey, biomes, color, null, defaultOverlay)
     }
 
     fun BootstrapContext<SnifferVariant>.register(
@@ -86,37 +74,12 @@ object SnifferVariants {
         overlayTexture: Identifier
     ): Holder.Reference<SnifferVariant> {
         println("4")
-        return this.register(
-            registryKey,
-            biomes,
-            null,
-            null,
-            overlayTexture
-        )
+        return this.register(registryKey, biomes, null, null, overlayTexture)
     }
 
     private fun BootstrapContext<SnifferVariant>.register(
         registryKey: RegistryKey<SnifferVariant>,
-        biomes: TagKey<Biome>,
-        color: Int? = null,
-        biomeColor: RegistryKey<Biome>? = null,
-        overlayTexture: Identifier? = null
-    ): Holder.Reference<SnifferVariant> {
-        println("5")
-        return this.register(
-            registryKey,
-            SnifferVariant(
-                getRegistryLookup(RegistryKeys.BIOME).getTagOrThrow(biomes),
-                color,
-                getRegistryLookup(RegistryKeys.BIOME).getHolder(biomeColor).getOrNull(),
-                overlayTexture
-            )
-        )
-    }
-
-    private fun BootstrapContext<SnifferVariant>.register(
-        registryKey: RegistryKey<SnifferVariant>,
-        biomes: HolderSet<Biome>,
+        biomes:TagKey<Biome>,
         color: Int? = null,
         biomeColor: RegistryKey<Biome>? = null,
         overlayTexture: Identifier? = null
@@ -125,9 +88,9 @@ object SnifferVariants {
         return this.register(
             registryKey,
             SnifferVariant(
-                biomes,
+                getRegistryLookup(RegistryKeys.BIOME).getTagOrThrow(biomes),
                 color,
-                getRegistryLookup(RegistryKeys.BIOME).getHolder(biomeColor).getOrNull(),
+                biomeColor?.let { getRegistryLookup(RegistryKeys.BIOME).getHolder(it).get() },
                 overlayTexture
             )
         )

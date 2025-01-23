@@ -25,8 +25,4 @@ accessible class net/minecraft/client/render/BackgroundRenderer$FogParameters
 
 accessible method net/minecraft/world/biome/OverworldBiomeCreator addBasicFeatures (Lnet/minecraft/world/biome/GenerationSettings$Builder;)V
 
-accessible class net/minecraft/registry/RegistrySetBuilder$BuildState
-accessible class net/minecraft/registry/RegistrySetBuilder$UniversalLookup
-accessible field net/minecraft/registry/RegistrySetBuilder$UniversalLookup holders Ljava/util/Map;
-
 accessible class net/minecraft/world/biome/Biome$Weather

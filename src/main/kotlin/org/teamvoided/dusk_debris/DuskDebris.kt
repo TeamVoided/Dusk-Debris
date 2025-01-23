@@ -54,14 +54,14 @@ object DuskDebris {
             val root = literal("sniffers").executes { cx ->
                 val world = cx.source.world
                 val player = cx.source.player ?: return@executes 0
-                var offset: Int = 0
+                var offset = 0.0
                 world.registryManager.get(DuskRegistries.SNIFFER_VARIANT).holders().forEach {
                     val sniffer = SnifferEntity(EntityType.SNIFFER, world)
-                    sniffer.setPosition(player.pos.add(0.0, 0.0, offset.toDouble()))
+                    sniffer.setPosition(player.pos.add(offset, 0.0,0.0))
                     sniffer.variant = it
                     sniffer.isAiDisabled = true
                     world.spawnEntity(sniffer)
-                    offset += 3
+                    offset += 2.0
                 }
                 0
             }.build()

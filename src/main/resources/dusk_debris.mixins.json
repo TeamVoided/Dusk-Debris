@@ -8,7 +8,6 @@
     "BlockEntityTypeMixin",
     "FreezeTopLayerFeatureMixin",
     "PaintingEntityMixin",
-    "RegistrySetBuilderMixin",
     "SnifferEntityMixin"
   ],
   "injectors": {
