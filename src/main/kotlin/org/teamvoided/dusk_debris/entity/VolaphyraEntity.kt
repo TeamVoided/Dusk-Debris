@@ -11,6 +11,7 @@ import net.minecraft.entity.data.TrackedData
 import net.minecraft.entity.data.TrackedDataHandlerRegistry
 import net.minecraft.entity.projectile.ProjectileEntity
 import net.minecraft.nbt.NbtCompound
+import net.minecraft.server.world.ServerWorld
 import net.minecraft.sound.SoundEvent
 import net.minecraft.util.TimeHelper
 import net.minecraft.util.math.BlockPos
@@ -68,6 +69,7 @@ class VolaphyraEntity(entityType: EntityType<out VolaphyraEntity>, world: World)
 //            println(angerTime)
 //            isLaunched = false
 //        }
+        println(propulsionTicks)
     }
 
     override fun travel(movementInput: Vec3d?) {
@@ -78,7 +80,7 @@ class VolaphyraEntity(entityType: EntityType<out VolaphyraEntity>, world: World)
                     if (this.hoverPos != BlockPos.ORIGIN) {
                         if (this.propulsionTicks == 10) {
                             propulse()
-                        } else if ((this.propulsionTicks >= 40 && checkCollisionForPathing()) || this.propulsionTicks >= 60) {
+                        } else if (world is ServerWorld && ((this.propulsionTicks >= 40 && checkCollisionForPathing()) || this.propulsionTicks >= 60)) {
                             world.sendEntityStatus(this, 19.toByte())
                         }
                     }

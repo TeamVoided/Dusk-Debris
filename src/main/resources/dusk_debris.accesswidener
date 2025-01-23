@@ -28,3 +28,5 @@ accessible method net/minecraft/world/biome/OverworldBiomeCreator addBasicFeatur
 accessible class net/minecraft/registry/RegistrySetBuilder$BuildState
 accessible class net/minecraft/registry/RegistrySetBuilder$UniversalLookup
 accessible field net/minecraft/registry/RegistrySetBuilder$UniversalLookup holders Ljava/util/Map;
+
+accessible class net/minecraft/world/biome/Biome$Weather
