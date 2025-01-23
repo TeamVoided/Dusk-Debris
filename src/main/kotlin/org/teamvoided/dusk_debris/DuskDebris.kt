@@ -6,10 +6,12 @@ import net.fabricmc.fabric.api.attachment.v1.AttachmentType
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback
 import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.entity.EntityType
+import net.minecraft.entity.decoration.DisplayEntity.TextDisplayEntity
 import net.minecraft.entity.passive.SnifferEntity
 import net.minecraft.item.ItemStack
 import net.minecraft.registry.RegistryKey
 import net.minecraft.server.command.CommandManager.literal
+import net.minecraft.text.Text
 import net.minecraft.util.Identifier
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -56,10 +58,20 @@ object DuskDebris {
                 val player = cx.source.player ?: return@executes 0
                 var offset = 0.0
                 world.registryManager.get(DuskRegistries.SNIFFER_VARIANT).holders().forEach {
+                    val pos = player.pos.add(offset, 0.0, 0.0)
+
                     val sniffer = SnifferEntity(EntityType.SNIFFER, world)
-                    sniffer.setPosition(player.pos.add(offset, 0.0,0.0))
+                    sniffer.setPosition(pos)
                     sniffer.variant = it
                     sniffer.isAiDisabled = true
+                    sniffer.addScoreboardTag("summoned_with_command")
+
+                    val name = TextDisplayEntity(EntityType.TEXT_DISPLAY, world)
+                    sniffer.setPosition(pos.add(0.0, 3.0, 0.0))
+                    name.setText(Text.literal(it.key.toString()))
+                    name.addScoreboardTag("summoned_with_command")
+
+                    world.spawnEntity(name)
                     world.spawnEntity(sniffer)
                     offset += 2.0
                 }

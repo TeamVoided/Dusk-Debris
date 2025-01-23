@@ -7,6 +7,10 @@ import org.teamvoided.dusk_debris.DuskDebris.id
 
 object DuskBiomeTags {
     val TEST = create("test")
+
+    @JvmStatic
+    val WORLDNOISE_WATER = create("worldnoise_water")
+
     //make theese ones generic
     val CRIMSON = create("crimson")
     val WARPED = create("warped")

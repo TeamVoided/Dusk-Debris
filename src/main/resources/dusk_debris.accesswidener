@@ -26,3 +26,5 @@ accessible class net/minecraft/client/render/BackgroundRenderer$FogParameters
 accessible method net/minecraft/world/biome/OverworldBiomeCreator addBasicFeatures (Lnet/minecraft/world/biome/GenerationSettings$Builder;)V
 
 accessible class net/minecraft/world/biome/Biome$Weather
+
+accessible method net/minecraft/entity/decoration/DisplayEntity$TextDisplayEntity setText (Lnet/minecraft/text/Text;)V
