@@ -34,7 +34,10 @@ object DuskParticles {
         FabricParticleTypes.complex(EntityTestParticleEffect.CODEC, EntityTestParticleEffect.PACKET_CODEC)
 
 
-    val WIND = FabricParticleTypes.complex(WindParticleEffect.CODEC, WindParticleEffect.PACKET_CODEC)
+    val WIND: ParticleType<WindParticleEffect> = FabricParticleTypes.complex(WindParticleEffect.CODEC, WindParticleEffect.PACKET_CODEC)
+
+    val SPARK: DefaultParticleType = FabricParticleTypes.simple()
+
 
     fun init() {
         Registry.register(Registries.PARTICLE_TYPE, id("toxic_smoke_particle"), TOXIC_SMOKE_PARTICLE)
@@ -50,5 +53,7 @@ object DuskParticles {
         Registry.register(Registries.PARTICLE_TYPE, id("entity_test"), ENTITY_TEST)
 
         Registry.register(Registries.PARTICLE_TYPE, id("wind"), WIND)
+
+        Registry.register(Registries.PARTICLE_TYPE, id("spark"), SPARK)
     }
 }

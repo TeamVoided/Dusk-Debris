@@ -76,7 +76,6 @@ class WindParticle(
     override fun getType(): ParticleTextureSheet = ParticleTextureSheet.PARTICLE_SHEET_TRANSLUCENT
 
     override fun tick() {
-        val rand = world.random
         this.setSpriteForAge(this.spriteProvider)
         this.prevPosX = this.x
         this.prevPosY = this.y
@@ -86,9 +85,9 @@ class WindParticle(
         } else {
             val i: Int = this.maxAge - this.age
             val lerp = 1.0 / i.toDouble()
-            this.x = MathHelper.lerp(lerp, this.x, endPos.x) + (rand.nextDouble() - rand.nextDouble()) / this.maxAge
-            this.y = MathHelper.lerp(lerp, this.y, endPos.y) + (rand.nextDouble() - rand.nextDouble()) / this.maxAge
-            this.z = MathHelper.lerp(lerp, this.z, endPos.z) + (rand.nextDouble() - rand.nextDouble()) / this.maxAge
+            this.x = MathHelper.lerp(lerp, this.x, endPos.x) + (random.nextDouble() - random.nextDouble()) / this.maxAge
+            this.y = MathHelper.lerp(lerp, this.y, endPos.y) + (random.nextDouble() - random.nextDouble()) / this.maxAge
+            this.z = MathHelper.lerp(lerp, this.z, endPos.z) + (random.nextDouble() - random.nextDouble()) / this.maxAge
 
             val xPoint = this.direction.vector.x * -1.0
             val yPoint = this.direction.vector.y * -1.0
@@ -97,7 +96,6 @@ class WindParticle(
             this.rotation = MathHelper.atan2(xPoint, zPoint).toFloat()
             this.prevPitch = this.pitch
             this.pitch = MathHelper.atan2(yPoint, sqrt(xPoint * xPoint + zPoint * zPoint)).toFloat()
-
         }
     }
 

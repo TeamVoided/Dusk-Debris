@@ -52,43 +52,8 @@ object DuskDebris {
         DuskAttachmentTypes.init()
         DuskRegistries.init()
 
-        CommandRegistrationCallback.EVENT.register { dispatcher, ctx, env ->
-            val root = literal("sniffers").executes { cx ->
-                val world = cx.source.world
-                val player = cx.source.player ?: return@executes 0
-                var offset = 0.0
-                world.registryManager.get(DuskRegistries.SNIFFER_VARIANT).holders().forEach {
-                    val pos = player.pos.add(offset, 0.0, 0.0)
-
-                    val sniffer = SnifferEntity(EntityType.SNIFFER, world)
-                    sniffer.setPosition(pos)
-                    sniffer.variant = it
-                    sniffer.isAiDisabled = true
-                    sniffer.addScoreboardTag("summoned_with_command")
-
-                    val name = TextDisplayEntity(EntityType.TEXT_DISPLAY, world)
-                    sniffer.setPosition(pos.add(0.0, 3.0, 0.0))
-                    name.setText(Text.literal(it.key.toString()))
-                    name.addScoreboardTag("summoned_with_command")
-
-                    world.spawnEntity(name)
-                    world.spawnEntity(sniffer)
-                    offset += 2.0
-                }
-                0
-            }.build()
-            dispatcher.root.addChild(root)
-        }
+        DuskCommands.init()
     }
-
-    @JvmField
-    val SNIFFER_VARIANT: AttachmentType<RegistryKey<SnifferVariant>> =
-        AttachmentRegistry.create(DuskDebris.id("sniffer_variant")) { builder: AttachmentRegistry.Builder<RegistryKey<SnifferVariant>> ->
-            builder
-                .initializer { SnifferVariants.DEFAULT }
-                .persistent(RegistryKey.codec(DuskRegistries.SNIFFER_VARIANT))
-                .syncWith(RegistryKey.packetCodec(DuskRegistries.SNIFFER_VARIANT), AttachmentSyncPredicate.all())
-        }
 
     fun id(path: String) = Identifier.of(MODID, path)
     fun mc(path: String) = Identifier.ofDefault(path)

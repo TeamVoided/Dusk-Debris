@@ -21,5 +21,7 @@ object DuskParticlesClient {
         ParticleFactoryRegistry.getInstance().register(DuskParticles.ENTITY_TEST, EntityTestParticle::Factory)
 
         ParticleFactoryRegistry.getInstance().register(DuskParticles.WIND, WindParticle::Factory)
+
+        ParticleFactoryRegistry.getInstance().register(DuskParticles.SPARK, ElectricityParticle::Factory)
     }
 }

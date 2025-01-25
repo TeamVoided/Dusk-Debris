@@ -37,13 +37,13 @@ public abstract class SnifferEntityMixin extends MobEntity implements VariantPro
 
     @Override
     public Holder<SnifferVariant> getVariant() {
-        var id = this.getAttachedOrElse(DuskDebris.SNIFFER_VARIANT, SnifferVariants.DEFAULT);
+        var id = this.getAttachedOrElse(DuskAttachmentTypes.SNIFFER_VARIANT, SnifferVariants.DEFAULT);
         return this.getWorld().getRegistryManager().getLookupOrThrow(DuskRegistries.SNIFFER_VARIANT).getHolderOrThrow(id);
     }
 
     @Override
     public void setVariant(Holder<SnifferVariant> holder) {
-        this.setAttached(DuskDebris.SNIFFER_VARIANT, holder.getKey().get());
+        this.setAttached(DuskAttachmentTypes.SNIFFER_VARIANT, holder.getKey().get());
     }
 
     static {
