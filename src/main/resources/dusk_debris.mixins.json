@@ -6,9 +6,22 @@
   "mixins": [
     "BiomeMixin",
     "BlockEntityTypeMixin",
+    "EntityWindLogicMixin",
     "FreezeTopLayerFeatureMixin",
     "PaintingEntityMixin",
-    "SnifferEntityMixin"
+    "SnifferEntityMixin",
+    "fluid_tag.BucketItemMixin",
+    "fluid_tag.FluidBlockMixin",
+    "fluid_tag.ItemEntityMixin",
+    "fluid_tag.LavaFluidMixin",
+    "fluid_tag.WaterFluidMixin",
+    "fluid_tag.lava.CactusBlockMixin",
+    "fluid_tag.water.ConcretePowderBlockMixin",
+    "fluid_tag.water.CoralParentBlockMixin",
+    "fluid_tag.water.EntityMixin",
+    "fluid_tag.water.FarmlandBlockMixin",
+    "fluid_tag.water.FishingBobberEntityMixin",
+    "fluid_tag.water.GlassBottleItemMixin"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -40,7 +40,9 @@ object DuskBlocks {
     val CUTOUT_BLOCKS = mutableSetOf<Block>()
     val TRANSLUCENT_BLOCKS = mutableSetOf<Block>()
 
-    val ENTITY_TEST_PARTICLE_BLOCK = register("entity_test_particle_block", EntityTestParticleBlock(copy(STONE)))
+    val TEST_BLOCK = register("test_block", EntityTestParticleBlock(copy(STONE)))
+
+    val ACID = registerNoItem("acid", FluidBlock(DuskFluids.ACID, copy(WATER).mapColor(MapColor.LIME)))
 
     val BRONZE_BLOCK = register(
         "bronze_block", Block(

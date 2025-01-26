@@ -1,7 +1,9 @@
 package org.teamvoided.dusk_debris.init
 
 import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry
+import net.minecraft.client.particle.BubblePopParticle
 import org.teamvoided.dusk_debris.particle.*
+import org.teamvoided.dusk_debris.particle.vanilla.AdditionalWaterSuspendParticle
 
 object DuskParticlesClient {
     //ParticleManager
@@ -23,5 +25,8 @@ object DuskParticlesClient {
         ParticleFactoryRegistry.getInstance().register(DuskParticles.WIND, WindParticle::Factory)
 
         ParticleFactoryRegistry.getInstance().register(DuskParticles.SPARK, ElectricityParticle::Factory)
+
+        ParticleFactoryRegistry.getInstance().register(DuskParticles.UNDERACID, AdditionalWaterSuspendParticle::UnderacidFactory)
+        ParticleFactoryRegistry.getInstance().register(DuskParticles.ACID_BUBBLE_POP, BubblePopParticle::Factory)
     }
 }

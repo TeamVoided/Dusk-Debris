@@ -43,6 +43,7 @@ class DuskDebrisData : DataGeneratorEntrypoint {
         gen.add(RegistryKeys.CONFIGURED_FEATURE, ConfiguredFeatureCreator::bootstrap)
         gen.add(RegistryKeys.PLACED_FEATURE, PlacedFeatureCreator::bootstrap)
 
+        gen.add(RegistryKeys.DAMAGE_TYPE, DamageTypeProvider::bootstrap)
         gen.add(RegistryKeys.ENCHANTMENT, EnchantmentsProvider::bootstrap)
 
         gen.add(RegistryKeys.PAINTING_VARIANT, PaintingVariants::bootstrap)

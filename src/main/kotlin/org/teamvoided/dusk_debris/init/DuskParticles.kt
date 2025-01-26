@@ -34,9 +34,16 @@ object DuskParticles {
         FabricParticleTypes.complex(EntityTestParticleEffect.CODEC, EntityTestParticleEffect.PACKET_CODEC)
 
 
-    val WIND: ParticleType<WindParticleEffect> = FabricParticleTypes.complex(WindParticleEffect.CODEC, WindParticleEffect.PACKET_CODEC)
+    val WIND: ParticleType<WindParticleEffect> =
+        FabricParticleTypes.complex(WindParticleEffect.CODEC, WindParticleEffect.PACKET_CODEC)
 
     val SPARK: DefaultParticleType = FabricParticleTypes.simple()
+
+    val UNDERACID: DefaultParticleType = FabricParticleTypes.simple()
+    val ACID_BUBBLE_POP: DefaultParticleType = FabricParticleTypes.simple()
+
+    val STATIONARY_EMITTER: ParticleType<StationaryEmitterParticleEffect> =
+        FabricParticleTypes.complex(StationaryEmitterParticleEffect.CODEC, StationaryEmitterParticleEffect.PACKET_CODEC)
 
 
     fun init() {
@@ -55,5 +62,7 @@ object DuskParticles {
         Registry.register(Registries.PARTICLE_TYPE, id("wind"), WIND)
 
         Registry.register(Registries.PARTICLE_TYPE, id("spark"), SPARK)
+        Registry.register(Registries.PARTICLE_TYPE, id("underacid"), UNDERACID)
+        Registry.register(Registries.PARTICLE_TYPE, id("acid_bubble_pop"), ACID_BUBBLE_POP)
     }
 }

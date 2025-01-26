@@ -3,6 +3,7 @@ package org.teamvoided.dusk_debris
 import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRendererRegistrationCallback
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper
+import net.minecraft.client.render.CameraSubmersionType
 import net.minecraft.client.render.entity.SnifferEntityRenderer
 import net.minecraft.client.render.entity.feature.FeatureRendererContext
 import net.minecraft.client.render.entity.model.SnifferEntityModel
@@ -33,6 +34,9 @@ object DuskDebrisClient {
             if (entityRenderer !is SnifferEntityRenderer) return@register
             registrationHelper.register(SnifferOverlayFeatureRenderer(entityRenderer))
         }
-       ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(WaterColormapResourceSupplier())
+        ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(WaterColormapResourceSupplier())
+
+
+        CameraSubmersionType.entries.forEach { println(it) }
     }
 }

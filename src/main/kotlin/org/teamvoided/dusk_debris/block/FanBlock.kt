@@ -22,8 +22,10 @@ import net.minecraft.world.WorldAccess
 import net.minecraft.world.event.GameEvent
 import org.teamvoided.dusk_debris.block.not_blocks.DuskProperties
 import org.teamvoided.dusk_debris.data.tags.DuskEntityTypeTags
+import org.teamvoided.dusk_debris.entity.helper.FanLogic.inFanWind
 import org.teamvoided.dusk_debris.particle.WindParticleEffect
 import org.teamvoided.dusk_debris.util.spawnParticles
+import org.teamvoided.dusk_debris.util.velocityWind
 
 open class FanBlock(val strength: Int, settings: Settings) :
     SixWayFacingBlock(settings) {
@@ -123,8 +125,6 @@ open class FanBlock(val strength: Int, settings: Settings) :
             val worldBlock = world.getBlockState(pos.offset(facing, it + 1))
             if (
                 !worldBlock.materialReplaceable() &&
-                worldBlock.isOpaque &&
-                worldBlock.isSolid &&
                 (worldBlock.isSideSolidFullSquare(world, posCheck, facing) ||
                         worldBlock.isSideSolidFullSquare(world, posCheck, facing.opposite))
             ) {
@@ -177,26 +177,16 @@ open class FanBlock(val strength: Int, settings: Settings) :
 
     private fun addEntitySpeed(entity: Entity, direction: Direction) {
         val power: Double = strength.toDouble()
-        var velocity: Vec3d = entity.velocity
-        velocity = when (direction) {
-            Direction.UP -> Vec3d(velocity.x, theee(velocity.y, power), velocity.z)
-            Direction.DOWN -> Vec3d(velocity.x, theee(velocity.y, -power), velocity.z)
-            Direction.SOUTH -> Vec3d(velocity.x, velocity.y, theee(velocity.z, power))
-            Direction.NORTH -> Vec3d(velocity.x, velocity.y, theee(velocity.z, -power))
-            Direction.EAST -> Vec3d(theee(velocity.x, power), velocity.y, velocity.z)
-            Direction.WEST -> Vec3d(theee(velocity.x, -power), velocity.y, velocity.z)
+        val velocity = when (direction) {
+            Direction.UP -> Vec3d(0.0, power, 0.0)
+            Direction.DOWN -> Vec3d(0.0, -power, 0.0)
+            Direction.SOUTH -> Vec3d(0.0, 0.0, power)
+            Direction.NORTH -> Vec3d(0.0, 0.0, -power)
+            Direction.EAST -> Vec3d(power, 0.0, 0.0)
+            Direction.WEST -> Vec3d(-power, 0.0, 0.0)
         }
 
-        entity.velocity = velocity
-    }
-
-    private fun theee(velocity: Double, power: Double): Double {
-        val upperBound = power * 0.1
-        val newVelocity = velocity + power * 0.025
-        return if (power < 0)
-            if (upperBound < newVelocity) newVelocity else velocity
-        else
-            if (upperBound > newVelocity) newVelocity else velocity
+        entity.inFanWind(velocity)
     }
 
     private fun getBox(direction: Direction, windLength: Double): Box {

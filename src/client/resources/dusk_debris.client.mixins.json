@@ -5,9 +5,16 @@
   "compatibilityLevel": "JAVA_21",
   "client": [
     "BackgroundRendererMixin",
-    "ExampleMixin"
+    "ExampleMixin",
+    "fluid_tag.CameraMixin",
+    "fluid_tag.water.BubbleColumnUpParticleMixin",
+    "fluid_tag.water.BubbleParticleMixin",
+    "fluid_tag.water.CurrentDownParticleMixin"
   ],
   "injectors": {
     "defaultRequire": 1
-  }
+  },
+  "mixins": [
+    "CameraSubmersionTypeMixin"
+  ]
 }

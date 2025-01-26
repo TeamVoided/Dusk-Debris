@@ -17,6 +17,7 @@ class DynamicRegistryProvider(o: FabricDataOutput, r: CompletableFuture<HolderLo
         e.addAll(reg.getLookupOrThrow(RegistryKeys.PLACED_FEATURE))
         e.addAll(reg.getLookupOrThrow(RegistryKeys.CONFIGURED_FEATURE))
 
+        e.addAll(reg.getLookupOrThrow(RegistryKeys.DAMAGE_TYPE))
         e.addAll(reg.getLookupOrThrow(RegistryKeys.ENCHANTMENT))
 
         e.addAll(reg.getLookupOrThrow(RegistryKeys.PAINTING_VARIANT))

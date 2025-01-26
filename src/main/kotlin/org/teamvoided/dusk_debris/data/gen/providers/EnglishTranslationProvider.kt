@@ -3,14 +3,13 @@ package org.teamvoided.dusk_debris.data.gen.providers
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricLanguageProvider
 import net.minecraft.block.Block
-import net.minecraft.enchantment.Enchantment
 import net.minecraft.entity.EntityType
 import net.minecraft.item.Item
 import net.minecraft.registry.HolderLookup
 import net.minecraft.registry.Registries
 import net.minecraft.util.Identifier
-import net.minecraft.util.Util
-import org.teamvoided.dusk_debris.data.DuskEnchantments
+import org.teamvoided.dusk_debris.data.gen.providers.english_translation.DamageTypeTranslations
+import org.teamvoided.dusk_debris.data.gen.providers.english_translation.PaintingTranslations
 import org.teamvoided.dusk_debris.entity.DuskEntityLists
 import org.teamvoided.dusk_debris.init.*
 import org.teamvoided.dusk_debris.init.DuskTabs.getKey
@@ -33,10 +32,8 @@ class EnglishTranslationProvider(o: FabricDataOutput, r: CompletableFuture<Holde
 
         gen.add("container.treasure_chest", "Treasure Chest")
 
-        gen.add("painting.dusk_debris.l_b_r.title", "L. Briggsy R.")
-        gen.add("painting.dusk_debris.l_b_r.author", "Original Model By Ivan Yosifov")
-        gen.add("painting.dusk_debris.skeleton_appears.title", "The Skeleton")
-        gen.add("painting.dusk_debris.skeleton_appears.author", "Appears")
+        DamageTypeTranslations.translations(gen)
+        PaintingTranslations.translations(gen)
 
         getKey(DuskTabs.DUSK_TAB)?.let { gen.add(it, "Dusk Items") }
         getKey(DuskTabs.EVERYTHING)?.let { gen.add(it, "Dusk Items") }

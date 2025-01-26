@@ -1,7 +1,9 @@
 package org.teamvoided.dusk_debris.entity.helper
 
 import net.minecraft.entity.Entity
+import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.util.math.Vec3d
+import org.teamvoided.dusk_debris.util.velocityWind
 
 object FanLogic {
     fun Entity.inFanWind(velocity: Vec3d) {
@@ -9,16 +11,12 @@ object FanLogic {
     }
 
     fun Entity.inFanWind(x: Double, y: Double, z: Double) {
-        val velocity = Vec3d.ZERO
-//        if (x != 0.0) velocity.add(lowerOrCombine(x, this.velocity.x), 0.0, 0.0)
-//        if (y != 0.0) velocity.add(0.0, lowerOrCombine(y, this.velocity.y), 0.0)
-//        if (z != 0.0) velocity.add(0.0, 0.0, lowerOrCombine(z, this.velocity.z))
-        velocity.add(
-            lowerOrCombine(x, this.velocity.x),
-            lowerOrCombine(y, this.velocity.y),
-            lowerOrCombine(z, this.velocity.z)
+        if (this !is PlayerEntity) return
+        this.velocityWind = Vec3d(
+            lowerOrCombine(x, this.velocityWind.x),
+            lowerOrCombine(y, this.velocityWind.y),
+            lowerOrCombine(z, this.velocityWind.z)
         )
-        this.velocity = velocity
     }
 
     private fun lowerOrCombine(input: Double, old: Double): Double {

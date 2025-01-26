@@ -23,6 +23,7 @@ import net.minecraft.util.random.RandomGenerator
 import net.minecraft.world.*
 import org.teamvoided.dusk_debris.data.tags.DuskFluidTags
 import org.teamvoided.dusk_debris.init.DuskFluids
+import org.teamvoided.dusk_debris.init.DuskParticles
 import java.util.*
 
 abstract class AcidFluid : FlowableFluid() {
@@ -45,7 +46,6 @@ abstract class AcidFluid : FlowableFluid() {
 
         super.flow(world, pos, state, direction, fluidState);
     }
-
 
     override fun getFlowing(): Fluid = DuskFluids.FLOWING_ACID
 
@@ -77,7 +77,7 @@ abstract class AcidFluid : FlowableFluid() {
 //            val fluidState2: FluidState = world.getFluidState(pos.offset(direction.opposite))
 //            return (fluid.getLevel() > this.getLevel(state))
 //        } else
-            return direction == Direction.DOWN && !fluid.isIn(DuskFluidTags.ACID)
+        return direction == Direction.DOWN && !fluid.isIn(DuskFluidTags.ACID_DOES_NOT_REPLACE_BELOW)
     }
 
     override fun getBucketFillSound(): Optional<SoundEvent> {
@@ -94,13 +94,13 @@ abstract class AcidFluid : FlowableFluid() {
                     SoundEvents.BLOCK_WATER_AMBIENT,
                     SoundCategory.BLOCKS,
                     random.nextFloat() * 0.25F + 0.75F,
-                    random.nextFloat() + 0.5F,
+                    random.nextFloat() + 0.25F,
                     false
                 )
             }
         } else if (random.nextInt(10) == 0) {
             world.addParticle(
-                ParticleTypes.UNDERWATER,
+                DuskParticles.UNDERACID,
                 pos.x + random.nextDouble(),
                 pos.y + random.nextDouble(),
                 pos.z + random.nextDouble(),
@@ -109,6 +109,27 @@ abstract class AcidFluid : FlowableFluid() {
                 0.0
             )
         }
+        val blockPosUp = pos.up()
+        if (world.getBlockState(blockPosUp).isAir &&
+            !world.getBlockState(blockPosUp).isOpaqueFullCube(world, blockPosUp)
+        ) {
+            if (random.nextInt(100) == 0) {
+                val x = pos.x + random.nextDouble()
+                val y = pos.y + 1.0
+                val z = pos.z + random.nextDouble()
+                world.addParticle(ParticleTypes.SMOKE, x, y, z, 0.0, 0.0, 0.0)
+                world.playSound(
+                    x, y, z,
+                    SoundEvents.BLOCK_FIRE_EXTINGUISH,
+                    SoundCategory.BLOCKS,
+                    0.2f + random.nextFloat() * 0.2f,
+                    0.9f + random.nextFloat() * 0.15f,
+                    false
+                )
+            }
+        }
+        val blockPosDown = pos.down()
+
     }
 
     override fun beforeBreakingBlock(world: WorldAccess, pos: BlockPos, state: BlockState) {
