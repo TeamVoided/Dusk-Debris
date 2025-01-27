@@ -45,6 +45,9 @@ object DuskParticles {
     val STATIONARY_EMITTER: ParticleType<StationaryEmitterParticleEffect> =
         FabricParticleTypes.complex(StationaryEmitterParticleEffect.CODEC, StationaryEmitterParticleEffect.PACKET_CODEC)
 
+    val FLASH: ParticleType<FlashParticleEffect> =
+        FabricParticleTypes.complex(FlashParticleEffect.CODEC, FlashParticleEffect.PACKET_CODEC)
+
 
     fun init() {
         Registry.register(Registries.PARTICLE_TYPE, id("toxic_smoke_particle"), TOXIC_SMOKE_PARTICLE)

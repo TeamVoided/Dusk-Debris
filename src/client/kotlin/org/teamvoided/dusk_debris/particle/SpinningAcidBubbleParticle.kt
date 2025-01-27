@@ -9,8 +9,6 @@ import net.fabricmc.api.Environment
 import net.minecraft.client.particle.*
 import net.minecraft.client.world.ClientWorld
 import net.minecraft.particle.DefaultParticleType
-import net.minecraft.particle.ParticleTypes
-import net.minecraft.registry.tag.FluidTags
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.MathHelper
 import org.teamvoided.dusk_debris.data.tags.DuskFluidTags
@@ -50,7 +48,7 @@ class SpinningAcidBubbleParticle internal constructor(world: ClientWorld?, d: Do
             this.velocityZ *= 0.07
             this.move(this.velocityX, this.velocityY, this.velocityZ)
             if (!world.getFluidState(BlockPos.create(this.x, this.y, this.z))
-                    .isIn(DuskFluidTags.ACID_BUBBLE_PARTICLE_PERSISTS) || this.onGround
+                    .isIn(DuskFluidTags.ACID_BUBBLE_PARTICLES) || this.onGround
             ) {
                 this.markDead()
             }

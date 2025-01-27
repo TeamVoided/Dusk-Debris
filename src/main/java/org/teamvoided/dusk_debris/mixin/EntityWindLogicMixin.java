@@ -9,10 +9,10 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.teamvoided.dusk_debris.entity.helper.VelocityWind;
+import org.teamvoided.dusk_debris.entity.helper.DuskVelocityWind;
 
 @Mixin(Entity.class)
-public abstract class EntityWindLogicMixin implements VelocityWind {
+public abstract class EntityWindLogicMixin implements DuskVelocityWind {
 
     @Shadow public abstract void addVelocity(Vec3d delta);
 

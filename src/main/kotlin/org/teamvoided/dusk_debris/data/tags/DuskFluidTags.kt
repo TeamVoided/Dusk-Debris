@@ -13,7 +13,7 @@ object DuskFluidTags {
 
     //ACID TAGS
     val ENABLES_ACID_FOG = create("enables_acid_fog") //probably too hard?
-    val ACID_BUBBLE_PARTICLE_PERSISTS = create("acid_bubble_particle_persists")
+    val ACID_BUBBLE_PARTICLES = create("acid_bubble_particles")
     val ACID_DOES_NOT_REPLACE_BELOW = create("acid_does_not_replace_below")
     //no, unless??? val GLASS_BOTTLES_FILL_ACID = create("glass_bottles_fill_acid")
 
@@ -26,6 +26,7 @@ object DuskFluidTags {
     val ENABLES_WATER_FOG = create("enables_water_fog")
     //    val RESETS_FALL_DISTANCE = create("resets_fall_distance") //eunim
     val ENTITY_WATER_MOVEMENT = create("entity_water_movement")
+    val ENTITY_SWIMABLE = create("entity_swimable")
     //    val ENTITY_WATER_PATHFIND = create("entity_water_pathfind")
     val WATER_COMPONENT_COBBLESTONES = create("water_component_stones")
     val WATER_COMPONENT_STONE = create("water_component_stone")
@@ -33,11 +34,14 @@ object DuskFluidTags {
     val WATER_DOES_NOT_REPLACE_BELOW = create("water_does_not_replace_below")
     //    val BOATS_FLOAT_ON = create("boats_float_on")
     val SOLIDIFIES_CONCRETE = create("solidifies_concrete")
-    val ITEMS_AND_EXPERIENCE_ORBS_FLOAT_WATER = create("items_and_experience_orbs_float_water")
+    val ITEMS_AND_EXPERIENCE_ORBS_WATER_LOGIC = create("items_and_experience_orbs_water_logic")
     //val AQUATIC_ENTITY_CHECKERS = create("aquatic_entity_checkers") guardians use this for pathfinding, movement, and spawning, havent checked squids and turtles
     val FISHING_BOBBER_BOBS = create("fishing_bobber_bobs")
     val GLASS_BOTTLES_FILL_WATER = create("glass_bottles_fill_water")
     val ULTRAWARM_BUCKET_RESTRICTION = create("ultrawarm_restriction")
+    val SPREADABLE_BLOCK_SPREADS_UNDER = create("spreadable_block_spreads_under")
+    val ENTITIES_DROWN_IN = create("entities_drown_in")
+    val WATER_SPAWN_TYPE = create("spawn_type/water")
 
 
     //LAVA TAGS
@@ -49,7 +53,8 @@ object DuskFluidTags {
     //    val ENTITY_LAVA_PATHFIND = create("entity_lava_pathfind")
     val LAVA_COMPONENT_BASALT_AND_COBBLESTONES = create("lava_component_basalt_and_cobblestones")
     val LAVA_COMPONENT_STONE = create("lava_component_stone")
-    val ITEMS_AND_EXPERIENCE_ORBS_FLOAT_LAVA = create("items_and_experience_orbs_float_lava")
+    val ITEMS_AND_EXPERIENCE_ORBS_LAVA_LOGIC = create("items_and_experience_orbs_lava_logic")
+    val LAVA_SPAWN_TYPE = create("spawn_type/lava")
 
     fun create(id: String): TagKey<Fluid> = TagKey.of(RegistryKeys.FLUID, DuskDebris.id(id))
     fun create(modId: String, path: String): TagKey<Fluid> = TagKey.of(

@@ -16,6 +16,7 @@ import org.teamvoided.dusk_debris.entity.volaphyra.VolaphyraEntityRenderer
 object DuskEntitiesClient {
     fun init() {
         EntityRendererRegistry.register(DuskEntities.BOX_AREA_EFFECT_CLOUD, ::EmptyEntityRenderer)
+        EntityRendererRegistry.register(DuskEntities.LIGHTNING_CLOUD, ::EmptyEntityRenderer)
         EntityRendererRegistry.register(DuskEntities.GUNPOWDER_BARREL, ::GunpowderBarrelEntityRenderer)
         EntityRendererRegistry.register(DuskEntities.GLOOM, ::GloomEntityRenderer)
         EntityRendererRegistry.register(DuskEntities.SKELETON_WOLF, ::SkeletonWolfEntityRenderer)

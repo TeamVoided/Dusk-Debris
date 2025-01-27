@@ -17,6 +17,7 @@ import org.teamvoided.dusk_debris.data.tags.DuskEntityTypeTags
 import org.teamvoided.dusk_debris.init.DuskBlocks
 import org.teamvoided.dusk_debris.init.DuskItems
 import org.teamvoided.dusk_debris.init.DuskParticles
+import org.teamvoided.dusk_debris.particle.FlashParticleEffect
 import org.teamvoided.dusk_debris.world.explosion.SpecialExplosionBehavior
 import kotlin.math.cos
 import kotlin.math.sin
@@ -47,13 +48,16 @@ open class BlunderbombEntity : AbstractThrwowableBombEntity {
         val serverWorld = this.world as ServerWorld
         serverWorld.spawnParticles(
             DuskParticles.BLUNDERBOMB,
-            this.x,
-            this.y,
-            this.z,
+            this.x, this.y, this.z,
             20,
-            0.0,
-            0.0,
-            0.0,
+            0.0, 0.0, 0.0,
+            1.0
+        )
+        serverWorld.spawnParticles(
+            FlashParticleEffect(0x603300),
+            this.x, this.y, this.z,
+            1,
+            0.0, 0.0, 0.0,
             1.0
         )
         world.playSound(

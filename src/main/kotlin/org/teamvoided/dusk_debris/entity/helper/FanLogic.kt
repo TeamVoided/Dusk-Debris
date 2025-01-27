@@ -11,11 +11,20 @@ object FanLogic {
     }
 
     fun Entity.inFanWind(x: Double, y: Double, z: Double) {
-        if (this !is PlayerEntity) return
+        var mult = 1
+        if (this is PlayerEntity) {
+            if (isCreative && abilities.flying) {
+                return
+            } else if (isOnGround) {
+                mult = 2
+            }
+        }
+        this.resetFallDistance()
+        this.velocityModified = true
         this.velocityWind = Vec3d(
-            lowerOrCombine(x, this.velocityWind.x),
-            lowerOrCombine(y, this.velocityWind.y),
-            lowerOrCombine(z, this.velocityWind.z)
+            lowerOrCombine(x * mult, this.velocityWind.x),
+            lowerOrCombine(y * mult, this.velocityWind.y),
+            lowerOrCombine(z * mult, this.velocityWind.z)
         )
     }
 

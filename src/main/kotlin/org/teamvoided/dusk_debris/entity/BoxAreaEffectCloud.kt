@@ -9,12 +9,13 @@ import net.minecraft.particle.ParticleTypes
 import net.minecraft.util.math.MathHelper
 import net.minecraft.util.math.Vec3d
 import net.minecraft.world.World
-import kotlin.math.sqrt
 
 class BoxAreaEffectCloud(entityType: EntityType<out BoxAreaEffectCloud>, world: World) :
     AreaEffectCloudEntity(entityType, world) {
+
     override fun getDimensions(pose: EntityPose): EntityDimensions {
-        return EntityDimensions.changing(this.radius * 2.0f, this.radius * 2.0f)
+        val dimensions = radius * 2f
+        return EntityDimensions.changing(dimensions, dimensions)
     }
 
     override fun tick() {
@@ -28,17 +29,17 @@ class BoxAreaEffectCloud(entityType: EntityType<out BoxAreaEffectCloud>, world: 
             }
 
             val particleEffect = this.particleType
-            val i: Int
+            val count: Int
             val radius: Float
             if (isWaiting) {
-                i = 2
+                count = 2
                 radius = 0.2f
             } else {
-                i = MathHelper.ceil((3.1415927f * setRadius * setRadius) / 5)
+                count = MathHelper.ceil((3.1415927f * setRadius * setRadius) / 5)
                 radius = setRadius
             }
 
-            for (j in 0 until i) {
+            for (j in 0 until count) {
                 val randInRadius = MathHelper.sqrt(random.nextFloat()) * radius * 1.5f
                 val inSphere = Vec3d(
                     random.nextDouble() - random.nextDouble(),

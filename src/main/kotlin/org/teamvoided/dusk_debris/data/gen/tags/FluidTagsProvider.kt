@@ -36,7 +36,7 @@ class FluidTagsProvider(o: FabricDataOutput, r: CompletableFuture<HolderLookup.P
     private fun acidTags() {
 //        getOrCreateTagBuilder(DuskFluidTags.ENABLES_ACID_FOG)
 //            .forceAddTag(DuskFluidTags.ACID)
-        getOrCreateTagBuilder(DuskFluidTags.ACID_BUBBLE_PARTICLE_PERSISTS)
+        getOrCreateTagBuilder(DuskFluidTags.ACID_BUBBLE_PARTICLES)
             .forceAddTag(FluidTags.WATER)
             .forceAddTag(DuskFluidTags.ACID)
         getOrCreateTagBuilder(DuskFluidTags.ACID_DOES_NOT_REPLACE_BELOW)
@@ -63,6 +63,9 @@ class FluidTagsProvider(o: FabricDataOutput, r: CompletableFuture<HolderLookup.P
         getOrCreateTagBuilder(DuskFluidTags.ENTITY_WATER_MOVEMENT)
             .forceAddTag(FluidTags.WATER)
             .forceAddTag(DuskFluidTags.ACID)
+        getOrCreateTagBuilder(DuskFluidTags.ENTITY_SWIMABLE)
+            .forceAddTag(FluidTags.WATER)
+            .forceAddTag(DuskFluidTags.ACID)
 //        getOrCreateTagBuilder(DuskFluidTags.ENTITY_WATER_PATHFIND)
 //            .forceAddTag(FluidTags.WATER)
         getOrCreateTagBuilder(DuskFluidTags.WATER_COMPONENT_COBBLESTONES)
@@ -83,7 +86,7 @@ class FluidTagsProvider(o: FabricDataOutput, r: CompletableFuture<HolderLookup.P
         getOrCreateTagBuilder(DuskFluidTags.SOLIDIFIES_CONCRETE)
             .forceAddTag(FluidTags.WATER)
             .forceAddTag(DuskFluidTags.ACID)
-        getOrCreateTagBuilder(DuskFluidTags.ITEMS_AND_EXPERIENCE_ORBS_FLOAT_WATER)
+        getOrCreateTagBuilder(DuskFluidTags.ITEMS_AND_EXPERIENCE_ORBS_WATER_LOGIC)
             .forceAddTag(FluidTags.WATER)
             .forceAddTag(DuskFluidTags.ACID)
         getOrCreateTagBuilder(DuskFluidTags.FISHING_BOBBER_BOBS)
@@ -94,6 +97,16 @@ class FluidTagsProvider(o: FabricDataOutput, r: CompletableFuture<HolderLookup.P
         getOrCreateTagBuilder(DuskFluidTags.ULTRAWARM_BUCKET_RESTRICTION)
             .forceAddTag(FluidTags.WATER)
             .forceAddTag(DuskFluidTags.ACID)
+        getOrCreateTagBuilder(DuskFluidTags.SPREADABLE_BLOCK_SPREADS_UNDER)
+            .forceAddTag(FluidTags.WATER)
+            .forceAddTag(DuskFluidTags.ACID)
+        getOrCreateTagBuilder(DuskFluidTags.ENTITIES_DROWN_IN)
+            .forceAddTag(FluidTags.WATER)
+            .forceAddTag(DuskFluidTags.ACID)
+        getOrCreateTagBuilder(DuskFluidTags.WATER_SPAWN_TYPE)
+            .forceAddTag(FluidTags.WATER)
+
+
     }
 
     private fun lavaTags() {
@@ -113,7 +126,9 @@ class FluidTagsProvider(o: FabricDataOutput, r: CompletableFuture<HolderLookup.P
 //            .forceAddTag(FluidTags.LAVA)
         getOrCreateTagBuilder(DuskFluidTags.LAVA_COMPONENT_BASALT_AND_COBBLESTONES)
             .forceAddTag(FluidTags.LAVA)
-        getOrCreateTagBuilder(DuskFluidTags.ITEMS_AND_EXPERIENCE_ORBS_FLOAT_LAVA)
+        getOrCreateTagBuilder(DuskFluidTags.ITEMS_AND_EXPERIENCE_ORBS_LAVA_LOGIC)
+            .forceAddTag(FluidTags.LAVA)
+        getOrCreateTagBuilder(DuskFluidTags.LAVA_SPAWN_TYPE)
             .forceAddTag(FluidTags.LAVA)
     }
 }

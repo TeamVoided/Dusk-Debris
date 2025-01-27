@@ -7,7 +7,8 @@ import org.teamvoided.dusk_debris.data.DuskDamageTypes
 object DamageTypeProvider {
     fun bootstrap(c: BootstrapContext<DamageType>) {
         c.register(DuskDamageTypes.ACID, DamageType("acid", 0.1f))
-        c.register(DuskDamageTypes.ELECTROCUTED, DamageType("electrocuted", 0.1f))
+        c.register(DuskDamageTypes.ELECTRICITY, DamageType("electricity", 0.1f))
+        c.register(DuskDamageTypes.INDIRECT_ELECTRICITY, DamageType("indirect_electricity", 0.1f))
     }
 
 //    fun BootstrapContext<DamageType>.register(
@@ -34,7 +35,7 @@ object DamageTypeProvider {
 //        return DamageType(messageId, DamageScalingType.WHEN_CAUSED_BY_LIVING_NON_PLAYER, exhaustion, effects)
 //    }
 
-    fun DamageType(messageId: String, exhaustion: Float): DamageType {
+    private fun DamageType(messageId: String, exhaustion: Float): DamageType {
         return DamageType(messageId, DamageScalingType.WHEN_CAUSED_BY_LIVING_NON_PLAYER, exhaustion)
     }
 }

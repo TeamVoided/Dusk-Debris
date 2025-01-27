@@ -8,7 +8,8 @@ import org.teamvoided.dusk_debris.DuskDebris
 object DuskDamageTypes {
 
     val ACID = create("acid")
-    val ELECTROCUTED = create("electrocuted")
+    val ELECTRICITY = create("electricity")
+    val INDIRECT_ELECTRICITY = create("indirect_electricity")
 
     fun create(id: String): RegistryKey<DamageType> {
         return RegistryKey.of(RegistryKeys.DAMAGE_TYPE, DuskDebris.id(id))

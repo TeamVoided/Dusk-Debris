@@ -28,5 +28,7 @@ object DuskParticlesClient {
 
         ParticleFactoryRegistry.getInstance().register(DuskParticles.UNDERACID, AdditionalWaterSuspendParticle::UnderacidFactory)
         ParticleFactoryRegistry.getInstance().register(DuskParticles.ACID_BUBBLE_POP, BubblePopParticle::Factory)
+
+        ParticleFactoryRegistry.getInstance().register(DuskParticles.FLASH, FlashParticle::Factory)
     }
 }

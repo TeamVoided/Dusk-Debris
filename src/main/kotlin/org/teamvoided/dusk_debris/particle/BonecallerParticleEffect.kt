@@ -28,7 +28,7 @@ class BonecallerParticleEffect(
             RecordCodecBuilder.mapCodec { instance ->
                 instance.group(
                     Codec.INT.fieldOf("color_1").forGetter { it.color1.rgb },
-                            Codec.INT.fieldOf("color_2").forGetter { it.color2.rgb }
+                    Codec.INT.fieldOf("color_2").forGetter { it.color2.rgb }
                 ).apply(instance, ::BonecallerParticleEffect)
             }
         val PACKET_CODEC: PacketCodec<RegistryByteBuf, BonecallerParticleEffect> =

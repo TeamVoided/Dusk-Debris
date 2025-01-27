@@ -16,10 +16,10 @@ public class ItemEntityMixin {
     @Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/ItemEntity;getFluidHeight(Lnet/minecraft/registry/tag/TagKey;)D"))
     private double fluidTag(ItemEntity instance, TagKey tagKey) {
         if (tagKey == FluidTags.WATER)
-            return instance.getFluidHeight(DuskFluidTags.INSTANCE.getITEMS_AND_EXPERIENCE_ORBS_FLOAT_WATER());
+            return instance.getFluidHeight(DuskFluidTags.INSTANCE.getITEMS_AND_EXPERIENCE_ORBS_WATER_LOGIC());
         else if (tagKey == FluidTags.LAVA)
-            return instance.getFluidHeight(DuskFluidTags.INSTANCE.getITEMS_AND_EXPERIENCE_ORBS_FLOAT_LAVA());
-        else return instance.getFluidHeight(tagKey);
+            return instance.getFluidHeight(DuskFluidTags.INSTANCE.getITEMS_AND_EXPERIENCE_ORBS_LAVA_LOGIC());
+        else return 0;
     }
 
 //    @Redirect(method = "getPositionType", at = @At(value = "INVOKE", target = "Lnet/minecraft/fluid/FluidState;isIn(Lnet/minecraft/registry/tag/TagKey;)Z"))

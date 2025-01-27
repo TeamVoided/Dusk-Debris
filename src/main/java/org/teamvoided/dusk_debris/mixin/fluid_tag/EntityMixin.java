@@ -1,4 +1,4 @@
-package org.teamvoided.dusk_debris.mixin.fluid_tag.water;
+package org.teamvoided.dusk_debris.mixin.fluid_tag;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.fluid.Fluid;

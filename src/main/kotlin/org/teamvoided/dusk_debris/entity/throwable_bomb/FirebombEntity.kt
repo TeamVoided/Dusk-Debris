@@ -27,6 +27,7 @@ import org.teamvoided.dusk_debris.init.DuskBlocks
 import org.teamvoided.dusk_debris.init.DuskEntities
 import org.teamvoided.dusk_debris.init.DuskItems
 import org.teamvoided.dusk_debris.init.DuskParticles
+import org.teamvoided.dusk_debris.particle.FlashParticleEffect
 import org.teamvoided.dusk_debris.world.explosion.FirebombExplosionBehavior
 
 class FirebombEntity : AbstractThrwowableBombEntity {
@@ -43,24 +44,16 @@ class FirebombEntity : AbstractThrwowableBombEntity {
         val serverWorld = this.world as ServerWorld
         serverWorld.spawnParticles(
             DuskParticles.FIREBOMB,
-            this.x,
-            this.y,
-            this.z,
+            this.x, this.y, this.z,
             20,
-            0.0,
-            0.0,
-            0.0,
+            0.0, 0.0, 0.0,
             1.0
         )
         serverWorld.spawnParticles(
-            ParticleTypes.FLASH,
-            this.x,
-            this.y,
-            this.z,
+            FlashParticleEffect(0xFF9000),
+            this.x, this.y, this.z,
             1,
-            0.0,
-            0.0,
-            0.0,
+            0.0, 0.0, 0.0,
             1.0
         )
         world.playSound(

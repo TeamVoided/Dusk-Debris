@@ -18,14 +18,12 @@ import net.minecraft.util.math.Direction
 import net.minecraft.util.math.Vec3d
 import net.minecraft.util.random.RandomGenerator
 import net.minecraft.world.World
-import net.minecraft.world.WorldAccess
 import net.minecraft.world.event.GameEvent
 import org.teamvoided.dusk_debris.block.not_blocks.DuskProperties
 import org.teamvoided.dusk_debris.data.tags.DuskEntityTypeTags
 import org.teamvoided.dusk_debris.entity.helper.FanLogic.inFanWind
 import org.teamvoided.dusk_debris.particle.WindParticleEffect
 import org.teamvoided.dusk_debris.util.spawnParticles
-import org.teamvoided.dusk_debris.util.velocityWind
 
 open class FanBlock(val strength: Int, settings: Settings) :
     SixWayFacingBlock(settings) {
@@ -40,6 +38,10 @@ open class FanBlock(val strength: Int, settings: Settings) :
     override fun appendProperties(builder: StateManager.Builder<Block, BlockState>) {
         super.appendProperties(builder)
         builder.add(ACTIVE, POWERED)
+    }
+
+    private fun fanTick(state: BlockState, world: World, pos: BlockPos) {
+        if (state.get(ACTIVE)) world.scheduleBlockTick(pos, this, 0)
     }
 
     override fun onBlockAdded(state: BlockState, world: World, pos: BlockPos, oldState: BlockState, notify: Boolean) {
@@ -59,12 +61,10 @@ open class FanBlock(val strength: Int, settings: Settings) :
         if (world is ServerWorld) {
             this.setState(state, world, pos)
         }
-        if (state.get(ACTIVE)) {
-            world.scheduleBlockTick(pos, this, 1)
-        }
+        fanTick(state, world, pos)
     }
 
-    private fun setState(state: BlockState, world: ServerWorld, pos: BlockPos?) {
+    private fun setState(state: BlockState, world: ServerWorld, pos: BlockPos) {
         val bl = world.isReceivingRedstonePower(pos)
         if (bl != state.get(POWERED)) {
             var blockState = state
@@ -79,7 +79,7 @@ open class FanBlock(val strength: Int, settings: Settings) :
                     SoundCategory.BLOCKS
                 )
                 if (blockState.get(ACTIVE))
-                    world.scheduleBlockTick(pos, this, 1)
+                    fanTick(state, world, pos)
             }
             world.setBlockState(pos, blockState.with(POWERED, bl), 3)
         }
@@ -109,7 +109,7 @@ open class FanBlock(val strength: Int, settings: Settings) :
                     )
                 }
             }
-            world.scheduleBlockTick(pos, this, 1)
+            fanTick(state, world, pos)
         }
     }
 
@@ -168,17 +168,15 @@ open class FanBlock(val strength: Int, settings: Settings) :
             { !it.type.isIn(DuskEntityTypeTags.FANS_DONT_AFFECT) }
         if (entitiesInRange.isNotEmpty()) {
             entitiesInRange.forEach {
-                it.resetFallDistance()
                 addEntitySpeed(it, facing)
-                it.velocityModified = true
             }
         }
     }
 
     private fun addEntitySpeed(entity: Entity, direction: Direction) {
-        val power: Double = strength.toDouble()
+        val power: Double = strength * 0.0175 + 0.03
         val velocity = when (direction) {
-            Direction.UP -> Vec3d(0.0, power, 0.0)
+            Direction.UP -> Vec3d(0.0, power + entity.gravity * 0.4, 0.0)
             Direction.DOWN -> Vec3d(0.0, -power, 0.0)
             Direction.SOUTH -> Vec3d(0.0, 0.0, power)
             Direction.NORTH -> Vec3d(0.0, 0.0, -power)
