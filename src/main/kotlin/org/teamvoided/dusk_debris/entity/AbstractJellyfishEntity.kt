@@ -65,6 +65,8 @@ abstract class AbstractJellyfishEntity(entityType: EntityType<out AbstractVolaph
     override fun isClimbing(): Boolean = false
     override fun fall(fallDistance: Double, onGround: Boolean, landedState: BlockState, landedPosition: BlockPos) {}
 
+    override fun playStepSound(pos: BlockPos, state: BlockState) {}
+
     override fun setAngerTime(ticks: Int) {
         this.angerTicks = ticks
     }
