@@ -1,25 +1,32 @@
 package org.teamvoided.dusk_debris.entity
 
+import com.google.common.annotations.VisibleForTesting
 import com.google.common.collect.ImmutableList
 import com.google.common.collect.ImmutableSet
 import com.mojang.datafixers.util.Pair
-import net.minecraft.entity.EntityType
+import net.minecraft.entity.EntityPose
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.ai.brain.Activity
 import net.minecraft.entity.ai.brain.Brain
+import net.minecraft.entity.ai.brain.MemoryModuleState
 import net.minecraft.entity.ai.brain.MemoryModuleType
 import net.minecraft.entity.ai.brain.sensor.Sensor
+import net.minecraft.entity.ai.brain.sensor.SensorType
 import net.minecraft.entity.ai.brain.task.*
-import net.minecraft.entity.mob.AbstractPiglinEntity
-import net.minecraft.entity.mob.PiglinBrain
+import net.minecraft.entity.mob.MobEntity
+import net.minecraft.server.world.ServerWorld
+import net.minecraft.sound.SoundEvents
+import net.minecraft.util.Unit
 import net.minecraft.util.dynamic.GlobalPos
+import org.teamvoided.dusk_debris.init.brain.DuskSensorType
 import java.util.*
+import java.util.Set
 
 object GiantEnemyJellyfishBrain {
     private const val ANGER_DURATION = 600
     private const val MELEE_ATTACK_COOLDOWN = 20
     private const val ACTIVITY_SOUND_PROBABILITY = 0.0125
-    private const val MAX_LOOK_DISTANCE = 8f
+    private const val MAX_FOLLOW_DISTANCE = 8f
     private const val INTERACTION_RANGE = 8
     private const val TARGETING_RANGE = 12.0
     private const val IDLING_SPEED = 0.6f
@@ -27,175 +34,104 @@ object GiantEnemyJellyfishBrain {
     private const val HOME_TOO_FAR_DISTANCE = 100
     private const val HOME_STROLL_AROUND_DISTANCE = 5
 
+    val SENSORS: List<SensorType<out Sensor<in GiantEnemyJellyfishEntity>>> =
+        listOf(
+            SensorType.NEAREST_LIVING_ENTITIES,
+            SensorType.NEAREST_PLAYERS,
+            SensorType.HURT_BY,
+            DuskSensorType.GEJ_ATTACK_ENTITY_SENSOR
+        )
+    val MEMORY_MODULES: List<MemoryModuleType<out Any>> =
+        listOf(
+            MemoryModuleType.LOOK_TARGET,
+            MemoryModuleType.MOBS,
+            MemoryModuleType.VISIBLE_MOBS,
+            MemoryModuleType.NEAREST_VISIBLE_PLAYER,
+            MemoryModuleType.NEAREST_VISIBLE_TARGETABLE_PLAYER,
+            MemoryModuleType.HURT_BY,
+            MemoryModuleType.HURT_BY_ENTITY,
+            MemoryModuleType.WALK_TARGET,
+            MemoryModuleType.CANT_REACH_WALK_TARGET_SINCE,
+//            MemoryModuleType.IS_EMERGING,
+
+            MemoryModuleType.ATTACK_TARGET,
+            MemoryModuleType.ATTACK_COOLING_DOWN,
+            MemoryModuleType.INTERACTION_TARGET,
+            MemoryModuleType.PATH,
+            MemoryModuleType.ANGRY_AT,
+            MemoryModuleType.NEAREST_VISIBLE_NEMESIS,
+            MemoryModuleType.HOME
+        )
+
+
     internal fun create(jellyfish: GiantEnemyJellyfishEntity, brain: Brain<GiantEnemyJellyfishEntity>): Brain<*> {
-        addCoreActivities(jellyfish, brain)
-        addIdleActivities(jellyfish, brain)
-        addFightActivities(jellyfish, brain)
-        brain.setCoreActivities(ImmutableSet.of(Activity.CORE))
+        addCoreTasks(brain)
+        addIdleTasks(brain)
+        addFightTasks(jellyfish, brain)
+        brain.setCoreActivities(Set.of(Activity.CORE))
         brain.setDefaultActivity(Activity.IDLE)
         brain.resetPossibleActivities()
         return brain
     }
+
+    fun createProfile(): Brain.Profile<GiantEnemyJellyfishEntity> =
+        Brain.createProfile(MEMORY_MODULES, SENSORS as Nothing?)
+
 
     internal fun setCurrentPosAsHome(jellyfish: GiantEnemyJellyfishEntity) {
         val globalPos = GlobalPos.create(jellyfish.world.registryKey, jellyfish.blockPos)
         jellyfish.brain.remember(MemoryModuleType.HOME, globalPos)
     }
 
-    private fun addCoreActivities(jellyfish: GiantEnemyJellyfishEntity, brain: Brain<GiantEnemyJellyfishEntity>) {
-        brain.setTaskList(
-            Activity.CORE,
-            0,
-            ImmutableList.of(
-                LookAroundTask(45, 90),
-                WanderAroundTask(),
-                OpenDoorsTask.create(),
-                ForgetAngryAtTargetTask.run()
-            )
-        )
+
+    private fun addCoreTasks(brain: Brain<GiantEnemyJellyfishEntity>) {
+        brain.setTaskList(Activity.CORE, 0, ImmutableList.of(StayAboveWaterTask(0.8f), LookAroundTask(45, 90)))
     }
 
-    private fun addIdleActivities(jellyfish: GiantEnemyJellyfishEntity, brain: Brain<GiantEnemyJellyfishEntity>) {
+    private fun addIdleTasks(brain: Brain<GiantEnemyJellyfishEntity>) {
         brain.setTaskList(
             Activity.IDLE,
-            10,
-            ImmutableList.of<TaskControl<in GiantEnemyJellyfishEntity>>(
-                UpdateAttackTargetTask.create { obj: GiantEnemyJellyfishEntity -> findNearestAttackableTarget(obj) },
-                createIdleLookTask(),
-                createIdleMovementTask(),
-                FindInteractionTargetTask.create(EntityType.PLAYER, 4)
+            ImmutableList.of(
+                Pair.of(
+                    0, UpdateAttackTargetTask.create { breezeEntity: GiantEnemyJellyfishEntity ->
+                        breezeEntity.brain.getOptionalMemory(MemoryModuleType.NEAREST_ATTACKABLE)
+                    }),
+                Pair.of(1, UpdateAttackTargetTask.create { it.getRecentAttacker() }),
+                Pair.of(2, WanderAroundTask(20, 40)),
+                Pair.of(
+                    3, RandomTask(
+                        ImmutableList.of(
+                            Pair.of(WaitTask(20, 100), 1),
+                            Pair.of(MeanderTask.create(0.6f), 2)
+                        )
+                    )
+                )
             )
         )
     }
 
-    private fun addFightActivities(jellyfish: GiantEnemyJellyfishEntity, brain: Brain<GiantEnemyJellyfishEntity>) {
+    private fun addFightTasks(jellyfish: GiantEnemyJellyfishEntity, brain: Brain<GiantEnemyJellyfishEntity>) {
         brain.setTaskList(
             Activity.FIGHT,
-            10,
             ImmutableList.of(
-                ForgetAttackTargetTask.create { target: LivingEntity ->
-                    !isNearestAttackableTarget(jellyfish, target)
-                },
-                RangedApproachTask.create(1.0f), MeleeAttackTask.create(MELEE_ATTACK_COOLDOWN)
+                Pair.of(
+                    0,
+                    ForgetAttackTargetTask.create { target: LivingEntity ->
+                        !Sensor.testAttackableTargetPredicate(jellyfish, target)
+                    }),
+//                Pair.of(1, BreezeShootTask()),
+//                Pair.of(2, BreezeLongJumpTask()),
+//                Pair.of(3, BreezeShootWhenStuckTask()),
+//                Pair.of(4, BreezeSlideTask())
             ),
-            MemoryModuleType.ATTACK_TARGET
-        )
-    }
-
-    private fun createIdleLookTask(): RandomTask<GiantEnemyJellyfishEntity> {
-        return RandomTask(
-            ImmutableList.of(
-                Pair.of(FollowMobTask.createMatchingType(EntityType.PLAYER, MAX_LOOK_DISTANCE), 1),
-                Pair.of(FollowMobTask.createMatchingType(EntityType.PIGLIN, MAX_LOOK_DISTANCE), 1),
-                Pair.of(FollowMobTask.createMatchingType(EntityType.PIGLIN_BRUTE, MAX_LOOK_DISTANCE), 1),
-                Pair.of(FollowMobTask.create(8.0f), 1),
-                Pair.of(WaitTask(30, 60), 1)
-            ) as List<Pair<out TaskControl<in GiantEnemyJellyfishEntity>, Int>>
-        )
-    }
-
-    private fun createIdleMovementTask(): RandomTask<GiantEnemyJellyfishEntity?> {
-        return RandomTask(
-            ImmutableList.of(
-                Pair.of(MeanderTask.create(IDLING_SPEED), 2),
-                Pair.of(
-                    FindEntityTask.run(
-                        EntityType.PIGLIN,
-                        INTERACTION_RANGE,
-                        MemoryModuleType.INTERACTION_TARGET,
-                        IDLING_SPEED,
-                        2
-                    ),
-                    2
-                ),
-                Pair.of(
-                    FindEntityTask.run(
-                        EntityType.PIGLIN_BRUTE,
-                        INTERACTION_RANGE,
-                        MemoryModuleType.INTERACTION_TARGET,
-                        IDLING_SPEED,
-                        2
-                    ),
-                    2
-                ),
-                Pair.of(
-                    GoToNearbyPositionTask.run(
-                        MemoryModuleType.HOME,
-                        IDLING_SPEED,
-                        HOME_CLOSE_ENOUGH_DISTANCE,
-                        HOME_TOO_FAR_DISTANCE
-                    ),
-                    2
-                ),
-                Pair.of(
-                    GoToIfNearbyTask.create(
-                        MemoryModuleType.HOME,
-                        IDLING_SPEED,
-                        HOME_STROLL_AROUND_DISTANCE
-                    ),
-                    2
-                ),
-                Pair.of(WaitTask(30, 60), 1)
+            ImmutableSet.of(
+                Pair.of(MemoryModuleType.ATTACK_TARGET, MemoryModuleState.VALUE_PRESENT),
+                Pair.of(MemoryModuleType.WALK_TARGET, MemoryModuleState.VALUE_ABSENT)
             )
         )
     }
 
-    internal fun updateActivity(jellyfish: GiantEnemyJellyfishEntity) {
-        val brain = jellyfish.brain
-        val activity = brain.firstPossibleNonCoreActivity.orElse(null as Activity?) as Activity
-        brain.resetPossibleActivities(ImmutableList.of(Activity.FIGHT, Activity.IDLE))
-        val activity2 = brain.firstPossibleNonCoreActivity.orElse(null as Activity?) as Activity
-        if (activity !== activity2) {
-            playAngrySoundIfFighting(jellyfish)
-        }
-
-        jellyfish.isAttacking = brain.hasMemoryModule(MemoryModuleType.ATTACK_TARGET)
-    }
-
-    private fun isNearestAttackableTarget(jellyfish: GiantEnemyJellyfishEntity, entity: LivingEntity): Boolean {
-        return findNearestAttackableTarget(jellyfish).filter { entity2: LivingEntity -> entity2 == entity }.isPresent
-    }
-
-    private fun findNearestAttackableTarget(jellyfish: GiantEnemyJellyfishEntity): Optional<out LivingEntity> {
-        val optional = LookTargetUtil.getEntity(jellyfish, MemoryModuleType.ANGRY_AT)
-        if (optional.isPresent && Sensor.testAttackableTargetPredicateIgnoreVisibility(jellyfish, optional.get())) {
-            return optional
-        } else {
-            val optional2 = findRememberedEntityInRange(jellyfish, MemoryModuleType.NEAREST_VISIBLE_TARGETABLE_PLAYER)
-            return if (optional2.isPresent) optional2 else jellyfish.brain.getOptionalMemory(MemoryModuleType.NEAREST_VISIBLE_NEMESIS)
-        }
-    }
-
-    private fun findRememberedEntityInRange(
-        jellyfish: GiantEnemyJellyfishEntity,
-        memoryType: MemoryModuleType<out LivingEntity>
-    ): Optional<out LivingEntity> {
-        return jellyfish.brain.getOptionalMemory(memoryType)
-            .filter { jellyfish: LivingEntity -> jellyfish.isInRange(jellyfish, TARGETING_RANGE) }
-    }
-
-    internal fun tryRevenge(jellyfish: GiantEnemyJellyfishEntity, target: LivingEntity) {
-//        if (target !is GiantEnemyJellyfishEntity) {
-//            PiglinBrain.tryRevenge(jellyfish, target)
-//        }
-    }
-
-    internal fun setAngryAt(jellyfish: GiantEnemyJellyfishEntity, target: LivingEntity) {
-        jellyfish.brain.forget(MemoryModuleType.CANT_REACH_WALK_TARGET_SINCE)
-        jellyfish.brain.remember(MemoryModuleType.ANGRY_AT, target.uuid, 600L)
-    }
-
-    internal fun randomlyPlayAngrySoundIfFighting(jellyfish: GiantEnemyJellyfishEntity) {
-        if (jellyfish.world.random.nextFloat().toDouble() < ACTIVITY_SOUND_PROBABILITY) {
-            playAngrySoundIfFighting(jellyfish)
-        }
-    }
-
-    private fun playAngrySoundIfFighting(jellyfish: GiantEnemyJellyfishEntity) {
-        jellyfish.brain.firstPossibleNonCoreActivity.ifPresent { activity: Activity ->
-            if (activity == Activity.FIGHT) {
-                jellyfish.playAngrySound()
-            }
-        }
+    fun updateActivities(jellyfish: GiantEnemyJellyfishEntity) {
+        jellyfish.brain.resetPossibleActivities(ImmutableList.of(Activity.FIGHT, Activity.IDLE))
     }
 }

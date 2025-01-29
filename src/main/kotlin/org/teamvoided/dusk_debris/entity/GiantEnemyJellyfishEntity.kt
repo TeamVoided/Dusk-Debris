@@ -1,18 +1,16 @@
 package org.teamvoided.dusk_debris.entity
 
-import com.google.common.collect.ImmutableList
 import com.mojang.serialization.Dynamic
 import net.minecraft.entity.*
 import net.minecraft.entity.ai.brain.Brain
 import net.minecraft.entity.ai.brain.MemoryModuleType
-import net.minecraft.entity.ai.brain.sensor.SensorType
+import net.minecraft.entity.ai.control.FlightMoveControl
 import net.minecraft.entity.ai.pathing.BirdNavigation
 import net.minecraft.entity.ai.pathing.EntityNavigation
 import net.minecraft.entity.attribute.DefaultAttributeContainer
 import net.minecraft.entity.attribute.EntityAttributes
 import net.minecraft.entity.damage.DamageSource
-import net.minecraft.entity.mob.HostileEntity
-import net.minecraft.entity.passive.AllayBrain
+import net.minecraft.registry.tag.DamageTypeTags
 import net.minecraft.server.network.DebugInfoSender
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.sound.SoundEvents
@@ -25,9 +23,14 @@ import net.minecraft.util.random.RandomGenerator
 import net.minecraft.world.*
 import org.teamvoided.dusk_debris.data.tags.DuskFluidTags
 import org.teamvoided.dusk_debris.util.Utils.degToRad
+import java.util.*
 
-class GiantEnemyJellyfishEntity(entityType: EntityType<out AbstractVolaphyraEntity>, world: World) :
+class GiantEnemyJellyfishEntity(entityType: EntityType<GiantEnemyJellyfishEntity>, world: World) :
     AbstractJellyfishEntity(entityType, world) {
+
+    init {
+        this.moveControl = FlightMoveControl(this, 20, true)
+    }
 
     override fun initialize(
         world: ServerWorldAccess,
@@ -40,21 +43,16 @@ class GiantEnemyJellyfishEntity(entityType: EntityType<out AbstractVolaphyraEnti
     }
 
     override fun mobTick() {
-//        this.world.profiler.push("giantEnemyJellyfishBrain")
-//        getBrain().tick(world as ServerWorld, this)
-//        world.profiler.pop()
-//        world.profiler.push("allayActivityUpdate")
-//        GiantEnemyJellyfishBrain.updateActivities(this)
-//        world.profiler.pop()
+        this.getWorld().profiler.push("giantEnemyJellyfishBrain")
+        (brain as Brain<GiantEnemyJellyfishEntity>).tick(this.getWorld() as ServerWorld, this)
+        this.getWorld().profiler.pop()
+        this.getWorld().profiler.push("giantEnemyJellyfishActivityUpdate")
+        GiantEnemyJellyfishBrain.updateActivities(this)
         super.mobTick()
     }
 
-//    override fun deserializeBrain(dynamic: Dynamic<*>): Brain<*> {
-//        return GiantEnemyJellyfishBrain.create(createBrainProfile().deserialize(dynamic))
-//    }
-
-    override fun getBrain(): Brain<*> {
-        return super.getBrain()
+    override fun deserializeBrain(dynamic: Dynamic<*>): Brain<*> {
+        return GiantEnemyJellyfishBrain.create(this, createBrainProfile().deserialize(dynamic))
     }
 
     override fun createNavigation(world: World): EntityNavigation {
@@ -70,7 +68,7 @@ class GiantEnemyJellyfishEntity(entityType: EntityType<out AbstractVolaphyraEnti
 //            if (this.isTouchingWater) {
 //                this.updateVelocity(0.02f, movementInput)
 //                this.move(MovementType.SELF, this.velocity)
-//                this.velocity = velocity.multiply(0.800000011920929)
+//                this.velocity = velocity.multiply(0.8)
 //            } else
             if (this.isInLava) {
                 this.updateVelocity(0.02f, movementInput)
@@ -86,18 +84,36 @@ class GiantEnemyJellyfishEntity(entityType: EntityType<out AbstractVolaphyraEnti
         this.updateLimbs(false)
     }
 
+    override fun getDefaultDimensions(pose: EntityPose): EntityDimensions {
+        val dimensions = super.getDefaultDimensions(pose)
+        return if (this.isProtectedByMembrane()) EntityDimensions.fixed(1.1f, 1.1f) else dimensions
+    }
+
+    override fun isPushable(): Boolean {
+        return !this.isProtectedByMembrane() && super.isPushable()
+    }
+
+    fun isProtectedByMembrane(): Boolean = true
+
 
     override fun chooseRandomAngerTime() {
         this.angerTime = ANGER_TIME_RANGE.get(this.random);
     }
 
-    override fun createBrainProfile(): Brain.Profile<Nothing> {
-        return Brain.createProfile(MEMORY_MODULES, SENSORS);
+    override fun createBrainProfile(): Brain.Profile<GiantEnemyJellyfishEntity> {
+        return GiantEnemyJellyfishBrain.createProfile()
     }
 
     override fun sendAiDebugData() {
         super.sendAiDebugData()
         DebugInfoSender.sendBrainDebugData(this)
+    }
+
+    fun getRecentAttacker(): Optional<LivingEntity> {
+        return getBrain().getOptionalMemory(MemoryModuleType.HURT_BY)
+            .map { obj: DamageSource -> obj.attacker }
+            .filter { entity: Entity? -> entity is LivingEntity }
+            .map { entity: Entity? -> entity as LivingEntity }
     }
 
     fun canSpawn(
@@ -119,18 +135,29 @@ class GiantEnemyJellyfishEntity(entityType: EntityType<out AbstractVolaphyraEnti
         return false
     }
 
-//    override fun damage(source: DamageSource?, amount: Float): Boolean {
-//        return if (isInvulnerable) this.isRemoved() || this.invulnerable
-//        else super.damage(source, amount)
-//    }
+    override fun damage(source: DamageSource, amount: Float): Boolean {
+        return if (isProtectedByMembrane()) this.isRemoved || this.isInvulnerable
+        else super.damage(source, amount)
+    }
 
-    override fun applyEnchantmentsToDamage(source: DamageSource, amount: Float): Float {
+    override fun applyDamage(source: DamageSource, amount: Float) {
         if (source.attacker != null) {
             val entity: Entity = source.attacker!!
             launchFromFacing(entity, -(amount * 0.2f + 0.5f))
         }
+        super.applyDamage(source, amount)
+    }
 
-        return super.applyEnchantmentsToDamage(source, amount)
+    override fun isInvulnerableTo(damageSource: DamageSource): Boolean {
+        return if (
+            isProtectedByMembrane() &&
+            !damageSource.isTypeIn(DamageTypeTags.BYPASSES_INVULNERABILITY) &&
+            !damageSource.isSourceCreativePlayer
+        ) {
+            true
+        } else {
+            super.isInvulnerableTo(damageSource)
+        }
     }
 
     private fun launchFromFacing(entity: Entity, mult: Float) {
@@ -151,36 +178,6 @@ class GiantEnemyJellyfishEntity(entityType: EntityType<out AbstractVolaphyraEnti
 
 
     companion object {
-        val SENSORS = ImmutableList.of(
-            SensorType.NEAREST_LIVING_ENTITIES,
-            SensorType.NEAREST_PLAYERS,
-            SensorType.NEAREST_ITEMS,
-            SensorType.HURT_BY,
-//            SensorType.PIGLIN_BRUTE_SPECIFIC_SENSOR
-        )
-        val MEMORY_MODULES: ImmutableList<MemoryModuleType<*>> = ImmutableList.of<MemoryModuleType<*>>(
-            MemoryModuleType.LOOK_TARGET,
-            MemoryModuleType.DOORS_TO_CLOSE,
-            MemoryModuleType.MOBS,
-            MemoryModuleType.VISIBLE_MOBS,
-            MemoryModuleType.NEAREST_VISIBLE_PLAYER,
-            MemoryModuleType.NEAREST_VISIBLE_TARGETABLE_PLAYER,
-            MemoryModuleType.NEAREST_VISIBLE_ADULT_PIGLINS,
-            MemoryModuleType.NEARBY_ADULT_PIGLINS,
-            MemoryModuleType.HURT_BY,
-            MemoryModuleType.HURT_BY_ENTITY,
-            MemoryModuleType.WALK_TARGET,
-            MemoryModuleType.CANT_REACH_WALK_TARGET_SINCE,
-            *arrayOf<MemoryModuleType<*>>(
-                MemoryModuleType.ATTACK_TARGET,
-                MemoryModuleType.ATTACK_COOLING_DOWN,
-                MemoryModuleType.INTERACTION_TARGET,
-                MemoryModuleType.PATH,
-                MemoryModuleType.ANGRY_AT,
-                MemoryModuleType.NEAREST_VISIBLE_NEMESIS,
-                MemoryModuleType.HOME
-            )
-        )
 
         val ANGER_TIME_RANGE: UniformIntProvider = TimeHelper.betweenSeconds(40, 79)
 

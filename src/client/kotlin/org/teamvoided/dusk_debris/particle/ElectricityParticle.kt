@@ -22,6 +22,7 @@ class ElectricityParticle(
 ) : SpriteBillboardParticle(world, x, y, z, 0.0, 0.0, 0.0) {
     private var yaw = 0f
     private var pitch = 0f
+    private var visible = true
 
     init {
         maxAge = (random.nextInt(10) + 10)
@@ -32,15 +33,17 @@ class ElectricityParticle(
         yaw = random.nextFloat() * Utils.rotate360
         pitch = random.nextFloat() * Utils.rotate360
         angle = random.nextFloat() * Utils.rotate360 //roll
-        scale = random.nextFloat() * 0.3f + 0.1f + (abs((age / maxAge) - 0.5f) + 0.5f) * 0.2f
+        scale = random.nextFloat() * 0.3f + 0.1f + (abs((age / maxAge) - 0.5f) + 0.5f) * 0.3f
     }
 
     override fun buildGeometry(vertexConsumer: VertexConsumer, camera: Camera, tickDelta: Float) {
-        val quaternionf = Quaternionf()
-        quaternionf.rotationY(yaw).rotateX(-pitch).rotateZ(angle)
-        this.method_60373(vertexConsumer, camera, quaternionf, tickDelta)
-        quaternionf.rotationY(-Utils.rotate180 + yaw).rotateX(pitch).rotateZ(angle)
-        this.method_60373(vertexConsumer, camera, quaternionf, tickDelta)
+        if (visible) {
+            val quaternionf = Quaternionf()
+            quaternionf.rotationY(yaw).rotateX(-pitch).rotateZ(angle)
+            this.method_60373(vertexConsumer, camera, quaternionf, tickDelta)
+            quaternionf.rotationY(yaw - Utils.rotate180).rotateX(pitch).rotateZ(angle)
+            this.method_60373(vertexConsumer, camera, quaternionf, tickDelta)
+        }
     }
 
     override fun tick() {
@@ -48,13 +51,12 @@ class ElectricityParticle(
         if (this.age++ >= this.maxAge) {
             this.markDead()
         } else {
-            setEverything()
+            if (random.nextInt(2) != 0) visible = !visible
+            if (visible) setEverything()
         }
     }
 
-    override fun getBrightness(tint: Float): Int {
-        return 240
-    }
+    override fun getBrightness(tint: Float): Int = 240
 
     override fun getType(): ParticleTextureSheet = ParticleTextureSheet.PARTICLE_SHEET_TRANSLUCENT
 

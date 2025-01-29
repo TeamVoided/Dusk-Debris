@@ -14,7 +14,7 @@ import net.minecraft.util.math.Vec3d
 import net.minecraft.world.World
 import java.util.*
 
-abstract class AbstractJellyfishEntity(entityType: EntityType<out AbstractVolaphyraEntity>, world: World) :
+abstract class AbstractJellyfishEntity(entityType: EntityType<out AbstractJellyfishEntity>, world: World) :
     HostileEntity(entityType, world), Angerable {
     var angerTicks = 0
     var targetUuid: UUID? = null
@@ -63,6 +63,7 @@ abstract class AbstractJellyfishEntity(entityType: EntityType<out AbstractVolaph
     }
 
     override fun isClimbing(): Boolean = false
+
     override fun fall(fallDistance: Double, onGround: Boolean, landedState: BlockState, landedPosition: BlockPos) {}
 
     override fun playStepSound(pos: BlockPos, state: BlockState) {}

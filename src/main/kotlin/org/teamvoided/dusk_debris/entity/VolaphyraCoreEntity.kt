@@ -18,7 +18,7 @@ import net.minecraft.world.World
 import org.teamvoided.dusk_debris.util.Utils.radToDeg
 import org.teamvoided.dusk_debris.world.explosion.custom.DuskExplosion
 
-class VolaphyraCoreEntity(entityType: EntityType<out VolaphyraCoreEntity>, world: World) :
+class VolaphyraCoreEntity(entityType: EntityType<VolaphyraCoreEntity>, world: World) :
     AbstractVolaphyraEntity(entityType, world) {
     override fun initGoals() {
         targetSelector.add(

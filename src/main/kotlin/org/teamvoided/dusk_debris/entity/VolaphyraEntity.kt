@@ -22,7 +22,7 @@ import net.minecraft.world.ServerWorldAccess
 import net.minecraft.world.World
 import org.teamvoided.dusk_debris.init.DuskEntities
 
-class VolaphyraEntity(entityType: EntityType<out VolaphyraEntity>, world: World) :
+class VolaphyraEntity(entityType: EntityType<VolaphyraEntity>, world: World) :
     AbstractVolaphyraEntity(entityType, world) {
 
     init {
