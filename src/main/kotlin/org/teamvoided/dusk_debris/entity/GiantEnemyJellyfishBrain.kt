@@ -93,8 +93,8 @@ object GiantEnemyJellyfishBrain {
             Activity.IDLE,
             ImmutableList.of(
                 Pair.of(
-                    0, UpdateAttackTargetTask.create { breezeEntity: GiantEnemyJellyfishEntity ->
-                        breezeEntity.brain.getOptionalMemory(MemoryModuleType.NEAREST_ATTACKABLE)
+                    0, UpdateAttackTargetTask.create { jellyfish: GiantEnemyJellyfishEntity ->
+                        jellyfish.brain.getOptionalMemory(MemoryModuleType.NEAREST_ATTACKABLE)
                     }),
                 Pair.of(1, UpdateAttackTargetTask.create { it.getRecentAttacker() }),
                 Pair.of(2, WanderAroundTask(20, 40)),

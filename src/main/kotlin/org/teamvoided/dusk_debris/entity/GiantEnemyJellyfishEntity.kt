@@ -24,6 +24,7 @@ import net.minecraft.world.*
 import org.teamvoided.dusk_debris.data.tags.DuskFluidTags
 import org.teamvoided.dusk_debris.util.Utils.degToRad
 import java.util.*
+import java.util.function.IntUnaryOperator
 
 class GiantEnemyJellyfishEntity(entityType: EntityType<GiantEnemyJellyfishEntity>, world: World) :
     AbstractJellyfishEntity(entityType, world) {
@@ -38,6 +39,10 @@ class GiantEnemyJellyfishEntity(entityType: EntityType<GiantEnemyJellyfishEntity
         spawnReason: SpawnReason,
         entityData: EntityData?
     ): EntityData? {
+        val random = world.random
+        Objects.requireNonNull(random)
+        this.getAttributeInstance(EntityAttributes.GENERIC_SCALE)!!.baseValue = generateSizeBonus(random).toDouble()
+
         GiantEnemyJellyfishBrain.setCurrentPosAsHome(this)
         return super.initialize(world, difficulty, spawnReason, entityData)
     }
@@ -86,7 +91,8 @@ class GiantEnemyJellyfishEntity(entityType: EntityType<GiantEnemyJellyfishEntity
 
     override fun getDefaultDimensions(pose: EntityPose): EntityDimensions {
         val dimensions = super.getDefaultDimensions(pose)
-        return if (this.isProtectedByMembrane()) EntityDimensions.fixed(1.1f, 1.1f) else dimensions
+        return if (!isProtectedByMembrane()) dimensions.scaled(0.37f)
+        else dimensions
     }
 
     override fun isPushable(): Boolean {
@@ -116,35 +122,17 @@ class GiantEnemyJellyfishEntity(entityType: EntityType<GiantEnemyJellyfishEntity
             .map { entity: Entity? -> entity as LivingEntity }
     }
 
-    fun canSpawn(
-        type: EntityType<GiantEnemyJellyfishEntity>,
-        world: WorldAccess,
-        spawnReason: SpawnReason,
-        pos: BlockPos,
-        random: RandomGenerator
-    ): Boolean {
-        if (world.difficulty != Difficulty.PEACEFUL) {
-            if (SpawnReason.isSpawner(spawnReason)) {
-                return true
-            } else if (random.nextInt(20) == 0) {
-                return !(!world.getFluidState(pos).isIn(DuskFluidTags.ACID) ||
-                        !world.getFluidState(pos.up()).isIn(DuskFluidTags.ACID) ||
-                        !world.getFluidState(pos.up(2)).isIn(DuskFluidTags.ACID))
-            }
-        }
-        return false
-    }
-
     override fun damage(source: DamageSource, amount: Float): Boolean {
-        return if (isProtectedByMembrane()) this.isRemoved || this.isInvulnerable
-        else super.damage(source, amount)
+        if (isInvulnerableTo(source)) {
+            if (source.attacker != null) {
+                val entity: Entity = source.attacker!!
+                launchFromFacing(entity, -(amount * 0.2f + 0.5f))
+            }
+            return this.isRemoved || this.isInvulnerable
+        } else return super.damage(source, amount)
     }
 
     override fun applyDamage(source: DamageSource, amount: Float) {
-        if (source.attacker != null) {
-            val entity: Entity = source.attacker!!
-            launchFromFacing(entity, -(amount * 0.2f + 0.5f))
-        }
         super.applyDamage(source, amount)
     }
 
@@ -172,14 +160,38 @@ class GiantEnemyJellyfishEntity(entityType: EntityType<GiantEnemyJellyfishEntity
         )
     }
 
-    fun playAngrySound() {
-        this.makeSound(SoundEvents.ENTITY_PIGLIN_BRUTE_ANGRY)
+    fun playRoarSound() {
+        this.makeSound(SoundEvents.ENTITY_WARDEN_ROAR)
+    }
+
+    private fun generateSizeBonus(random: RandomGenerator): Float { //biased to bottom
+        return 1f + random.nextFloat() * random.nextFloat() * 1.66667f
+    }
+
+    fun canSpawn(
+        type: EntityType<GiantEnemyJellyfishEntity>,
+        world: WorldAccess,
+        spawnReason: SpawnReason,
+        pos: BlockPos,
+        random: RandomGenerator
+    ): Boolean {
+        if (world.difficulty != Difficulty.PEACEFUL) {
+            if (SpawnReason.isSpawner(spawnReason)) {
+                return true
+            } else if (random.nextInt(20) == 0) {
+                return !(!world.getFluidState(pos).isIn(DuskFluidTags.ACID) ||
+                        !world.getFluidState(pos.up()).isIn(DuskFluidTags.ACID) ||
+                        !world.getFluidState(pos.up(2)).isIn(DuskFluidTags.ACID))
+            }
+        }
+        return false
     }
 
 
     companion object {
 
         val ANGER_TIME_RANGE: UniformIntProvider = TimeHelper.betweenSeconds(40, 79)
+        val VULNERABLE_TIME: UniformIntProvider = TimeHelper.betweenSeconds(40, 79)
 
         fun createAttributes(): DefaultAttributeContainer.Builder {
             return AbstractJellyfishEntity.createAttributes()
