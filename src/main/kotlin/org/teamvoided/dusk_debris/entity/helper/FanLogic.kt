@@ -11,13 +11,13 @@ object FanLogic {
     }
 
     fun Entity.inFanWind(x: Double, y: Double, z: Double) {
-        var mult = 1
+        var mult = 1.0
         if (this is PlayerEntity) {
             if (isCreative && abilities.flying) {
                 return
-            } else if (isOnGround) {
-                mult = 2
             }
+//            mult = 1.25x
+            this.isOnGround = false
         }
         this.resetFallDistance()
         this.velocityModified = true

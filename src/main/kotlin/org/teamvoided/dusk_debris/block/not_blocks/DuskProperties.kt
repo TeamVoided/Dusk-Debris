@@ -6,12 +6,13 @@ import net.minecraft.state.property.IntProperty
 
 object DuskProperties {
     val ACTIVE: BooleanProperty = BooleanProperty.of("active")
-    var SQUISHED: BooleanProperty = BooleanProperty.of("squished")
-
 
     val CHALICES: IntProperty = IntProperty.of("chalices", 1, 4)
     val DISTANCE_1_15: IntProperty = IntProperty.of("distance", 1, 15)
 
-
-    val GODHOME_BRONZE_PHASE = EnumProperty.of("godhome_bronze_phase", GodhomeBronzePhase::class.java)
+    val SQUISHED: BooleanProperty = BooleanProperty.of("squished")
+    val SQUISHED_VOLATILE: EnumProperty<ExplosiveBubblePhase> =
+        EnumProperty.of("bubble_phase", ExplosiveBubblePhase::class.java)
+    val GODHOME_BRONZE_PHASE: EnumProperty<GodhomeBronzePhase> =
+        EnumProperty.of("godhome_bronze_phase", GodhomeBronzePhase::class.java)
 }

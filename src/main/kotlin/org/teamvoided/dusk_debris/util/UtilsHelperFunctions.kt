@@ -11,6 +11,7 @@ import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Box
 import net.minecraft.util.math.Direction
+import net.minecraft.util.math.Direction.Axis
 import net.minecraft.util.math.Vec3d
 import net.minecraft.util.math.noise.DoublePerlinNoiseSampler
 import net.minecraft.util.shape.VoxelShape

@@ -245,6 +245,6 @@ class NethershroomPlantBlock(
         }
 
         private val SHAPE: VoxelShape = createCuboidShape(5.0, 0.0, 5.0, 11.0, 6.0, 11.0)
-        var SQUISHED: BooleanProperty = DuskProperties.SQUISHED
+        val SQUISHED: BooleanProperty = DuskProperties.SQUISHED
     }
 }

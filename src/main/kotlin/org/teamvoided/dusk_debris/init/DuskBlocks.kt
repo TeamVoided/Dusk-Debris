@@ -43,6 +43,13 @@ object DuskBlocks {
     val TEST_BLOCK = register("test_block", EntityTestParticleBlock(copy(STONE)))
 
     val ACID = registerNoItem("acid", FluidBlock(DuskFluids.ACID, copy(WATER).mapColor(MapColor.LIME)))
+    val FOG_BUBBLE = registerNoItem(
+        "fog_bubble", BubbleBlock(
+            AbstractBlock.Settings.create().mapColor(MapColor.PURPLE_TERRACOTTA).strength(0.25f)
+                .sounds(BlockSoundGroup.HONEY).solidBlock(Blocks::nonSolid).ticksRandomly()
+        )
+    )
+
 
     val BRONZE_BLOCK = register(
         "bronze_block", Block(
