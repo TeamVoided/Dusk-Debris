@@ -48,6 +48,8 @@ object DuskParticles {
     val FLASH: ParticleType<FlashParticleEffect> =
         FabricParticleTypes.complex(FlashParticleEffect.CODEC, FlashParticleEffect.PACKET_CODEC)
 
+    val SMALL_PURPLE_BUBBLE_CUBE: DefaultParticleType = FabricParticleTypes.simple()
+
 
     fun init() {
         Registry.register(Registries.PARTICLE_TYPE, id("toxic_smoke_particle"), TOXIC_SMOKE_PARTICLE)
@@ -67,5 +69,7 @@ object DuskParticles {
         Registry.register(Registries.PARTICLE_TYPE, id("spark"), SPARK)
         Registry.register(Registries.PARTICLE_TYPE, id("underacid"), UNDERACID)
         Registry.register(Registries.PARTICLE_TYPE, id("acid_bubble_pop"), ACID_BUBBLE_POP)
+
+        Registry.register(Registries.PARTICLE_TYPE, id("small_purple_bubble_cube"), SMALL_PURPLE_BUBBLE_CUBE)
     }
 }
