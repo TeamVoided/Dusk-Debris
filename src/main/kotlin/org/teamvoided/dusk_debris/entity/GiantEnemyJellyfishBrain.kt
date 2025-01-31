@@ -113,7 +113,7 @@ object GiantEnemyJellyfishBrain {
     private fun addFightTasks(jellyfish: GiantEnemyJellyfishEntity, brain: Brain<GiantEnemyJellyfishEntity>) {
         brain.setTaskList(
             Activity.FIGHT,
-            ImmutableList.of(
+            ImmutableList.of<Pair<Int, TaskControl<GiantEnemyJellyfishEntity>>>(
                 Pair.of(
                     0,
                     ForgetAttackTargetTask.create { target: LivingEntity ->

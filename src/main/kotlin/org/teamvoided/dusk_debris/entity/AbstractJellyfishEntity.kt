@@ -92,11 +92,15 @@ abstract class AbstractJellyfishEntity(entityType: EntityType<out AbstractJellyf
         const val GRAVITY_VALUE = 0.003
 
         fun createAttributes(): DefaultAttributeContainer.Builder {
-            return HostileEntity.createAttributes()
+            return createAttributesNoSpecial()
                 .add(EntityAttributes.GENERIC_ARMOR, 30.0)
                 .add(EntityAttributes.GENERIC_ARMOR_TOUGHNESS, 20.0)
-                .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.3)
                 .add(EntityAttributes.GENERIC_FOLLOW_RANGE, 64.0)
+        }
+
+        fun createAttributesNoSpecial(): DefaultAttributeContainer.Builder {
+            return HostileEntity.createAttributes()
+                .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.3)
                 .add(EntityAttributes.GENERIC_GRAVITY, 0.0)
         }
     }

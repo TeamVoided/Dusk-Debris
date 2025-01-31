@@ -60,6 +60,15 @@ class GiantEnemyJellyfishEntity(entityType: EntityType<GiantEnemyJellyfishEntity
         return GiantEnemyJellyfishBrain.create(this, createBrainProfile().deserialize(dynamic))
     }
 
+    override fun createBrainProfile(): Brain.Profile<GiantEnemyJellyfishEntity> {
+        return GiantEnemyJellyfishBrain.createProfile()
+    }
+
+    override fun sendAiDebugData() {
+        super.sendAiDebugData()
+        DebugInfoSender.sendBrainDebugData(this)
+    }
+
     override fun createNavigation(world: World): EntityNavigation {
         val birdNavigation = BirdNavigation(this, world)
         birdNavigation.setCanPathThroughDoors(false)
@@ -104,15 +113,6 @@ class GiantEnemyJellyfishEntity(entityType: EntityType<GiantEnemyJellyfishEntity
 
     override fun chooseRandomAngerTime() {
         this.angerTime = ANGER_TIME_RANGE.get(this.random);
-    }
-
-    override fun createBrainProfile(): Brain.Profile<GiantEnemyJellyfishEntity> {
-        return GiantEnemyJellyfishBrain.createProfile()
-    }
-
-    override fun sendAiDebugData() {
-        super.sendAiDebugData()
-        DebugInfoSender.sendBrainDebugData(this)
     }
 
     fun getRecentAttacker(): Optional<LivingEntity> {
