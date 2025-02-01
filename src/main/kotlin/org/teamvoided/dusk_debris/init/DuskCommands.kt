@@ -10,8 +10,7 @@ import org.teamvoided.dusk_debris.util.variant
 
 object DuskCommands {
     fun init() {
-
-        CommandRegistrationCallback.EVENT.register { dispatcher, ctx, env ->
+        CommandRegistrationCallback.EVENT.register { dispatcher, _, _ ->
             val root = literal("sniffers").executes { cx ->
                 val world = cx.source.world
                 val player = cx.source.player ?: return@executes 0
@@ -21,20 +20,24 @@ object DuskCommands {
 
                     val sniffer = SnifferEntity(EntityType.SNIFFER, world)
                     sniffer.setPosition(pos)
+                    sniffer.isInvulnerable = true
                     sniffer.variant = it
                     sniffer.isAiDisabled = true
                     sniffer.isSilent = true
                     sniffer.yaw = 0f
                     sniffer.addScoreboardTag("summoned_with_command")
+                    world.spawnEntity(sniffer)
+                    sniffer.isBaby
+                    sniffer.setPosition(pos.add(0.0, sniffer.height.toDouble(), 0.0))
+                    world.spawnEntity(sniffer)
 
                     val name = TextDisplayEntity(EntityType.TEXT_DISPLAY, world)
                     name.setPosition(pos.add(0.0, 3.0, 0.0))
                     name.setText(Text.literal(it.key.get().value.toString()))
                     name.addScoreboardTag("summoned_with_command")
-
                     world.spawnEntity(name)
-                    world.spawnEntity(sniffer)
-                    offset += 3.0
+
+                    offset += EntityType.SNIFFER.width * 2
                 }
                 0
             }.build()

@@ -12,6 +12,7 @@ import org.teamvoided.dusk_debris.init.DuskBlocks
 import org.teamvoided.dusk_debris.init.DuskItems
 import org.teamvoided.dusk_debris.item.DuskItemLists
 import org.teamvoided.dusk_debris.util.*
+import org.teamvoided.dusk_debris.util.model_helper.bubbleBlock
 
 class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
 
@@ -49,6 +50,8 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
         DuskBlockLists.GUNPOWDER_BARREL_BLOCK_LIST.forEach {
             gen.gunpowderBarrelBlock(it)
         }
+
+        gen.bubbleBlock(DuskBlocks.FOG_BUBBLE)
 
         gen.registerSimpleCubeAll(DuskBlocks.BRONZE_BLOCK)
         gen.wallOffset(DuskBlocks.CUT_BRONZE_WALL, DuskBlocks.CUT_BRONZE)

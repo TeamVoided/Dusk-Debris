@@ -10,8 +10,8 @@ import org.teamvoided.dusk_debris.entity.skeleton.SkeletonWolfEntityRenderer
 import org.teamvoided.dusk_debris.entity.skeleton.WitherSkeletonHorseEntityRenderer
 import org.teamvoided.dusk_debris.entity.skeleton.WitherSkeletonWolfEntityRenderer
 import org.teamvoided.dusk_debris.entity.tuff_golem.TuffGolemEntityRenderer
-import org.teamvoided.dusk_debris.entity.volaphyra.VolaphyraCoreEntityRenderer
-import org.teamvoided.dusk_debris.entity.volaphyra.VolaphyraEntityRenderer
+import org.teamvoided.dusk_debris.entity.jellyfish.volaphyra.VolaphyraCoreEntityRenderer
+import org.teamvoided.dusk_debris.entity.jellyfish.volaphyra.VolaphyraEntityRenderer
 
 object DuskEntitiesClient {
     fun init() {

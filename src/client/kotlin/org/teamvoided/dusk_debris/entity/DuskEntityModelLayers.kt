@@ -12,8 +12,8 @@ import org.teamvoided.dusk_debris.entity.skeleton.render.GloomEntityModel
 import org.teamvoided.dusk_debris.entity.skeleton.render.SkeletonWolfEntityModel.Companion.texturedModelData
 import org.teamvoided.dusk_debris.entity.tuff_golem.model.TuffGolemCloakModel
 import org.teamvoided.dusk_debris.entity.tuff_golem.model.TuffGolemEntityModel
-import org.teamvoided.dusk_debris.entity.volaphyra.model.VolaphyraCoreModel
-import org.teamvoided.dusk_debris.entity.volaphyra.model.VolaphyraMesogleaModel
+import org.teamvoided.dusk_debris.entity.jellyfish.volaphyra.model.VolaphyraCoreModel
+import org.teamvoided.dusk_debris.entity.jellyfish.volaphyra.model.VolaphyraMesogleaModel
 
 object DuskEntityModelLayers {
     val GLOOM: EntityModelLayer = registerMain("gloomed")

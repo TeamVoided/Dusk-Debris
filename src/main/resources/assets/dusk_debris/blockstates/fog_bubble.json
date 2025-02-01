@@ -1,0 +1,33 @@
+{
+  "variants": {
+    "squished=false": {
+      "model": "dusk_debris:block/fog_bubble"
+    },
+    "squished=true,facing=down": {
+      "model": "dusk_debris:block/fog_bubble_popped"
+    },
+    "squished=true,facing=up": {
+      "model": "dusk_debris:block/fog_bubble_popped",
+      "x": 180
+    },
+    "squished=true,facing=west": {
+      "model": "dusk_debris:block/fog_bubble_popped",
+      "x": 90
+    },
+    "squished=true,facing=north": {
+      "model": "dusk_debris:block/fog_bubble_popped",
+      "x": 90,
+      "y": 90
+    },
+    "squished=true,facing=east": {
+      "model": "dusk_debris:block/fog_bubble_popped",
+      "x": 90,
+      "y": 180
+    },
+    "squished=true,facing=south": {
+      "model": "dusk_debris:block/fog_bubble_popped",
+      "x": 90,
+      "y": 270
+    }
+  }
+}

@@ -1,4 +1,4 @@
-package org.teamvoided.dusk_debris.entity.volaphyra.animation
+package org.teamvoided.dusk_debris.entity.jellyfish.volaphyra.animation
 
 import net.minecraft.client.render.animation.Animation
 import net.minecraft.client.render.animation.AnimationKeyframe
@@ -8,16 +8,16 @@ import net.minecraft.client.render.animation.PartAnimation
 import net.minecraft.client.render.animation.PartAnimation.AnimationTargets
 import net.minecraft.client.render.animation.PartAnimation.Interpolations
 import net.minecraft.util.math.Direction
-import org.teamvoided.dusk_debris.entity.volaphyra.model.VolaphyraMesogleaModel.Companion.ARMS_EAST
-import org.teamvoided.dusk_debris.entity.volaphyra.model.VolaphyraMesogleaModel.Companion.ARMS_EAST_LOWER
-import org.teamvoided.dusk_debris.entity.volaphyra.model.VolaphyraMesogleaModel.Companion.ARMS_NORTH
-import org.teamvoided.dusk_debris.entity.volaphyra.model.VolaphyraMesogleaModel.Companion.ARMS_NORTH_LOWER
-import org.teamvoided.dusk_debris.entity.volaphyra.model.VolaphyraMesogleaModel.Companion.ARMS_SOUTH
-import org.teamvoided.dusk_debris.entity.volaphyra.model.VolaphyraMesogleaModel.Companion.ARMS_SOUTH_LOWER
-import org.teamvoided.dusk_debris.entity.volaphyra.model.VolaphyraMesogleaModel.Companion.ARMS_WEST
-import org.teamvoided.dusk_debris.entity.volaphyra.model.VolaphyraMesogleaModel.Companion.ARMS_WEST_LOWER
-import org.teamvoided.dusk_debris.entity.volaphyra.model.VolaphyraMesogleaModel.Companion.MESOGLEA
-import org.teamvoided.dusk_debris.entity.volaphyra.model.VolaphyraMesogleaModel.Companion.MESOGLEA_LOWER
+import org.teamvoided.dusk_debris.entity.jellyfish.volaphyra.model.VolaphyraMesogleaModel.Companion.ARMS_EAST
+import org.teamvoided.dusk_debris.entity.jellyfish.volaphyra.model.VolaphyraMesogleaModel.Companion.ARMS_EAST_LOWER
+import org.teamvoided.dusk_debris.entity.jellyfish.volaphyra.model.VolaphyraMesogleaModel.Companion.ARMS_NORTH
+import org.teamvoided.dusk_debris.entity.jellyfish.volaphyra.model.VolaphyraMesogleaModel.Companion.ARMS_NORTH_LOWER
+import org.teamvoided.dusk_debris.entity.jellyfish.volaphyra.model.VolaphyraMesogleaModel.Companion.ARMS_SOUTH
+import org.teamvoided.dusk_debris.entity.jellyfish.volaphyra.model.VolaphyraMesogleaModel.Companion.ARMS_SOUTH_LOWER
+import org.teamvoided.dusk_debris.entity.jellyfish.volaphyra.model.VolaphyraMesogleaModel.Companion.ARMS_WEST
+import org.teamvoided.dusk_debris.entity.jellyfish.volaphyra.model.VolaphyraMesogleaModel.Companion.ARMS_WEST_LOWER
+import org.teamvoided.dusk_debris.entity.jellyfish.volaphyra.model.VolaphyraMesogleaModel.Companion.MESOGLEA
+import org.teamvoided.dusk_debris.entity.jellyfish.volaphyra.model.VolaphyraMesogleaModel.Companion.MESOGLEA_LOWER
 import org.teamvoided.dusk_debris.util.scale
 
 object VolaphyraEntityAnimations {

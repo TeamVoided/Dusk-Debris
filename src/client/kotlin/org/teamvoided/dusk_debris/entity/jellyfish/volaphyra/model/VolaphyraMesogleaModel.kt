@@ -1,4 +1,4 @@
-package org.teamvoided.dusk_debris.entity.volaphyra.model
+package org.teamvoided.dusk_debris.entity.jellyfish.volaphyra.model
 
 import net.minecraft.client.model.*
 import net.minecraft.client.render.RenderLayer
@@ -7,7 +7,7 @@ import net.minecraft.util.math.Direction
 import net.minecraft.util.math.MathHelper
 import org.teamvoided.dusk_debris.entity.AbstractVolaphyraEntity
 import org.teamvoided.dusk_debris.entity.tuff_golem.animation.TuffGolemEntityAnimations
-import org.teamvoided.dusk_debris.entity.volaphyra.animation.VolaphyraEntityAnimations
+import org.teamvoided.dusk_debris.entity.jellyfish.volaphyra.animation.VolaphyraEntityAnimations
 
 class VolaphyraMesogleaModel(private val root: ModelPart) :
     SinglePartEntityModel<AbstractVolaphyraEntity>(RenderLayer::getEntityTranslucent) {

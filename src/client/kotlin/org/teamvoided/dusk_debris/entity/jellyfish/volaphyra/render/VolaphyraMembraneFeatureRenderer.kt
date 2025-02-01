@@ -1,4 +1,4 @@
-package org.teamvoided.dusk_debris.entity.volaphyra.render
+package org.teamvoided.dusk_debris.entity.jellyfish.volaphyra.render
 
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.render.RenderLayer
@@ -12,9 +12,9 @@ import net.minecraft.util.Identifier
 import org.teamvoided.dusk_debris.DuskDebris
 import org.teamvoided.dusk_debris.entity.AbstractVolaphyraEntity
 import org.teamvoided.dusk_debris.entity.DuskEntityModelLayers
-import org.teamvoided.dusk_debris.entity.volaphyra.VolaphyraEntityRenderer.Companion.TEXTURE_MESOGLEA
-import org.teamvoided.dusk_debris.entity.volaphyra.model.VolaphyraCoreModel
-import org.teamvoided.dusk_debris.entity.volaphyra.model.VolaphyraMesogleaModel
+import org.teamvoided.dusk_debris.entity.jellyfish.volaphyra.VolaphyraEntityRenderer.Companion.TEXTURE_MESOGLEA
+import org.teamvoided.dusk_debris.entity.jellyfish.volaphyra.model.VolaphyraCoreModel
+import org.teamvoided.dusk_debris.entity.jellyfish.volaphyra.model.VolaphyraMesogleaModel
 
 class VolaphyraMembraneFeatureRenderer(
     context: FeatureRendererContext<AbstractVolaphyraEntity, VolaphyraCoreModel>,

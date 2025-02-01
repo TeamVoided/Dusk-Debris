@@ -16,7 +16,6 @@ import net.minecraft.util.math.int_provider.UniformIntProvider
 
 object TinyEnemyJellyfishBrain {
     private const val PANICKING_SPEED = 2f
-    private const val WATER_IDLE_SPEED = 0.5f
 
 
     val SENSORS: List<SensorType<out Sensor<in TinyEnemyJellyfishEntity>>> =
@@ -32,7 +31,6 @@ object TinyEnemyJellyfishBrain {
             MemoryModuleType.WALK_TARGET,
             MemoryModuleType.CANT_REACH_WALK_TARGET_SINCE,
             MemoryModuleType.PATH,
-            MemoryModuleType.IS_TEMPTED,
             MemoryModuleType.TEMPTING_PLAYER,
             MemoryModuleType.IS_PANICKING
         )
@@ -64,24 +62,12 @@ object TinyEnemyJellyfishBrain {
         brain.setTaskList(
             Activity.IDLE,
             ImmutableList.of(
-                Pair.of(0, (C_lygsomtd.method_47069(EntityType.PLAYER, 6.0f, UniformIntProvider.create(30, 60)))),
+                Pair.of(0, WanderAroundTask(20, 40)),
                 Pair.of(
-                    1,
-                    CompositeTask(
-                        ImmutableMap.of(
-                            MemoryModuleType.WALK_TARGET,
-                            MemoryModuleState.VALUE_ABSENT
-                        ),
-                        ImmutableSet.of(),
-                        CompositeTask.Order.ORDERED,
-                        CompositeTask.RunMode.TRY_ALL,
+                    1, RandomTask(
                         ImmutableList.of(
-                            Pair.of(MeanderTask.createSwim(WATER_IDLE_SPEED), 2),
-                            Pair.of(GoTowardsLookTarget.create(WATER_IDLE_SPEED, 3), 3),
-                            Pair.of(
-                                TaskBuilder.triggerIf { obj: LivingEntity -> obj.isInsideWaterOrBubbleColumn },
-                                5
-                            )
+                            Pair.of(WaitTask(20, 100), 1),
+                            Pair.of(MeanderTask.create(0.6f), 2)
                         )
                     )
                 )

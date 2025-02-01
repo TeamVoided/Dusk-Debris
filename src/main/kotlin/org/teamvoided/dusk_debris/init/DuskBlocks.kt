@@ -48,7 +48,7 @@ object DuskBlocks {
             AbstractBlock.Settings.create().mapColor(MapColor.PURPLE_TERRACOTTA).strength(0.25f)
                 .sounds(BlockSoundGroup.HONEY).solidBlock(Blocks::nonSolid).ticksRandomly()
         )
-    )
+    ).translucent()
 
 
     val BRONZE_BLOCK = register(
@@ -326,25 +326,25 @@ object DuskBlocks {
             AbstractBlock.Settings.create().mapColor(TREACHEROUS_GOLD_BLOCK.defaultMapColor)
                 .pistonBehavior(PistonBehavior.DESTROY)
         )
-    )
+    ).cutout()
     val TARNISHED_CHALICE = register(
         "tarnished_chalice", 16, GildedChaliceBlock(
             AbstractBlock.Settings.create().mapColor(TARNISHED_GOLD_BLOCK.defaultMapColor)
                 .pistonBehavior(PistonBehavior.DESTROY)
         )
-    )
+    ).cutout()
     val SILVERED_CHALICE = register(
         "silvered_chalice", 16, GildedChaliceBlock(
             AbstractBlock.Settings.create().mapColor(LOST_SILVER_BLOCK.defaultMapColor)
                 .pistonBehavior(PistonBehavior.DESTROY)
         )
-    )
+    ).cutout()
     val BRONZED_CHALICE = register(
         "bronzed_chalice", 16, GildedChaliceBlock(
             AbstractBlock.Settings.create().mapColor(SUNKEN_BRONZE_BLOCK.defaultMapColor)
                 .pistonBehavior(PistonBehavior.DESTROY)
         )
-    )
+    ).cutout()
     val LAPIS_RELIC = register(
         "lapis_relic", 16, PerculiarRelicBlock(
             AbstractBlock.Settings.create().mapColor(LAPIS_BLOCK.defaultMapColor).pistonBehavior(PistonBehavior.DESTROY)

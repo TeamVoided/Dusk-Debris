@@ -1,4 +1,4 @@
-package org.teamvoided.dusk_debris.entity.volaphyra
+package org.teamvoided.dusk_debris.entity.jellyfish.volaphyra
 
 import net.minecraft.client.render.VertexConsumerProvider
 import net.minecraft.client.render.entity.EntityRendererFactory
@@ -8,8 +8,8 @@ import net.minecraft.util.Identifier
 import org.teamvoided.dusk_debris.DuskDebris
 import org.teamvoided.dusk_debris.entity.AbstractVolaphyraEntity
 import org.teamvoided.dusk_debris.entity.DuskEntityModelLayers
-import org.teamvoided.dusk_debris.entity.volaphyra.model.VolaphyraCoreModel
-import org.teamvoided.dusk_debris.entity.volaphyra.render.VolaphyraMembraneFeatureRenderer
+import org.teamvoided.dusk_debris.entity.jellyfish.volaphyra.model.VolaphyraCoreModel
+import org.teamvoided.dusk_debris.entity.jellyfish.volaphyra.render.VolaphyraMembraneFeatureRenderer
 
 class VolaphyraEntityRenderer(context: EntityRendererFactory.Context) :
     MobEntityRenderer<AbstractVolaphyraEntity, VolaphyraCoreModel>(

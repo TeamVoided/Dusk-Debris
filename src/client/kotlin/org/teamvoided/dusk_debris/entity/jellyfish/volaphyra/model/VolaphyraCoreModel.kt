@@ -1,4 +1,4 @@
-package org.teamvoided.dusk_debris.entity.volaphyra.model
+package org.teamvoided.dusk_debris.entity.jellyfish.volaphyra.model
 
 
 import net.minecraft.client.model.ModelData
@@ -8,11 +8,11 @@ import net.minecraft.client.model.ModelTransform
 import net.minecraft.client.model.TexturedModelData
 import net.minecraft.client.render.entity.model.SinglePartEntityModel
 import org.teamvoided.dusk_debris.entity.AbstractVolaphyraEntity
-import org.teamvoided.dusk_debris.entity.volaphyra.animation.VolaphyraEntityAnimations
-import org.teamvoided.dusk_debris.entity.volaphyra.model.VolaphyraMesogleaModel.Companion.ARMS_EAST
-import org.teamvoided.dusk_debris.entity.volaphyra.model.VolaphyraMesogleaModel.Companion.ARMS_NORTH
-import org.teamvoided.dusk_debris.entity.volaphyra.model.VolaphyraMesogleaModel.Companion.ARMS_SOUTH
-import org.teamvoided.dusk_debris.entity.volaphyra.model.VolaphyraMesogleaModel.Companion.ARMS_WEST
+import org.teamvoided.dusk_debris.entity.jellyfish.volaphyra.animation.VolaphyraEntityAnimations
+import org.teamvoided.dusk_debris.entity.jellyfish.volaphyra.model.VolaphyraMesogleaModel.Companion.ARMS_EAST
+import org.teamvoided.dusk_debris.entity.jellyfish.volaphyra.model.VolaphyraMesogleaModel.Companion.ARMS_NORTH
+import org.teamvoided.dusk_debris.entity.jellyfish.volaphyra.model.VolaphyraMesogleaModel.Companion.ARMS_SOUTH
+import org.teamvoided.dusk_debris.entity.jellyfish.volaphyra.model.VolaphyraMesogleaModel.Companion.ARMS_WEST
 import org.teamvoided.dusk_debris.util.Utils.rotate45
 
 class VolaphyraCoreModel(val root: ModelPart, val offset: Float = 0f) :
