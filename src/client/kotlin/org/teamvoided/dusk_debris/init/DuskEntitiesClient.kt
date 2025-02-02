@@ -5,6 +5,7 @@ import net.minecraft.client.render.entity.EmptyEntityRenderer
 import net.minecraft.client.render.entity.FlyingItemEntityRenderer
 import org.teamvoided.dusk_debris.entity.DuskEntityLists
 import org.teamvoided.dusk_debris.entity.gunpowder_barrel.GunpowderBarrelEntityRenderer
+import org.teamvoided.dusk_debris.entity.jellyfish.tiny.TinyEnemyJellyfishEntityRenderer
 import org.teamvoided.dusk_debris.entity.skeleton.GloomEntityRenderer
 import org.teamvoided.dusk_debris.entity.skeleton.SkeletonWolfEntityRenderer
 import org.teamvoided.dusk_debris.entity.skeleton.WitherSkeletonHorseEntityRenderer
@@ -26,6 +27,8 @@ object DuskEntitiesClient {
         EntityRendererRegistry.register(DuskEntities.TWISTING_SOUL_CHARGE, ::EmptyEntityRenderer)
         EntityRendererRegistry.register(DuskEntities.VOLAPHYRA, ::VolaphyraEntityRenderer)
         EntityRendererRegistry.register(DuskEntities.VOLAPHYRA_CORE, ::VolaphyraCoreEntityRenderer)
+        EntityRendererRegistry.register(DuskEntities.TINY_ENEMY_JELLYFISH, ::TinyEnemyJellyfishEntityRenderer)
+
 
         DuskEntityLists.THROWABLE_BOMB_ENTITIES.forEach {
             EntityRendererRegistry.register(it, ::FlyingItemEntityRenderer)

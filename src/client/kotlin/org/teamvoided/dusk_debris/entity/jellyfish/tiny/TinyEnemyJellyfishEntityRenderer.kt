@@ -8,36 +8,28 @@ import net.minecraft.util.Identifier
 import org.teamvoided.dusk_debris.DuskDebris
 import org.teamvoided.dusk_debris.entity.AbstractVolaphyraEntity
 import org.teamvoided.dusk_debris.entity.DuskEntityModelLayers
+import org.teamvoided.dusk_debris.entity.TinyEnemyJellyfishEntity
+import org.teamvoided.dusk_debris.entity.jellyfish.tiny.model.TinyEnemyJellyfishCoreModel
+import org.teamvoided.dusk_debris.entity.jellyfish.tiny.model.TinyEnemyJellyfishModel
+import org.teamvoided.dusk_debris.entity.jellyfish.tiny.render.TinyEnemyJellyfishMembraneFeatureRenderer
 import org.teamvoided.dusk_debris.entity.jellyfish.volaphyra.model.VolaphyraCoreModel
 import org.teamvoided.dusk_debris.entity.jellyfish.volaphyra.render.VolaphyraMembraneFeatureRenderer
 
 class TinyEnemyJellyfishEntityRenderer(context: EntityRendererFactory.Context) :
-    MobEntityRenderer<AbstractVolaphyraEntity, VolaphyraCoreModel>(
+    MobEntityRenderer<TinyEnemyJellyfishEntity, TinyEnemyJellyfishCoreModel>(
         context,
-        VolaphyraCoreModel(context.getPart(DuskEntityModelLayers.VOLAPHYRA), 2f),
-        0.45f
+        TinyEnemyJellyfishCoreModel(context.getPart(DuskEntityModelLayers.TINY_ENEMY_JELLYFISH)),
+        0.125f
     ) {
 
     init {
-        this.addFeature(VolaphyraMembraneFeatureRenderer(this, context.modelLoader))
+        this.addFeature(TinyEnemyJellyfishMembraneFeatureRenderer(this, context.modelLoader))
     }
 
-    override fun render(
-        entity: AbstractVolaphyraEntity,
-        f: Float,
-        g: Float,
-        matrices: MatrixStack,
-        vertexConsumers: VertexConsumerProvider,
-        i: Int
-    ) {
-        if (entity.isAlive)
-            super.render(entity, f, g, matrices, vertexConsumers, i)
-    }
-
-    override fun getTexture(entity: AbstractVolaphyraEntity): Identifier = TEXTURE_CORE
+    override fun getTexture(entity: TinyEnemyJellyfishEntity): Identifier = TEXTURE_CORE
 
     companion object {
-        val TEXTURE_CORE: Identifier = DuskDebris.id("textures/entity/volaphyra/volaphyra_core.png")
-        val TEXTURE_MESOGLEA: Identifier = DuskDebris.id("textures/entity/volaphyra/volaphyra_mesoglea.png")
+        val TEXTURE_CORE: Identifier = DuskDebris.id("textures/entity/jellyfish/tiny_enemy_jellyfish_core.png")
+        val TEXTURE_MESOGLEA: Identifier = DuskDebris.id("textures/entity/jellyfish/tiny_enemy_jellyfish.png")
     }
 }

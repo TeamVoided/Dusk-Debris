@@ -34,10 +34,10 @@ class VolaphyraEntityRenderer(context: EntityRendererFactory.Context) :
             super.render(entity, f, g, matrices, vertexConsumers, i)
     }
 
-    override fun getTexture(entity: AbstractVolaphyraEntity): Identifier = TEXTURE_CORE
+    override fun getTexture(entity: AbstractVolaphyraEntity): Identifier = VOLAPHYRA_CORE
 
     companion object {
-        val TEXTURE_CORE: Identifier = DuskDebris.id("textures/entity/volaphyra/volaphyra_core.png")
-        val TEXTURE_MESOGLEA: Identifier = DuskDebris.id("textures/entity/volaphyra/volaphyra_mesoglea.png")
+        val VOLAPHYRA_CORE: Identifier = DuskDebris.id("textures/entity/jellyfish/volaphyra_core.png")
+        val VOLAPHYRA_MESOGLEA: Identifier = DuskDebris.id("textures/entity/jellyfish/volaphyra_mesoglea.png")
     }
 }

@@ -13,6 +13,7 @@ import org.teamvoided.dusk_debris.init.DuskItems
 import org.teamvoided.dusk_debris.item.DuskItemLists
 import org.teamvoided.dusk_debris.util.*
 import org.teamvoided.dusk_debris.util.model_helper.bubbleBlock
+import org.teamvoided.dusk_debris.util.model_helper.bubbleBlossomBlock
 
 class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
 
@@ -51,7 +52,7 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
             gen.gunpowderBarrelBlock(it)
         }
 
-        gen.bubbleBlock(DuskBlocks.FOG_BUBBLE)
+        gen.fogCanyonModels()
 
         gen.registerSimpleCubeAll(DuskBlocks.BRONZE_BLOCK)
         gen.wallOffset(DuskBlocks.CUT_BRONZE_WALL, DuskBlocks.CUT_BRONZE)
@@ -178,6 +179,11 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
 //        gen.registerSingleton(DuskBlocks.SMOOTH_VOLCANIC_SANDSTONE) {
 //            TexturedModel.getCubeAll(Texture.getSubId(DuskBlocks.VOLCANIC_SANDSTONE, "_top"))
 //        }
+    }
+
+    private fun BlockStateModelGenerator.fogCanyonModels(){
+        this.bubbleBlock(DuskBlocks.FOG_BUBBLE)
+        this.bubbleBlossomBlock(DuskBlocks.PURPLE_BUBBLE_BLOSSOM)
     }
 
     override fun generateItemModels(gen: ItemModelGenerator) {

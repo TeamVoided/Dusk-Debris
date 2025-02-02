@@ -5,7 +5,9 @@ import net.minecraft.block.dispenser.DispenserBlock
 import net.minecraft.block.dispenser.ItemDispenserBehavior
 import net.minecraft.component.DataComponentTypes
 import net.minecraft.component.type.DyedColorComponent
+import net.minecraft.component.type.NbtComponent
 import net.minecraft.entity.Entity
+import net.minecraft.entity.EntityType
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.*
@@ -20,10 +22,7 @@ import org.teamvoided.dusk_debris.DuskDebris.id
 import org.teamvoided.dusk_debris.block.DuskBlockLists
 import org.teamvoided.dusk_debris.block.GunpowderBarrelBlock
 import org.teamvoided.dusk_debris.entity.GunpowderBarrelEntity
-import org.teamvoided.dusk_debris.item.BonecallerBandanaItem
-import org.teamvoided.dusk_debris.item.DuskItemLists
-import org.teamvoided.dusk_debris.item.EquipableBlockItemItem
-import org.teamvoided.dusk_debris.item.ThrowableItem
+import org.teamvoided.dusk_debris.item.*
 import org.teamvoided.dusk_debris.item.throwable_bomb.BlunderbombItem
 import org.teamvoided.dusk_debris.item.throwable_bomb.BonecallerItem
 import org.teamvoided.dusk_debris.item.throwable_bomb.FirebombItem
@@ -39,6 +38,14 @@ import org.teamvoided.dusk_debris.item.throwable_bomb.nethershroom_throwable_ite
 @Suppress("unused", "MemberVisibilityCanBePrivate")
 object DuskItems {
     val ITEMS = mutableListOf<Item>()
+
+    val TINY_JELLYFISH = register(
+        "tiny_jellyfish", EntityItem(
+            DuskEntities.TINY_ENEMY_JELLYFISH, SoundEvents.ITEM_BUCKET_EMPTY_TADPOLE,
+            Item.Settings().maxCount(1).component(DataComponentTypes.BUCKET_ENTITY_DATA, NbtComponent.DEFAULT)
+        )
+    )
+
 
     val TWISTING_SOUL_CHARGE = register("twisting_soul_charge", ThrowableItem(Item.Settings()))
 

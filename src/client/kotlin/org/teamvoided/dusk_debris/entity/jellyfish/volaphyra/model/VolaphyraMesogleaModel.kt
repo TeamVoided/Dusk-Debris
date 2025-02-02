@@ -6,7 +6,6 @@ import net.minecraft.client.render.entity.model.SinglePartEntityModel
 import net.minecraft.util.math.Direction
 import net.minecraft.util.math.MathHelper
 import org.teamvoided.dusk_debris.entity.AbstractVolaphyraEntity
-import org.teamvoided.dusk_debris.entity.tuff_golem.animation.TuffGolemEntityAnimations
 import org.teamvoided.dusk_debris.entity.jellyfish.volaphyra.animation.VolaphyraEntityAnimations
 
 class VolaphyraMesogleaModel(private val root: ModelPart) :
@@ -35,7 +34,7 @@ class VolaphyraMesogleaModel(private val root: ModelPart) :
         headPitch: Float //j
     ) {
         this.part.traverse().forEach(ModelPart::resetTransform)
-        this.animate(entity.propulsionAnimationState, VolaphyraEntityAnimations.IDLE, animationProgress, 1.0f)
+        this.animate(entity.idleAnimationState, VolaphyraEntityAnimations.IDLE, animationProgress, 1.0f)
         animateArms(
             limbAngle,
             limbDistance,

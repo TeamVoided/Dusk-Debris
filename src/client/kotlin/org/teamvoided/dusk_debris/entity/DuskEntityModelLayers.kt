@@ -8,6 +8,8 @@ import net.minecraft.client.render.entity.model.BipedEntityModel
 import net.minecraft.client.render.entity.model.EntityModelLayer
 import net.minecraft.client.render.entity.model.HorseEntityModel
 import org.teamvoided.dusk_debris.DuskDebris.id
+import org.teamvoided.dusk_debris.entity.jellyfish.tiny.model.TinyEnemyJellyfishCoreModel
+import org.teamvoided.dusk_debris.entity.jellyfish.tiny.model.TinyEnemyJellyfishModel
 import org.teamvoided.dusk_debris.entity.skeleton.render.GloomEntityModel
 import org.teamvoided.dusk_debris.entity.skeleton.render.SkeletonWolfEntityModel.Companion.texturedModelData
 import org.teamvoided.dusk_debris.entity.tuff_golem.model.TuffGolemCloakModel
@@ -32,6 +34,9 @@ object DuskEntityModelLayers {
     val VOLAPHYRA_MESOGLEA: EntityModelLayer = register("volaphyra", "mesoglea")
     val VOLAPHYRA_CORE: EntityModelLayer = registerMain("volaphyra_core")
 
+    val TINY_ENEMY_JELLYFISH: EntityModelLayer = registerMain("tiny_enemy_jellyfish")
+    val TINY_ENEMY_JELLYFISH_MESOGLEA: EntityModelLayer = register("tiny_enemy_jellyfish", "mesoglea")
+
 
     fun init() {
         EntityModelLayerRegistry.registerModelLayer(GLOOM, GloomEntityModel::texturedModelData)
@@ -49,6 +54,9 @@ object DuskEntityModelLayers {
         EntityModelLayerRegistry.registerModelLayer(VOLAPHYRA, VolaphyraCoreModel::texturedModelData)
         EntityModelLayerRegistry.registerModelLayer(VOLAPHYRA_MESOGLEA, VolaphyraMesogleaModel::texturedModelData)
         EntityModelLayerRegistry.registerModelLayer(VOLAPHYRA_CORE, VolaphyraCoreModel::texturedModelData)
+
+        EntityModelLayerRegistry.registerModelLayer(TINY_ENEMY_JELLYFISH, TinyEnemyJellyfishCoreModel::texturedModelData)
+        EntityModelLayerRegistry.registerModelLayer(TINY_ENEMY_JELLYFISH_MESOGLEA, TinyEnemyJellyfishModel::texturedModelData)
     }
 
     private fun createInnerArmor(): TexturedModelData =

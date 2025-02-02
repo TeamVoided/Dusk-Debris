@@ -39,7 +39,7 @@ class VolaphyraCoreModel(val root: ModelPart, val offset: Float = 0f) :
         if (offset != 0f) {
             core.setPivot(core.pivotX, core.pivotY - offset, core.pivotZ)
         }
-        this.animate(entity.propulsionAnimationState, VolaphyraEntityAnimations.IDLE, animationProgress, 1.0f)
+        this.animate(entity.idleAnimationState, VolaphyraEntityAnimations.IDLE, animationProgress, 1.0f)
         VolaphyraMesogleaModel.animateArms(
             limbAngle,
             limbDistance,

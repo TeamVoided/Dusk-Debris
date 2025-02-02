@@ -49,7 +49,9 @@ object DuskBlocks {
                 .sounds(BlockSoundGroup.HONEY).solidBlock(Blocks::nonSolid).ticksRandomly()
         )
     ).translucent()
-
+    val PURPLE_BUBBLE_BLOSSOM = register(
+        "purple_bubble_blossom", BubbleBlossomBlock(copy(SPORE_BLOSSOM).ticksRandomly())
+    ).cutout()
 
     val BRONZE_BLOCK = register(
         "bronze_block", Block(

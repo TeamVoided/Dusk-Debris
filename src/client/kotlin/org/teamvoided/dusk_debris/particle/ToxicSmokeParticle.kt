@@ -16,8 +16,7 @@ open class ToxicSmokeParticle(
     velocityY: Double,
     velocityZ: Double,
     val color: Color
-) :
-    SpriteBillboardParticle(world, x, y, z) {
+) : SpriteBillboardParticle(world, x, y, z) {
 
     init {
         this.velocityX = (random.nextFloat() - random.nextFloat()) * 0.05

@@ -32,3 +32,4 @@ accessible method net/minecraft/entity/decoration/DisplayEntity$TextDisplayEntit
 accessible method net/minecraft/entity/LivingEntity swimUpward (Lnet/minecraft/registry/tag/TagKey;)V
 
 accessible field net/minecraft/entity/EntityType spawnDimensionsScale F
+

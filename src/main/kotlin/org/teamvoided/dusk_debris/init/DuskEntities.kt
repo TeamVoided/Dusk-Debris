@@ -116,6 +116,13 @@ object DuskEntities {
             .passengerAttachments(0.25f)
             .maxTrackingRange(8)
     )
+    val TINY_ENEMY_JELLYFISH = register(
+        "tiny_enemy_jellyfish", EntityType.Builder.create(::TinyEnemyJellyfishEntity, SpawnGroup.AMBIENT)
+            .setDimensions(0.5f, 0.5f)
+            .setEyeHeight(0.25f)
+            .passengerAttachments(0.5f)
+            .maxTrackingRange(8)
+    )
 
 
     fun <T : Entity> throwableBomb(id: String, factory: EntityType.EntityFactory<T>): EntityType<T> {
@@ -150,6 +157,7 @@ object DuskEntities {
         FabricDefaultAttributeRegistry.register(TUFF_GOLEM, TuffGolemEntity.createAttributes().build())
         FabricDefaultAttributeRegistry.register(VOLAPHYRA, VolaphyraEntity.createAttributes().build())
         FabricDefaultAttributeRegistry.register(VOLAPHYRA_CORE, VolaphyraCoreEntity.createAttributes().build())
+        FabricDefaultAttributeRegistry.register(TINY_ENEMY_JELLYFISH, TinyEnemyJellyfishEntity.createAttributes().build())
     }
 
     fun <T : Entity> register(id: String, entityType: EntityType.Builder<T>): EntityType<T> =

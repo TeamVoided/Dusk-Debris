@@ -1,7 +1,5 @@
 package org.teamvoided.dusk_debris.entity
 
-import net.minecraft.block.BlockState
-import net.minecraft.entity.AnimationState
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.MovementType
@@ -9,32 +7,28 @@ import net.minecraft.entity.attribute.DefaultAttributeContainer
 import net.minecraft.entity.attribute.EntityAttributes
 import net.minecraft.entity.damage.DamageSource
 import net.minecraft.entity.damage.DamageTypes
-import net.minecraft.entity.mob.Angerable
-import net.minecraft.entity.mob.HostileEntity
 import net.minecraft.entity.passive.WolfEntity
 import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.nbt.NbtCompound
 import net.minecraft.registry.tag.DamageTypeTags
 import net.minecraft.registry.tag.EntityTypeTags
-import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.function.BooleanBiFunction
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Box
 import net.minecraft.util.math.Vec3d
 import net.minecraft.util.shape.VoxelShapes
 import net.minecraft.world.World
-import java.util.*
 
 abstract class AbstractVolaphyraEntity(entityType: EntityType<out AbstractVolaphyraEntity>, world: World) :
     AbstractJellyfishEntity(entityType, world) {
     var propulsionTicks: Int = 0
-    val propulsionAnimationState: AnimationState = AnimationState()
     override fun tick() {
-        if (world.isClient()) {
-            this.updateAnimationStates()
-        }
         super.tick()
         this.propulsionTicks++
+    }
+
+    override fun move(movementType: MovementType, movement: Vec3d) {
+        super.move(movementType, movement)
+        checkBlockCollision()
     }
 
     fun checkCollisionForPop() {
@@ -85,11 +79,11 @@ abstract class AbstractVolaphyraEntity(entityType: EntityType<out AbstractVolaph
 
     override fun travel(movementInput: Vec3d?) {}
 
-    fun updateAnimationStates() {
+    override fun updateAnimations() {
         if (propulsionTicks <= 0) {
-            propulsionAnimationState.stop()
+            idleAnimationState.stop()
         } else {
-            propulsionAnimationState.start(this.age)
+            idleAnimationState.start(this.age)
         }
     }
 

@@ -1,37 +1,34 @@
 package org.teamvoided.dusk_debris.entity
 
 import com.google.common.collect.ImmutableList
-import com.google.common.collect.ImmutableMap
 import com.google.common.collect.ImmutableSet
 import com.mojang.datafixers.util.Pair
-import net.minecraft.entity.EntityType
 import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.ai.brain.*
+import net.minecraft.entity.ReportingTaskControl
+import net.minecraft.entity.ai.brain.Activity
+import net.minecraft.entity.ai.brain.Brain
+import net.minecraft.entity.ai.brain.MemoryModuleType
 import net.minecraft.entity.ai.brain.sensor.Sensor
 import net.minecraft.entity.ai.brain.sensor.SensorType
 import net.minecraft.entity.ai.brain.task.*
-import net.minecraft.entity.passive.TadpoleEntity
-import net.minecraft.unmapped.C_lygsomtd
-import net.minecraft.util.math.int_provider.UniformIntProvider
 
 object TinyEnemyJellyfishBrain {
     private const val PANICKING_SPEED = 2f
 
 
-    val SENSORS: List<SensorType<out Sensor<in TinyEnemyJellyfishEntity>>> =
+    val SENSORS: List<SensorType<Sensor<TinyEnemyJellyfishEntity>>> =
         listOf(
             SensorType.NEAREST_LIVING_ENTITIES,
             SensorType.NEAREST_PLAYERS,
             SensorType.HURT_BY
-        )
+        ) as List<SensorType<Sensor<TinyEnemyJellyfishEntity>>>
     val MEMORY_MODULES: List<MemoryModuleType<out Any>> =
         listOf(
+            MemoryModuleType.WALK_TARGET,
             MemoryModuleType.LOOK_TARGET,
             MemoryModuleType.VISIBLE_MOBS,
-            MemoryModuleType.WALK_TARGET,
             MemoryModuleType.CANT_REACH_WALK_TARGET_SINCE,
             MemoryModuleType.PATH,
-            MemoryModuleType.TEMPTING_PLAYER,
             MemoryModuleType.IS_PANICKING
         )
 
@@ -46,7 +43,7 @@ object TinyEnemyJellyfishBrain {
     }
 
     fun createProfile(): Brain.Profile<TinyEnemyJellyfishEntity> =
-        Brain.createProfile(MEMORY_MODULES, SENSORS as Nothing?)
+        Brain.createProfile(MEMORY_MODULES, SENSORS)
 
     private fun addCoreActivities(brain: Brain<TinyEnemyJellyfishEntity>) {
         brain.setTaskList(
@@ -62,15 +59,16 @@ object TinyEnemyJellyfishBrain {
         brain.setTaskList(
             Activity.IDLE,
             ImmutableList.of(
-                Pair.of(0, WanderAroundTask(20, 40)),
+                Pair.of(0, WanderAroundTask(20, 100)),
                 Pair.of(
                     1, RandomTask(
                         ImmutableList.of(
                             Pair.of(WaitTask(20, 100), 1),
-                            Pair.of(MeanderTask.create(0.6f), 2)
+                            Pair.of(MeanderTask.create(1f), 2),
+                            Pair.of(GoTowardsLookTarget.create(1f, 3), 2)
                         )
                     )
-                )
+                ),
             )
         )
     }

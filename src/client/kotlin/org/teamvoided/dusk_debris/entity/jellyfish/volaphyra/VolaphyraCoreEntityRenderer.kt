@@ -13,6 +13,5 @@ class VolaphyraCoreEntityRenderer(context: EntityRendererFactory.Context) :
         VolaphyraCoreModel(context.getPart(DuskEntityModelLayers.VOLAPHYRA_CORE)),
         0.25f
     ) {
-
-    override fun getTexture(entity: AbstractVolaphyraEntity): Identifier = VolaphyraEntityRenderer.TEXTURE_CORE
+    override fun getTexture(entity: AbstractVolaphyraEntity): Identifier = VolaphyraEntityRenderer.VOLAPHYRA_CORE
 }

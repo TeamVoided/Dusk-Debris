@@ -9,6 +9,7 @@ import net.minecraft.registry.tag.EntityTypeTags
 import org.teamvoided.dusk_debris.data.tags.DuskEntityTypeTags
 import org.teamvoided.dusk_debris.entity.DuskEntityLists.DUSK_SKELETON_ENTITIES
 import org.teamvoided.dusk_debris.entity.DuskEntityLists.THROWABLE_BOMB_ENTITIES
+import org.teamvoided.dusk_debris.init.DuskEntities
 import java.util.concurrent.CompletableFuture
 
 class EntityTypeTagsProvider(output: FabricDataOutput, registriesFuture: CompletableFuture<HolderLookup.Provider>) :
@@ -63,6 +64,18 @@ class EntityTypeTagsProvider(output: FabricDataOutput, registriesFuture: Complet
             .add(EntityType.ITEM)
         getOrCreateTagBuilder(DuskEntityTypeTags.FIREBOMB_DOES_NOT_DAMAGE)
             .forceAddTag(DuskEntityTypeTags.BLUNDERBOMB_DOES_NOT_DAMAGE)
+
+        getOrCreateTagBuilder(DuskEntityTypeTags.JELLYFISH)
+            .add(DuskEntities.VOLAPHYRA)
+            .add(DuskEntities.VOLAPHYRA_CORE)
+            .add(DuskEntities.TINY_ENEMY_JELLYFISH)
+        getOrCreateTagBuilder(DuskEntityTypeTags.FOG_CANYON_ENTITIES)
+            .forceAddTag(DuskEntityTypeTags.JELLYFISH)
+        getOrCreateTagBuilder(DuskEntityTypeTags.DONT_POP_FOG_BUBBLES)
+            .forceAddTag(DuskEntityTypeTags.FOG_CANYON_ENTITIES)
+        getOrCreateTagBuilder(DuskEntityTypeTags.NOT_DAMAGED_BY_FOG_EXPLOSIONS)
+            .forceAddTag(DuskEntityTypeTags.FOG_CANYON_ENTITIES)
+
     }
 
     private fun vanillaTags() {
@@ -74,11 +87,12 @@ class EntityTypeTagsProvider(output: FabricDataOutput, registriesFuture: Complet
 //           .add(DuskEntities.GREED)
         getOrCreateTagBuilder(EntityTypeTags.IMPACT_PROJECTILES)
             .forceAddTag(DuskEntityTypeTags.THROWABLE_BOMB)
-//        getOrCreateTagBuilder(EntityTypeTags.AQUATIC)
-//            .add(DuskEntities.CRAB)
+        getOrCreateTagBuilder(EntityTypeTags.AQUATIC)
+            .forceAddTag(DuskEntityTypeTags.JELLYFISH)
 //        getOrCreateTagBuilder(EntityTypeTags.ARTHROPOD)
 //            .add(DuskEntities.CRAB)
-//        getOrCreateTagBuilder(EntityTypeTags.CAN_BREATHE_UNDER_WATER)
+        getOrCreateTagBuilder(EntityTypeTags.CAN_BREATHE_UNDER_WATER)
+            .forceAddTag(DuskEntityTypeTags.JELLYFISH)
 //            .add(DuskEntities.CRAB)
     }
 

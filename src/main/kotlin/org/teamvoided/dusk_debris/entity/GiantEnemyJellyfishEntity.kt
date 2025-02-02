@@ -164,6 +164,10 @@ class GiantEnemyJellyfishEntity(entityType: EntityType<GiantEnemyJellyfishEntity
         this.makeSound(SoundEvents.ENTITY_WARDEN_ROAR)
     }
 
+    override fun updateAnimations() {
+            this.idleAnimationState.start(this.age)
+    }
+
     private fun generateSizeBonus(random: RandomGenerator): Float { //biased to bottom
         return 1f + random.nextFloat() * random.nextFloat() * 1.66667f
     }

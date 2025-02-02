@@ -80,7 +80,7 @@ interface Pickupable {
 
         fun <T> tryPickup(
             player: PlayerEntity,
-            hand: Hand?,
+            hand: Hand,
             entity: T
         ): Optional<ActionResult> where T : LivingEntity, T : Pickupable {
             val handStack = player.getStackInHand(hand)

@@ -17,6 +17,7 @@ object DuskEntityTypeTags {
     val BLUNDERBOMB_DOES_NOT_DAMAGE = create("blunderbomb_does_not_damage")
     val GUNPOWDER_BARREL_DOES_NOT_DAMAGE = create("gunpowder_barrel_does_not_damage")
 
+    val JELLYFISH = create("jellyfish")
     val FOG_CANYON_ENTITIES = create("fog_canyon_entities")
     val DONT_POP_FOG_BUBBLES = create("dont_pop_fog_bubbles")
     val NOT_DAMAGED_BY_FOG_EXPLOSIONS = create("not_damaged_by_fog_explosions")

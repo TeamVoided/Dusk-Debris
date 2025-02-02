@@ -32,5 +32,7 @@ object DuskParticlesClient {
         ParticleFactoryRegistry.getInstance().register(DuskParticles.FLASH, FlashParticle::Factory)
 
         ParticleFactoryRegistry.getInstance().register(DuskParticles.SMALL_PURPLE_BUBBLE_CUBE, BubbleCubeParticle::SmallFactory)
+        ParticleFactoryRegistry.getInstance().register(DuskParticles.PURPLE_BIOME_BUBBLE, BiomeBubbleParticle::Factory)
+        ParticleFactoryRegistry.getInstance().register(DuskParticles.PURPLE_BUBBLE, DuskBubbleParticle::Factory)
     }
 }

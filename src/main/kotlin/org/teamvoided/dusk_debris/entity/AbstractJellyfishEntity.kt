@@ -1,8 +1,8 @@
 package org.teamvoided.dusk_debris.entity
 
 import net.minecraft.block.BlockState
+import net.minecraft.entity.AnimationState
 import net.minecraft.entity.EntityType
-import net.minecraft.entity.MovementType
 import net.minecraft.entity.attribute.DefaultAttributeContainer
 import net.minecraft.entity.attribute.EntityAttributes
 import net.minecraft.entity.mob.Angerable
@@ -10,7 +10,6 @@ import net.minecraft.entity.mob.HostileEntity
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Vec3d
 import net.minecraft.world.World
 import java.util.*
 
@@ -18,6 +17,7 @@ abstract class AbstractJellyfishEntity(entityType: EntityType<out AbstractJellyf
     HostileEntity(entityType, world), Angerable {
     var angerTicks = 0
     var targetUuid: UUID? = null
+    val idleAnimationState: AnimationState = AnimationState()
 
     init {
         this.setNoGravity(true)
@@ -27,6 +27,11 @@ abstract class AbstractJellyfishEntity(entityType: EntityType<out AbstractJellyf
 //        super.initDataTracker(builder)
 //    }
 
+    override fun tick() {
+        super.tick()
+        this.updateAnimations()
+    }
+
     override fun writeCustomDataToNbt(nbt: NbtCompound) {
         super.writeCustomDataToNbt(nbt)
         this.writeAngerToNbt(nbt)
@@ -35,11 +40,6 @@ abstract class AbstractJellyfishEntity(entityType: EntityType<out AbstractJellyf
     override fun readCustomDataFromNbt(nbt: NbtCompound) {
         super.readCustomDataFromNbt(nbt)
         this.readAngerFromNbt(this.world, nbt)
-    }
-
-    override fun move(movementType: MovementType, movement: Vec3d) {
-        super.move(movementType, movement)
-        checkBlockCollision()
     }
 
     override fun tickMovement() {
@@ -88,6 +88,8 @@ abstract class AbstractJellyfishEntity(entityType: EntityType<out AbstractJellyf
         return true
     }
 
+    abstract fun updateAnimations()
+
     companion object {
         const val GRAVITY_VALUE = 0.003
 
@@ -101,6 +103,7 @@ abstract class AbstractJellyfishEntity(entityType: EntityType<out AbstractJellyf
         fun createAttributesNoSpecial(): DefaultAttributeContainer.Builder {
             return HostileEntity.createAttributes()
                 .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.3)
+                .add(EntityAttributes.GENERIC_FLYING_SPEED, 0.3)
                 .add(EntityAttributes.GENERIC_GRAVITY, 0.0)
         }
     }
