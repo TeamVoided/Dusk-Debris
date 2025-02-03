@@ -1,7 +1,12 @@
 package org.teamvoided.dusk_debris.init
 
 import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry
-import net.minecraft.client.particle.BubblePopParticle
+import net.minecraft.client.particle.*
+import net.minecraft.client.world.ClientWorld
+import net.minecraft.particle.DefaultParticleType
+import net.minecraft.particle.ParticleEffect
+import net.minecraft.particle.ParticleType
+import net.minecraft.particle.ParticleTypes
 import org.teamvoided.dusk_debris.particle.*
 import org.teamvoided.dusk_debris.particle.vanilla.AdditionalWaterSuspendParticle
 
@@ -26,13 +31,22 @@ object DuskParticlesClient {
 
         ParticleFactoryRegistry.getInstance().register(DuskParticles.SPARK, ElectricityParticle::Factory)
 
-        ParticleFactoryRegistry.getInstance().register(DuskParticles.UNDERACID, AdditionalWaterSuspendParticle::UnderacidFactory)
+        ParticleFactoryRegistry.getInstance()
+            .register(DuskParticles.UNDERACID, AdditionalWaterSuspendParticle::UnderacidFactory)
         ParticleFactoryRegistry.getInstance().register(DuskParticles.ACID_BUBBLE_POP, BubblePopParticle::Factory)
 
         ParticleFactoryRegistry.getInstance().register(DuskParticles.FLASH, FlashParticle::Factory)
 
-        ParticleFactoryRegistry.getInstance().register(DuskParticles.SMALL_PURPLE_BUBBLE_CUBE, BubbleCubeParticle::SmallFactory)
+        ParticleFactoryRegistry.getInstance()
+            .register(DuskParticles.SMALL_PURPLE_BUBBLE_CUBE, BubbleCubeParticle::SmallFactory)
         ParticleFactoryRegistry.getInstance().register(DuskParticles.PURPLE_BIOME_BUBBLE, BiomeBubbleParticle::Factory)
         ParticleFactoryRegistry.getInstance().register(DuskParticles.PURPLE_BUBBLE, DuskBubbleParticle::Factory)
+
+        ParticleFactoryRegistry.getInstance()
+            .register(DuskParticles.ASTRAS_FLYING_GOOP, AstrasStrangeGoopParticle::FallingGoopFactory)
+        ParticleFactoryRegistry.getInstance()
+            .register(DuskParticles.ASTRAS_LANDED_GOOP, AstrasStrangeGoopParticle::LandedGoopFactory)
     }
+
+
 }

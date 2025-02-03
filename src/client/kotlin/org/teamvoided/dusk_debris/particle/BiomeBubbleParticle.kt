@@ -1,8 +1,10 @@
 package org.teamvoided.dusk_debris.particle
 
+import com.mojang.blaze3d.vertex.VertexConsumer
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import net.minecraft.client.particle.*
+import net.minecraft.client.render.Camera
 import net.minecraft.client.world.ClientWorld
 import net.minecraft.particle.DefaultParticleType
 import org.teamvoided.dusk_debris.util.Utils
@@ -16,6 +18,7 @@ class BiomeBubbleParticle(
     posZ: Double,
 ) : SpriteBillboardParticle(world, posX, posY, posZ) {
     val spinSpeed: Float
+    val maxAlpha: Float
 
     init {
         this.maxAge = 80 + random.nextInt(420)
@@ -27,6 +30,7 @@ class BiomeBubbleParticle(
         this.velocityY = (random.nextDouble() - 0.5f) * 0.02
         this.velocityZ = (random.nextDouble() - 0.5f) * 0.005
         this.colorAlpha = 0f
+        this.maxAlpha = random.nextFloat() * 0.2f + 0.1f
     }
 
     override fun getType(): ParticleTextureSheet = ParticleTextureSheet.PARTICLE_SHEET_TRANSLUCENT
@@ -34,11 +38,6 @@ class BiomeBubbleParticle(
     public override fun getBrightness(tint: Float): Int = super.getBrightness(tint) + 255
 
     override fun tick() {
-        if (age + 20 >= maxAge) {
-            this.colorAlpha -= 0.05f
-        } else if (this.colorAlpha < 1) {
-            this.colorAlpha += 0.05f
-        }
         if (age++ >= this.maxAge) {
             this.markDead()
         } else {
@@ -51,6 +50,15 @@ class BiomeBubbleParticle(
             this.y += this.velocityY
             this.z += this.velocityZ
         }
+    }
+
+    override fun buildGeometry(vertexConsumer: VertexConsumer, camera: Camera, tickDelta: Float) {
+        var alpha = (age + tickDelta) / maxAge
+        alpha = 1f - 2f * alpha
+        alpha *= alpha
+        alpha = 1f - alpha
+        this.colorAlpha = alpha * maxAlpha
+        super.buildGeometry(vertexConsumer, camera, tickDelta)
     }
 
     @Environment(EnvType.CLIENT)

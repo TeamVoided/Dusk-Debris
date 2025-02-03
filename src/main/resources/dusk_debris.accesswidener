@@ -33,3 +33,5 @@ accessible method net/minecraft/entity/LivingEntity swimUpward (Lnet/minecraft/r
 
 accessible field net/minecraft/entity/EntityType spawnDimensionsScale F
 
+accessible method net/minecraft/client/particle/BlockLeakParticle <init> (Lnet/minecraft/client/world/ClientWorld;DDDLnet/minecraft/fluid/Fluid;)V
+accessible method net/minecraft/client/particle/BlockLeakParticle$ContinuousFalling <init> (Lnet/minecraft/client/world/ClientWorld;DDDLnet/minecraft/fluid/Fluid;Lnet/minecraft/particle/ParticleEffect;)V

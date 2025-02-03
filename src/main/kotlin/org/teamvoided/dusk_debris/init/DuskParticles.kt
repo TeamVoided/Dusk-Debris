@@ -52,6 +52,10 @@ object DuskParticles {
     val PURPLE_BIOME_BUBBLE: DefaultParticleType = FabricParticleTypes.simple()
     val PURPLE_BUBBLE: DefaultParticleType = FabricParticleTypes.simple()
 
+    val ASTRAS_FLYING_GOOP: ParticleType<GoopFlyingParticleEffect> =
+        FabricParticleTypes.complex(GoopFlyingParticleEffect.CODEC, GoopFlyingParticleEffect.PACKET_CODEC)
+    val ASTRAS_LANDED_GOOP: ParticleType<GoopLandedParticleEffect> =
+        FabricParticleTypes.complex(GoopLandedParticleEffect.CODEC, GoopLandedParticleEffect.PACKET_CODEC)
 
     fun init() {
         Registry.register(Registries.PARTICLE_TYPE, id("toxic_smoke_particle"), TOXIC_SMOKE_PARTICLE)
@@ -75,5 +79,8 @@ object DuskParticles {
         Registry.register(Registries.PARTICLE_TYPE, id("small_purple_bubble_cube"), SMALL_PURPLE_BUBBLE_CUBE)
         Registry.register(Registries.PARTICLE_TYPE, id("purple_biome_bubble"), PURPLE_BIOME_BUBBLE)
         Registry.register(Registries.PARTICLE_TYPE, id("purple_bubble"), PURPLE_BUBBLE)
+
+        Registry.register(Registries.PARTICLE_TYPE, id("goop_flying"), ASTRAS_FLYING_GOOP)
+        Registry.register(Registries.PARTICLE_TYPE, id("goop_landed"), ASTRAS_LANDED_GOOP)
     }
 }
