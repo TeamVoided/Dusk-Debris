@@ -56,10 +56,6 @@ class DuskBubbleParticle(
             this.velocityZ += sin(the) * 0.05f * radius
             this.velocityY -= gravityStrength
             this.move(this.velocityX, this.velocityY, this.velocityZ)
-            this.velocityX = 0.0
-            this.velocityY = 0.0
-            this.velocityZ = 0.0
-
             if (this.x == this.prevPosX || this.y == this.prevPosY || this.z == this.prevPosZ) {
                 this.markDead()
             }
