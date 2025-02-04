@@ -37,13 +37,12 @@ class EntityTestParticleBlock(settings: Settings) : Block(settings) {
             (random.nextDouble() - 0.5) * 5
         ).add(pos.ofCenter())
         val particleVel = Vec3d(
-            1.0, 0.0, 0.0
-//            (world.random.nextDouble() - world.random.nextDouble()) * 0.1,
-//            world.random.nextDouble() * 0.2 + 0.1,
-//            (world.random.nextDouble() - world.random.nextDouble()) * 0.1,
+            (world.random.nextDouble() - 0.5) * 0.2,
+            world.random.nextDouble() * 0.2 + 0.1,
+            (world.random.nextDouble() - 0.5) * 0.2,
         )
         world.addParticle(
-            GoopFlyingParticleEffect(100),
+            GoopFlyingParticleEffect(1000),
             particlePos,
             particleVel
         )

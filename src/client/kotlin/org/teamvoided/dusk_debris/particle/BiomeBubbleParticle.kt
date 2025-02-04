@@ -22,15 +22,15 @@ class BiomeBubbleParticle(
 
     init {
         this.maxAge = 80 + random.nextInt(420)
-        this.scale = random.nextFloat() * 0.3f + 0.15f
-        this.angle = (random.nextFloat()) * Utils.rotate360
+        this.scale = random.nextFloat() * 0.85f + 0.15f
+        this.angle = (random.nextFloat()) * Utils.rotate90 - Utils.rotate45
         this.prevAngle = angle
         this.spinSpeed = (random.nextFloat() - 0.5f) * 0.01f * pi
         this.velocityX = (random.nextDouble() - 0.5f) * 0.005
         this.velocityY = (random.nextDouble() - 0.5f) * 0.02
         this.velocityZ = (random.nextDouble() - 0.5f) * 0.005
         this.colorAlpha = 0f
-        this.maxAlpha = random.nextFloat() * 0.2f + 0.1f
+        this.maxAlpha = random.nextFloat() * 0.35f + 0.15f
     }
 
     override fun getType(): ParticleTextureSheet = ParticleTextureSheet.PARTICLE_SHEET_TRANSLUCENT
@@ -53,11 +53,13 @@ class BiomeBubbleParticle(
     }
 
     override fun buildGeometry(vertexConsumer: VertexConsumer, camera: Camera, tickDelta: Float) {
-        var alpha = (age + tickDelta) / maxAge
-        alpha = 1f - 2f * alpha
-        alpha *= alpha
-        alpha = 1f - alpha
-        this.colorAlpha = alpha * maxAlpha
+        if (age + tickDelta < maxAge) {
+            var alpha = (age + tickDelta) / maxAge
+            alpha = 1f - 2f * alpha
+            alpha *= alpha
+            alpha = 1f - alpha
+            this.colorAlpha = alpha * maxAlpha
+        }
         super.buildGeometry(vertexConsumer, camera, tickDelta)
     }
 

@@ -45,16 +45,17 @@ class BiomeTagsProvider(o: FabricDataOutput, r: CompletableFuture<HolderLookup.P
             .forceAddTag(ConventionalBiomeTags.IS_SWAMP)
             .add(Biomes.LUSH_CAVES)
             .add(Biomes.DEEP_DARK)
-            .add(Biomes.DRIPSTONE_CAVES)
             .add(DuskBiomes.BOREAL_VALLEY)
+            .add(DuskBiomes.FOG_CANYON)
         getOrCreateTagBuilder(DuskBiomeTags.FOG_START_20)
+            .add(Biomes.DRIPSTONE_CAVES)
             .add(Biomes.DARK_FOREST)
 //            .add(Biomes.PALE_GARDEN)
 
-        getOrCreateTagBuilder(DuskBiomeTags.FOG_END_20)
-            .add(Biomes.DRIPSTONE_CAVES)
         getOrCreateTagBuilder(DuskBiomeTags.FOG_END_80)
             .add(DuskBiomes.BOREAL_VALLEY)
+            .add(DuskBiomes.FOG_CANYON)
+
         getOrCreateTagBuilder(DuskBiomeTags.FOG_BOREAL_VALLEY)
             .add(DuskBiomes.BOREAL_VALLEY)
     }

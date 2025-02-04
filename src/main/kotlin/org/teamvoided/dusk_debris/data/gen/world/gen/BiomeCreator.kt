@@ -4,18 +4,23 @@ import net.minecraft.client.sound.MusicType
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.SpawnGroup
 import net.minecraft.registry.BootstrapContext
+import net.minecraft.registry.HolderProvider
 import net.minecraft.registry.RegistryKeys
 import net.minecraft.sound.BiomeMoodSound
 import net.minecraft.sound.SoundEvents
 import net.minecraft.world.biome.*
 import net.minecraft.world.gen.GenerationStep
+import net.minecraft.world.gen.carver.ConfiguredCarver
 import net.minecraft.world.gen.feature.DefaultBiomeFeatures
+import net.minecraft.world.gen.feature.PlacedFeature
 import org.teamvoided.dusk_debris.data.worldgen.DuskPlacedFeatures
+import org.teamvoided.dusk_debris.init.DuskParticles
 import org.teamvoided.dusk_debris.init.worldgen.DuskBiomes
 
 object BiomeCreator {
     fun boostrap(context: BootstrapContext<Biome>) {
         context.register(DuskBiomes.BOREAL_VALLEY, createFreezingForest(context))
+        context.register(DuskBiomes.FOG_CANYON, createFogCanyon(context))
     }
 
     fun createFreezingForest(c: BootstrapContext<Biome>): Biome {
@@ -57,6 +62,43 @@ object BiomeCreator {
                 .build()
         ).spawnSettings(spawnSettings.build()).generationSettings(generationSettings.build()).build()
     }
+
+//    0xC196E0
+
+
+    fun createFogCanyon(c: BootstrapContext<Biome>): Biome {
+        val spawnSettings = SpawnSettings.Builder()
+        val generationSettings = GenerationSettings.Builder(
+            c.getRegistryLookup(RegistryKeys.PLACED_FEATURE),
+            c.getRegistryLookup(RegistryKeys.CONFIGURED_CARVER)
+        )
+        spawnSettings.spawn(SpawnGroup.WATER_AMBIENT, SpawnSettings.SpawnEntry(EntityType.TROPICAL_FISH, 25, 8, 8))
+        DefaultBiomeFeatures.addBatsAndMonsters(spawnSettings)
+        OverworldBiomeCreator.addBasicFeatures(generationSettings)
+        DefaultBiomeFeatures.addPlainsTallGrass(generationSettings)
+        DefaultBiomeFeatures.addDefaultOres(generationSettings)
+        DefaultBiomeFeatures.addClayOre(generationSettings)
+        DefaultBiomeFeatures.addDefaultDisks(generationSettings)
+        DefaultBiomeFeatures.addLushCavesDecoration(generationSettings)
+        val musicSound = MusicType.createIngameMusic(SoundEvents.MUSIC_OVERWORLD_LUSH_CAVES)
+        return Biome.Builder()
+            .temperature(0.25f)
+            .downfall(0.6f)
+            .effects(
+                BiomeEffects.Builder()
+                    .grassColor(0x316B9E)
+                    .foliageColor(0x307096)
+                    .waterColor(6254825)
+                    .waterFogColor(1836338)
+                    .fogColor(0xC196E0)
+                    .skyColor(0x774E96)
+                    .particleConfig(BiomeParticleConfig(DuskParticles.PURPLE_BIOME_BUBBLE, 0.00025f))
+                    .moodSound(BiomeMoodSound.CAVE)
+                    .music(musicSound)
+                    .build()
+            ).spawnSettings(spawnSettings.build()).generationSettings(generationSettings.build()).build()
+    }
+
 
     /*Generation Steps Reference:
       RAW_GENERATION

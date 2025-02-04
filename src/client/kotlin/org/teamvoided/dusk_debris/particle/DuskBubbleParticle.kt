@@ -20,7 +20,6 @@ class DuskBubbleParticle(
     velocityZ: Double
 ) : SpriteBillboardParticle(world, x, y, z, velocityX, velocityY, velocityZ) {
     val rotOffset: Float
-    val radius: Float
     val speed: Float
 
     init {
@@ -30,14 +29,11 @@ class DuskBubbleParticle(
         this.velocityX = velocityX
         this.velocityY = velocityY
         this.velocityZ = velocityZ
-        this.maxAge = 800 + random.nextInt(800)
+        this.maxAge = 300 + random.nextInt(700)
         this.scale = 0.1f + 0.125f * random.nextFloat()
-        this.velocityMultiplier = 0.005f
         this.gravityStrength = -(0.007f * random.nextFloat() + 0.002f)
         this.colorAlpha = 0f
-
         this.rotOffset = random.nextFloat() * Utils.rotate360
-        this.radius = random.nextFloat() * 0.1f + 0.01f
         this.speed = random.nextFloat() * 0.1f + 0.01f
     }
 
@@ -52,13 +48,16 @@ class DuskBubbleParticle(
         }
         if (age++ < this.maxAge) {
             val the = age * 0.05f * Utils.rotate360 * speed + rotOffset // * 3.18318
-            this.velocityX += cos(the) * 0.05f * radius
-            this.velocityZ += sin(the) * 0.05f * radius
+            this.velocityX += cos(the) * 0.003f
+            this.velocityZ += sin(the) * 0.003f
             this.velocityY -= gravityStrength
             this.move(this.velocityX, this.velocityY, this.velocityZ)
             if (this.x == this.prevPosX || this.y == this.prevPosY || this.z == this.prevPosZ) {
                 this.markDead()
             }
+            this.velocityX = 0.0
+            this.velocityY = 0.0
+            this.velocityZ = 0.0
         } else {
             this.markDead()
         }

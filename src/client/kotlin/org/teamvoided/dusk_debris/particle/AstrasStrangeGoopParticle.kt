@@ -1,20 +1,24 @@
 package org.teamvoided.dusk_debris.particle
 
+import com.mojang.blaze3d.vertex.VertexConsumer
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
-import net.minecraft.client.particle.*
+import net.minecraft.client.particle.BlockLeakParticle
+import net.minecraft.client.particle.Particle
+import net.minecraft.client.particle.ParticleFactory
+import net.minecraft.client.particle.SpriteProvider
+import net.minecraft.client.render.Camera
 import net.minecraft.client.world.ClientWorld
 import net.minecraft.entity.Entity
 import net.minecraft.fluid.Fluid
 import net.minecraft.fluid.Fluids
-import net.minecraft.particle.DefaultParticleType
 import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvents
 import net.minecraft.util.math.Direction
 import net.minecraft.util.math.MathHelper
 import net.minecraft.util.math.Vec3d
-import org.teamvoided.dusk_debris.util.sendMessageIngame
-import kotlin.math.abs
+import org.joml.Quaternionf
+import org.teamvoided.dusk_debris.util.Utils
 
 class AstrasStrangeGoopParticle(world: ClientWorld, x: Double, y: Double, z: Double, fluid: Fluid) :
     BlockLeakParticle(world, x, y, z, fluid) {
@@ -46,6 +50,7 @@ class AstrasStrangeGoopParticle(world: ClientWorld, x: Double, y: Double, z: Dou
             this.velocityX = velocityX
             this.velocityY = velocityY
             this.velocityZ = velocityZ
+            gravityStrength = 0.02f
         }
 
         override fun updateVelocity() {
@@ -141,12 +146,46 @@ class AstrasStrangeGoopParticle(world: ClientWorld, x: Double, y: Double, z: Dou
             this.stoppedInDirection = particle.direction()
             this.gravityStrength = 0f
             this.onGround = true
+            this.angle = random.nextFloat() * Utils.rotate360
+            this.prevAngle = angle
         }
 
-        override fun updateVelocity() {
-//            if (!this.onGround) {
-//                fly()
-//            }
+        override fun buildGeometry(vertexConsumer: VertexConsumer, camera: Camera, tickDelta: Float) {
+            val quaternionf = Quaternionf()
+            //x is pitch, top and bottom
+            //y is yaw, left to right
+            //z is roll, side to side
+            when (this.stoppedInDirection.axis) {
+                Direction.Axis.Y ->
+                    if (camera.pos.y < this.y) quaternionf.rotationX(Utils.rotate90)
+                    else quaternionf.rotationX(Utils.rotate270)
+
+                Direction.Axis.X ->
+                    if (camera.pos.x < this.x) quaternionf.rotationY(Utils.rotate270)
+                    else quaternionf.rotationY(Utils.rotate90)
+
+                Direction.Axis.Z ->
+                    if (camera.pos.z < this.z) quaternionf.rotationY(Utils.rotate180)
+            }
+            if (this.angle != 0f) {
+                quaternionf.rotateZ(MathHelper.lerp(tickDelta, this.prevAngle, this.angle))
+            }
+            this.method_60373(vertexConsumer, camera, quaternionf, tickDelta)
+        }
+
+        override fun method_60373(
+            vertexConsumer: VertexConsumer,
+            camera: Camera,
+            quaternionf: Quaternionf,
+            tickDelta: Float
+        ) {
+            if (stoppedInDirection == Direction.DOWN) {
+                val vec3d = camera.pos
+                val posX = (MathHelper.lerp(tickDelta.toDouble(), this.prevPosX, this.x) - vec3d.getX()).toFloat()
+                val posY = (MathHelper.lerp(tickDelta.toDouble(), this.prevPosY, this.y) - vec3d.getY()).toFloat()
+                val posZ = (MathHelper.lerp(tickDelta.toDouble(), this.prevPosZ, this.z) - vec3d.getZ()).toFloat()
+                this.method_60374(vertexConsumer, quaternionf, posX, posY + 0.0005f, posZ, tickDelta)
+            } else super.method_60373(vertexConsumer, camera, quaternionf, tickDelta)
         }
 
         private fun fly() {
@@ -154,10 +193,10 @@ class AstrasStrangeGoopParticle(world: ClientWorld, x: Double, y: Double, z: Dou
             world.addParticle(GoopFlyingParticleEffect(maxAge), this.x, this.y, this.z, 0.0, 0.0, 0.0)
         }
 
-        override fun updateAge() {
+//        override fun updateAge() {
 //            this.maxAge -= 7 // + 1, super already subtracts one
-            super.updateAge()
-        }
+//            super.updateAge()
+//        }
 
         override fun move(x: Double, y: Double, z: Double) {
             var dx = x
@@ -212,7 +251,6 @@ class AstrasStrangeGoopParticle(world: ClientWorld, x: Double, y: Double, z: Dou
         ): Particle {
             val particle =
                 FlyingGoop(clientWorld, x, y, z, velocityX, velocityY, velocityZ, Fluids.EMPTY, particleEffect)
-            particle.gravityStrength = 0.01f
             particle.setSprite(spriteProvider)
             return particle
         }

@@ -7,6 +7,7 @@ import org.teamvoided.dusk_debris.DuskDebris.id
 
 object DuskBiomes {
     val BOREAL_VALLEY = create("boreal_valley")
+    val FOG_CANYON = create("fog_canyon")
 
     fun init() {}
 
