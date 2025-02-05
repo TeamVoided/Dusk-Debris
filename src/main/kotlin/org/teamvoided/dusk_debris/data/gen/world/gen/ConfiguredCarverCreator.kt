@@ -29,15 +29,14 @@ object ConfiguredCarverCreator {
             LakeCarverConfig(
                 0.15f,
                 UniformHeightProvider.create(YOffset.aboveBottom(8), YOffset.fixed(180)),
-                UniformFloatProvider.create(0.3f, 1f),
+                UniformFloatProvider.create(0.4f, 1f),
                 YOffset.aboveBottom(8),
-                LakeCarverDebugConfig.default(true),
+                LakeCarverDebugConfig.default(),
                 block.getTagOrThrow(BlockTags.OVERWORLD_CARVER_REPLACEABLES),
 
-                UniformFloatProvider.create(0.7f, 1.4f),
-                UniformFloatProvider.create(0.8f, 1.3f),
+                UniformIntProvider.create(10, 30),
                 Blocks.WATER.defaultState,
-                UniformFloatProvider.create(-0.4f, 0.2f)
+                UniformFloatProvider.create(-0.8f, 0.2f)
             )
         )
 

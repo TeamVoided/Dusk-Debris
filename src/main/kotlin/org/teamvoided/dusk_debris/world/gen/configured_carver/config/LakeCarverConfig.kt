@@ -7,6 +7,7 @@ import net.minecraft.block.BlockState
 import net.minecraft.block.Blocks
 import net.minecraft.registry.HolderSet
 import net.minecraft.util.math.float_provider.FloatProvider
+import net.minecraft.util.math.int_provider.IntProvider
 import net.minecraft.world.gen.YOffset
 import net.minecraft.world.gen.carver.CarverConfig
 import net.minecraft.world.gen.carver.CarverDebugConfig
@@ -20,8 +21,7 @@ class LakeCarverConfig(
     lavaLevel: YOffset,
     debugConfig: CarverDebugConfig, //LakeCarverDebugConfig, this doesent work
     replaceableBlocks: HolderSet<Block>,
-    val horizontalRadiusMultiplier: FloatProvider,
-    val verticalRadiusMultiplier: FloatProvider,
+    val horizontalRadius: IntProvider,
     val fluidState: BlockState,
     val waterLevel: FloatProvider //section of carver filled with water, bottom is -1, top is 1
 ) : CarverConfig(probability, y, yScale, lavaLevel, debugConfig, replaceableBlocks) {
@@ -31,8 +31,7 @@ class LakeCarverConfig(
         yScale: FloatProvider,
         lavaLevel: YOffset,
         replaceableBlocks: HolderSet<Block>,
-        horizontalRadiusMultiplier: FloatProvider,
-        verticalRadiusMultiplier: FloatProvider,
+        horizontalRadiusMultiplier: IntProvider,
         fluidState: BlockState,
         waterLevel: FloatProvider
     ) : this(
@@ -43,15 +42,13 @@ class LakeCarverConfig(
         LakeCarverDebugConfig.default(),
         replaceableBlocks,
         horizontalRadiusMultiplier,
-        verticalRadiusMultiplier,
         fluidState,
         waterLevel
     )
 
     constructor(
         config: CarverConfig,
-        horizontalRadiusMultiplier: FloatProvider,
-        verticalRadiusMultiplier: FloatProvider,
+        horizontalRadiusMultiplier: IntProvider,
         fluidState: BlockState,
         waterLevel: FloatProvider
     ) : this(
@@ -62,7 +59,6 @@ class LakeCarverConfig(
         config.debugConfig,
         config.replaceable,
         horizontalRadiusMultiplier,
-        verticalRadiusMultiplier,
         fluidState,
         waterLevel
     )
@@ -72,10 +68,8 @@ class LakeCarverConfig(
             RecordCodecBuilder.create { instance: RecordCodecBuilder.Instance<LakeCarverConfig> ->
                 instance.group(
                     CarverConfig.CODEC.forGetter { config: LakeCarverConfig -> config },
-                    FloatProvider.VALUE_CODEC.fieldOf("horizontal_radius_multiplier")
-                        .forGetter { config: LakeCarverConfig -> config.horizontalRadiusMultiplier },
-                    FloatProvider.VALUE_CODEC.fieldOf("vertical_radius_multiplier")
-                        .forGetter { config: LakeCarverConfig -> config.verticalRadiusMultiplier },
+                    IntProvider.VALUE_CODEC.fieldOf("horizontal_radius")
+                        .forGetter { it.horizontalRadius },
                     BlockState.CODEC.optionalFieldOf("fluid_state", Blocks.WATER.defaultState)
                         .forGetter { it.fluidState },
                     FloatProvider.createValidatedCodec(-1.0f, 1.0f).fieldOf("water_level")

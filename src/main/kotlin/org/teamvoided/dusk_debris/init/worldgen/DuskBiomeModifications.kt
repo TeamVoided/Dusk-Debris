@@ -11,6 +11,7 @@ import net.minecraft.world.gen.carver.ConfiguredCarver
 import net.minecraft.world.gen.feature.PlacedFeature
 import org.teamvoided.dusk_debris.DuskDebris.id
 import org.teamvoided.dusk_debris.data.tags.DuskBiomeTags
+import org.teamvoided.dusk_debris.data.worldgen.DuskConfiguredCarvers
 import org.teamvoided.dusk_debris.data.worldgen.DuskPlacedFeatures
 import java.util.function.Predicate
 
@@ -51,6 +52,12 @@ object DuskBiomeModifications {
             "add_overworld_torus",
             GenerationStep.Feature.LOCAL_MODIFICATIONS,
             DuskPlacedFeatures.OVERWORLD_TORUS,
+            BiomeTags.OVERWORLD
+        )
+
+        addCarver(
+            "add_lake_carvers",
+            DuskConfiguredCarvers.LAKE,
             BiomeTags.OVERWORLD
         )
     }

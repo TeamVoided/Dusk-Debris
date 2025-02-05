@@ -20,7 +20,6 @@ import net.minecraft.world.gen.carver.CarverContext
 import net.minecraft.world.gen.carver.CarvingMask
 import net.minecraft.world.gen.chunk.AquiferSampler
 import org.apache.commons.lang3.mutable.MutableBoolean
-import org.teamvoided.dusk_debris.world.gen.configured_carver.LakeCarver.SkipOrWaterPredicate
 import org.teamvoided.dusk_debris.world.gen.configured_carver.config.LakeCarverConfig
 import org.teamvoided.dusk_debris.world.gen.configured_carver.config.debug.LakeCarverDebugConfig
 import java.util.function.Function
@@ -46,23 +45,24 @@ class LakeCarver(codec: Codec<LakeCarverConfig>) : Carver<LakeCarverConfig>(code
         val posX: Double = chunkPos.getOffsetX(random.nextInt(16)).toDouble()
         val posY: Double = config.y.get(random, carverContext).toDouble()
         val posZ: Double = chunkPos.getOffsetZ(random.nextInt(16)).toDouble()
-        val floorLevel: Double = config.waterLevel.get(random).toDouble()
+        val waterLevel: Double = config.waterLevel.get(random).toDouble()
 
 
 //        chunk.setBlockState(Vec3d(posX, posY, posZ).toBlockPos(), Blocks.GLOWSTONE.defaultState, false)
 
         val skipPredicate =
-            SkipOrWaterPredicate { context: CarverContext, scaledRelativeX: Double, scaledRelativeY: Double, scaledRelativeZ: Double, y: Int ->
+            SkipOrWaterPredicate { context: CarverContext, scaledRelativeX: Double, scaledRelativeY: Double, scaledRelativeZ: Double, y: Int, dps: Double ->
                 isPositionExcludedOrWater(
                     scaledRelativeX,
                     scaledRelativeY,
                     scaledRelativeZ,
-                    floorLevel
+                    waterLevel,
+                    dps
                 )
             }
 
         val height: Double = config.yScale.get(random).toDouble() //radius*this+2
-        val radius: Float = 20f //2*this+2 //1.0f + random.nextFloat() * 6.0f
+        val radius: Float = config.horizontalRadius.get(random).toFloat() //2*this+2 //1.0f + random.nextFloat() * 6.0f
         this.carveCave(
             carverContext,
             config,
@@ -90,13 +90,13 @@ class LakeCarver(codec: Codec<LakeCarverConfig>) : Carver<LakeCarverConfig>(code
         x: Double,
         y: Double,
         z: Double,
-        yaw: Float,
-        yawPitchRatio: Double,
+        radius: Float,
+        height: Double,
         carvingMask: CarvingMask,
         predicate: SkipOrWaterPredicate
     ) {
-        val horizontalScale = 1.5 + yaw
-        val verticalScale = horizontalScale * yawPitchRatio
+        val horizontalScale = 1.5 + radius
+        val verticalScale = horizontalScale * height
         this.carveRegion(
             context,
             config,
@@ -166,30 +166,24 @@ class LakeCarver(codec: Codec<LakeCarverConfig>) : Carver<LakeCarverConfig>(code
                         for (loopY in yMin downTo yMax + 1) {
                             val funY = (loopY - 0.5 - y) / verticalScale
 
-                            val output = predicate.shouldSkip(context, funX, funY, funZ, loopY)
-                            if (output != 0 &&
-                                (!mask[loopX, loopY, loopZ] || isDebug(config))
-                            ) {
-                                val sample = abs(dps.sample(chunkX.toDouble(), loopY * 0.25, chunkZ.toDouble()))
-                                val skipEquation = funX * funX + funY * funY + funZ * funZ
-
-                                if (1 - sample >= skipEquation) {
-                                    mask[loopX, loopY] = loopZ
-                                    mutable[chunkX, loopY] = chunkZ
-
-                                    bl = bl or carveAtPoint(
-                                        context,
-                                        config,
-                                        chunk,
-                                        posToBiome,
-                                        mask,
-                                        mutable,
-                                        mutable2,
-                                        sampler,
-                                        mutableBoolean,
-                                        output
-                                    )
-                                }
+                            val sample = dps.sample(chunkX.toDouble(), loopY * 0.25, chunkZ.toDouble())
+                            val sampleMathed = if (sample >= -0.25) sample * 0.2 - 0.2 else sample
+                            val output = predicate.shouldSkip(context, funX, funY, funZ, loopY, sample * sample)
+                            if (output != 0 && (!mask[loopX, loopY, loopZ] || isDebug(config))) {
+                                mask[loopX, loopY] = loopZ
+                                mutable[chunkX, loopY] = chunkZ
+                                bl = bl or carveAtPoint(
+                                    context,
+                                    config,
+                                    chunk,
+                                    posToBiome,
+                                    mask,
+                                    mutable,
+                                    mutable2,
+                                    sampler,
+                                    mutableBoolean,
+                                    output
+                                )
                             }
                         }
                     }
@@ -213,7 +207,7 @@ class LakeCarver(codec: Codec<LakeCarverConfig>) : Carver<LakeCarverConfig>(code
         foundSurface: MutableBoolean,
         predicateResult: Int,
 
-    ): Boolean {
+        ): Boolean {
         val blockState = chunk.getBlockState(pos)
         if (blockState.isOf(Blocks.GRASS_BLOCK) || blockState.isOf(Blocks.MYCELIUM)) {
             foundSurface.setTrue()
@@ -222,7 +216,8 @@ class LakeCarver(codec: Codec<LakeCarverConfig>) : Carver<LakeCarverConfig>(code
         if (!this.canReplaceBlock(config, blockState) && !isDebug(config)) {
             return false
         } else {
-            val blockState2 = this.getState(context, config, pos, sampler, predicateResult)
+            val blockState2 =
+                this.getState(context, config, pos, sampler, predicateResult, chunk)
             if (blockState2 == null) {
                 return false
             } else {
@@ -255,22 +250,22 @@ class LakeCarver(codec: Codec<LakeCarverConfig>) : Carver<LakeCarverConfig>(code
         config: LakeCarverConfig,
         pos: BlockPos,
         sampler: AquiferSampler,
-        predicateResult: Int
+        predicateResult: Int,
+        chunk: Chunk,
     ): BlockState? {
+        val debug = isDebug(config)
         if (pos.y <= config.lavaLevel.getY(context)) {
-            return LAVA.blockState
+            return if (debug) config.debugConfig.lavaState else LAVA.blockState
         } else {
             val blockState = sampler.apply(DensityFunction.SinglePointContext(pos.x, pos.y, pos.z), 0.0)
-            return if (blockState == null || predicateResult == 2) {
-                if (isDebug(config))
-                    if (predicateResult == 2) LakeCarverDebugConfig.default().fluidBarrierState
-                    else config.debugConfig.barrierState
-                else null
-            } else if (predicateResult == 3) {
-                if (isDebug(config)) LakeCarverDebugConfig.default().fluidState else config.fluidState
+            if (blockState == null) {
+                return if (debug) config.debugConfig.barrierState else null
+//            } else if (predicateResult == 2) {
+//                return if (debug) Blocks.WHITE_STAINED_GLASS.defaultState else blockState
+            } else if (predicateResult >= 2) {
+                return if (debug) LakeCarverDebugConfig.default().fluidState else config.fluidState
             } else {
-//                if (isDebug(config)) getDebugState(config, blockState) else blockState
-                blockState
+                return if (debug) getDebugState(config, blockState) else blockState
             }
         }
     }
@@ -279,11 +274,12 @@ class LakeCarver(codec: Codec<LakeCarverConfig>) : Carver<LakeCarverConfig>(code
         scaledRelativeX: Double,
         scaledRelativeY: Double,
         scaledRelativeZ: Double,
-        waterY: Double
+        waterY: Double,
+        dps: Double
     ): Int {
         val value =
-            scaledRelativeX * scaledRelativeX + scaledRelativeY * scaledRelativeY + scaledRelativeZ * scaledRelativeZ
-        return if (value <= 1.0) if (scaledRelativeY <= waterY) if (value <= 0.5) 3 else 2 else 1 else 0
+            scaledRelativeX * scaledRelativeX + scaledRelativeY * scaledRelativeY + scaledRelativeZ * scaledRelativeZ + dps
+        return if (value <= 1.0) if (scaledRelativeY <= waterY) if (value <= 0.8) 3 else 2 else 1 else 0
 
         //0 means nothing
         //1 means air
@@ -293,6 +289,6 @@ class LakeCarver(codec: Codec<LakeCarverConfig>) : Carver<LakeCarverConfig>(code
 
 
     fun interface SkipOrWaterPredicate {
-        fun shouldSkip(carverContext: CarverContext, x: Double, y: Double, z: Double, waterY: Int): Int
+        fun shouldSkip(carverContext: CarverContext, x: Double, y: Double, z: Double, waterY: Int, sample: Double): Int
     }
 }
