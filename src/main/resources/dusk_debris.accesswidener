@@ -24,6 +24,7 @@ accessible class net/minecraft/client/render/BackgroundRenderer$FogEffect
 accessible class net/minecraft/client/render/BackgroundRenderer$FogParameters
 
 accessible method net/minecraft/world/biome/OverworldBiomeCreator addBasicFeatures (Lnet/minecraft/world/biome/GenerationSettings$Builder;)V
+accessible method net/minecraft/world/biome/OverworldBiomeCreator create (ZFFLnet/minecraft/world/biome/SpawnSettings$Builder;Lnet/minecraft/world/biome/GenerationSettings$Builder;Lnet/minecraft/sound/MusicSound;)Lnet/minecraft/world/biome/Biome;
 
 accessible class net/minecraft/world/biome/Biome$Weather
 
@@ -35,3 +36,7 @@ accessible field net/minecraft/entity/EntityType spawnDimensionsScale F
 
 accessible method net/minecraft/client/particle/BlockLeakParticle <init> (Lnet/minecraft/client/world/ClientWorld;DDDLnet/minecraft/fluid/Fluid;)V
 accessible method net/minecraft/client/particle/BlockLeakParticle$ContinuousFalling <init> (Lnet/minecraft/client/world/ClientWorld;DDDLnet/minecraft/fluid/Fluid;Lnet/minecraft/particle/ParticleEffect;)V
+
+accessible method net/minecraft/world/gen/carver/Carver getDebugState (Lnet/minecraft/world/gen/carver/CarverConfig;Lnet/minecraft/block/BlockState;)Lnet/minecraft/block/BlockState;
+accessible method net/minecraft/world/gen/carver/Carver isDebug (Lnet/minecraft/world/gen/carver/CarverConfig;)Z
+accessible method net/minecraft/world/gen/carver/CarverDebugConfig <init> (ZLnet/minecraft/block/BlockState;Lnet/minecraft/block/BlockState;Lnet/minecraft/block/BlockState;Lnet/minecraft/block/BlockState;)V

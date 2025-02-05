@@ -22,7 +22,6 @@ object SnifferVariants {
     val DEFAULT = DuskSnifferVariants.DEFAULT
 
     fun bootstrap(c: BootstrapContext<SnifferVariant>) {
-        println("boot 1")
         c.registerDefault(DuskSnifferVariants.DEFAULT, BiomeTags.OVERWORLD)
         c.register(DuskSnifferVariants.BRIGHT, DuskBiomeTags.SNIFFER_BRIGHT, Biomes.JUNGLE)
         c.register(DuskSnifferVariants.SWAMP, DuskBiomeTags.SNIFFER_SWAMP, Biomes.SWAMP)
@@ -39,14 +38,12 @@ object SnifferVariants {
         c.register(DuskSnifferVariants.SNOW, DuskBiomeTags.SNIFFER_SNOW, Biomes.SNOWY_SLOPES)
         c.register(DuskSnifferVariants.FROZEN, DuskBiomeTags.SNIFFER_FROZEN, 0xF9FEFE)
         c.register(DuskSnifferVariants.DEEP_DARK, DuskBiomeTags.SNIFFER_DEEP_DARK, texture("sculk"))
-        println("boot 2")
     }
 
     fun BootstrapContext<SnifferVariant>.registerDefault(
         registryKey: RegistryKey<SnifferVariant>,
         biomes: TagKey<Biome>
     ): Holder.Reference<SnifferVariant> {
-        println("1")
         return this.register(registryKey,biomes)
     }
 
@@ -55,7 +52,6 @@ object SnifferVariants {
         biomes: TagKey<Biome>,
         biomeColor: RegistryKey<Biome>
     ): Holder.Reference<SnifferVariant> {
-        println("2")
         return this.register(registryKey, biomes, null, biomeColor, defaultOverlay)
     }
 
@@ -64,7 +60,6 @@ object SnifferVariants {
         biomes: TagKey<Biome>,
         color: Int
     ): Holder.Reference<SnifferVariant> {
-        println("3")
         return this.register(registryKey, biomes, color, null, defaultOverlay)
     }
 
@@ -73,7 +68,6 @@ object SnifferVariants {
         biomes: TagKey<Biome>,
         overlayTexture: Identifier
     ): Holder.Reference<SnifferVariant> {
-        println("4")
         return this.register(registryKey, biomes, null, null, overlayTexture)
     }
 
@@ -84,7 +78,6 @@ object SnifferVariants {
         biomeColor: RegistryKey<Biome>? = null,
         overlayTexture: Identifier? = null
     ): Holder.Reference<SnifferVariant> {
-        println("6")
         return this.register(
             registryKey,
             SnifferVariant(

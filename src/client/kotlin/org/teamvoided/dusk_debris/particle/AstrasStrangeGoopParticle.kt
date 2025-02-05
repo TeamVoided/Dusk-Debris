@@ -101,30 +101,15 @@ class AstrasStrangeGoopParticle(world: ClientWorld, x: Double, y: Double, z: Dou
             }
 
             if (x != dx) {
-                if (x >= 0)
-                    stoppedInDirection = Direction.EAST
-                else
-                    stoppedInDirection = Direction.WEST
-                this.velocityX = 0.0
+                stoppedInDirection = if (x >= 0) Direction.EAST else Direction.WEST
             }
 
             if (y != dy) {
-                if (dy < 0.0)
-                    this.onGround
-                if (y >= 0)
-                    stoppedInDirection = Direction.UP
-                else
-                    stoppedInDirection = Direction.DOWN
-
-                this.velocityY = 0.0
+                stoppedInDirection = if (y >= 0) Direction.UP else Direction.DOWN
             }
 
             if (z != dz) {
-                if (y >= 0)
-                    stoppedInDirection = Direction.SOUTH
-                else
-                    stoppedInDirection = Direction.NORTH
-                this.velocityZ = 0.0
+                stoppedInDirection = if (y >= 0) Direction.SOUTH else Direction.NORTH
             }
         }
     }
@@ -198,6 +183,18 @@ class AstrasStrangeGoopParticle(world: ClientWorld, x: Double, y: Double, z: Dou
 //            super.updateAge()
 //        }
 
+        override fun tick() {
+            when (stoppedInDirection) {
+                Direction.EAST -> this.velocityX = 0.05
+                Direction.WEST -> this.velocityX = -0.05
+                Direction.SOUTH -> this.velocityZ = 0.05
+                Direction.NORTH -> this.velocityZ = -0.05
+                Direction.UP -> this.velocityY = 0.05
+                Direction.DOWN -> this.velocityY = -0.05
+            }
+            super.tick()
+        }
+
         override fun move(x: Double, y: Double, z: Double) {
             var dx = x
             var dy = y
@@ -219,14 +216,6 @@ class AstrasStrangeGoopParticle(world: ClientWorld, x: Double, y: Double, z: Dou
             }
 
 //            this.onGround = (y != dy && dy < 0.0)
-            when (stoppedInDirection) {
-                Direction.EAST -> this.velocityX = 0.05
-                Direction.WEST -> this.velocityX = -0.05
-                Direction.SOUTH -> this.velocityZ = 0.05
-                Direction.NORTH -> this.velocityZ = -0.05
-                Direction.UP -> this.velocityY = 0.05
-                Direction.DOWN -> this.velocityY = -0.05
-            }
 
             when (stoppedInDirection.axis) {
                 Direction.Axis.Y -> if (dy != 0.0) fly()

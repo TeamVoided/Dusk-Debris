@@ -4,15 +4,14 @@ import net.minecraft.client.sound.MusicType
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.SpawnGroup
 import net.minecraft.registry.BootstrapContext
-import net.minecraft.registry.HolderProvider
 import net.minecraft.registry.RegistryKeys
 import net.minecraft.sound.BiomeMoodSound
 import net.minecraft.sound.SoundEvents
 import net.minecraft.world.biome.*
 import net.minecraft.world.gen.GenerationStep
-import net.minecraft.world.gen.carver.ConfiguredCarver
 import net.minecraft.world.gen.feature.DefaultBiomeFeatures
-import net.minecraft.world.gen.feature.PlacedFeature
+import net.minecraft.world.gen.feature.VegetationPlacedFeatures
+import org.teamvoided.dusk_debris.data.worldgen.DuskConfiguredCarvers
 import org.teamvoided.dusk_debris.data.worldgen.DuskPlacedFeatures
 import org.teamvoided.dusk_debris.init.DuskParticles
 import org.teamvoided.dusk_debris.init.worldgen.DuskBiomes
@@ -21,6 +20,7 @@ object BiomeCreator {
     fun boostrap(context: BootstrapContext<Biome>) {
         context.register(DuskBiomes.BOREAL_VALLEY, createFreezingForest(context))
         context.register(DuskBiomes.FOG_CANYON, createFogCanyon(context))
+        context.register(DuskBiomes.TEST, createTest(context))
     }
 
     fun createFreezingForest(c: BootstrapContext<Biome>): Biome {
@@ -99,6 +99,30 @@ object BiomeCreator {
             ).spawnSettings(spawnSettings.build()).generationSettings(generationSettings.build()).build()
     }
 
+    fun createTest(c: BootstrapContext<Biome>): Biome {
+        val spawnSettings = SpawnSettings.Builder()
+        val generationSettings = GenerationSettings.Builder(
+            c.getRegistryLookup(RegistryKeys.PLACED_FEATURE),
+            c.getRegistryLookup(RegistryKeys.CONFIGURED_CARVER)
+        )
+
+        generationSettings.carver(GenerationStep.Carver.AIR, DuskConfiguredCarvers.LAKE)
+
+        DefaultBiomeFeatures.addDefaultDisks(generationSettings)
+        generationSettings.feature(GenerationStep.Feature.VEGETAL_DECORATION, VegetationPlacedFeatures.TREES_PLAINS)
+
+        DefaultBiomeFeatures.addDefaultMushrooms(generationSettings)
+        DefaultBiomeFeatures.addDefaultVegetation(generationSettings)
+
+        return OverworldBiomeCreator.create(
+            true,
+            0.8f,
+            0.4f,
+            spawnSettings,
+            generationSettings,
+            null
+        )
+    }
 
     /*Generation Steps Reference:
       RAW_GENERATION

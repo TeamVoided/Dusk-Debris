@@ -13,6 +13,7 @@ import org.teamvoided.dusk_debris.data.gen.world.gen.BiomeCreator
 import org.teamvoided.dusk_debris.data.gen.world.gen.ConfiguredFeatureCreator
 import org.teamvoided.dusk_debris.data.gen.world.gen.PlacedFeatureCreator
 import org.teamvoided.dusk_debris.data.gen.providers.variants.SnifferVariants
+import org.teamvoided.dusk_debris.data.gen.world.gen.ConfiguredCarverCreator
 import org.teamvoided.dusk_debris.init.DuskRegistries
 
 @Suppress("unused")
@@ -40,6 +41,7 @@ class DuskDebrisData : DataGeneratorEntrypoint {
     override fun buildRegistry(gen: RegistrySetBuilder) {
         println("Start build registry")
         gen.add(RegistryKeys.BIOME, BiomeCreator::boostrap)
+        gen.add(RegistryKeys.CONFIGURED_CARVER, ConfiguredCarverCreator::bootstrap)
         gen.add(RegistryKeys.CONFIGURED_FEATURE, ConfiguredFeatureCreator::bootstrap)
         gen.add(RegistryKeys.PLACED_FEATURE, PlacedFeatureCreator::bootstrap)
 

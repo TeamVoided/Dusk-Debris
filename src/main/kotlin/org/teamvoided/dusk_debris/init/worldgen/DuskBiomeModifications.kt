@@ -7,6 +7,7 @@ import net.minecraft.registry.tag.BiomeTags
 import net.minecraft.registry.tag.TagKey
 import net.minecraft.world.biome.Biome
 import net.minecraft.world.gen.GenerationStep
+import net.minecraft.world.gen.carver.ConfiguredCarver
 import net.minecraft.world.gen.feature.PlacedFeature
 import org.teamvoided.dusk_debris.DuskDebris.id
 import org.teamvoided.dusk_debris.data.tags.DuskBiomeTags
@@ -64,6 +65,18 @@ object DuskBiomeModifications {
             ModificationPhase.ADDITIONS, BiomeSelectors.tag(biome)
         ) { context: BiomeModificationContext ->
             context.generationSettings.addFeature(generationStep, placedFeature)
+        }
+    }
+
+    private fun addCarver(
+        id: String,
+        placedFeature: RegistryKey<ConfiguredCarver<*>>,
+        biome: TagKey<Biome>
+    ) {
+        BiomeModifications.create(id(id)).add(
+            ModificationPhase.ADDITIONS, BiomeSelectors.tag(biome)
+        ) { context: BiomeModificationContext ->
+            context.generationSettings.addCarver(GenerationStep.Carver.AIR, placedFeature)
         }
     }
 
