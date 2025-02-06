@@ -107,6 +107,7 @@ object BiomeCreator {
         )
 
         generationSettings.carver(GenerationStep.Carver.AIR, DuskConfiguredCarvers.LAKE)
+        generationSettings.carver(GenerationStep.Carver.AIR, DuskConfiguredCarvers.LAVA_LAKE)
 
         DefaultBiomeFeatures.addDefaultDisks(generationSettings)
         generationSettings.feature(GenerationStep.Feature.VEGETAL_DECORATION, VegetationPlacedFeatures.TREES_PLAINS)

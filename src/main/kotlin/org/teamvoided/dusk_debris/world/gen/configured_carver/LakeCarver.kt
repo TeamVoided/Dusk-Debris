@@ -137,9 +137,9 @@ class LakeCarver(codec: Codec<LakeCarverConfig>) : Carver<LakeCarverConfig>(code
             val startZ = chunkPos.startZ
             val xMin = max((MathHelper.floor(x - horizontalScale) - startX - 1.0), 0.0).toInt()
             val xMax = min((MathHelper.floor(x + horizontalScale) - startX).toDouble(), 15.0).toInt()
-            val yMax = max((MathHelper.floor(y - verticalScale) - 1.0), (context.minY + 1.0)).toInt()
+            val yMin = max((MathHelper.floor(y - verticalScale) - 1.0), (context.minY + 1.0)).toInt()
             val n = if (chunk.hasBelowZeroRetrogen()) 0 else 7
-            val yMin =
+            val yMax =
                 min(
                     (MathHelper.floor(y + verticalScale) + 1.0),
                     (context.minY + context.height - 1.0 - n)
@@ -163,12 +163,12 @@ class LakeCarver(codec: Codec<LakeCarverConfig>) : Carver<LakeCarverConfig>(code
                     if (!(funX * funX + funZ * funZ >= 1.0)) {
                         val mutableBoolean = MutableBoolean(false)
 
-                        for (loopY in yMin downTo yMax + 1) {
+                        for (loopY in yMax downTo yMin + 1) {
                             val funY = (loopY - 0.5 - y) / verticalScale
 
                             val sample = dps.sample(chunkX.toDouble(), loopY * 0.25, chunkZ.toDouble())
-                            val sampleMathed = if (sample >= -0.25) sample * 0.2 - 0.2 else sample
-                            val output = predicate.shouldSkip(context, funX, funY, funZ, loopY, sample * sample)
+                            val sampleMathed = abs(sample)
+                            val output = predicate.shouldSkip(context, funX, funY, funZ, loopY, sampleMathed)
                             if (output != 0 && (!mask[loopX, loopY, loopZ] || isDebug(config))) {
                                 mask[loopX, loopY] = loopZ
                                 mutable[chunkX, loopY] = chunkZ

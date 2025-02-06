@@ -9,6 +9,7 @@ import org.teamvoided.dusk_debris.DuskDebris.id
 object DuskConfiguredCarvers {
 
     val LAKE = create("lake")
+    val LAVA_LAKE = create("lava_lake")
 
     private fun create(id: String): RegistryKey<ConfiguredCarver<*>> =
         RegistryKey.of(RegistryKeys.CONFIGURED_CARVER, id(id))
