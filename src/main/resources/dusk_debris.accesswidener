@@ -40,3 +40,15 @@ accessible method net/minecraft/client/particle/BlockLeakParticle$ContinuousFall
 accessible method net/minecraft/world/gen/carver/Carver getDebugState (Lnet/minecraft/world/gen/carver/CarverConfig;Lnet/minecraft/block/BlockState;)Lnet/minecraft/block/BlockState;
 accessible method net/minecraft/world/gen/carver/Carver isDebug (Lnet/minecraft/world/gen/carver/CarverConfig;)Z
 accessible method net/minecraft/world/gen/carver/CarverDebugConfig <init> (ZLnet/minecraft/block/BlockState;Lnet/minecraft/block/BlockState;Lnet/minecraft/block/BlockState;Lnet/minecraft/block/BlockState;)V
+
+accessible method net/minecraft/world/gen/DensityFunctions$ShiftedNoise <init> (Lnet/minecraft/world/gen/DensityFunction;Lnet/minecraft/world/gen/DensityFunction;Lnet/minecraft/world/gen/DensityFunction;DDLnet/minecraft/world/gen/DensityFunction$NoiseHolder;)V
+accessible method net/minecraft/world/gen/noise/NoiseRouterData getFunction (Lnet/minecraft/registry/HolderProvider;Lnet/minecraft/registry/RegistryKey;)Lnet/minecraft/world/gen/DensityFunction;
+accessible field net/minecraft/world/gen/noise/NoiseRouterData SHIFT_Z Lnet/minecraft/registry/RegistryKey;
+accessible field net/minecraft/world/gen/noise/NoiseRouterData SHIFT_X Lnet/minecraft/registry/RegistryKey;
+accessible field net/minecraft/world/gen/noise/NoiseRouterData Y Lnet/minecraft/registry/RegistryKey;
+accessible method net/minecraft/world/gen/noise/NoiseRouterData postProcess (Lnet/minecraft/world/gen/DensityFunction;)Lnet/minecraft/world/gen/DensityFunction;
+accessible method net/minecraft/world/gen/noise/NoiseRouterData noiseGradientDensity (Lnet/minecraft/world/gen/DensityFunction;Lnet/minecraft/world/gen/DensityFunction;)Lnet/minecraft/world/gen/DensityFunction;
+accessible field net/minecraft/world/gen/noise/NoiseRouterData BASE_3D_NOISE_NETHER Lnet/minecraft/registry/RegistryKey;
+accessible method net/minecraft/world/gen/noise/NoiseRouterData splineWithBlending (Lnet/minecraft/world/gen/DensityFunction;Lnet/minecraft/world/gen/DensityFunction;)Lnet/minecraft/world/gen/DensityFunction;
+accessible class net/minecraft/world/biome/util/MultiNoiseBiomeSourceParameterList$Preset$SourceProvider
+accessible method net/minecraft/world/gen/noise/NoiseRouterData slide (Lnet/minecraft/world/gen/DensityFunction;IIIIDIID)Lnet/minecraft/world/gen/DensityFunction;

@@ -11,16 +11,33 @@ import net.minecraft.world.biome.*
 import net.minecraft.world.gen.GenerationStep
 import net.minecraft.world.gen.feature.DefaultBiomeFeatures
 import net.minecraft.world.gen.feature.VegetationPlacedFeatures
+import org.teamvoided.dusk_debris.data.gen.world.gen.biome_creators.NetherBiomeCreators.createBasaltDeltas
+import org.teamvoided.dusk_debris.data.gen.world.gen.biome_creators.NetherBiomeCreators.createCrimsonForest
+import org.teamvoided.dusk_debris.data.gen.world.gen.biome_creators.NetherBiomeCreators.createNetherTest
+import org.teamvoided.dusk_debris.data.gen.world.gen.biome_creators.NetherBiomeCreators.createNetherWastes
+import org.teamvoided.dusk_debris.data.gen.world.gen.biome_creators.NetherBiomeCreators.createSoulSandValley
+import org.teamvoided.dusk_debris.data.gen.world.gen.biome_creators.NetherBiomeCreators.createWarpedForest
 import org.teamvoided.dusk_debris.data.worldgen.DuskConfiguredCarvers
 import org.teamvoided.dusk_debris.data.worldgen.DuskPlacedFeatures
 import org.teamvoided.dusk_debris.init.DuskParticles
-import org.teamvoided.dusk_debris.init.worldgen.DuskBiomes
+import org.teamvoided.dusk_debris.data.worldgen.DuskBiomes
 
 object BiomeCreator {
-    fun boostrap(context: BootstrapContext<Biome>) {
-        context.register(DuskBiomes.BOREAL_VALLEY, createFreezingForest(context))
-        context.register(DuskBiomes.FOG_CANYON, createFogCanyon(context))
-        context.register(DuskBiomes.TEST, createTest(context))
+    fun boostrap(c: BootstrapContext<Biome>) {
+        c.register(DuskBiomes.TEST, createTest(c))
+
+        c.register(DuskBiomes.BOREAL_VALLEY, createFreezingForest(c))
+        c.register(DuskBiomes.FOG_CANYON, createFogCanyon(c))
+
+
+        c.register(DuskBiomes.NETHER_TEST, c.createNetherTest())
+        c.register(DuskBiomes.NETHER_WASTES, c.createNetherWastes())
+        c.register(DuskBiomes.CRIMSON_FOREST, c.createCrimsonForest())
+        c.register(DuskBiomes.CRIMSON_WASTES, c.createCrimsonForest(false, false))
+        c.register(DuskBiomes.WARPED_FOREST, c.createWarpedForest())
+        c.register(DuskBiomes.WARPED_WASTES, c.createWarpedForest(false, false))
+        c.register(DuskBiomes.BASALT_DELTAS, c.createBasaltDeltas())
+        c.register(DuskBiomes.SOUL_SAND_VALLEY, c.createSoulSandValley())
     }
 
     fun createFreezingForest(c: BootstrapContext<Biome>): Biome {

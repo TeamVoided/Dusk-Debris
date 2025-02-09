@@ -9,11 +9,8 @@ import org.teamvoided.dusk_debris.data.gen.providers.*
 import org.teamvoided.dusk_debris.data.gen.providers.loot_table.EntityLootTableProvider
 import org.teamvoided.dusk_debris.data.gen.providers.variants.PaintingVariants
 import org.teamvoided.dusk_debris.data.gen.tags.*
-import org.teamvoided.dusk_debris.data.gen.world.gen.BiomeCreator
-import org.teamvoided.dusk_debris.data.gen.world.gen.ConfiguredFeatureCreator
-import org.teamvoided.dusk_debris.data.gen.world.gen.PlacedFeatureCreator
 import org.teamvoided.dusk_debris.data.gen.providers.variants.SnifferVariants
-import org.teamvoided.dusk_debris.data.gen.world.gen.ConfiguredCarverCreator
+import org.teamvoided.dusk_debris.data.gen.world.gen.*
 import org.teamvoided.dusk_debris.init.DuskRegistries
 
 @Suppress("unused")
@@ -44,6 +41,10 @@ class DuskDebrisData : DataGeneratorEntrypoint {
         gen.add(RegistryKeys.CONFIGURED_CARVER, ConfiguredCarverCreator::bootstrap)
         gen.add(RegistryKeys.CONFIGURED_FEATURE, ConfiguredFeatureCreator::bootstrap)
         gen.add(RegistryKeys.PLACED_FEATURE, PlacedFeatureCreator::bootstrap)
+
+        gen.add(RegistryKeys.NOISE_PARAMETERS, NoiseCreator::bootstrap)
+        gen.add(RegistryKeys.DENSITY_FUNCTION, DensityFunctionCreator::bootstrap)
+        gen.add(RegistryKeys.CHUNK_GENERATOR_SETTINGS, NoiseSettingsGenerator::bootstrap)
 
         gen.add(RegistryKeys.DAMAGE_TYPE, DamageTypeProvider::bootstrap)
         gen.add(RegistryKeys.ENCHANTMENT, EnchantmentsProvider::bootstrap)

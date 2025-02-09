@@ -6,11 +6,13 @@
   "mixins": [
     "BiomeMixin",
     "BlockEntityTypeMixin",
+    "ChunkNoiseSamplerMixin",
     "EntityWindLogicMixin",
     "FreezeTopLayerFeatureMixin",
     "PaintingEntityMixin",
     "SnifferEntityMixin",
     "fluid_tag.BucketItemMixin",
+    "fluid_tag.EntityMixin",
     "fluid_tag.FluidBlockMixin",
     "fluid_tag.ItemEntityMixin",
     "fluid_tag.LavaFluidMixin",
@@ -18,7 +20,6 @@
     "fluid_tag.lava.CactusBlockMixin",
     "fluid_tag.water.ConcretePowderBlockMixin",
     "fluid_tag.water.CoralParentBlockMixin",
-    "fluid_tag.EntityMixin",
     "fluid_tag.water.FarmlandBlockMixin",
     "fluid_tag.water.FishingBobberEntityMixin",
     "fluid_tag.water.GlassBottleItemMixin"

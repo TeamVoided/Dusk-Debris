@@ -9,10 +9,7 @@ import net.minecraft.world.gen.DensityFunction.ContextProvider
 import net.minecraft.world.gen.DensityFunctions
 import org.teamvoided.dusk_debris.util.world_helper.makeCodec
 
-class ShiftedNoiseRange(
-    val shiftX: DensityFunction,
-    val shiftY: DensityFunction,
-    val shiftZ: DensityFunction,
+class NoiseRange(
     val horizontalScale: Double,
     val verticalScale: Double,
     val minYRange: Double,
@@ -27,9 +24,9 @@ class ShiftedNoiseRange(
             else if (y2 >= maxYRange) maxYRange.toInt()
             else y2
 
-        val x: Double = c.blockX() * this.horizontalScale + shiftX.compute(c)
-        val y: Double = y3 * this.horizontalScale + shiftY.compute(c)
-        val z: Double = c.blockZ() * this.horizontalScale + shiftZ.compute(c)
+        val x: Double = c.blockX() * this.horizontalScale
+        val y: Double = y3 * this.horizontalScale
+        val z: Double = c.blockZ() * this.horizontalScale
 
         return noise.sample(x, y, z)
     }
@@ -38,10 +35,7 @@ class ShiftedNoiseRange(
 
     override fun mapAll(visitor: DensityFunction.Visitor): DensityFunction {
         return visitor.apply(
-            ShiftedNoiseRange(
-                shiftX.mapAll(visitor),
-                shiftY.mapAll(visitor),
-                shiftZ.mapAll(visitor),
+            NoiseRange(
                 horizontalScale,
                 verticalScale,
                 minYRange,
@@ -55,23 +49,20 @@ class ShiftedNoiseRange(
 
     override fun maxValue(): Double = noise.maxValue
 
-    override fun codec(): CodecHolder<ShiftedNoiseRange> = CODEC
+    override fun codec(): CodecHolder<NoiseRange> = CODEC
 
     companion object {
-        private val DATA_CODEC: MapCodec<ShiftedNoiseRange> =
+        private val DATA_CODEC: MapCodec<NoiseRange> =
             RecordCodecBuilder.mapCodec { instance ->
                 instance.group(
-                    DensityFunction.HOLDER_HELPER_CODEC.fieldOf("shift_x").forGetter { it.shiftX },
-                    DensityFunction.HOLDER_HELPER_CODEC.fieldOf("shift_y").forGetter { it.shiftY },
-                    DensityFunction.HOLDER_HELPER_CODEC.fieldOf("shift_z").forGetter { it.shiftZ },
                     Codec.DOUBLE.fieldOf("xz_scale").forGetter { it.horizontalScale },
                     Codec.DOUBLE.fieldOf("y_scale").forGetter { it.verticalScale },
                     Codec.DOUBLE.fieldOf("min_y_range").forGetter { it.minYRange },
                     Codec.DOUBLE.fieldOf("max_y_range").forGetter { it.maxYRange },
                     DensityFunction.NoiseHolder.CODEC.fieldOf("noise").forGetter { it.noise })
-                    .apply(instance, ::ShiftedNoiseRange)
+                    .apply(instance, ::NoiseRange)
             }
 
-        val CODEC: CodecHolder<ShiftedNoiseRange> = makeCodec(DATA_CODEC)
+        val CODEC: CodecHolder<NoiseRange> = makeCodec(DATA_CODEC)
     }
 }

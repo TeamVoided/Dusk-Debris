@@ -1,0 +1,11 @@
+{
+  "type": "dusk_debris:nether",
+  "generator": {
+    "type": "minecraft:noise",
+    "biome_source": {
+      "type": "minecraft:fixed",
+      "biome": "dusk_debris:nether_test"
+    },
+    "settings": "dusk_debris:nether"
+  }
+}
