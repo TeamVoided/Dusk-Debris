@@ -20,8 +20,8 @@ class NoiseRange(
     override fun compute(c: DensityFunction.FunctionContext): Double {
         val y2: Int = c.blockY()
         val y3: Int =
-            if (y2 <= minYRange) minYRange.toInt()
-            else if (y2 >= maxYRange) maxYRange.toInt()
+            if (y2 < minYRange) minYRange.toInt()
+            else if (y2 > maxYRange) maxYRange.toInt()
             else y2
 
         val x: Double = c.blockX() * this.horizontalScale
