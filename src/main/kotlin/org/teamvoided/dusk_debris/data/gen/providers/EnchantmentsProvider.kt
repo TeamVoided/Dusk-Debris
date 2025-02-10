@@ -413,7 +413,7 @@ object EnchantmentsProvider {
                     EntityPropertiesLootCondition.builder(
                         LootContext.EntityTarget.THIS,
                         EntityPredicate.Builder.create()
-                            .location(LocationPredicate.Builder.create().method_60275(true))
+                            .location(LocationPredicate.Builder.create().canSeeSky(true))
                     )
                 )
             )
@@ -506,7 +506,7 @@ object EnchantmentsProvider {
                             EntityPropertiesLootCondition.builder(
                                 LootContext.EntityTarget.THIS,
                                 EntityPredicate.Builder.create()
-                                    .location(LocationPredicate.Builder.create().method_60275(true))
+                                    .location(LocationPredicate.Builder.create().canSeeSky(true))
                             )
                         )
                     )

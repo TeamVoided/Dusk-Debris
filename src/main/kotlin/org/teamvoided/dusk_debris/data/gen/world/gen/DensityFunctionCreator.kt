@@ -9,8 +9,6 @@ import net.minecraft.world.gen.DensityFunctions.*
 import net.minecraft.world.gen.noise.NoiseParametersKeys
 import net.minecraft.world.gen.noise.NoiseRouter
 import net.minecraft.world.gen.noise.NoiseRouterData
-import org.teamvoided.dusk_debris.data.gen.world.gen.DensityFunctionCreator.createNetherFinalDensity
-import org.teamvoided.dusk_debris.data.gen.world.gen.DensityFunctionCreator.misc
 import org.teamvoided.dusk_debris.data.worldgen.DuskDensityFunctions
 import org.teamvoided.dusk_debris.data.worldgen.DuskNoiseParametersKeys
 import org.teamvoided.dusk_debris.world.gen.density_functions.Fold
@@ -210,18 +208,18 @@ object DensityFunctionCreator {
     }
 
 
-    fun BootstrapContext<DensityFunction>.misc(
-    ) {
-        val pillarNoise = noise(this.noiseHold(NoiseParametersKeys.PILLAR), 10.0, 0.2)
-        val pillarRarenessNoise = mappedNoise(this.noiseHold(NoiseParametersKeys.PILLAR_RARENESS), 5.0, 1.0, 0.0, -2.0)
-        val pillarThicknessNoise = mappedNoise(this.noiseHold(NoiseParametersKeys.PILLAR_THICKNESS), 5.0, 1.0, 0.0, 1.1)
+    fun BootstrapContext<DensityFunction>.misc() {
+        val pillarNoise = noise(this.noiseHold(NoiseParametersKeys.PILLAR), 10.0, 0.05)
+        val pillarRarenessNoise = mappedNoise(this.noiseHold(NoiseParametersKeys.PILLAR_RARENESS), 2.0, 0.0, 0.0, -2.0)
+        val pillarThicknessNoise =
+            mappedNoise(this.noiseHold(NoiseParametersKeys.PILLAR_THICKNESS), 0.75, 2.0, 0.0, 1.1)
         val pillar = add(multiply(pillarNoise, constant(2.0)), pillarRarenessNoise)
         this.register(
             DuskDensityFunctions.NETHER_PILLARS,
             cacheOnce(
                 min(
                     add(
-                        constant(0.85),
+                        constant(0.8),
                         this.dense(DuskDensityFunctions.RIDGES_FOLDED_NETHER)
                     ),
                     multiply(pillar, pillarThicknessNoise.cube())
@@ -263,10 +261,10 @@ object DensityFunctionCreator {
             offsetCeilingKey,
             copySpline(
                 NetherTerrainParametersCreator.offsetCeilingSpline(
-                    dropCeiling,
                     continents,
                     erosion,
                     ridgesFolded,
+                    dropCeiling,
                     amplified
                 )
             )
@@ -307,7 +305,7 @@ object DensityFunctionCreator {
             factorSpline,
             max(
                 add(depthFunction, jagged),
-                this.dense(DuskDensityFunctions.NETHER_PILLARS)
+                maxRangeChoice(this.dense(DuskDensityFunctions.NETHER_PILLARS), 0.03)
             )
         )
         this.register(
@@ -426,5 +424,17 @@ object DensityFunctionCreator {
         256.0,
         noise
     )
+
+    fun maxRangeChoice(input: DensityFunction, maxInclusive: Double): DensityFunction {
+        val minInclusive = -1000000.0
+        return rangeChoice(input, minInclusive, maxInclusive, constant(minInclusive), input)
+    }
+
+
+    fun minRangeChoice(input: DensityFunction, minInclusive: Double): DensityFunction {
+        val maxInclusive = 1000000.0
+        return rangeChoice(input, minInclusive, maxInclusive, constant(maxInclusive), input)
+    }
+
 //    NoiseRouterData.class
 }

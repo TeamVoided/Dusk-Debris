@@ -59,17 +59,18 @@ object NetherTerrainParametersCreator {
     }
 
     fun <C, I : ToFloatFunction<C>> offsetCeilingSpline(
-        dropCeiling: I,
         continents: I,
         erosion: I,
         ridgesFolded: I,
+        dropCeiling: I,
         amplified: Boolean
     ): Spline<C, I> {
         val amplifiedTransformer = if (amplified) OFFSET_AMPLIFIED else NO_TRANSFORM
         return Spline.builder(dropCeiling, amplifiedTransformer)
-            .add(-1f, nCeil(230))
-//            .add(0f, nCeil(210))
-//            .add(1f, nCeil(180))
+            .add(-1f, nCeil(224))
+            .add(-0.5f, nCeil(200))
+            .add(0.5f, nCeil(200))
+            .add(1f, nCeil(180))
             .build()
     }
 
@@ -86,7 +87,8 @@ object NetherTerrainParametersCreator {
             .add(0f, 1f)
         return spline.build()
     }
-    fun <C, I : ToFloatFunction<C>> jaggednessSpline (
+
+    fun <C, I : ToFloatFunction<C>> jaggednessSpline(
         continents: I,
         erosion: I,
         ridges: I,
@@ -107,9 +109,10 @@ object NetherTerrainParametersCreator {
     ): Spline<C, I> {
         val spline = Spline.builder(ridgesFolded, amplifier)
             .add(-1f, nFloor(21))
-            .add(-0.8f, nFloor(48))
-            .add(-0.5f, nFloor(64))
-            .add(1f, nFloor(128))
+            .add(-0.8f, nFloor(32))
+            .add(-0.25f, nFloor(48))
+            .add(0.25f, nFloor(64))
+            .add(0.8f, nFloor(128))
         return spline.build()
     }
 
@@ -130,14 +133,14 @@ object NetherTerrainParametersCreator {
     }
 
     private fun nFloor(inputY: Int): Float {
-        val output = ((inputY - SEA_LEVEL).toFloat() / ((HIGHEST_LEVEL / 2) - SEA_LEVEL).toFloat())
+        val output = ((inputY - 1f - SEA_LEVEL) / ((HIGHEST_LEVEL / 2f) - SEA_LEVEL))
 //        println("floor $inputY")
-        return (round(1000f * output)) / 1000f
+        return (round(10000f * output)) / 10000f
     }
 
     private fun nCeil(inputY: Int): Float {
-        val output = ((inputY - ROOF_LEVEL).toFloat() / ((HIGHEST_LEVEL / 2) - ROOF_LEVEL))
+        val output = ((inputY - ROOF_LEVEL).toFloat() / ((HIGHEST_LEVEL / 2f) - ROOF_LEVEL))
 //        println("ceiling $inputY")
-        return (round(1000f * output)) / 1000f
+        return (round(10000f * output)) / 10000f
     }
 }
