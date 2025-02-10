@@ -26,7 +26,7 @@ object DensityFunctionCreator {
         )
         c.parameters()
         c.shapers()
-        c.misc()
+        c.pillar()
 
         c.register(
             DuskDensityFunctions.NETHER_FINAL_DENSITY,
@@ -169,6 +169,7 @@ object DensityFunctionCreator {
             dropCeiling,
             DuskDensityFunctions.OFFSET_FLOOR_NETHER,
             DuskDensityFunctions.OFFSET_CEILING_NETHER,
+            DuskDensityFunctions.OFFSET_NETHER,
             DuskDensityFunctions.FACTOR_NETHER,
             DuskDensityFunctions.JAGGEDNESS_NETHER,
             DuskDensityFunctions.DEPTH_NETHER,
@@ -208,24 +209,13 @@ object DensityFunctionCreator {
     }
 
 
-    fun BootstrapContext<DensityFunction>.misc() {
-        val pillarNoise = noise(this.noiseHold(NoiseParametersKeys.PILLAR), 10.0, 0.05)
-        val pillarRarenessNoise = mappedNoise(this.noiseHold(NoiseParametersKeys.PILLAR_RARENESS), 2.0, 0.0, 0.0, -2.0)
+    fun BootstrapContext<DensityFunction>.pillar() {
+        val pillarNoise = noise(this.noiseHold(NoiseParametersKeys.PILLAR), 5.0, 0.1)
+        val pillarRarenessNoise = mappedNoise(this.noiseHold(NoiseParametersKeys.PILLAR_RARENESS), 1.0, 0.1, 0.0, -2.0)
         val pillarThicknessNoise =
-            mappedNoise(this.noiseHold(NoiseParametersKeys.PILLAR_THICKNESS), 0.75, 2.0, 0.0, 1.1)
+            mappedNoise(this.noiseHold(NoiseParametersKeys.PILLAR_THICKNESS), 0.75, 0.25, 0.5, 1.25)
         val pillar = add(multiply(pillarNoise, constant(2.0)), pillarRarenessNoise)
-        this.register(
-            DuskDensityFunctions.NETHER_PILLARS,
-            cacheOnce(
-                min(
-                    add(
-                        constant(0.8),
-                        this.dense(DuskDensityFunctions.RIDGES_FOLDED_NETHER)
-                    ),
-                    multiply(pillar, pillarThicknessNoise.cube())
-                )
-            )
-        )
+        this.register(DuskDensityFunctions.NETHER_PILLARS, cacheOnce(multiply(pillar, pillarThicknessNoise.cube())))
     }
 
     private fun BootstrapContext<DensityFunction>.cheeseMaker(
@@ -235,6 +225,7 @@ object DensityFunctionCreator {
         dropCeilingKey: Holder<DensityFunction>,
         offsetFloorKey: RegistryKey<DensityFunction>,
         offsetCeilingKey: RegistryKey<DensityFunction>,
+        offsetKey: RegistryKey<DensityFunction>,
         factorKey: RegistryKey<DensityFunction>,
         jaggednessKey: RegistryKey<DensityFunction>,
         floorKey: RegistryKey<DensityFunction>,
@@ -244,8 +235,8 @@ object DensityFunctionCreator {
         val continents = Spline.FunctionWrapper(continentsKey)
         val erosion = Spline.FunctionWrapper(erosionKey)
         val dropCeiling = Spline.FunctionWrapper(dropCeilingKey)
-        val ridges = Spline.FunctionWrapper(this.denseHold(NoiseRouterData.RIDGES_OVERWORLD))
-        val ridgesFolded = Spline.FunctionWrapper(this.denseHold(NoiseRouterData.RIDGES_FOLDED_OVERWORLD))
+        val ridges = Spline.FunctionWrapper(this.denseHold(DuskDensityFunctions.RIDGES_NETHER))
+        val ridgesFolded = Spline.FunctionWrapper(this.denseHold(DuskDensityFunctions.RIDGES_FOLDED_NETHER))
         val offsetFloorSpline = registerAndWrap(
             offsetFloorKey,
             copySpline(
@@ -358,7 +349,7 @@ object DensityFunctionCreator {
                 //   if (amplified) DuskDensityFunctions.DEPTH_NETHER_AMPLIFIED else
                 DuskDensityFunctions.DEPTH_NETHER
             ),
-            this.dense(DuskDensityFunctions.RIDGES_NETHER),
+            this.dense(DuskDensityFunctions.RIDGES_FOLDED_NETHER),
             this.dense(DuskDensityFunctions.DEPTH_FLOOR_NETHER),
             finalDensity,
             zero(),
