@@ -19,6 +19,7 @@ object DuskDensityFunctions {
     val OFFSET_NETHER = create("offset")
     val JAGGEDNESS_NETHER = create("jaggedness")
     val FACTOR_NETHER = create("factor")
+    val JAGGED_PARAMETER_NETHER = create("jagged_parameter")
 
     val TEMPERATURE_NETHER = create("parameters/temperature")
     val HUMIDITY_NETHER = create("parameters/humidity")

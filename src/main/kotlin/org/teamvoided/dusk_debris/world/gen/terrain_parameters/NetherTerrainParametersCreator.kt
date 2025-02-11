@@ -68,8 +68,8 @@ object NetherTerrainParametersCreator {
         val amplifiedTransformer = if (amplified) OFFSET_AMPLIFIED else NO_TRANSFORM
         return Spline.builder(dropCeiling, amplifiedTransformer)
             .add(-1f, nCeil(224))
-            .add(0f, nCeil(180))
-            .add(1f, nCeil(0))
+//            .add(0f, nCeil(180))
+//            .add(1f, nCeil(0))
             .build()
     }
 
@@ -83,7 +83,7 @@ object NetherTerrainParametersCreator {
     ): Spline<C, I> {
         val amplifiedTransformer = if (amplified) FACTOR_AMPLIFIED else NO_TRANSFORM
         val spline = Spline.builder(erosion, amplifiedTransformer)
-            .add(0f, 1f)
+            .add(0f, 7f)
         return spline.build()
     }
 
@@ -92,11 +92,13 @@ object NetherTerrainParametersCreator {
         erosion: I,
         ridges: I,
         ridgesFolded: I,
+        jaggedness: I,
         amplified: Boolean
     ): Spline<C, I> {
         val amplifiedTransformer = if (amplified) JAGGEDNESS_AMPLIFIED else NO_TRANSFORM
-        val spline = Spline.builder(erosion, amplifiedTransformer)
-            .add(0f, 0f)
+        val spline = Spline.builder(jaggedness, amplifiedTransformer)
+            .add(-1f, 1f, )//-0.07f)
+//            .add(0f, 0f)
         return spline.build()
     }
 
@@ -107,12 +109,12 @@ object NetherTerrainParametersCreator {
         amplifier: ToFloatFunction<Float>
     ): Spline<C, I> {
         val spline = Spline.builder(ridgesFolded, amplifier)
-            .add(-1f, nFloor(24))
-            .add(-0.8f, nFloor(32))
-            .add(-0.5f, nFloor(32))
+//            .add(-1f, nFloor(24))
+//            .add(-0.8f, nFloor(32))
+//            .add(-0.5f, nFloor(32))
             .add(-0.25f, nFloor(64))
-            .add(0.5f, nFloor(64))
-            .add(0.8f, nFloor(128))
+//            .add(0.5f, nFloor(64))
+//            .add(0.8f, nFloor(128))
         return spline.build()
     }
 

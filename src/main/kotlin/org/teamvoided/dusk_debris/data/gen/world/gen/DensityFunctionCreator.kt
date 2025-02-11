@@ -9,6 +9,8 @@ import net.minecraft.world.gen.DensityFunctions.*
 import net.minecraft.world.gen.noise.NoiseParametersKeys
 import net.minecraft.world.gen.noise.NoiseRouter
 import net.minecraft.world.gen.noise.NoiseRouterData
+import org.teamvoided.dusk_debris.data.gen.world.gen.DensityFunctionCreator.cheeseMaker
+import org.teamvoided.dusk_debris.data.gen.world.gen.DensityFunctionCreator.shapers
 import org.teamvoided.dusk_debris.data.worldgen.DuskDensityFunctions
 import org.teamvoided.dusk_debris.data.worldgen.DuskNoiseParametersKeys
 import org.teamvoided.dusk_debris.world.gen.density_functions.Fold
@@ -161,12 +163,17 @@ object DensityFunctionCreator {
 //            val continentsLarge = densityFunctions.getHolderOrThrow(DuskDensityFunctions.CONTINENTALNESS_NETHER_LARGE_BIOME)
 //            val erosionLarge = densityFunctions.getHolderOrThrow(EROSION_NETHER_LARGE_BIOME)
 //            val dropCeilingLarge = densityFunctions.getHolderOrThrow(DROP_CEILING_LARGE_BIOME)
-        val jaggedness = noise(this.noiseHold(NoiseParametersKeys.JAGGED), 1500.0, 0.0)
+
+
+        val jaggedParameterFunction = this.register(
+            DuskDensityFunctions.JAGGED_PARAMETER_NETHER,
+            noise(this.noiseHold(NoiseParametersKeys.JAGGED), 150.0, 15.0)
+        )
         this.cheeseMaker(
-            jaggedness,
             continents,
             erosion,
             dropCeiling,
+            jaggedParameterFunction,
             DuskDensityFunctions.OFFSET_FLOOR_NETHER,
             DuskDensityFunctions.OFFSET_CEILING_NETHER,
             DuskDensityFunctions.OFFSET_NETHER,
@@ -219,10 +226,10 @@ object DensityFunctionCreator {
     }
 
     private fun BootstrapContext<DensityFunction>.cheeseMaker(
-        jaggednessFunction: DensityFunction,
         continentsKey: Holder<DensityFunction>,
         erosionKey: Holder<DensityFunction>,
         dropCeilingKey: Holder<DensityFunction>,
+        jaggedFunction: Holder<DensityFunction>,
         offsetFloorKey: RegistryKey<DensityFunction>,
         offsetCeilingKey: RegistryKey<DensityFunction>,
         offsetKey: RegistryKey<DensityFunction>,
@@ -279,6 +286,7 @@ object DensityFunctionCreator {
                 this.dense(DuskDensityFunctions.DEPTH_CEILING_NETHER)
             )
         )
+
         val jaggednessSpline = this.registerAndWrap(
             jaggednessKey,
             copySpline(
@@ -287,23 +295,25 @@ object DensityFunctionCreator {
                     erosion,
                     ridges,
                     ridgesFolded,
+                    Spline.FunctionWrapper(jaggedFunction),
                     amplified
                 )
             )
         )
-        val jagged = multiply(jaggednessSpline, jaggednessFunction.halfNegative())
+        val jaggednessFunction = noise(this.noiseHold(NoiseParametersKeys.JAGGED), 1500.0, 150.0)
+        val jagged = multiply(jaggednessSpline, jaggednessFunction.quarterNegative())
         val depthAndJaggedness = NoiseRouterData.noiseGradientDensity(
             factorSpline,
-            max(
+//            max(
                 add(depthFunction, jagged),
-                maxRangeChoice(this.dense(DuskDensityFunctions.NETHER_PILLARS), 0.03)
-            )
+//                maxRangeChoice(this.dense(DuskDensityFunctions.NETHER_PILLARS), 0.03)
+//            )
         )
         this.register(
             cheeseKey,
-            depthAndJaggedness
-
-            //            add(depthAndJaggedness, NoiseRouterData.getFunction(densityFunctions, NoiseRouterData.BASE_3D_NOISE_NETHER))
+//            add(
+                depthAndJaggedness
+//                , this.dense(NoiseRouterData.BASE_3D_NOISE_NETHER))
         )
     }
 
