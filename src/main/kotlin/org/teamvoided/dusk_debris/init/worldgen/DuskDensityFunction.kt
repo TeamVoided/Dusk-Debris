@@ -15,6 +15,9 @@ object DuskDensityFunction {
     val SHIFTED_NOISE_RANGE = register("shifted_noise_range", ShiftedNoiseRange.CODEC)
 //    val MIN_RANGE_CHOICE = register("min_range_choice", MinRangeChoice.CODEC)
 
+    val DEBUG_AXIS = register("debug_axis", DebugAxis.CODEC)
+
+
     fun init() {}
     private fun <C : DensityFunction, F : CodecHolder<C>> register(id: String, densityFunction: F): MapCodec<C> =
         Registry.register(Registries.DENSITY_FUNCTION, id(id), densityFunction.codec())

@@ -11,6 +11,7 @@ import net.minecraft.world.biome.*
 import net.minecraft.world.gen.GenerationStep
 import net.minecraft.world.gen.feature.DefaultBiomeFeatures
 import net.minecraft.world.gen.feature.VegetationPlacedFeatures
+import org.teamvoided.dusk_debris.data.gen.world.gen.biome_creators.HollowKnightBiomeCreators.createFogCanyon
 import org.teamvoided.dusk_debris.data.gen.world.gen.biome_creators.NetherBiomeCreators.createBasaltDeltas
 import org.teamvoided.dusk_debris.data.gen.world.gen.biome_creators.NetherBiomeCreators.createCrimsonForest
 import org.teamvoided.dusk_debris.data.gen.world.gen.biome_creators.NetherBiomeCreators.createNetherTest
@@ -26,9 +27,9 @@ object BiomeCreator {
     fun boostrap(c: BootstrapContext<Biome>) {
         c.register(DuskBiomes.TEST, createTest(c))
 
-        c.register(DuskBiomes.BOREAL_VALLEY, createFreezingForest(c))
-        c.register(DuskBiomes.FOG_CANYON, createFogCanyon(c))
+        c.register(DuskBiomes.BOREAL_VALLEY, c.createFreezingForest())
 
+        c.register(DuskBiomes.FOG_CANYON, c.createFogCanyon())
 
         c.register(DuskBiomes.NETHER_TEST, c.createNetherTest())
         c.register(DuskBiomes.NETHER_WASTES, c.createNetherWastes())
@@ -40,11 +41,11 @@ object BiomeCreator {
         c.register(DuskBiomes.SOUL_SAND_VALLEY, c.createSoulSandValley())
     }
 
-    fun createFreezingForest(c: BootstrapContext<Biome>): Biome {
+    fun BootstrapContext<Biome>.createFreezingForest(): Biome {
         val spawnSettings = SpawnSettings.Builder()
         val generationSettings = GenerationSettings.Builder(
-            c.getRegistryLookup(RegistryKeys.PLACED_FEATURE),
-            c.getRegistryLookup(RegistryKeys.CONFIGURED_CARVER)
+            this.getRegistryLookup(RegistryKeys.PLACED_FEATURE),
+            this.getRegistryLookup(RegistryKeys.CONFIGURED_CARVER)
         )
 
         DefaultBiomeFeatures.addFarmAnimals(spawnSettings)
@@ -81,40 +82,6 @@ object BiomeCreator {
     }
 
 //    0xC196E0
-
-
-    fun createFogCanyon(c: BootstrapContext<Biome>): Biome {
-        val spawnSettings = SpawnSettings.Builder()
-        val generationSettings = GenerationSettings.Builder(
-            c.getRegistryLookup(RegistryKeys.PLACED_FEATURE),
-            c.getRegistryLookup(RegistryKeys.CONFIGURED_CARVER)
-        )
-        spawnSettings.spawn(SpawnGroup.WATER_AMBIENT, SpawnSettings.SpawnEntry(EntityType.TROPICAL_FISH, 25, 8, 8))
-        DefaultBiomeFeatures.addBatsAndMonsters(spawnSettings)
-        OverworldBiomeCreator.addBasicFeatures(generationSettings)
-        DefaultBiomeFeatures.addPlainsTallGrass(generationSettings)
-        DefaultBiomeFeatures.addDefaultOres(generationSettings)
-        DefaultBiomeFeatures.addClayOre(generationSettings)
-        DefaultBiomeFeatures.addDefaultDisks(generationSettings)
-        DefaultBiomeFeatures.addLushCavesDecoration(generationSettings)
-        val musicSound = MusicType.createIngameMusic(SoundEvents.MUSIC_OVERWORLD_LUSH_CAVES)
-        return Biome.Builder()
-            .temperature(0.25f)
-            .downfall(0.6f)
-            .effects(
-                BiomeEffects.Builder()
-                    .grassColor(0x316B9E)
-                    .foliageColor(0x307096)
-                    .waterColor(6254825)
-                    .waterFogColor(1836338)
-                    .fogColor(0xC196E0)
-                    .skyColor(0x774E96)
-                    .particleConfig(BiomeParticleConfig(DuskParticles.PURPLE_BIOME_BUBBLE, 0.00025f))
-                    .moodSound(BiomeMoodSound.CAVE)
-                    .music(musicSound)
-                    .build()
-            ).spawnSettings(spawnSettings.build()).generationSettings(generationSettings.build()).build()
-    }
 
     fun createTest(c: BootstrapContext<Biome>): Biome {
         val spawnSettings = SpawnSettings.Builder()

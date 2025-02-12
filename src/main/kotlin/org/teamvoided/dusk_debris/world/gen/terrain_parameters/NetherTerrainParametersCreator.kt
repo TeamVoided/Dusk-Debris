@@ -97,7 +97,7 @@ object NetherTerrainParametersCreator {
     ): Spline<C, I> {
         val amplifiedTransformer = if (amplified) JAGGEDNESS_AMPLIFIED else NO_TRANSFORM
         val spline = Spline.builder(jaggedness, amplifiedTransformer)
-            .add(-1f, 1f, )//-0.07f)
+            .add(-1f, 0f)//-0.07f)
 //            .add(0f, 0f)
         return spline.build()
     }
@@ -109,12 +109,12 @@ object NetherTerrainParametersCreator {
         amplifier: ToFloatFunction<Float>
     ): Spline<C, I> {
         val spline = Spline.builder(ridgesFolded, amplifier)
-//            .add(-1f, nFloor(24))
-//            .add(-0.8f, nFloor(32))
-//            .add(-0.5f, nFloor(32))
+            .add(-1f, nFloor(24))
+            .add(-0.8f, nFloor(32))
+            .add(-0.5f, nFloor(32))
             .add(-0.25f, nFloor(64))
-//            .add(0.5f, nFloor(64))
-//            .add(0.8f, nFloor(128))
+            .add(0.5f, nFloor(64))
+            .add(0.8f, nFloor(128))
         return spline.build()
     }
 
@@ -135,13 +135,13 @@ object NetherTerrainParametersCreator {
     }
 
     private fun nFloor(inputY: Int): Float {
-        val output = ((inputY + 1f - SEA_LEVEL) / ((HIGHEST_LEVEL / 2f) - SEA_LEVEL))
+        val output = ((inputY - 1f - SEA_LEVEL) / HIGHEST_LEVEL)
 //        println("floor $inputY")
         return output//(round(10000f * output)) / 10000f
     }
 
     private fun nCeil(inputY: Int): Float {
-        val output = ((inputY - ROOF_LEVEL).toFloat() / ((HIGHEST_LEVEL / 2f) - ROOF_LEVEL))
+        val output = ((inputY + 1f - ROOF_LEVEL) / HIGHEST_LEVEL)
 //        println("ceiling $inputY")
         return output
     }
