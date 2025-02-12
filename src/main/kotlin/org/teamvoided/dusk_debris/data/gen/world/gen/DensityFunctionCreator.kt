@@ -124,7 +124,7 @@ object DensityFunctionCreator {
         this.register(
             DuskDensityFunctions.RIDGES_NETHER,
             cacheOnce(
-                multiply(constant(2.0), add(constant(-0.5), DebugAxis(Direction.Axis.X, 100.0)))
+                multiply(constant(2.0), add(constant(-0.5), DebugAxis(Direction.Axis.X, 800.0)))
 //                shiftedNoiseRangeNether(
 //                    shiftX,
 //                    zero(),
@@ -137,8 +137,7 @@ object DensityFunctionCreator {
         )
         this.register(
             DuskDensityFunctions.RIDGES_FOLDED_NETHER,
-            add(this.dense(DuskDensityFunctions.RIDGES_NETHER), constant(0.0))
-            //Fold(this.dense(DuskDensityFunctions.RIDGES_NETHER))
+            Fold(this.dense(DuskDensityFunctions.RIDGES_NETHER))
         )
         this.register(
             DuskDensityFunctions.DEPTH_FLOOR_NETHER,
@@ -146,7 +145,7 @@ object DensityFunctionCreator {
                 add(
                     this.dense(DuskDensityFunctions.OFFSET_FLOOR_NETHER),
                     clampedGradientY(
-                        -256 - 256 + 32,
+                        -(256 + 256) + 32,
                         (256 + 256) + 32,
                         2.0,
                         -2.0
@@ -160,7 +159,7 @@ object DensityFunctionCreator {
                 add(
                     this.dense(DuskDensityFunctions.OFFSET_CEILING_NETHER),
                     clampedGradientY(
-                        0 - 256 - 32,
+                        -(0 + 256) - 32,
                         512 + 256 - 32,
                         -2.0,
                         2.0
@@ -315,7 +314,7 @@ object DensityFunctionCreator {
             )
         )
         val jaggednessFunction = noise(this.noiseHold(NoiseParametersKeys.JAGGED), 1500.0, 150.0)
-        val jagged = multiply(jaggednessSpline, jaggednessFunction.quarterNegative())
+        val jagged = multiply(jaggednessSpline, jaggednessFunction.halfNegative())
         val depthAndJaggedness = NoiseRouterData.noiseGradientDensity(
             factorSpline,
 //            max(

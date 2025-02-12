@@ -23,7 +23,10 @@ class DebugAxis(
             Direction.Axis.Y -> c.blockY()
             Direction.Axis.Z -> c.blockZ()
         }
-        return acos(cos((Utils.pi * axis) / axisScale)) / Utils.pi
+        val mod1 = (axis - 1) % 2 - 1
+        val mod2 = (-axis - 1) % 4 - 1
+        val mod = if (mod2 < 1) mod2 else mod1
+        return mod / axisScale
     }
 
     override fun fillArray(array: DoubleArray, context: ContextProvider) = context.fillAllDirectly(array, this)

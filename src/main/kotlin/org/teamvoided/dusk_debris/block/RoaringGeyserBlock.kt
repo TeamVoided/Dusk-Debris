@@ -75,7 +75,7 @@ class RoaringGeyserBlock(settings: Settings) :
     }
 
     override fun scheduledTick(state: BlockState, world: ServerWorld, pos: BlockPos, random: RandomGenerator) {
-        if (state.get(PERSISTENT) || (state.get(ACTIVE) && random.range(0, 5) != 0)) {
+        if (state.get(PERSISTENT) || (state.get(ACTIVE) && random.nextInt(5) != 0)) {
             geyser(pos, world)
             world.scheduleBlockTick(pos, state.block, random.nextInt(130) + 10)
         } else {

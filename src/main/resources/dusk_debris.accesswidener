@@ -54,3 +54,5 @@ accessible class net/minecraft/world/biome/util/MultiNoiseBiomeSourceParameterLi
 accessible method net/minecraft/world/gen/noise/NoiseRouterData slide (Lnet/minecraft/world/gen/DensityFunction;IIIIDIID)Lnet/minecraft/world/gen/DensityFunction;
 
 accessible class net/minecraft/world/gen/DensityFunctions$PureTransformer
+
+accessible field net/minecraft/block/TrialSpawnerData currentMobs Ljava/util/Set;

@@ -11,6 +11,7 @@
     "FreezeTopLayerFeatureMixin",
     "PaintingEntityMixin",
     "SnifferEntityMixin",
+    "TrialSpawnerStateMixin",
     "fluid_tag.BucketItemMixin",
     "fluid_tag.EntityMixin",
     "fluid_tag.FluidBlockMixin",

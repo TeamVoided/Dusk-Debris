@@ -18,8 +18,8 @@ object NetherTerrainParametersCreator {
     private const val INLAND_EXTREME = 1f
     private const val HIGHEST_LEVEL = 256
     private const val LOWEST_LEVEL = 0
-    private const val ROOF_LEVEL = HIGHEST_LEVEL - 32
-    private const val SEA_LEVEL = LOWEST_LEVEL + 32
+    private const val ROOF_OFFSET = HIGHEST_LEVEL - 32
+    private const val SEA_OFFSET = LOWEST_LEVEL + 32
 
     //if above sea level, terrain height gets multiplied by 2, otherwise, return the same
     private var OFFSET_AMPLIFIED: ToFloatFunction<Float> =
@@ -135,14 +135,12 @@ object NetherTerrainParametersCreator {
     }
 
     private fun nFloor(inputY: Int): Float {
-        val output = ((inputY - 1f - SEA_LEVEL) / HIGHEST_LEVEL)
-//        println("floor $inputY")
+        val output = ((inputY - SEA_OFFSET - 1f) / HIGHEST_LEVEL)
         return output//(round(10000f * output)) / 10000f
     }
 
     private fun nCeil(inputY: Int): Float {
-        val output = ((inputY + 1f - ROOF_LEVEL) / HIGHEST_LEVEL)
-//        println("ceiling $inputY")
+        val output = ((inputY - ROOF_OFFSET - 1f) / HIGHEST_LEVEL)
         return output
     }
 }
