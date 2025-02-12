@@ -124,7 +124,7 @@ object DensityFunctionCreator {
         this.register(
             DuskDensityFunctions.RIDGES_NETHER,
             cacheOnce(
-                multiply(constant(2.0), add(constant(-0.5), DebugAxis(Direction.Axis.X, 800.0)))
+                DebugAxis(Direction.Axis.X, 100)
 //                shiftedNoiseRangeNether(
 //                    shiftX,
 //                    zero(),
@@ -137,7 +137,11 @@ object DensityFunctionCreator {
         )
         this.register(
             DuskDensityFunctions.RIDGES_FOLDED_NETHER,
-            Fold(this.dense(DuskDensityFunctions.RIDGES_NETHER))
+//            Fold(
+            add(
+                constant(0.0),
+                this.dense(DuskDensityFunctions.RIDGES_NETHER)
+            )
         )
         this.register(
             DuskDensityFunctions.DEPTH_FLOOR_NETHER,
@@ -145,8 +149,8 @@ object DensityFunctionCreator {
                 add(
                     this.dense(DuskDensityFunctions.OFFSET_FLOOR_NETHER),
                     clampedGradientY(
-                        -(256 + 256) + 32,
-                        (256 + 256) + 32,
+                        -(256 + 256),
+                        (256 + 256),
                         2.0,
                         -2.0
                     ),
@@ -159,8 +163,8 @@ object DensityFunctionCreator {
                 add(
                     this.dense(DuskDensityFunctions.OFFSET_CEILING_NETHER),
                     clampedGradientY(
-                        -(0 + 256) - 32,
-                        512 + 256 - 32,
+                        -(0 + 256),
+                        512 + 256,
                         -2.0,
                         2.0
                     ),
@@ -259,24 +263,30 @@ object DensityFunctionCreator {
         val ridgesFolded = Spline.FunctionWrapper(this.denseHold(DuskDensityFunctions.RIDGES_FOLDED_NETHER))
         val offsetFloorSpline = registerAndWrap(
             offsetFloorKey,
-            copySpline(
-                NetherTerrainParametersCreator.offsetFloorSpline(
-                    continents,
-                    erosion,
-                    ridgesFolded,
-                    amplified
+            add(
+                constant(0.125),
+                copySpline(
+                    NetherTerrainParametersCreator.offsetFloorSpline(
+                        continents,
+                        erosion,
+                        ridgesFolded,
+                        amplified
+                    )
                 )
             )
         )
         val offsetCeilingSpline = registerAndWrap(
             offsetCeilingKey,
-            copySpline(
-                NetherTerrainParametersCreator.offsetCeilingSpline(
-                    continents,
-                    erosion,
-                    ridgesFolded,
-                    dropCeiling,
-                    amplified
+            add(
+                constant(0.125),
+                copySpline(
+                    NetherTerrainParametersCreator.offsetCeilingSpline(
+                        continents,
+                        erosion,
+                        ridgesFolded,
+                        dropCeiling,
+                        amplified
+                    )
                 )
             )
         )

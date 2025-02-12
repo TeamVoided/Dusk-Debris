@@ -9,13 +9,19 @@ import net.minecraft.world.gen.DensityFunction
 import net.minecraft.world.gen.DensityFunction.ContextProvider
 import org.teamvoided.dusk_debris.util.Utils
 import org.teamvoided.dusk_debris.util.world_helper.makeCodec
+import kotlin.math.abs
 import kotlin.math.acos
 import kotlin.math.cos
 
 class DebugAxis(
     val axis: Direction.Axis,
-    val axisScale: Double
+    val amplitude: Double,
+    val period: Double
 ) : DensityFunction {
+    constructor(axis: Direction.Axis, amplitude: Int, period: Int) : this(axis, amplitude.toDouble(), period.toDouble())
+    constructor(axis: Direction.Axis, period: Double) : this(axis, 1.0, period)
+    constructor(axis: Direction.Axis, period: Int) : this(axis, period.toDouble())
+
 
     override fun compute(c: DensityFunction.FunctionContext): Double {
         val axis = when (axis) {
@@ -23,26 +29,20 @@ class DebugAxis(
             Direction.Axis.Y -> c.blockY()
             Direction.Axis.Z -> c.blockZ()
         }
-        val mod1 = (axis - 1) % 2 - 1
-        val mod2 = (-axis - 1) % 4 - 1
-        val mod = if (mod2 < 1) mod2 else mod1
-        return mod / axisScale
+        val a = amplitude * 2.0
+        val p = period
+        return abs(a * ((axis / p) % 2.0) - a) - (a / 2.0)
     }
 
     override fun fillArray(array: DoubleArray, context: ContextProvider) = context.fillAllDirectly(array, this)
 
-    override fun mapAll(visitor: DensityFunction.Visitor): DensityFunction {
-        return visitor.apply(
-            DebugAxis(
-                axis,
-                axisScale
-            )
-        )
-    }
+    override fun mapAll(visitor: DensityFunction.Visitor): DensityFunction =
+        visitor.apply(DebugAxis(axis, amplitude, period))
 
-    override fun minValue(): Double = 0.0
 
-    override fun maxValue(): Double = 1.0
+    override fun minValue(): Double = -maxValue()
+
+    override fun maxValue(): Double = amplitude * 2
 
     override fun codec(): CodecHolder<DebugAxis> = CODEC
 
@@ -51,10 +51,10 @@ class DebugAxis(
             RecordCodecBuilder.mapCodec { instance ->
                 instance.group(
                     Direction.Axis.CODEC.fieldOf("axis").forGetter { it.axis },
-                    Codec.DOUBLE.fieldOf("axis_scale").forGetter { it.axisScale })
+                    Codec.doubleRange(0.0, 1000000.0).fieldOf("amplitude").forGetter { it.amplitude },
+                    Codec.doubleRange(0.0, 1000000.0).fieldOf("period").forGetter { it.period })
                     .apply(instance, ::DebugAxis)
             }
-
         val CODEC: CodecHolder<DebugAxis> = makeCodec(DATA_CODEC)
     }
 }
