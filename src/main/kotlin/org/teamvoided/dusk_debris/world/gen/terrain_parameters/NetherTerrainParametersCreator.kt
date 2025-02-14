@@ -44,7 +44,17 @@ object NetherTerrainParametersCreator {
     ): Spline<C, I> {
         val amplifiedTransformer = if (amplified) OFFSET_AMPLIFIED else NO_TRANSFORM
 
-        val shoreline = offsetFloor(0f, erosion, ridgesFolded, amplifiedTransformer)
+        val shoreline = offsetFloor(0.2f, erosion, ridgesFolded, amplifiedTransformer)
+        val outlandSpline = offsetFloor(0.6f, erosion, ridgesFolded, amplifiedTransformer)
+        val midlandSpline = offsetFloor(1f, erosion, ridgesFolded, amplifiedTransformer)
+        val inlandSpline = offsetFloor(1.2f, erosion, ridgesFolded, amplifiedTransformer)
+
+
+        val warpedIsland = Spline.builder(ridgesFolded, amplifiedTransformer)
+            .add(-1f, nFloor(24), 0.2f)
+            .add(-0.5f, nFloor(38), 0.4f)
+            .add(0.25f, nFloor(64), 0.4f)
+            .add(0.8f, nFloor(128), 0.4f)
 
         //OFFSET CONTINENTALNESS
         return Spline.builder(continents, amplifiedTransformer)
@@ -52,9 +62,9 @@ object NetherTerrainParametersCreator {
 //            .add(LAVA_OCEAN_DEEP, nFloor(-18))
 //            .add(LAVA_OCEAN, nFloor(24))
             .add(SHORELINE, shoreline)
-//            .add(OUTLAND, midlandSpline)
-//            .add(INLAND, inlandSpline)
-//            .add(INLAND_EXTREME, inlandSpline)
+            .add(OUTLAND, outlandSpline)
+            .add(INLAND, midlandSpline)
+            .add(INLAND_EXTREME, inlandSpline)
             .build()
     }
 
@@ -109,12 +119,12 @@ object NetherTerrainParametersCreator {
         amplifier: ToFloatFunction<Float>
     ): Spline<C, I> {
         val spline = Spline.builder(ridgesFolded, amplifier)
-            .add(-1f, nFloor(24))
-            .add(-0.8f, nFloor(32))
-            .add(-0.5f, nFloor(32))
-            .add(-0.25f, nFloor(64))
-            .add(0.5f, nFloor(64))
-            .add(0.8f, nFloor(128))
+            .add(-1f, nFloor(24), 0.2f)
+            .add(-0.8f, nFloor(32), 0.2f)
+            .add(-0.5f, nFloor(38) * continents, 0.4f * continents)
+            .add(-0.25f, nFloor(64) * continents, 0.4f * continents)
+            .add(0.5f, nFloor(70) * continents, 0.4f * continents)
+            .add(0.8f, nFloor(128) * continents, 0.4f * continents)
         return spline.build()
     }
 

@@ -15,34 +15,30 @@ import kotlin.math.cos
 
 class DebugAxis(
     val axis: Direction.Axis,
-    val amplitude: Double,
     val period: Double
 ) : DensityFunction {
-    constructor(axis: Direction.Axis, amplitude: Int, period: Int) : this(axis, amplitude.toDouble(), period.toDouble())
-    constructor(axis: Direction.Axis, period: Double) : this(axis, 1.0, period)
     constructor(axis: Direction.Axis, period: Int) : this(axis, period.toDouble())
-
 
     override fun compute(c: DensityFunction.FunctionContext): Double {
         val axis = when (axis) {
-            Direction.Axis.X -> c.blockX()
-            Direction.Axis.Y -> c.blockY()
-            Direction.Axis.Z -> c.blockZ()
+            Direction.Axis.X -> kotlin.math.abs(c.blockX())
+            Direction.Axis.Y -> kotlin.math.abs(c.blockY())
+            Direction.Axis.Z -> kotlin.math.abs(c.blockZ())
         }
-        val a = amplitude * 2.0
+
         val p = period
-        return abs(a * ((axis / p) % 2.0) - a) - (a / 2.0)
+        val the = 2 * kotlin.math.abs(((axis / p) % 2.0) - 1) - 1
+        return the  // abs(a * ((axis / p) % 2.0) - a) - (a / 2.0)
     }
 
     override fun fillArray(array: DoubleArray, context: ContextProvider) = context.fillAllDirectly(array, this)
 
     override fun mapAll(visitor: DensityFunction.Visitor): DensityFunction =
-        visitor.apply(DebugAxis(axis, amplitude, period))
-
+        visitor.apply(DebugAxis(axis, period))
 
     override fun minValue(): Double = -maxValue()
 
-    override fun maxValue(): Double = amplitude * 2
+    override fun maxValue(): Double = 1.0
 
     override fun codec(): CodecHolder<DebugAxis> = CODEC
 
@@ -51,7 +47,6 @@ class DebugAxis(
             RecordCodecBuilder.mapCodec { instance ->
                 instance.group(
                     Direction.Axis.CODEC.fieldOf("axis").forGetter { it.axis },
-                    Codec.doubleRange(0.0, 1000000.0).fieldOf("amplitude").forGetter { it.amplitude },
                     Codec.doubleRange(0.0, 1000000.0).fieldOf("period").forGetter { it.period })
                     .apply(instance, ::DebugAxis)
             }

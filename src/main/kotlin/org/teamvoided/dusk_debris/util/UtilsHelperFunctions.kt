@@ -11,7 +11,6 @@ import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Box
 import net.minecraft.util.math.Direction
-import net.minecraft.util.math.Direction.Axis
 import net.minecraft.util.math.Vec3d
 import net.minecraft.util.math.noise.DoublePerlinNoiseSampler
 import net.minecraft.util.shape.VoxelShape
@@ -95,6 +94,13 @@ fun createCuboidShape(min1: Double, min2: Double, max1: Double, max2: Double, ax
         Direction.Axis.X -> Block.createCuboidShape(min2, min1, min1, max2, max1, max1)
         Direction.Axis.Z -> Block.createCuboidShape(min1, min1, min2, max1, max1, max2)
     }
+}
+
+fun Vec3d.normalizeHorizontal(yMult: Double = 1.0): Vec3d {
+    val xz = sqrt(this.x * this.x + this.z * this.z)
+    val y = this.y * yMult
+    return if (xz < 1.0E-4) Vec3d(0.0, y, 0.0)
+    else Vec3d(this.x / xz, y, this.z / xz)
 }
 
 fun Vec3d.getSquaredDistanceToCenter(vec: Vec3d): Double {

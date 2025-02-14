@@ -46,6 +46,15 @@ object DuskItems {
         )
     )
 
+    val MACE_BLAZE = register(
+        "mace_blaze",
+        MaceBlazeItem(
+            Item.Settings().rarity(net.minecraft.util.Rarity.EPIC).maxDamage(500)
+                .component(DataComponentTypes.TOOL, MaceBlazeItem.createToolComponent())
+                .attributeModifiersComponent(MaceBlazeItem.createAttributes())
+        )
+    )
+
 
     val TWISTING_SOUL_CHARGE = register("twisting_soul_charge", ThrowableItem(Item.Settings()))
 

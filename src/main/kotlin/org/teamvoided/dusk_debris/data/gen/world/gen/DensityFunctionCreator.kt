@@ -85,27 +85,30 @@ object DensityFunctionCreator {
         this.register(
             DuskDensityFunctions.CONTINENTALNESS_NETHER,
             cacheOnce(
-                shiftedNoiseRangeNether(
-                    shiftX,
-                    zero(),
-                    shiftZ,
-                    (1.0 / 3),
-                    0.025,
-                    this.noise(DuskNoiseParametersKeys.CONTINENTALNESS_NETHER)
-                )
+                DebugAxis(Direction.Axis.Z, 100)
+//                shiftedNoiseRangeNether(
+//                    shiftX,
+//                    zero(),
+//                    shiftZ,
+//                    (1.0 / 3),
+//                    0.025,
+//                    this.noise(DuskNoiseParametersKeys.CONTINENTALNESS_NETHER)
+//                )
             )
         )
         this.register(
             DuskDensityFunctions.EROSION_NETHER,
             cacheOnce(
-                shiftedNoiseRangeNether(
-                    shiftX,
-                    zero(),
-                    shiftZ,
-                    0.25,
-                    0.025,
-                    this.noise(DuskNoiseParametersKeys.EROSION_NETHER)
-                )
+                constant(0.0)
+//                DebugAxis(Direction.Axis.Z, 100)
+//                shiftedNoiseRangeNether(
+//                    shiftX,
+//                    zero(),
+//                    shiftZ,
+//                    0.25,
+//                    0.025,
+//                    this.noise(DuskNoiseParametersKeys.EROSION_NETHER)
+//                )
             )
         )
         this.register(

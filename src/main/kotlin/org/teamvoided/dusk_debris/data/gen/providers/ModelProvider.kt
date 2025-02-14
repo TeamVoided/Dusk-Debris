@@ -54,6 +54,9 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
 
         gen.fogCanyonModels()
 
+        gen.registerItemModel(DuskItems.MACE_BLAZE)
+
+
         gen.registerSimpleCubeAll(DuskBlocks.BRONZE_BLOCK)
         gen.wallOffset(DuskBlocks.CUT_BRONZE_WALL, DuskBlocks.CUT_BRONZE)
         gen.registerTrapdoor(DuskBlocks.BRONZE_TRAPDOOR)
@@ -181,7 +184,7 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
 //        }
     }
 
-    private fun BlockStateModelGenerator.fogCanyonModels(){
+    private fun BlockStateModelGenerator.fogCanyonModels() {
         this.bubbleBlock(DuskBlocks.FOG_BUBBLE)
         this.bubbleBlossomBlock(DuskBlocks.PURPLE_BUBBLE_BLOSSOM)
     }
