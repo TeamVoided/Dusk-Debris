@@ -51,6 +51,7 @@ class DuskDebrisData : DataGeneratorEntrypoint {
 
         gen.add(RegistryKeys.PAINTING_VARIANT, PaintingVariants::bootstrap)
         gen.add(DuskRegistries.SNIFFER_VARIANT, SnifferVariants::bootstrap)
+        gen.add(DuskRegistries.FOG_MODIFIER, FogModifiers::bootstrap)
         println("End build registry")
     }
 }

@@ -3,23 +3,32 @@ package org.teamvoided.dusk_debris.data.gen.providers.loot_table
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.SimpleFabricLootTableProvider
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalBiomeTags
+import net.minecraft.entity.EntityType
 import net.minecraft.item.Item
 import net.minecraft.item.Items
 import net.minecraft.loot.LootPool
 import net.minecraft.loot.LootTable
+import net.minecraft.loot.condition.EntityPropertiesLootCondition
 import net.minecraft.loot.condition.LocationCheckLootCondition
+import net.minecraft.loot.context.LootContext
 import net.minecraft.loot.context.LootContextTypes
 import net.minecraft.loot.entry.EmptyEntry
 import net.minecraft.loot.entry.ItemEntry
 import net.minecraft.loot.entry.LootTableEntry
+import net.minecraft.loot.function.SetCountLootFunction
+import net.minecraft.loot.function.SetOminousBottleLootFunction
+import net.minecraft.loot.provider.number.ConstantLootNumberProvider
+import net.minecraft.loot.provider.number.UniformLootNumberProvider
+import net.minecraft.predicate.entity.EntityPredicate
 import net.minecraft.predicate.entity.LocationPredicate
+import net.minecraft.predicate.entity.RaiderPredicate
 import net.minecraft.registry.HolderLookup
 import net.minecraft.registry.RegistryKey
 import net.minecraft.registry.RegistryKeys
 import net.minecraft.registry.tag.TagKey
 import net.minecraft.world.biome.Biome
-import org.teamvoided.dusk_debris.util.Utils
 import org.teamvoided.dusk_debris.data.DuskLootTables
+import org.teamvoided.dusk_debris.util.Utils
 import java.util.concurrent.CompletableFuture
 import java.util.function.BiConsumer
 
@@ -31,6 +40,25 @@ class EntityLootTableProvider(o: FabricDataOutput, val r: CompletableFuture<Hold
 
     override fun generate(gen: BiConsumer<RegistryKey<LootTable>, LootTable.Builder>) {
         gen.accept(
+            DuskLootTables.RAIDER_BAD_OMEN_BOTTLE,
+            LootTable.builder().pool(
+                LootPool.builder().rolls(ConstantLootNumberProvider.create(1.0f)).with(
+                    ItemEntry.builder(Items.OMINOUS_BOTTLE)
+                        .apply(SetCountLootFunction.builder(ConstantLootNumberProvider.create(1.0f)))
+                        .apply(SetOminousBottleLootFunction.method_58737(UniformLootNumberProvider.create(0.0f, 4.0f)))
+                ).conditionally(
+                    EntityPropertiesLootCondition.builder(
+                        LootContext.EntityTarget.THIS,
+                        EntityPredicate.Builder.create().typeSpecific(RaiderPredicate.field_50163)
+                    )
+                )
+            )
+        )
+        gen.endermanHolds()
+    }
+
+    private fun BiConsumer<RegistryKey<LootTable>, LootTable.Builder>.endermanHolds() {
+        this.accept(
             DuskLootTables.ENDERMAN_HOLDS,
             LootTable.builder().pool(
                 LootPool.builder().rolls(Utils.constantNum(1))
@@ -44,7 +72,7 @@ class EntityLootTableProvider(o: FabricDataOutput, val r: CompletableFuture<Hold
                     .with(DuskLootTables.ENDERMAN_OVERWORLD_BADLANDS, ConventionalBiomeTags.IS_BADLANDS, 25)
             )
         )
-        gen.endermanHolding(
+        this.endermanHolding(
             DuskLootTables.ENDERMAN_OVERWORLD_GENERIC,
             item(Items.GRASS_BLOCK, 10),
             item(Items.DIRT, 3),
@@ -58,7 +86,7 @@ class EntityLootTableProvider(o: FabricDataOutput, val r: CompletableFuture<Hold
             item(Items.RED_MUSHROOM, 3),
             item(Items.BROWN_MUSHROOM, 3)
         )
-        gen.endermanHolding(
+        this.endermanHolding(
             DuskLootTables.ENDERMAN_NETHER_GENERIC,
             item(Items.NETHERRACK, 10),
             item(Items.CRIMSON_NYLIUM, 3),
@@ -68,7 +96,7 @@ class EntityLootTableProvider(o: FabricDataOutput, val r: CompletableFuture<Hold
             item(Items.SOUL_SOIL, 3),
             item(Items.BASALT, 3)
         )
-        gen.accept(
+        this.accept(
             DuskLootTables.ENDERMAN_END_GENERIC,
             LootTable.builder().pool(
                 LootPool.builder().rolls(Utils.constantNum(1))
@@ -78,7 +106,7 @@ class EntityLootTableProvider(o: FabricDataOutput, val r: CompletableFuture<Hold
                     .with(ItemEntry.builder(Items.OBSIDIAN))
             )
         )
-        gen.endermanHolding(
+        this.endermanHolding(
             DuskLootTables.ENDERMAN_OVERWORLD_FLOWER,
             item(Items.POPPY, 10),
             item(Items.DANDELION, 10),
@@ -92,7 +120,7 @@ class EntityLootTableProvider(o: FabricDataOutput, val r: CompletableFuture<Hold
             item(Items.WHITE_TULIP, 10),
             item(Items.BLUE_ORCHID)
         )
-        gen.endermanHolding(
+        this.endermanHolding(
             DuskLootTables.ENDERMAN_OVERWORLD_ICE,
             item(Items.SNOW_BLOCK, 10),
             item(Items.POWDER_SNOW_BUCKET, 10),
@@ -100,7 +128,7 @@ class EntityLootTableProvider(o: FabricDataOutput, val r: CompletableFuture<Hold
             item(Items.PACKED_ICE, 10),
             item(Items.BLUE_ICE)
         )
-        gen.endermanHolding(
+        this.endermanHolding(
             DuskLootTables.ENDERMAN_OVERWORLD_DESERT,
             item(Items.SAND, 25),
             item(Items.SANDSTONE, 25),
@@ -109,7 +137,7 @@ class EntityLootTableProvider(o: FabricDataOutput, val r: CompletableFuture<Hold
             item(Items.DEAD_BUSH, 15),
             item(Items.CACTUS, 7)
         )
-        gen.endermanHolding(
+        this.endermanHolding(
             DuskLootTables.ENDERMAN_OVERWORLD_BADLANDS,
             item(Items.RED_SAND, 100),
             item(Items.RED_SANDSTONE, 100),

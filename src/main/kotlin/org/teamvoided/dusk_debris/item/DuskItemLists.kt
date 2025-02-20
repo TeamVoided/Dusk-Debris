@@ -1,5 +1,6 @@
 package org.teamvoided.dusk_debris.item
 
+import net.minecraft.item.SpawnEggItem
 import org.teamvoided.dusk_debris.init.DuskBlocks
 import org.teamvoided.dusk_debris.init.DuskItems
 
@@ -9,9 +10,7 @@ object DuskItemLists {
         DuskBlocks.STRONGHOLD_GUNPOWDER_BARREL,
         DuskBlocks.ANCIENT_BLACK_POWDER_BARREL
     )
-    val SPAWN_EGGS_ITEM_LIST = listOf(
-        DuskItems.GLOOM_SPAWN_EGG
-    )
+    val SPAWN_EGGS_ITEM_LIST = DuskItems.ITEMS.filterIsInstance<SpawnEggItem>()
     val OCEAN_METALS_ITEM_LIST = listOf(
         DuskBlocks.TREACHEROUS_GOLD_BLOCK.asItem(),
         DuskItems.TREACHEROUS_GOLD_COINS,

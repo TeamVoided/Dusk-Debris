@@ -38,21 +38,16 @@ class BiomeTagsProvider(o: FabricDataOutput, r: CompletableFuture<HolderLookup.P
             .add(Biomes.SOUL_SAND_VALLEY)
 
 
-        getOrCreateTagBuilder(DuskBiomeTags.FOG_START_0)
+        getOrCreateTagBuilder(DuskBiomeTags.FOG_EMPTY)
+        getOrCreateTagBuilder(DuskBiomeTags.FOG_HUMID)
             .forceAddTag(ConventionalBiomeTags.IS_SWAMP)
             .add(Biomes.LUSH_CAVES)
-            .add(Biomes.DEEP_DARK)
-            .add(DuskBiomes.BOREAL_VALLEY)
-            .add(DuskBiomes.FOG_CANYON)
-        getOrCreateTagBuilder(DuskBiomeTags.FOG_START_20)
             .add(Biomes.DRIPSTONE_CAVES)
+        getOrCreateTagBuilder(DuskBiomeTags.FOG_CREEPY)
+            .add(Biomes.DEEP_DARK)
             .add(Biomes.DARK_FOREST)
-//            .add(Biomes.PALE_GARDEN)
-
-        getOrCreateTagBuilder(DuskBiomeTags.FOG_END_80)
-            .add(DuskBiomes.BOREAL_VALLEY)
             .add(DuskBiomes.FOG_CANYON)
-
+//            .add(Biomes.PALE_GARDEN)
         getOrCreateTagBuilder(DuskBiomeTags.FOG_BOREAL_VALLEY)
             .add(DuskBiomes.BOREAL_VALLEY)
     }

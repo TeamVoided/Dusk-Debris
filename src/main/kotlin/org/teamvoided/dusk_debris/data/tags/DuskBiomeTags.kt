@@ -17,16 +17,9 @@ object DuskBiomeTags {
     val ASHEN = create("ashen")
     val SOUL_VALLEY = create("soul_valley")
 
-    val FOG_START_0 = create("fog/start/0")
-    val FOG_START_20 = create("fog/start/20")
-    val FOG_START_50 = create("fog/start/50")
-    val FOG_START_80 = create("fog/start/80")
-
-    val FOG_END_0 = create("fog/end/0")
-    val FOG_END_20 = create("fog/end/20")
-    val FOG_END_50 = create("fog/end/50")
-    val FOG_END_80 = create("fog/end/80")
-
+    val FOG_EMPTY = create("fog/empty")
+    val FOG_HUMID = create("fog/humid")
+    val FOG_CREEPY = create("fog/creepy")
     val FOG_BOREAL_VALLEY = create("fog/special/boreal_valley")
 
     val SNIFFER_BRIGHT = create("sniffer/bright")

@@ -1,6 +1,5 @@
 package org.teamvoided.dusk_debris.mixin;
 
-import com.mojang.serialization.Codec;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.SnowBlock;
@@ -13,7 +12,6 @@ import net.minecraft.world.Heightmap;
 import net.minecraft.world.StructureWorldAccess;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.feature.DefaultFeatureConfig;
-import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.FreezeTopLayerFeature;
 import net.minecraft.world.gen.feature.util.FeatureContext;
 import org.spongepowered.asm.mixin.Mixin;
@@ -35,26 +33,26 @@ public class FreezeTopLayerFeatureMixin {
             cir.setReturnValue(false);
         } else if (snowHeight > 1) {
             BlockPos blockPos = context.getOrigin();
-            BlockPos.Mutable mutable = new BlockPos.Mutable();
-            BlockPos.Mutable mutable2 = new BlockPos.Mutable();
+            BlockPos.Mutable snowPos = new BlockPos.Mutable();
+            BlockPos.Mutable blockBelow = new BlockPos.Mutable();
 
-            for (int i = 0; i < 16; ++i) {
-                for (int j = 0; j < 16; ++j) {
-                    int k = blockPos.getX() + i;
-                    int l = blockPos.getZ() + j;
-                    int m = structureWorldAccess.getTopY(Heightmap.Type.MOTION_BLOCKING, k, l);
-                    mutable.set(k, m, l);
-                    mutable2.set(mutable).move(Direction.DOWN, 1);
-                    Biome biome = structureWorldAccess.getBiome(mutable).value();
-                    if (biome.canSetIce(structureWorldAccess, mutable2, false)) {
-                        structureWorldAccess.setBlockState(mutable2, Blocks.ICE.getDefaultState(), 2);
+            for (int loopX = 0; loopX < 16; ++loopX) {
+                int x = blockPos.getX() + loopX;
+                for (int loopZ = 0; loopZ < 16; ++loopZ) {
+                    int z = blockPos.getZ() + loopZ;
+                    int y = structureWorldAccess.getTopY(Heightmap.Type.MOTION_BLOCKING, x, z);
+                    snowPos.set(x, y, z);
+                    blockBelow.set(snowPos).move(Direction.DOWN, 1);
+                    Biome biome = structureWorldAccess.getBiome(snowPos).value();
+                    if (biome.canSetIce(structureWorldAccess, blockBelow, false)) {
+                        structureWorldAccess.setBlockState(blockBelow, Blocks.ICE.getDefaultState(), 2);
                     }
 
-                    if (biome.canSetSnow(structureWorldAccess, mutable)) {
-                        BlockState blockState = structureWorldAccess.getBlockState(mutable2);
-                        placeSnowLayers(structureWorldAccess, snowHeight, mutable);
-                        if (blockState.contains(SnowyBlock.SNOWY)) {
-                            structureWorldAccess.setBlockState(mutable2, blockState.with(SnowyBlock.SNOWY, true), 2);
+                    if (biome.canSetSnow(structureWorldAccess, snowPos)) {
+                        BlockState downState = structureWorldAccess.getBlockState(blockBelow);
+                        placeSnowLayers(structureWorldAccess, snowHeight, snowPos);
+                        if (downState.contains(SnowyBlock.SNOWY)) {
+                            structureWorldAccess.setBlockState(blockBelow, downState.with(SnowyBlock.SNOWY, true), 2);
                         }
                     }
                 }
@@ -69,11 +67,8 @@ public class FreezeTopLayerFeatureMixin {
             int height = snowHeight / 8;
             for (int i = 1; i <= height; ++i) {
                 BlockPos pos = blockPos.up(i - 1);
-                if (i == height) {
-                    world.setBlockState(pos, Blocks.SNOW.getDefaultState().with(Properties.LAYERS, snowHeight % 8), 2);
-                } else {
-                    world.setBlockState(pos, Blocks.SNOW.getDefaultState().with(Properties.LAYERS, SnowBlock.MAX_LAYERS), 2);
-                }
+                int layerheight = i == height ? snowHeight % SnowBlock.MAX_LAYERS : SnowBlock.MAX_LAYERS;
+                world.setBlockState(pos, Blocks.SNOW.getDefaultState().with(Properties.LAYERS, layerheight), 2);
             }
         } else {
             world.setBlockState(blockPos, Blocks.SNOW.getDefaultState().with(Properties.LAYERS, snowHeight), 2);

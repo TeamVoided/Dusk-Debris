@@ -1,11 +1,15 @@
 package org.teamvoided.dusk_debris.init
 
 import net.fabricmc.fabric.api.`object`.builder.v1.entity.FabricDefaultAttributeRegistry
+import net.minecraft.block.Block
 import net.minecraft.block.Blocks
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.SpawnGroup
+import net.minecraft.entity.mob.MobEntity
 import net.minecraft.entity.passive.AbstractHorseEntity
+import net.minecraft.item.Item
+import net.minecraft.item.SpawnEggItem
 import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
 import net.minecraft.util.math.Vec3d
@@ -23,6 +27,8 @@ import org.teamvoided.dusk_debris.entity.throwable_bomb.nethershroom_throwable.P
 import org.teamvoided.dusk_debris.entity.throwable_bomb.nethershroom_throwable.SmokebombEntity
 
 object DuskEntities {
+    val ENTITIES = mutableSetOf<EntityType<*>>()
+
     //        val CRAB = register(
 //        "crab", EntityType.Builder
 //            .create(EntityType.EntityFactory(::CrabEntity), SpawnGroup.CREATURE)
@@ -55,7 +61,7 @@ object DuskEntities {
     val BLINDBOMB = throwableBomb("blindbomb", ::BlindbombEntity)
     val SMOKEBOMB = throwableBomb("smokebomb", ::SmokebombEntity)
 
-    val GLOOM = skeleton("gloomed", ::GloomEntity)
+    val GLOOM = skeleton("gloomed", 0x222222, 0x222222, ::GloomEntity)
 
     val SKELETON_WOLF = register(
         "skeleton_wolf",
@@ -102,7 +108,7 @@ object DuskEntities {
     )
 
     val VOLAPHYRA = register(
-        "volaphyra", EntityType.Builder.create(::VolaphyraEntity, SpawnGroup.MONSTER)
+        "volaphyra", 0xFEFCFF, 0x37CE56, EntityType.Builder.create(::VolaphyraEntity, SpawnGroup.MONSTER)
             .setDimensions(1f, 1f)
             .setEyeHeight(0.33333f)
             .passengerAttachments(1f)
@@ -110,14 +116,14 @@ object DuskEntities {
     )
 
     val VOLAPHYRA_CORE = register(
-        "volaphyra_core", EntityType.Builder.create(::VolaphyraCoreEntity, SpawnGroup.MONSTER)
+        "volaphyra_core", 0x37CE56, 0x37CE56, EntityType.Builder.create(::VolaphyraCoreEntity, SpawnGroup.MONSTER)
             .setDimensions(0.5f, 0.5f)
             .setEyeHeight(0.25f)
             .passengerAttachments(0.25f)
             .maxTrackingRange(8)
     )
     val TINY_ENEMY_JELLYFISH = register(
-        "tiny_enemy_jellyfish", EntityType.Builder.create(::TinyEnemyJellyfishEntity, SpawnGroup.AMBIENT)
+        "tiny_enemy_jellyfish", 0xECEAED, 0x9AF1B2, EntityType.Builder.create(::TinyEnemyJellyfishEntity, SpawnGroup.AMBIENT)
             .setDimensions(0.5f, 0.5f)
             .setEyeHeight(0.25f)
             .passengerAttachments(0.5f)
@@ -135,9 +141,14 @@ object DuskEntities {
         )
     }
 
-    fun <T : Entity> skeleton(id: String, factory: EntityType.EntityFactory<T>): EntityType<T> {
+    fun <T : MobEntity> skeleton(
+        id: String,
+        priCol: Int,
+        secCol: Int,
+        factory: EntityType.EntityFactory<T>
+    ): EntityType<T> {
         return register(
-            id, EntityType.Builder.create(factory, SpawnGroup.MONSTER)
+            id, priCol, secCol, EntityType.Builder.create(factory, SpawnGroup.MONSTER)
                 .setDimensions(0.6f, 1.99f)
                 .setEyeHeight(1.74f)
                 .vehicleAttachment(-0.7f)
@@ -157,9 +168,26 @@ object DuskEntities {
         FabricDefaultAttributeRegistry.register(TUFF_GOLEM, TuffGolemEntity.createAttributes().build())
         FabricDefaultAttributeRegistry.register(VOLAPHYRA, VolaphyraEntity.createAttributes().build())
         FabricDefaultAttributeRegistry.register(VOLAPHYRA_CORE, VolaphyraCoreEntity.createAttributes().build())
-        FabricDefaultAttributeRegistry.register(TINY_ENEMY_JELLYFISH, TinyEnemyJellyfishEntity.createAttributes().build())
+        FabricDefaultAttributeRegistry.register(
+            TINY_ENEMY_JELLYFISH,
+            TinyEnemyJellyfishEntity.createAttributes().build()
+        )
     }
 
-    fun <T : Entity> register(id: String, entityType: EntityType.Builder<T>): EntityType<T> =
-        Registry.register(Registries.ENTITY_TYPE, id(id), entityType.build(id))
+    fun <T : MobEntity> register(
+        id: String,
+        priCol: Int,
+        secCol: Int,
+        entityType: EntityType.Builder<T>
+    ): EntityType<T> {
+        val regEntityType = register(id, entityType)
+        DuskItems.register(id + "_spawn_egg", (SpawnEggItem(regEntityType, priCol, secCol, Item.Settings())))
+        return regEntityType
+    }
+
+    fun <T : Entity> register(id: String, entityType: EntityType.Builder<T>): EntityType<T> {
+        val regEntityType = Registry.register(Registries.ENTITY_TYPE, id(id), entityType.build(id))
+        ENTITIES.add(regEntityType)
+        return regEntityType
+    }
 }

@@ -18,17 +18,11 @@ import java.util.concurrent.CompletableFuture
 @Suppress("MemberVisibilityCanBePrivate")
 class EnglishTranslationProvider(o: FabricDataOutput, r: CompletableFuture<HolderLookup.Provider>) :
     FabricLanguageProvider(o, r) {
-    val entities = listOf(
-        DuskEntities.GUNPOWDER_BARREL,
-        DuskEntities.BOX_AREA_EFFECT_CLOUD
-    ) +
-            DuskEntityLists.THROWABLE_BOMB_ENTITIES +
-            DuskEntityLists.DUSK_SKELETON_ENTITIES
 
     override fun generateTranslations(lookup: HolderLookup.Provider, gen: TranslationBuilder) {
         DuskItems.ITEMS.forEach { gen.add(it.translationKey, genLang(it.id)) }
 //        DuskBlocks.BLOCKS.forEach { gen.add(it.translationKey, genLang(it.id)) }
-        entities.forEach { gen.add(it.translationKey, genLang(it.id)) }
+        DuskEntities.ENTITIES.forEach { gen.add(it.translationKey, genLang(it.id)) }
 
         gen.add("container.treasure_chest", "Treasure Chest")
 

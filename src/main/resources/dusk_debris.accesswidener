@@ -56,3 +56,5 @@ accessible method net/minecraft/world/gen/noise/NoiseRouterData slide (Lnet/mine
 accessible class net/minecraft/world/gen/DensityFunctions$PureTransformer
 
 accessible field net/minecraft/block/TrialSpawnerData currentMobs Ljava/util/Set;
+
+accessible method net/minecraft/world/gen/PillagerSpawner spawnPillager (Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/random/RandomGenerator;Z)Z

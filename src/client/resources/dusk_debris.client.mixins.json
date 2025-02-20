@@ -6,6 +6,7 @@
   "client": [
     "BackgroundRendererMixin",
     "ExampleMixin",
+    "GameRendererMixin",
     "fluid_tag.CameraMixin",
     "fluid_tag.water.BubbleColumnUpParticleMixin",
     "fluid_tag.water.BubbleParticleMixin",
