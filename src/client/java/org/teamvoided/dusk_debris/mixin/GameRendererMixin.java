@@ -24,8 +24,8 @@ public class GameRendererMixin {
 
             float dur = (statusEffectInstance.getDuration() - tickDelta);
             float mult = (1F - dur / fadeTime) / 2F;
-            Float ret = mult * MathHelper.cos((rate * dur * Utils.pi) - Utils.pi) - mult + 1F;
-//            Float ret = mult / 2F * MathHelper.cos((rate * dur * Utils.pi) - Utils.pi) - (1.5F * mult) + 1F; //alternative so the max decreases as well
+//            Float ret = mult * MathHelper.cos((rate * dur * Utils.pi) + Utils.pi) - mult + 1F;
+            Float ret = (mult / 2F) * MathHelper.cos((rate * dur * Utils.pi) + Utils.pi) - (1.5F * mult) + 1F; //alternative so the max decreases as well
             cir.setReturnValue(ret);
         } else {
             cir.setReturnValue(1F);
