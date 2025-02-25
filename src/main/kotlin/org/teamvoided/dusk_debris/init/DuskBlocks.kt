@@ -247,6 +247,8 @@ object DuskBlocks {
     val GRAY_RIBBON = register("gray_ribbon", registerRibbon(GRAY_WOOL.defaultMapColor))
     val BLACK_RIBBON = register("black_ribbon", registerRibbon(BLACK_WOOL.defaultMapColor))
 
+    val RED_CARPET_STAIRS = register("red_carpet_stairs", CarpetStairBlock(copy(RED_CARPET)))
+
     val TREACHEROUS_GOLD_BLOCK = register(
         "treacherous_gold_block", Block(
             AbstractBlock.Settings.variantOf(GOLD_BLOCK).strength(3.5f, 6.0f)

@@ -11,6 +11,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.teamvoided.dusk_debris.util.Utils;
 
+import static org.teamvoided.dusk_debris.util.UtilsClientHelperFunctionsKt.sendMessageIngame;
+
 @Mixin(GameRenderer.class)
 
 public class GameRendererMixin {
@@ -22,7 +24,8 @@ public class GameRendererMixin {
         if (statusEffectInstance.endsWithin(fadeTime)) {
             float rate = 0.05F;
 
-            float dur = (statusEffectInstance.getDuration() - tickDelta);
+            float duration = statusEffectInstance.getDuration();
+            float dur = (duration - (duration <= 0 ? 0F : tickDelta));
             float mult = (1F - dur / fadeTime) / 2F;
 //            Float ret = mult * MathHelper.cos((rate * dur * Utils.pi) + Utils.pi) - mult + 1F;
             Float ret = (mult / 2F) * MathHelper.cos((rate * dur * Utils.pi) + Utils.pi) - (1.5F * mult) + 1F; //alternative so the max decreases as well

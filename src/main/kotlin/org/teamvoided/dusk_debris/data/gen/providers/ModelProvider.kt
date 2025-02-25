@@ -3,6 +3,7 @@ package org.teamvoided.dusk_debris.data.gen.providers
 
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider
+import net.minecraft.block.Blocks
 import net.minecraft.data.client.ItemModelGenerator
 import net.minecraft.data.client.model.*
 import net.minecraft.util.Identifier
@@ -14,6 +15,7 @@ import org.teamvoided.dusk_debris.item.DuskItemLists
 import org.teamvoided.dusk_debris.util.*
 import org.teamvoided.dusk_debris.util.model_helper.bubbleBlock
 import org.teamvoided.dusk_debris.util.model_helper.bubbleBlossomBlock
+import org.teamvoided.dusk_debris.util.model_helper.carpetStairs
 
 class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
 
@@ -51,6 +53,8 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
         DuskBlockLists.GUNPOWDER_BARREL_BLOCK_LIST.forEach {
             gen.gunpowderBarrelBlock(it)
         }
+
+        gen.carpetStairs(DuskBlocks.RED_CARPET_STAIRS, Blocks.RED_WOOL)
 
         gen.fogCanyonModels()
 

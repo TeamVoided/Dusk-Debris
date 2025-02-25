@@ -12,10 +12,10 @@ object DuskEffects {
     fun init() = Unit
 
     val MADNESS = register("madness", MadnessEffect(StatusEffectType.HARMFUL, 0x3E1663))
+    private fun register(id: String, entry: StatusEffect): Holder<StatusEffect> =
+        Registry.registerHolder(Registries.STATUS_EFFECT, id(id), entry)
 
-    private fun register(id: String, entry: StatusEffect): Holder<StatusEffect> {
-        return Registry.registerHolder(Registries.STATUS_EFFECT, id(id), entry)
-    }
+
 //    fun modifyDamage(entity: LivingEntity, damage: Float): Float {
 //        var output = damage
 //        if (entity.hasStatusEffect(REDUCE))
