@@ -28,7 +28,7 @@ class ShiftedNoiseRange(
             else y2
 
         val x: Double = c.blockX() * this.horizontalScale + shiftX.compute(c)
-        val y: Double = y3 * this.horizontalScale + shiftY.compute(c)
+        val y: Double = y3 * this.verticalScale + shiftY.compute(c)
         val z: Double = c.blockZ() * this.horizontalScale + shiftZ.compute(c)
 
         return noise.sample(x, y, z)

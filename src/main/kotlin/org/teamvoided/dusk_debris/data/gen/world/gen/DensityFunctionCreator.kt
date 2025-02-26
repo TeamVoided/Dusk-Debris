@@ -11,9 +11,13 @@ import net.minecraft.world.gen.noise.NoiseParametersKeys
 import net.minecraft.world.gen.noise.NoiseRouter
 import net.minecraft.world.gen.noise.NoiseRouterData
 import org.teamvoided.dusk_debris.data.gen.world.gen.DensityFunctionCreator.cheeseMaker
+import org.teamvoided.dusk_debris.data.gen.world.gen.DensityFunctionCreator.netherNoiseRouter
+import org.teamvoided.dusk_debris.data.gen.world.gen.DensityFunctionCreator.noise
+import org.teamvoided.dusk_debris.data.gen.world.gen.DensityFunctionCreator.parameters
 import org.teamvoided.dusk_debris.data.gen.world.gen.DensityFunctionCreator.shapers
 import org.teamvoided.dusk_debris.data.worldgen.DuskDensityFunctions
 import org.teamvoided.dusk_debris.data.worldgen.DuskNoiseParametersKeys
+import org.teamvoided.dusk_debris.world.gen.density_functions.CheckerboardNoise
 import org.teamvoided.dusk_debris.world.gen.density_functions.DebugAxis
 import org.teamvoided.dusk_debris.world.gen.density_functions.Fold
 import org.teamvoided.dusk_debris.world.gen.density_functions.ShiftedNoiseRange
@@ -26,7 +30,7 @@ object DensityFunctionCreator {
         val densityFunctions = c.getRegistryLookup(RegistryKeys.DENSITY_FUNCTION)
         c.register(
             DuskDensityFunctions.EXAMPLE,
-            InterpolatedNoiseSampler.createUnseeded(0.25, 0.125, 80.0, 160.0, 8.0)
+            noise(c.noiseHold(DuskNoiseParametersKeys.EXAMPLE), 0.25, 0.0)
         )
         c.parameters()
         c.shapers()
@@ -85,15 +89,16 @@ object DensityFunctionCreator {
         this.register(
             DuskDensityFunctions.CONTINENTALNESS_NETHER,
             cacheOnce(
-                DebugAxis(Direction.Axis.Z, 100)
-//                shiftedNoiseRangeNether(
-//                    shiftX,
-//                    zero(),
-//                    shiftZ,
-//                    (1.0 / 3),
-//                    0.025,
-//                    this.noise(DuskNoiseParametersKeys.CONTINENTALNESS_NETHER)
-//                )
+//                constant(0.0)
+                //DebugAxis(Direction.Axis.Z, 100)
+                shiftedNoiseRangeNether(
+                    shiftX,
+                    zero(),
+                    shiftZ,
+                    (1.0 / 3),
+                    0.025,
+                    this.noise(DuskNoiseParametersKeys.CONTINENTALNESS_NETHER)
+                )
             )
         )
         this.register(
@@ -401,7 +406,22 @@ object DensityFunctionCreator {
         maxHeight: Int
     ): DensityFunction {
         return NoiseRouterData.slide(
-            this.dense(DuskDensityFunctions.SLOPED_CHEESE_NETHER),
+//            this.dense(DuskDensityFunctions.SLOPED_CHEESE_NETHER),
+            add(
+                CheckerboardNoise(
+                    this.dense(NoiseRouterData.SHIFT_X),
+                    zero(),
+                    this.dense(NoiseRouterData.SHIFT_Z),
+                    100.0,
+                    this.noise(DuskNoiseParametersKeys.EXAMPLE)
+                ),
+                clampedGradientY(
+                    0,
+                    256,
+                    1.0,
+                    -1.0
+                )
+            ),
             minHeight,
             maxHeight,
             24,

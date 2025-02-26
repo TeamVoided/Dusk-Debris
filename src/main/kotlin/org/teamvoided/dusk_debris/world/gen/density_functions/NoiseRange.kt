@@ -25,7 +25,7 @@ class NoiseRange(
             else y2
 
         val x: Double = c.blockX() * this.horizontalScale
-        val y: Double = y3 * this.horizontalScale
+        val y: Double = y3 * this.verticalScale
         val z: Double = c.blockZ() * this.horizontalScale
 
         return noise.sample(x, y, z)

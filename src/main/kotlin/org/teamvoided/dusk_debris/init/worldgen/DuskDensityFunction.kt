@@ -16,6 +16,7 @@ object DuskDensityFunction {
 //    val MIN_RANGE_CHOICE = register("min_range_choice", MinRangeChoice.CODEC)
 
     val DEBUG_AXIS = register("debug_axis", DebugAxis.CODEC)
+    val CHECKERBOARD_NOISE = register("checkerboard_noise", CheckerboardNoise.CODEC)
 
 
     fun init() {}
