@@ -9,11 +9,12 @@ import net.minecraft.world.gen.feature.TreeFeatureConfig
 import net.minecraft.world.gen.foliage.FoliagePlacer
 import net.minecraft.world.gen.foliage.FoliagePlacerType
 import org.teamvoided.dusk_debris.init.DuskWorldgen
+import org.teamvoided.dusk_debris.init.worldgen.trees.DuskTreeStuff
 
 class CypressFoliagePlacer(intProvider: IntProvider?, intProvider2: IntProvider?) :
     FoliagePlacer(intProvider, intProvider2) {
     override fun getType(): FoliagePlacerType<*> {
-        return DuskWorldgen.CYPRESS_FOLIAGE_PLACER
+        return DuskTreeStuff.CYPRESS_FOLIAGE_PLACER
     }
 
     override fun createFoliage(

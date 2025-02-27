@@ -3,8 +3,10 @@ package org.teamvoided.dusk_debris.data.gen.world.gen
 import net.minecraft.block.Block
 import net.minecraft.block.Blocks
 import net.minecraft.registry.BootstrapContext
+import net.minecraft.registry.RegistryKey
 import net.minecraft.registry.RegistryKeys
 import net.minecraft.util.math.VerticalSurfaceType
+import net.minecraft.util.math.noise.DoublePerlinNoiseSampler
 import net.minecraft.world.biome.Biomes
 import net.minecraft.world.gen.YOffset
 import net.minecraft.world.gen.chunk.ChunkGeneratorSettings
@@ -15,6 +17,7 @@ import net.minecraft.world.gen.surfacebuilder.SurfaceRules.*
 import org.teamvoided.dusk_debris.data.gen.world.gen.DensityFunctionCreator.createNether
 import org.teamvoided.dusk_debris.data.worldgen.DuskBiomes
 import org.teamvoided.dusk_debris.data.worldgen.DuskNoiseSettings
+import org.teamvoided.dusk_debris.world.gen.surface_rules.NoiseThresholdThreeMaterialCondition
 
 object NoiseSettingsGenerator {
     //ChunkGeneratorSettings
@@ -51,6 +54,13 @@ object NoiseSettingsGenerator {
         )
     }
 
+    fun noiseThresholdThree(
+        noise: RegistryKey<DoublePerlinNoiseSampler.NoiseParameters>,
+        minThreshold: Double,
+        maxThreshold: Double
+    ): MaterialCondition = NoiseThresholdThreeMaterialCondition(noise, minThreshold, maxThreshold)
+
+
     fun getNetherRules(): MaterialRule {
         val lava = block(Blocks.LAVA)
         val gravel = block(Blocks.GRAVEL)
@@ -83,7 +93,7 @@ object NoiseSettingsGenerator {
         val gravelLayer = noiseThreshold(NoiseParametersKeys.GRAVEL_LAYER, -0.012)
         val blackstoneStripsCondition =
             condition(
-                noiseThreshold(NoiseParametersKeys.CALCITE, -0.0125, 0.0125),
+                noiseThresholdThree(NoiseParametersKeys.CALCITE, -0.0125, 0.0125),
                 blackstone
             )
         val patch = noiseThreshold(NoiseParametersKeys.PATCH, -0.012)
@@ -117,16 +127,17 @@ object NoiseSettingsGenerator {
             not(
                 basaltDelta
             ),
-            sequence(
-                condition(
-                    stoneDepth(0, true, VerticalSurfaceType.FLOOR),
-                    blackstoneStripsCondition
-                ),
-                condition(
-                    stoneDepth(0, true, VerticalSurfaceType.CEILING),
-                    blackstoneStripsCondition
-                )
-            )
+            blackstoneStripsCondition
+//            sequence(
+//                condition(
+//                    stoneDepth(0, true, VerticalSurfaceType.FLOOR),
+//                    blackstoneStripsCondition
+//                ),
+//                condition(
+//                    stoneDepth(0, true, VerticalSurfaceType.CEILING),
+//                    blackstoneStripsCondition
+//                )
+//            )
         )
         val soulValleySurface = condition(
             soulValley,

@@ -58,3 +58,11 @@ accessible class net/minecraft/world/gen/DensityFunctions$PureTransformer
 accessible field net/minecraft/block/TrialSpawnerData currentMobs Ljava/util/Set;
 
 accessible method net/minecraft/world/gen/PillagerSpawner spawnPillager (Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/random/RandomGenerator;Z)Z
+
+accessible class net/minecraft/world/gen/surfacebuilder/SurfaceRules$Context
+accessible field net/minecraft/world/gen/surfacebuilder/SurfaceRules$Context x I
+accessible field net/minecraft/world/gen/surfacebuilder/SurfaceRules$Context y I
+accessible field net/minecraft/world/gen/surfacebuilder/SurfaceRules$Context z I
+accessible class net/minecraft/world/gen/surfacebuilder/SurfaceRules$LazyHorizontalCondition
+accessible class net/minecraft/world/gen/surfacebuilder/SurfaceRules$Condition
+accessible field net/minecraft/world/gen/surfacebuilder/SurfaceRules$Context randomState Lnet/minecraft/world/gen/RandomState;

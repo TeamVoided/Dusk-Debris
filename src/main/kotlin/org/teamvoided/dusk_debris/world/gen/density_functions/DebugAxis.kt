@@ -21,13 +21,13 @@ class DebugAxis(
 
     override fun compute(c: DensityFunction.FunctionContext): Double {
         val axis = when (axis) {
-            Direction.Axis.X -> kotlin.math.abs(c.blockX())
-            Direction.Axis.Y -> kotlin.math.abs(c.blockY())
-            Direction.Axis.Z -> kotlin.math.abs(c.blockZ())
+            Direction.Axis.X -> abs(c.blockX())
+            Direction.Axis.Y -> abs(c.blockY())
+            Direction.Axis.Z -> abs(c.blockZ())
         }
 
         val p = period
-        val the = 2 * kotlin.math.abs(((axis / p) % 2.0) - 1) - 1
+        val the = 2 * abs((((axis + p) / p) % 2.0) - 1) - 1
         return the  // abs(a * ((axis / p) % 2.0) - a) - (a / 2.0)
     }
 

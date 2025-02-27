@@ -24,6 +24,7 @@ import org.teamvoided.dusk_debris.world.gen.density_functions.ShiftedNoiseRange
 import org.teamvoided.dusk_debris.world.gen.terrain_parameters.NetherTerrainParametersCreator
 
 object DensityFunctionCreator {
+    private val debug = true
 
     fun bootstrap(c: BootstrapContext<DensityFunction>) {
         val noiseParameters = c.getRegistryLookup(RegistryKeys.NOISE_PARAMETERS)
@@ -104,8 +105,7 @@ object DensityFunctionCreator {
         this.register(
             DuskDensityFunctions.EROSION_NETHER,
             cacheOnce(
-                constant(0.0)
-//                DebugAxis(Direction.Axis.Z, 100)
+                DebugAxis(Direction.Axis.Z, 100)
 //                shiftedNoiseRangeNether(
 //                    shiftX,
 //                    zero(),
@@ -129,10 +129,11 @@ object DensityFunctionCreator {
                 )
             )
         )
+        val rangesDebug = 100
         this.register(
             DuskDensityFunctions.RIDGES_NETHER,
             cacheOnce(
-                DebugAxis(Direction.Axis.X, 100)
+                DebugAxis(Direction.Axis.X, rangesDebug * 3)
 //                shiftedNoiseRangeNether(
 //                    shiftX,
 //                    zero(),
@@ -145,11 +146,10 @@ object DensityFunctionCreator {
         )
         this.register(
             DuskDensityFunctions.RIDGES_FOLDED_NETHER,
+            DebugAxis(Direction.Axis.X, rangesDebug)
 //            Fold(
-            add(
-                constant(0.0),
-                this.dense(DuskDensityFunctions.RIDGES_NETHER)
-            )
+//                this.dense(DuskDensityFunctions.RIDGES_NETHER)
+//            )
         )
         this.register(
             DuskDensityFunctions.DEPTH_FLOOR_NETHER,
@@ -278,6 +278,7 @@ object DensityFunctionCreator {
                         continents,
                         erosion,
                         ridgesFolded,
+                        ridges,
                         amplified
                     )
                 )
@@ -406,22 +407,7 @@ object DensityFunctionCreator {
         maxHeight: Int
     ): DensityFunction {
         return NoiseRouterData.slide(
-//            this.dense(DuskDensityFunctions.SLOPED_CHEESE_NETHER),
-            add(
-                CheckerboardNoise(
-                    this.dense(NoiseRouterData.SHIFT_X),
-                    zero(),
-                    this.dense(NoiseRouterData.SHIFT_Z),
-                    100.0,
-                    this.noise(DuskNoiseParametersKeys.EXAMPLE)
-                ),
-                clampedGradientY(
-                    0,
-                    256,
-                    1.0,
-                    -1.0
-                )
-            ),
+            this.dense(DuskDensityFunctions.SLOPED_CHEESE_NETHER),
             minHeight,
             maxHeight,
             24,

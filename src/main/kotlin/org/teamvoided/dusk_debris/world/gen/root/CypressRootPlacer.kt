@@ -15,6 +15,7 @@ import net.minecraft.world.gen.root.RootPlacer
 import net.minecraft.world.gen.root.RootPlacerType
 import net.minecraft.world.gen.stateprovider.BlockStateProvider
 import org.teamvoided.dusk_debris.init.DuskWorldgen
+import org.teamvoided.dusk_debris.init.worldgen.trees.DuskTreeStuff
 import org.teamvoided.dusk_debris.util.isInSet
 import org.teamvoided.dusk_debris.util.isInTag
 import org.teamvoided.dusk_debris.world.gen.root.config.CypressRootConfig
@@ -78,7 +79,7 @@ class CypressRootPlacer(
         }
     }
 
-    override fun getType(): RootPlacerType<CypressRootPlacer> = DuskWorldgen.CYPRESS_ROOT_PLACER
+    override fun getType(): RootPlacerType<CypressRootPlacer> = DuskTreeStuff.CYPRESS_ROOT_PLACER
 
     companion object {
         const val MAX_ROOT_LENGTH: Int = 15

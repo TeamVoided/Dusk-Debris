@@ -4,10 +4,15 @@ import com.mojang.serialization.Codec
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.minecraft.util.dynamic.CodecHolder
+import net.minecraft.util.math.MathHelper
+import net.minecraft.util.math.MathHelper.lerp
 import net.minecraft.world.gen.DensityFunction
 import net.minecraft.world.gen.DensityFunction.ContextProvider
 import net.minecraft.world.gen.DensityFunctions
 import org.teamvoided.dusk_debris.util.world_helper.makeCodec
+import kotlin.math.abs
+import kotlin.math.ceil
+import kotlin.math.floor
 import kotlin.math.round
 
 class CheckerboardNoise(
@@ -15,45 +20,63 @@ class CheckerboardNoise(
     val shiftY: DensityFunction,
     val shiftZ: DensityFunction,
     val horizontalSize: Double,
-    val verticalScale: Double,
     val transitionPercent: Double,
     val noise: DensityFunction.NoiseHolder
 ) : DensityFunction {
 
     override fun compute(c: DensityFunction.FunctionContext): Double {
         if (horizontalSize != 1.0 && transitionPercent != 0.0) {
-            val trans = transitionPercent / 2
-            val transX = ((c.blockX() / horizontalSize) % 1)
+            val y: Double = 0.0//c.blockY() + shiftY.compute(c)
+            val xFloor: Double = checkerboardFloor(c.blockX(), horizontalSize, shiftX.compute(c))
+            val zFloor: Double = checkerboardFloor(c.blockZ(), horizontalSize, shiftZ.compute(c))
+            val xCeil: Double = checkerboardCeil(c.blockX(), horizontalSize, shiftX.compute(c))
+            val zCeil: Double = checkerboardCeil(c.blockZ(), horizontalSize, shiftZ.compute(c))
 
+            val noiseXFZF = noise.sample(xFloor, y, zFloor)
+            val noiseXCZF = noise.sample(xCeil, y, zFloor)
+            val noiseXFZC = noise.sample(xFloor, y, zCeil)
+            val noiseXCZC = noise.sample(xCeil, y, zCeil)
 
-            if (transX < trans) {
-
-            } else if (transX > 1 - trans) {
-                val x: Double = checkerboard(c.blockX(), horizontalSize, shiftX.compute(c))
-//                val x1: Double = checkerboard()
+            val xLerp: Double
+            val zLerp: Double
+            if (transitionPercent != 1.0) {
+                xLerp = lerpNum(c.blockX(), (shiftX.compute(c) / 20))
+                zLerp = lerpNum(c.blockZ(), (shiftZ.compute(c) / 20))
             } else {
-
+                xLerp = (((c.blockX() % horizontalSize) / horizontalSize))
+                zLerp = (((c.blockZ() % horizontalSize) / horizontalSize))
             }
+
+            val lerpXF = MathHelper.clampedLerp(noiseXFZF, noiseXCZF, xLerp)
+            val lerpXC = MathHelper.clampedLerp(noiseXFZC, noiseXCZC, xLerp)
+            val lerpZ = MathHelper.clampedLerp(lerpXF, lerpXC, zLerp)
+
+            return lerpZ
+        } else {
+            val x: Double = checkerboardFloor(c.blockX(), horizontalSize, shiftX.compute(c))
+            val y: Double = c.blockY() + shiftY.compute(c)
+            val z: Double = checkerboardFloor(c.blockZ(), horizontalSize, shiftZ.compute(c))
+            return noise.sample(x, y, z)
         }
-
-
-        val x: Double = checkerboard(c.blockX(), horizontalSize, shiftX.compute(c))
-        val y: Double = c.blockY() + shiftY.compute(c)
-        val z: Double = checkerboard(c.blockZ(), horizontalSize, shiftZ.compute(c))
-        val noise1 = noise.sample(x, y, z)
-
-//        if (horizontalScale != 1.0) {
-//            if (((c.blockX() / horizontalScale) % 1) > threshold) {
-//                val noisex = noise.sample(x, y, z)
-//
-//            }
-//        }
-
-        return noise1
     }
 
-    private fun checkerboard(pos: Int, scale: Double, shift: Double): Double {
-        return scale * round((pos + shift) / scale)
+    fun lerpNum(posAxis: Int, shift: Double): Double {
+        val tP = 0.5
+        val mod = (((posAxis % horizontalSize) / horizontalSize) + shift)
+        val sub = horizontalSize * ((1 - tP) / 2)
+        return (mod - sub) / (horizontalSize * tP)
+    }
+
+//    private fun checkerboard(pos: Int, scale: Double, shift: Double): Double {
+//        return scale * round((pos) / scale)
+//    }
+
+    private fun checkerboardFloor(pos: Int, scale: Double, shift: Double): Double {
+        return scale * floor((pos) / scale)
+    }
+
+    private fun checkerboardCeil(pos: Int, scale: Double, shift: Double): Double {
+        return scale * ceil((pos) / scale)
     }
 
     override fun fillArray(array: DoubleArray, context: ContextProvider) = context.fillAllDirectly(array, this)
@@ -65,7 +88,6 @@ class CheckerboardNoise(
                 shiftY.mapAll(visitor),
                 shiftZ.mapAll(visitor),
                 horizontalSize,
-                verticalScale,
                 transitionPercent,
                 visitor.visitNoise(this.noise)
             )
@@ -89,7 +111,6 @@ class CheckerboardNoise(
                     DensityFunction.HOLDER_HELPER_CODEC.fieldOf("shift_y").forGetter { it.shiftY },
                     DensityFunction.HOLDER_HELPER_CODEC.fieldOf("shift_z").forGetter { it.shiftZ },
                     RANGE_BIG.fieldOf("xz_size").forGetter { it.horizontalSize },
-                    RANGE_BIG.fieldOf("y_scale").orElse(1.0).forGetter { it.verticalScale },
                     RANGE_SMALL.fieldOf("y_scale").orElse(0.0).forGetter { it.transitionPercent },
                     DensityFunction.NoiseHolder.CODEC.fieldOf("noise").forGetter { it.noise })
                     .apply(instance, ::CheckerboardNoise)

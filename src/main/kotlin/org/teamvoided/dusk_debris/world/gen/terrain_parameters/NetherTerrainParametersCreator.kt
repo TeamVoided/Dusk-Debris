@@ -40,6 +40,7 @@ object NetherTerrainParametersCreator {
         continents: I,
         erosion: I,
         ridgesFolded: I,
+        ridges: I,
         amplified: Boolean = false
     ): Spline<C, I> {
         val amplifiedTransformer = if (amplified) OFFSET_AMPLIFIED else NO_TRANSFORM
@@ -61,10 +62,10 @@ object NetherTerrainParametersCreator {
 //            .add(WARPED_ISLAND, nFloor(180))
 //            .add(LAVA_OCEAN_DEEP, nFloor(-18))
 //            .add(LAVA_OCEAN, nFloor(24))
-            .add(SHORELINE, shoreline)
-            .add(OUTLAND, outlandSpline)
+//            .add(SHORELINE, shoreline)
+//            .add(OUTLAND, outlandSpline)
             .add(INLAND, midlandSpline)
-            .add(INLAND_EXTREME, inlandSpline)
+//            .add(INLAND_EXTREME, inlandSpline)
             .build()
     }
 
@@ -118,13 +119,18 @@ object NetherTerrainParametersCreator {
         ridgesFolded: I,
         amplifier: ToFloatFunction<Float>
     ): Spline<C, I> {
-        val spline = Spline.builder(ridgesFolded, amplifier)
-            .add(-1f, nFloor(24), 0.2f)
-            .add(-0.8f, nFloor(32), 0.2f)
-            .add(-0.5f, nFloor(38) * continents, 0.4f * continents)
-            .add(-0.25f, nFloor(64) * continents, 0.4f * continents)
-            .add(0.5f, nFloor(70) * continents, 0.4f * continents)
-            .add(0.8f, nFloor(128) * continents, 0.4f * continents)
+        val shelf = Spline.builder(ridgesFolded, amplifier)
+            .add(-1f, nFloor(24))
+            .add(-0.8f, nFloor(32))
+            .add(-0.5f, nFloor(38) * continents)
+            .add(-0.25f, nFloor(64) * continents)
+            .add(0.5f, nFloor(70) * continents)
+            .add(0.8f, nFloor(128) * continents)
+            .build()
+        val tallMountain = createMountain(0, (200 * continents).toInt(), ridgesFolded, amplifier)
+        val spline = Spline.builder(erosion, amplifier)
+            .add(0f, shelf)
+            .add(0.75f, tallMountain)
         return spline.build()
     }
 
@@ -139,6 +145,37 @@ object NetherTerrainParametersCreator {
 //        }
 //        return spline.build()
 //    }
+
+    private fun <C, I : ToFloatFunction<C>> createMountain(
+        valley: Int,
+        peak: Int,
+        ridgesFolded: I,
+        amplifier: ToFloatFunction<Float>
+    ): Spline<C, I> {
+        val valley1 = nFloor(valley)
+        val peak1 = nFloor(peak)
+
+        val slope = calculateSlope(peak1, valley1, 1f, -1f)
+
+        val spline = Spline.builder(ridgesFolded, amplifier)
+            .add(-1f, valley1, slope)
+            .add(1f, peak1, slope)
+        return spline.build()
+    }
+
+    private fun <C, I : ToFloatFunction<C>> createAlternate(
+        positive: Spline<C, I>,
+        negative: Spline<C, I>,
+        ridgesFolded: I,
+        ridges: I,
+        amplifier: ToFloatFunction<Float>
+    ): Spline<C, I> {
+        val spline = Spline.builder(ridges, amplifier)
+            .add(-0.1f, positive)
+            .add(0.1f, negative)
+        return spline.build()
+    }
+
 
     private fun calculateSlope(value1: Float, value2: Float, point1: Float, point2: Float): Float {
         return (value2 - value1) / (point2 - point1)
