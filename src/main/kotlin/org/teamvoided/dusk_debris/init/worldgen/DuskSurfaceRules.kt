@@ -6,13 +6,8 @@ import net.minecraft.registry.Registry
 import net.minecraft.util.dynamic.CodecHolder
 import net.minecraft.world.gen.surfacebuilder.SurfaceRules.*
 import org.teamvoided.dusk_debris.DuskDebris.id
-import org.teamvoided.dusk_debris.world.gen.surface_rules.NoiseThresholdThreeMaterialCondition
 
 object DuskSurfaceRules {
-
-    val threeDNoiseThresholdCondition =
-        registerC("noise_threshold_3_condition", NoiseThresholdThreeMaterialCondition.CONDITION_CODEC)
-
 
     fun init() {}
 

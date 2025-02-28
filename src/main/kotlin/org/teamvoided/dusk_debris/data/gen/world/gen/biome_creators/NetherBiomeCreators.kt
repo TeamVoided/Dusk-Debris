@@ -11,10 +11,12 @@ import net.minecraft.sound.BiomeMoodSound
 import net.minecraft.sound.SoundEvents
 import net.minecraft.world.biome.*
 import net.minecraft.world.gen.GenerationStep
+import net.minecraft.world.gen.GenerationStep.Feature.LOCAL_MODIFICATIONS as lm2
 import net.minecraft.world.gen.GenerationStep.Feature.UNDERGROUND_DECORATION as ud7
 import net.minecraft.world.gen.feature.MiscPlacedFeatures
 import net.minecraft.world.gen.feature.NetherPlacedFeatures
 import org.teamvoided.dusk_debris.data.gen.world.gen.biome_creators.features.NetherBiomeFeatures
+import org.teamvoided.dusk_debris.data.worldgen.DuskPlacedFeatures
 
 object NetherBiomeCreators {
     fun BootstrapContext<Biome>.createNetherWastes(): Biome {
@@ -181,6 +183,7 @@ object NetherBiomeCreators {
         generationSettings.feature(ud7, NetherPlacedFeatures.GLOWSTONE_EXTRA)
         generationSettings.feature(ud7, NetherPlacedFeatures.GLOWSTONE)
         generationSettings.feature(ud7, NetherPlacedFeatures.PATCH_CRIMSON_ROOTS)
+        generationSettings.feature(lm2, DuskPlacedFeatures.BLACKSTONE_STRIPS)
         return Biome.Builder()
             .hasPrecipitation(false)
             .temperature(2.0f)

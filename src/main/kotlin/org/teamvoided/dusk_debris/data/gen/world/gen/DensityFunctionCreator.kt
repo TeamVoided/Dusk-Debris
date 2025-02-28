@@ -3,28 +3,24 @@ package org.teamvoided.dusk_debris.data.gen.world.gen
 import net.minecraft.registry.*
 import net.minecraft.util.math.Direction
 import net.minecraft.util.math.noise.DoublePerlinNoiseSampler.*
-import net.minecraft.util.math.noise.InterpolatedNoiseSampler
 import net.minecraft.world.gen.DensityFunction
 import net.minecraft.world.gen.DensityFunction.*
 import net.minecraft.world.gen.DensityFunctions.*
 import net.minecraft.world.gen.noise.NoiseParametersKeys
 import net.minecraft.world.gen.noise.NoiseRouter
 import net.minecraft.world.gen.noise.NoiseRouterData
-import org.teamvoided.dusk_debris.data.gen.world.gen.DensityFunctionCreator.cheeseMaker
-import org.teamvoided.dusk_debris.data.gen.world.gen.DensityFunctionCreator.netherNoiseRouter
-import org.teamvoided.dusk_debris.data.gen.world.gen.DensityFunctionCreator.noise
-import org.teamvoided.dusk_debris.data.gen.world.gen.DensityFunctionCreator.parameters
-import org.teamvoided.dusk_debris.data.gen.world.gen.DensityFunctionCreator.shapers
 import org.teamvoided.dusk_debris.data.worldgen.DuskDensityFunctions
 import org.teamvoided.dusk_debris.data.worldgen.DuskNoiseParametersKeys
-import org.teamvoided.dusk_debris.world.gen.density_functions.CheckerboardNoise
 import org.teamvoided.dusk_debris.world.gen.density_functions.DebugAxis
 import org.teamvoided.dusk_debris.world.gen.density_functions.Fold
 import org.teamvoided.dusk_debris.world.gen.density_functions.ShiftedNoiseRange
 import org.teamvoided.dusk_debris.world.gen.terrain_parameters.NetherTerrainParametersCreator
 
 object DensityFunctionCreator {
-    private val debug = true
+    private val debug: String? = "erosion"
+    private const val LAVA = false
+    private const val RANGES_DEBUG_WIDTH = 200
+    private const val DEBUG_WIDTH = 200
 
     fun bootstrap(c: BootstrapContext<DensityFunction>) {
         val noiseParameters = c.getRegistryLookup(RegistryKeys.NOISE_PARAMETERS)
@@ -90,30 +86,41 @@ object DensityFunctionCreator {
         this.register(
             DuskDensityFunctions.CONTINENTALNESS_NETHER,
             cacheOnce(
-//                constant(0.0)
-                //DebugAxis(Direction.Axis.Z, 100)
-                shiftedNoiseRangeNether(
-                    shiftX,
-                    zero(),
-                    shiftZ,
-                    (1.0 / 3),
-                    0.025,
-                    this.noise(DuskNoiseParametersKeys.CONTINENTALNESS_NETHER)
-                )
+                if (debug != null) {
+                    if (debug == "continent")
+                        DebugAxis(Direction.Axis.Z, DEBUG_WIDTH)
+                    else
+                        constant(0.0)
+                } else {
+                    shiftedNoiseRangeNether(
+                        shiftX,
+                        zero(),
+                        shiftZ,
+                        (1.0 / 3),
+                        0.025,
+                        this.noise(DuskNoiseParametersKeys.CONTINENTALNESS_NETHER)
+                    )
+                }
             )
         )
         this.register(
             DuskDensityFunctions.EROSION_NETHER,
             cacheOnce(
-                DebugAxis(Direction.Axis.Z, 100)
-//                shiftedNoiseRangeNether(
-//                    shiftX,
-//                    zero(),
-//                    shiftZ,
-//                    0.25,
-//                    0.025,
-//                    this.noise(DuskNoiseParametersKeys.EROSION_NETHER)
-//                )
+                if (debug != null) {
+                    if (debug == "erosion")
+                        DebugAxis(Direction.Axis.Z, DEBUG_WIDTH)
+                    else
+                        constant(0.0)
+                } else {
+                    shiftedNoiseRangeNether(
+                        shiftX,
+                        zero(),
+                        shiftZ,
+                        0.25,
+                        0.025,
+                        this.noise(DuskNoiseParametersKeys.EROSION_NETHER)
+                    )
+                }
             )
         )
         this.register(
@@ -129,27 +136,34 @@ object DensityFunctionCreator {
                 )
             )
         )
-        val rangesDebug = 100
         this.register(
             DuskDensityFunctions.RIDGES_NETHER,
             cacheOnce(
-                DebugAxis(Direction.Axis.X, rangesDebug * 3)
-//                shiftedNoiseRangeNether(
-//                    shiftX,
-//                    zero(),
-//                    shiftZ,
-//                    0.25,
-//                    0.0075,
-//                    this.noise(DuskNoiseParametersKeys.RIDGE_NETHER),
-//                )
+                if (debug != null) {
+                    DebugAxis(Direction.Axis.X, RANGES_DEBUG_WIDTH * 2)
+                } else {
+                    shiftedNoiseRangeNether(
+                        shiftX,
+                        zero(),
+                        shiftZ,
+                        0.25,
+                        0.0075,
+                        this.noise(DuskNoiseParametersKeys.RIDGE_NETHER),
+                    )
+                }
             )
         )
         this.register(
             DuskDensityFunctions.RIDGES_FOLDED_NETHER,
-            DebugAxis(Direction.Axis.X, rangesDebug)
-//            Fold(
-//                this.dense(DuskDensityFunctions.RIDGES_NETHER)
-//            )
+            cacheOnce(
+                if (debug != null) {
+                    DebugAxis(Direction.Axis.X, RANGES_DEBUG_WIDTH)
+                } else {
+                    Fold(
+                        this.dense(DuskDensityFunctions.RIDGES_NETHER)
+                    )
+                }
+            )
         )
         this.register(
             DuskDensityFunctions.DEPTH_FLOOR_NETHER,
@@ -336,16 +350,22 @@ object DensityFunctionCreator {
         val jagged = multiply(jaggednessSpline, jaggednessFunction.halfNegative())
         val depthAndJaggedness = NoiseRouterData.noiseGradientDensity(
             factorSpline,
-//            max(
-            add(depthFunction, jagged),
-//                maxRangeChoice(this.dense(DuskDensityFunctions.NETHER_PILLARS), 0.03)
-//            )
+            if (debug != null) {
+                add(depthFunction, jagged)
+            } else {
+                max(
+                    add(depthFunction, jagged),
+                    maxRangeChoice(this.dense(DuskDensityFunctions.NETHER_PILLARS), 0.03)
+                )
+            }
         )
         this.register(
             cheeseKey,
-//            add(
-            depthAndJaggedness
-//                , this.dense(NoiseRouterData.BASE_3D_NOISE_NETHER))
+            if (debug != null) {
+                depthAndJaggedness
+            } else {
+                add(depthAndJaggedness, this.dense(NoiseRouterData.BASE_3D_NOISE_NETHER))
+            }
         )
     }
 
@@ -367,7 +387,7 @@ object DensityFunctionCreator {
     ): NoiseRouter {
         return NoiseRouter(
             zero(),
-            zero(),//  this.dense(DuskDensityFunctions.LAVA_LEVEL),
+            if (LAVA) this.dense(DuskDensityFunctions.LAVA_LEVEL) else zero(),
             zero(),
             constant(6.0),
             this.dense(

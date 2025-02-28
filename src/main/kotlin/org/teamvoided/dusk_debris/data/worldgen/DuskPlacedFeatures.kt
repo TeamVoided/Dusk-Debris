@@ -22,6 +22,9 @@ object DuskPlacedFeatures {
     val CRIMSON_PURPLE_NETHERSHROOM_PATCH = create("nether/crimson_purple_nethershroom_patch")
     val PURPLE_NETHERSHROOM_PATCH = create("nether/purple_nethershroom_patch")
 
+    val BLACKSTONE_STRIPS = create("nether/blackstone_strips")
+
+
     val TORUS = create("torus")
     val OVERWORLD_TORUS = create("overworld_torus")
 

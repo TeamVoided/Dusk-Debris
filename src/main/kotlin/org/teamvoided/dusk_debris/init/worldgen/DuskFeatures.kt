@@ -5,10 +5,7 @@ import net.minecraft.registry.Registry
 import net.minecraft.world.gen.feature.*
 import org.teamvoided.dusk_debris.DuskDebris.id
 import org.teamvoided.dusk_debris.world.gen.configured_feature.*
-import org.teamvoided.dusk_debris.world.gen.configured_feature.config.HugeNethershroomFeatureConfig
-import org.teamvoided.dusk_debris.world.gen.configured_feature.config.GlassSpikeFeatureConfig
-import org.teamvoided.dusk_debris.world.gen.configured_feature.config.NoiseFeatureConfig
-import org.teamvoided.dusk_debris.world.gen.configured_feature.config.TorusFeatureConfig
+import org.teamvoided.dusk_debris.world.gen.configured_feature.config.*
 
 object DuskFeatures {
 
@@ -23,7 +20,10 @@ object DuskFeatures {
 
     val SEQUOIA_TREE = register("sequoia_tree", SequoiaTreeFeature(DefaultFeatureConfig.CODEC))
 
+    val NOISE_SURFACE = register("noise_surface", NoiseSurfaceFeature(NoiseSurfaceFeatureConfig.CODEC))
+
     fun init() {}
+
     private fun <C : FeatureConfig?, F : Feature<C>> register(name: String, feature: F): F =
         Registry.register(Registries.FEATURE, id(name), feature)
 }

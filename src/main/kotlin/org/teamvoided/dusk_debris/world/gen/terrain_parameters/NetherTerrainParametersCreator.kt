@@ -3,7 +3,7 @@ package org.teamvoided.dusk_debris.world.gen.terrain_parameters
 import net.minecraft.util.function.ToFloatFunction
 import net.minecraft.util.math.Spline
 import org.teamvoided.dusk_debris.util.world_helper.add
-import kotlin.math.round
+import org.teamvoided.dusk_debris.world.gen.terrain_parameters.nether.OffsetFloor
 
 object NetherTerrainParametersCreator {
     private var NO_TRANSFORM: ToFloatFunction<Float> = ToFloatFunction.IDENTITY
@@ -33,9 +33,6 @@ object NetherTerrainParametersCreator {
     private var JAGGEDNESS_AMPLIFIED: ToFloatFunction<Float> =
         ToFloatFunction.createUnlimited { it * 2.0f }
 
-    fun NetherTerrainParametersCreator() {
-    }
-
     fun <C, I : ToFloatFunction<C>> offsetFloorSpline(
         continents: I,
         erosion: I,
@@ -45,17 +42,13 @@ object NetherTerrainParametersCreator {
     ): Spline<C, I> {
         val amplifiedTransformer = if (amplified) OFFSET_AMPLIFIED else NO_TRANSFORM
 
-        val shoreline = offsetFloor(0.2f, erosion, ridgesFolded, amplifiedTransformer)
-        val outlandSpline = offsetFloor(0.6f, erosion, ridgesFolded, amplifiedTransformer)
-        val midlandSpline = offsetFloor(1f, erosion, ridgesFolded, amplifiedTransformer)
-        val inlandSpline = offsetFloor(1.2f, erosion, ridgesFolded, amplifiedTransformer)
+        val warpedIsland = OffsetFloor.createWarpedIsland(ridgesFolded, amplifiedTransformer)
+        val shoreline = offsetFloor(0.7f, erosion, ridges, ridgesFolded, amplifiedTransformer)
+        val outlandSpline = offsetFloor(0.8f, erosion, ridges, ridgesFolded, amplifiedTransformer)
+        val midlandSpline = offsetFloor(1f, erosion, ridges, ridgesFolded, amplifiedTransformer)
+        val inlandSpline = offsetFloor(1.2f, erosion, ridges, ridgesFolded, amplifiedTransformer)
 
 
-        val warpedIsland = Spline.builder(ridgesFolded, amplifiedTransformer)
-            .add(-1f, nFloor(24), 0.2f)
-            .add(-0.5f, nFloor(38), 0.4f)
-            .add(0.25f, nFloor(64), 0.4f)
-            .add(0.8f, nFloor(128), 0.4f)
 
         //OFFSET CONTINENTALNESS
         return Spline.builder(continents, amplifiedTransformer)
@@ -93,9 +86,12 @@ object NetherTerrainParametersCreator {
         amplified: Boolean
     ): Spline<C, I> {
         val amplifiedTransformer = if (amplified) FACTOR_AMPLIFIED else NO_TRANSFORM
-        val spline = Spline.builder(erosion, amplifiedTransformer)
-            .add(0f, 7f)
-        return spline.build()
+        val jaggedErosion = Spline.builder(erosion, amplifiedTransformer)
+            .add(0f, 3f)
+        val jaggedRidgesFolded = Spline.builder(ridgesFolded, amplifiedTransformer)
+            .add(-0.9f, 6f)
+            .add(-0.8f, jaggedErosion.build())
+        return jaggedRidgesFolded.build()
     }
 
     fun <C, I : ToFloatFunction<C>> jaggednessSpline(
@@ -114,80 +110,35 @@ object NetherTerrainParametersCreator {
     }
 
     private fun <C, I : ToFloatFunction<C>> offsetFloor(
-        continents: Float,
+        mult: Float,
         erosion: I,
-        ridgesFolded: I,
-        amplifier: ToFloatFunction<Float>
-    ): Spline<C, I> {
-        val shelf = Spline.builder(ridgesFolded, amplifier)
-            .add(-1f, nFloor(24))
-            .add(-0.8f, nFloor(32))
-            .add(-0.5f, nFloor(38) * continents)
-            .add(-0.25f, nFloor(64) * continents)
-            .add(0.5f, nFloor(70) * continents)
-            .add(0.8f, nFloor(128) * continents)
-            .build()
-        val tallMountain = createMountain(0, (200 * continents).toInt(), ridgesFolded, amplifier)
-        val spline = Spline.builder(erosion, amplifier)
-            .add(0f, shelf)
-            .add(0.75f, tallMountain)
-        return spline.build()
-    }
-
-//    private fun <C, I : ToFloatFunction<C>> spline(
-//        densityFunction: I,
-//        amplifier: ToFloatFunction<Float>,
-//        vararg splines: Pair<Float, Float>
-//    ): Spline<C, I> {
-//        val spline = Spline.builder(densityFunction, amplifier)
-//        splines.forEach {
-//            spline.add(it.first, it.second)
-//        }
-//        return spline.build()
-//    }
-
-    private fun <C, I : ToFloatFunction<C>> createMountain(
-        valley: Int,
-        peak: Int,
-        ridgesFolded: I,
-        amplifier: ToFloatFunction<Float>
-    ): Spline<C, I> {
-        val valley1 = nFloor(valley)
-        val peak1 = nFloor(peak)
-
-        val slope = calculateSlope(peak1, valley1, 1f, -1f)
-
-        val spline = Spline.builder(ridgesFolded, amplifier)
-            .add(-1f, valley1, slope)
-            .add(1f, peak1, slope)
-        return spline.build()
-    }
-
-    private fun <C, I : ToFloatFunction<C>> createAlternate(
-        positive: Spline<C, I>,
-        negative: Spline<C, I>,
-        ridgesFolded: I,
         ridges: I,
+        ridgesFolded: I,
         amplifier: ToFloatFunction<Float>
     ): Spline<C, I> {
-        val spline = Spline.builder(ridges, amplifier)
-            .add(-0.1f, positive)
-            .add(0.1f, negative)
+        val tallMountain = OffsetFloor.createMountain(24, (200 * mult).toInt(), ridgesFolded, amplifier)
+        val mountain = OffsetFloor.createMountain(24, (180 * mult).toInt(), ridgesFolded, amplifier)
+        val plateau = OffsetFloor.createPlateau(mult, ridgesFolded, amplifier)
+        val shelf = OffsetFloor.createShelfs(mult, ridgesFolded, amplifier)
+        val flats = OffsetFloor.createFlats(mult, ridgesFolded, amplifier)
+        val spline = Spline.builder(erosion, amplifier)
+            .add(-1f, tallMountain)
+            .add(-.75f, mountain)
+            .add(-.4f, plateau)
+            .add(-.1f, shelf)
+            .add(.1f, shelf)
+            .add(.75f, flats)
         return spline.build()
     }
 
-
-    private fun calculateSlope(value1: Float, value2: Float, point1: Float, point2: Float): Float {
-        return (value2 - value1) / (point2 - point1)
-    }
-
-    private fun nFloor(inputY: Int): Float {
-        val output = ((inputY - SEA_OFFSET - 1f) / HIGHEST_LEVEL)
+    fun nFloor(inputY: Int): Float {
+        val output = ((inputY - SEA_OFFSET).toFloat() / HIGHEST_LEVEL)
+//        val output = ((inputY - SEA_OFFSET - 1f) / HIGHEST_LEVEL)
         return output//(round(10000f * output)) / 10000f
     }
 
-    private fun nCeil(inputY: Int): Float {
-        val output = ((inputY - ROOF_OFFSET - 1f) / HIGHEST_LEVEL)
+    fun nCeil(inputY: Int): Float {
+        val output = ((inputY - ROOF_OFFSET).toFloat() / HIGHEST_LEVEL)
         return output
     }
 }

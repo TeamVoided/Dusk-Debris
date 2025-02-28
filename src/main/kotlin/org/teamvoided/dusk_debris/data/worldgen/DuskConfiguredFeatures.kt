@@ -21,6 +21,7 @@ object DuskConfiguredFeatures {
     val HUGE_PURPLE_NETHERSHROOM = create("nether/huge_purple_nethershroom")
     val LARGE_PURPLE_NETHERSHROOM_PATCH = create("nether/large_purple_nethershroom_patch")
     val PURPLE_NETHERSHROOM_PATCH = create("nether/purple_nethershroom_patch")
+    val BLACKSTONE_STRIPS =  create("nether/blackstone_strips")
 
     val GLASS_SPIKE = create("glass_spike")
     val COBBLESTONE_TORUS = create("cobblestone_torus")
@@ -30,6 +31,8 @@ object DuskConfiguredFeatures {
 
     val BOREAL_VALLEY_VEGETATION = create("boreal_valley/boreal_valley_vegetation")
     val SEQUOIA_TREE = create("boreal_valley/sequoia_tree")
+
+
 
     private fun create(id: String): RegistryKey<ConfiguredFeature<*, *>> =
         RegistryKey.of(RegistryKeys.CONFIGURED_FEATURE, id(id))

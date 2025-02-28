@@ -16,6 +16,7 @@ import net.minecraft.world.gen.feature.ConfiguredFeature
 import net.minecraft.world.gen.feature.PlacedFeature
 import net.minecraft.world.gen.feature.PlacementModifier
 import net.minecraft.world.gen.feature.util.PlacedFeatureUtil
+import org.teamvoided.dusk_debris.data.gen.world.gen.placed_feature_creators.NetherPlacedFeatureCreators.netherPlacedFeatureCreators
 import org.teamvoided.dusk_debris.data.worldgen.DuskConfiguredFeatures
 import org.teamvoided.dusk_debris.data.worldgen.DuskPlacedFeatures
 import org.teamvoided.dusk_debris.data.tags.DuskBlockTags
@@ -25,7 +26,7 @@ object PlacedFeatureCreator {
     fun bootstrap(c: BootstrapContext<PlacedFeature>) {
 
         val configuredFeatureProvider = c.getRegistryLookup(RegistryKeys.CONFIGURED_FEATURE)
-
+        c.netherPlacedFeatureCreators()
 
         c.register(
             DuskPlacedFeatures.CYPRESS,
@@ -59,41 +60,7 @@ object PlacedFeatureCreator {
             BiomePlacementModifier.getInstance()
         )
 
-        c.register(
-            DuskPlacedFeatures.HUGE_BLUE_NETHERSHROOM,
-            configuredFeatureProvider.getHolderOrThrow(DuskConfiguredFeatures.HUGE_BLUE_NETHERSHROOM),
-            BlockPredicateFilterPlacementModifier.create(
-                BlockPredicate.matchingBlockTags(DuskBlockTags.NETHERSHROOM_GROWABLE_ON)
-            )
-        )
-        c.register(
-            DuskPlacedFeatures.HUGE_PURPLE_NETHERSHROOM,
-            configuredFeatureProvider.getHolderOrThrow(DuskConfiguredFeatures.HUGE_PURPLE_NETHERSHROOM),
-            BlockPredicateFilterPlacementModifier.create(
-                BlockPredicate.matchingBlockTags(DuskBlockTags.NETHERSHROOM_GROWABLE_ON)
-            )
-        )
 
-        c.registerNethershroomPlacement(
-            DuskPlacedFeatures.BLUE_NETHERSHROOM_PATCH,
-            DuskConfiguredFeatures.BLUE_NETHERSHROOM_PATCH,
-            RarityFilterPlacementModifier.create(7),
-        )
-        c.registerNethershroomPlacement(
-            DuskPlacedFeatures.WARPED_BLUE_NETHERSHROOM_PATCH,
-            DuskConfiguredFeatures.LARGE_BLUE_NETHERSHROOM_PATCH,
-            CountPlacementModifier.create(1),
-        )
-        c.registerNethershroomPlacement(
-            DuskPlacedFeatures.PURPLE_NETHERSHROOM_PATCH,
-            DuskConfiguredFeatures.PURPLE_NETHERSHROOM_PATCH,
-            RarityFilterPlacementModifier.create(7),
-        )
-        c.registerNethershroomPlacement(
-            DuskPlacedFeatures.CRIMSON_PURPLE_NETHERSHROOM_PATCH,
-            DuskConfiguredFeatures.LARGE_PURPLE_NETHERSHROOM_PATCH,
-            CountPlacementModifier.create(1),
-        )
 
         c.register(
             DuskPlacedFeatures.TORUS,
@@ -125,30 +92,6 @@ object PlacedFeatureCreator {
             SurfaceWaterDepthFilterPlacementModifier.create(0),
             PlacedFeatureUtil.OCEAN_FLOOR_HEIGHTMAP,
             BiomePlacementModifier.getInstance()
-        )
-    }
-
-    private fun BootstrapContext<PlacedFeature>.registerNethershroomPlacement(
-        registryKey: RegistryKey<PlacedFeature>,
-        configuredFeature: RegistryKey<ConfiguredFeature<*, *>>,
-        count: PlacementModifier
-    ) {
-        this.register(
-            registryKey,
-            this.getRegistryLookup(RegistryKeys.CONFIGURED_FEATURE).getHolderOrThrow(configuredFeature),
-            listOf(
-                count,
-                InSquarePlacementModifier.getInstance(),
-                HeightRangePlacementModifier.createUniform(YOffset.getBottom(), YOffset.fixed(128)),
-                EnvironmentScanPlacementModifier.create(
-                    Direction.DOWN,
-                    BlockPredicate.solid(),
-                    BlockPredicate.IS_AIR,
-                    12
-                ),
-                RandomOffsetPlacementModifier.vertical(ConstantIntProvider.create(1)),
-                BiomePlacementModifier.getInstance()
-            )
         )
     }
 
