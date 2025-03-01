@@ -3,6 +3,7 @@ package org.teamvoided.dusk_debris.data.gen.world.gen
 import net.minecraft.registry.*
 import net.minecraft.util.math.Direction
 import net.minecraft.util.math.noise.DoublePerlinNoiseSampler.*
+import net.minecraft.world.biome.source.util.VanillaTerrainParametersCreator
 import net.minecraft.world.gen.DensityFunction
 import net.minecraft.world.gen.DensityFunction.*
 import net.minecraft.world.gen.DensityFunctions.*
@@ -14,6 +15,7 @@ import org.teamvoided.dusk_debris.data.worldgen.DuskNoiseParametersKeys
 import org.teamvoided.dusk_debris.world.gen.density_functions.DebugAxis
 import org.teamvoided.dusk_debris.world.gen.density_functions.Fold
 import org.teamvoided.dusk_debris.world.gen.density_functions.ShiftedNoiseRange
+import org.teamvoided.dusk_debris.world.gen.density_functions.SingleDensityFunctionInput
 import org.teamvoided.dusk_debris.world.gen.terrain_parameters.NetherTerrainParametersCreator
 
 object DensityFunctionCreator {
@@ -46,14 +48,30 @@ object DensityFunctionCreator {
         this.register(
             DuskDensityFunctions.LAVA_LEVEL,
             cacheOnce(
-                ShiftedNoise(
-                    shiftX,
-                    zero(),
-                    shiftZ,
-                    1.0,
-                    0.0,
-                    this.noise(DuskNoiseParametersKeys.LAVA_LEVEL)
-                )
+                if (LAVA) {
+                    max(
+                        multiply(
+                            floor(
+                                multiply(
+                                    constant(32.0 / 4.0),
+                                    mapFromUnitToValue(
+                                        noise(
+                                            this.noiseHold(DuskNoiseParametersKeys.LAVA_LEVEL),
+                                            1.0,
+                                            0.0,
+                                        ),
+                                        -0.25,
+                                        1.0
+                                    )
+                                )
+                            ),
+                            constant(4.0)
+                        ),
+                        zero()
+                    )
+                } else {
+                    zero()
+                }
             )
         )
 
@@ -90,7 +108,7 @@ object DensityFunctionCreator {
                     if (debug == "continent")
                         DebugAxis(Direction.Axis.Z, DEBUG_WIDTH)
                     else
-                        constant(0.0)
+                        constant(0.25)
                 } else {
                     shiftedNoiseRangeNether(
                         shiftX,
@@ -110,7 +128,7 @@ object DensityFunctionCreator {
                     if (debug == "erosion")
                         DebugAxis(Direction.Axis.Z, DEBUG_WIDTH)
                     else
-                        constant(0.0)
+                        zero()
                 } else {
                     shiftedNoiseRangeNether(
                         shiftX,
@@ -159,9 +177,7 @@ object DensityFunctionCreator {
                 if (debug != null) {
                     DebugAxis(Direction.Axis.X, RANGES_DEBUG_WIDTH)
                 } else {
-                    Fold(
-                        this.dense(DuskDensityFunctions.RIDGES_NETHER)
-                    )
+                    Fold(this.dense(DuskDensityFunctions.RIDGES_NETHER))
                 }
             )
         )
@@ -285,14 +301,24 @@ object DensityFunctionCreator {
         val ridgesFolded = Spline.FunctionWrapper(this.denseHold(DuskDensityFunctions.RIDGES_FOLDED_NETHER))
         val offsetFloorSpline = registerAndWrap(
             offsetFloorKey,
+//            add(
+//                constant(0.125),
+//                copySpline(
+//                  NetherTerrainParametersCreator.offsetFloorSpline(/
+//                      continents,
+//                      erosion,
+//                      ridgesFolded,
+//                      ridges,
+//                      amplified
+//                  )
+//                )
             add(
-                constant(0.125),
+                constant(0.15),
                 copySpline(
-                    NetherTerrainParametersCreator.offsetFloorSpline(
+                    VanillaTerrainParametersCreator.method_42056(
                         continents,
                         erosion,
                         ridgesFolded,
-                        ridges,
                         amplified
                     )
                 )
@@ -350,22 +376,24 @@ object DensityFunctionCreator {
         val jagged = multiply(jaggednessSpline, jaggednessFunction.halfNegative())
         val depthAndJaggedness = NoiseRouterData.noiseGradientDensity(
             factorSpline,
-            if (debug != null) {
-                add(depthFunction, jagged)
-            } else {
-                max(
-                    add(depthFunction, jagged),
-                    maxRangeChoice(this.dense(DuskDensityFunctions.NETHER_PILLARS), 0.03)
-                )
-            }
+            add(depthFunction, jagged)
+//            if (debug != null) {
+//                add(depthFunction, jagged)
+//            } else {
+//                max(
+//                    add(depthFunction, jagged),
+//                    maxRangeChoice(this.dense(DuskDensityFunctions.NETHER_PILLARS), 0.03)
+//                )
+//            }
         )
         this.register(
             cheeseKey,
-            if (debug != null) {
-                depthAndJaggedness
-            } else {
-                add(depthAndJaggedness, this.dense(NoiseRouterData.BASE_3D_NOISE_NETHER))
-            }
+            depthAndJaggedness
+//            if (debug != null) {
+//                depthAndJaggedness
+//            } else {
+//                add(depthAndJaggedness, this.dense(NoiseRouterData.BASE_3D_NOISE_NETHER))
+//            }
         )
     }
 
@@ -387,7 +415,7 @@ object DensityFunctionCreator {
     ): NoiseRouter {
         return NoiseRouter(
             zero(),
-            if (LAVA) this.dense(DuskDensityFunctions.LAVA_LEVEL) else zero(),
+            this.dense(DuskDensityFunctions.LAVA_LEVEL),
             zero(),
             constant(6.0),
             this.dense(
@@ -487,6 +515,18 @@ object DensityFunctionCreator {
     fun minRangeChoice(input: DensityFunction, minInclusive: Double): DensityFunction {
         val maxInclusive = 1000000.0
         return rangeChoice(input, minInclusive, maxInclusive, constant(maxInclusive), input)
+    }
+
+    fun round(input: DensityFunction): DensityFunction {
+        return SingleDensityFunctionInput(SingleDensityFunctionInput.Type.ROUND, input)
+    }
+
+    fun floor(input: DensityFunction): DensityFunction {
+        return SingleDensityFunctionInput(SingleDensityFunctionInput.Type.FLOOR, input)
+    }
+
+    fun ceil(input: DensityFunction): DensityFunction {
+        return SingleDensityFunctionInput(SingleDensityFunctionInput.Type.CEIL, input)
     }
 
 //    NoiseRouterData.class

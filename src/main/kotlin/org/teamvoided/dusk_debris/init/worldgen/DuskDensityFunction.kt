@@ -18,6 +18,8 @@ object DuskDensityFunction {
     val DEBUG_AXIS = register("debug_axis", DebugAxis.CODEC)
     val CHECKERBOARD_NOISE = register("checkerboard_noise", CheckerboardNoise.CODEC)
 
+    val ROUND = register("round", SingleDensityFunctionInput.CODEC)
+
 
     fun init() {}
     private fun <C : DensityFunction, F : CodecHolder<C>> register(id: String, densityFunction: F): MapCodec<C> =

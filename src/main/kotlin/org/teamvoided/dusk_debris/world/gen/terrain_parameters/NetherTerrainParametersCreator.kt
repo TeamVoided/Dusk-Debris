@@ -49,7 +49,6 @@ object NetherTerrainParametersCreator {
         val inlandSpline = offsetFloor(1.2f, erosion, ridges, ridgesFolded, amplifiedTransformer)
 
 
-
         //OFFSET CONTINENTALNESS
         return Spline.builder(continents, amplifiedTransformer)
 //            .add(WARPED_ISLAND, nFloor(180))
@@ -89,8 +88,8 @@ object NetherTerrainParametersCreator {
         val jaggedErosion = Spline.builder(erosion, amplifiedTransformer)
             .add(0f, 3f)
         val jaggedRidgesFolded = Spline.builder(ridgesFolded, amplifiedTransformer)
-            .add(-0.9f, 6f)
-            .add(-0.8f, jaggedErosion.build())
+            .add(-0.8f, 6f)
+            .add(-0.7f, jaggedErosion.build())
         return jaggedRidgesFolded.build()
     }
 
@@ -116,16 +115,19 @@ object NetherTerrainParametersCreator {
         ridgesFolded: I,
         amplifier: ToFloatFunction<Float>
     ): Spline<C, I> {
-        val tallMountain = OffsetFloor.createMountain(24, (200 * mult).toInt(), ridgesFolded, amplifier)
-        val mountain = OffsetFloor.createMountain(24, (180 * mult).toInt(), ridgesFolded, amplifier)
-        val plateau = OffsetFloor.createPlateau(mult, ridgesFolded, amplifier)
+        val tallMountain = OffsetFloor.createMountain(0, 300, mult, ridgesFolded, amplifier)
+        val mountain = OffsetFloor.createMountain(16, 200, mult, ridgesFolded, amplifier)
+        val plateauTall = OffsetFloor.createPlateau(0, 144, mult, ridgesFolded, amplifier)
+        val plateau = OffsetFloor.createPlateau(16, 128, mult, ridgesFolded, amplifier)
         val shelf = OffsetFloor.createShelfs(mult, ridgesFolded, amplifier)
+        val flatsWithPoint = OffsetFloor.createFlatsWithPoint(mult, ridgesFolded, amplifier)
         val flats = OffsetFloor.createFlats(mult, ridgesFolded, amplifier)
         val spline = Spline.builder(erosion, amplifier)
             .add(-1f, tallMountain)
             .add(-.75f, mountain)
-            .add(-.4f, plateau)
-            .add(-.1f, shelf)
+            .add(-.4f, plateauTall)
+            .add(-.1f, plateau)
+            .add(0f, shelf)
             .add(.1f, shelf)
             .add(.75f, flats)
         return spline.build()

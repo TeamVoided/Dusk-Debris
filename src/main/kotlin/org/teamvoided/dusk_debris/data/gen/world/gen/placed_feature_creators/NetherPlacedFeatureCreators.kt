@@ -24,7 +24,7 @@ object NetherPlacedFeatureCreators {
         this.register(
             DuskPlacedFeatures.BLACKSTONE_STRIPS,
             configuredFeatureProvider.getHolderOrThrow(DuskConfiguredFeatures.BLACKSTONE_STRIPS),
-            CountPlacementModifier.create(30),
+            CountPlacementModifier.create(40),
             InSquarePlacementModifier.getInstance(),
             HeightRangePlacementModifier.createUniform(YOffset.getBottom(), YOffset.getTop()),
             EnvironmentScanPlacementModifier.create(

@@ -12,7 +12,6 @@ object DuskDensityFunctions {
 
     val LAVA_LEVEL = create("lava_level")
 
-
     val SLOPED_CHEESE_NETHER = create("sloped_cheese")
     val OFFSET_FLOOR_NETHER = create("offset_floor")
     val OFFSET_CEILING_NETHER = create("offset_ceiling")

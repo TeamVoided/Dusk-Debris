@@ -51,25 +51,25 @@ interface CustomAquiferSampler : AquiferSampler {
 //        }
 
 
-        override fun apply(c: DensityFunction.FunctionContext, noiseIDWJ: Double): BlockState? {
-            if (noiseIDWJ > 0.0) return null
+        override fun apply(c: DensityFunction.FunctionContext, baseNoise: Double): BlockState? {
+            if (baseNoise > 0.0) return null
 
             val posX = c.blockX()
             val posY = c.blockY()
             val posZ = c.blockZ()
             val floodedness = fluidLevelFloodednessNoise.compute(c)
+            val posY2 = (posY - floodedness).toInt()
+            return globalFluidPicker.computeFluid(posX, posY2, posZ).getBlockState(posY2)
 
-            if (floodedness > 0) {
-                val posY2 = (posY - ((floodedness * 32) / 4).toInt() * 4)
-                return globalFluidPicker.computeFluid(posX, posY2, posZ).getBlockState(posY2)
-            }
+//            if (floodedness > 0) {
+//                val posY2 = (posY - ((floodedness * 32) / 4).toInt() * 4)
+//                return globalFluidPicker.computeFluid(posX, posY2, posZ).getBlockState(posY2)
+//            }
 
-            return AquiferSampler.seaLevel(globalFluidPicker).apply(c, noiseIDWJ)
+//            return AquiferSampler.seaLevel(globalFluidPicker).apply(c, noiseIDWJ)
         }
 
         override fun needsFluidTick(): Boolean = needsFluidTick
-        
-        
     }
 
     companion object {
