@@ -1,11 +1,14 @@
 package org.teamvoided.dusk_debris.init
 
+import com.mojang.brigadier.arguments.IntegerArgumentType
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.decoration.DisplayEntity.TextDisplayEntity
 import net.minecraft.entity.passive.SnifferEntity
+import net.minecraft.server.command.CommandManager.argument
 import net.minecraft.server.command.CommandManager.literal
 import net.minecraft.text.Text
+import org.teamvoided.dusk_debris.util.toBlockPos
 import org.teamvoided.dusk_debris.util.variant
 
 object DuskCommands {
@@ -43,6 +46,18 @@ object DuskCommands {
             }.build()
             dispatcher.root.addChild(root)
         }
-    }
+        CommandRegistrationCallback.EVENT.register { dispatcher, _, _ ->
+            val root = literal("worldEvent").build()
+            val argument = argument("eventID", IntegerArgumentType.integer()).executes { cx ->
+                val world = cx.source.world
+                val pos = cx.source.position
+                val eventID = IntegerArgumentType.getInteger(cx, "eventID")
+                world.syncWorldEvent(eventID, pos.toBlockPos(), 0)
 
+                0
+            }.build()
+            dispatcher.root.addChild(root)
+            root.addChild(argument)
+        }
+    }
 }

@@ -68,3 +68,6 @@ accessible field net/minecraft/world/gen/surfacebuilder/SurfaceRules$Context z I
 accessible class net/minecraft/world/gen/surfacebuilder/SurfaceRules$LazyHorizontalCondition
 accessible class net/minecraft/world/gen/surfacebuilder/SurfaceRules$Condition
 accessible field net/minecraft/world/gen/surfacebuilder/SurfaceRules$Context randomState Lnet/minecraft/world/gen/RandomState;
+
+accessible method net/minecraft/client/particle/ShriekParticle <init> (Lnet/minecraft/client/world/ClientWorld;DDDI)V
+accessible field net/minecraft/client/particle/ShriekParticle delay I

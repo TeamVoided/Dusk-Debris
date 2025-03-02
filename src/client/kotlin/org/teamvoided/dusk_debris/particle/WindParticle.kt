@@ -19,11 +19,10 @@ class WindParticle(
     y: Double,
     z: Double,
     distance: Double,
-    direction: Int,
+    private val direction: Direction,
     maxAge: Int,
     private val spriteProvider: SpriteProvider
 ) : SpriteBillboardParticle(world, x, y, z, 0.0, 0.0, 0.0) {
-    private var direction: Direction = Direction.UP
     private var endPos = Vec3d(0.0, 0.0, 0.0)
     private var rotation = 0f
     private var prevRotation = 0f
@@ -34,7 +33,6 @@ class WindParticle(
 
     init {
         this.scale = world.random.nextFloat() * 0.2f + 0.1f
-        this.direction = Direction.byId(direction)
         this.maxAge = maxAge
         this.rotationOffset = MathHelper.nextFloat(random, 0f, rotate360)
         this.rotationMultiplier =
@@ -116,9 +114,9 @@ class WindParticle(
                 posX,
                 posY,
                 posZ,
-                particleEffect.distance(),
-                particleEffect.direction(),
-                particleEffect.arrivalTicks(),
+                particleEffect.distance,
+                particleEffect.direction,
+                particleEffect.arrivalTicks,
                 spriteProvider
             )
             windParticle.setColorAlpha(world.random.nextFloat() * 0.25f + 0.5f)

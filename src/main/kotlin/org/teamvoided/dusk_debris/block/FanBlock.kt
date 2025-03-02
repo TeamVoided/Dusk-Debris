@@ -146,7 +146,7 @@ open class FanBlock(val strength: Int, settings: Settings) :
                 world.spawnParticles(
                     WindParticleEffect(
                         windLength * limitor,
-                        facing.id,
+                        facing,
                         maxAge
                     ),
                     Vec3d(

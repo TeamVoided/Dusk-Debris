@@ -1,4 +1,4 @@
-package org.teamvoided.dusk_debris.data.gen.providers
+package org.teamvoided.dusk_debris.data.gen.providers.models
 
 
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
@@ -9,6 +9,7 @@ import net.minecraft.data.client.model.*
 import net.minecraft.util.Identifier
 import org.teamvoided.dusk_debris.block.DuskBlockFamilies
 import org.teamvoided.dusk_debris.block.DuskBlockLists
+import org.teamvoided.dusk_debris.data.gen.providers.models.MinecraftModelProvider.generateAlternativeMinecraftModels
 import org.teamvoided.dusk_debris.init.DuskBlocks
 import org.teamvoided.dusk_debris.init.DuskItems
 import org.teamvoided.dusk_debris.item.DuskItemLists
@@ -18,6 +19,7 @@ import org.teamvoided.dusk_debris.util.model_helper.bubbleBlossomBlock
 import org.teamvoided.dusk_debris.util.model_helper.carpetStairs
 
 class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
+    val minecraft = true
 
     override fun generateBlockStateModels(gen: BlockStateModelGenerator) {
         gen.sandstoneModels = mapOf(
@@ -40,6 +42,9 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
             gen.registerCubeAllModelTexturePool(it.baseBlock).family(it)
         }
 
+        if (minecraft) {
+            gen.generateAlternativeMinecraftModels()
+        }
 
         DuskItemLists.SPAWN_EGGS_ITEM_LIST.forEach {
             gen.registerParentedItemModel(it, Identifier.ofDefault("item/template_spawn_egg"))

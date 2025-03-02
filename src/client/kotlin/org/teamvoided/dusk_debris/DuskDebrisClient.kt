@@ -36,7 +36,6 @@ object DuskDebrisClient {
         }
         ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(WaterColormapResourceSupplier())
 
-
         CameraSubmersionType.entries.forEach { println(it) }
     }
 }

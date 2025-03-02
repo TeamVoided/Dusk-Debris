@@ -7,6 +7,7 @@ import net.minecraft.registry.RegistrySetBuilder
 import org.teamvoided.dusk_debris.DuskDebris.log
 import org.teamvoided.dusk_debris.data.gen.providers.*
 import org.teamvoided.dusk_debris.data.gen.providers.loot_table.EntityLootTableProvider
+import org.teamvoided.dusk_debris.data.gen.providers.models.ModelProvider
 import org.teamvoided.dusk_debris.data.gen.providers.variants.PaintingVariants
 import org.teamvoided.dusk_debris.data.gen.tags.*
 import org.teamvoided.dusk_debris.data.gen.providers.variants.SnifferVariants

@@ -46,7 +46,8 @@ object DuskParticlesClient {
             .register(DuskParticles.ASTRAS_FLYING_GOOP, AstrasStrangeGoopParticle::FallingGoopFactory)
         ParticleFactoryRegistry.getInstance()
             .register(DuskParticles.ASTRAS_LANDED_GOOP, AstrasStrangeGoopParticle::LandedGoopFactory)
+
+        ParticleFactoryRegistry.getInstance()
+            .register(DuskParticles.SHRIEK_DIRECTIONAL, ShriekDirectionalParticle::Factory)
     }
-
-
 }

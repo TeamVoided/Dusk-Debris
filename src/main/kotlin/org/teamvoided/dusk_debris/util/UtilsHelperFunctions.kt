@@ -17,6 +17,7 @@ import net.minecraft.util.shape.VoxelShape
 import net.minecraft.util.shape.VoxelShapes
 import net.minecraft.world.TestableWorld
 import net.minecraft.world.World
+import kotlin.math.floor
 import kotlin.math.sqrt
 
 fun ServerWorld.spawnParticles(particle: ParticleEffect, pos: Vec3d, velocity: Vec3d) =
@@ -111,7 +112,11 @@ fun Vec3d.getSquaredDistanceToCenter(vec: Vec3d): Double {
 }
 
 fun Vec3d.toBlockPos(): BlockPos {
-    return BlockPos(this.x.toInt(), this.y.toInt(), this.z.toInt())
+    return BlockPos(floor(this.x).toInt(), floor(this.y).toInt(), floor(this.z).toInt())
+}
+
+fun BlockPos.toVec3d(): Vec3d {
+    return Vec3d(this.x.toDouble(), this.y.toDouble(), this.z.toDouble())
 }
 
 fun box(double: Double): Box {

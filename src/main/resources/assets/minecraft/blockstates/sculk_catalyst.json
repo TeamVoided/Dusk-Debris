@@ -1,0 +1,56 @@
+{
+  "variants": {
+    "bloom=false,facing=down": {
+      "model": "minecraft:block/sculk_catalyst",
+      "x": 180
+    },
+    "bloom=false,facing=east": {
+      "model": "minecraft:block/sculk_catalyst",
+      "x": 90,
+      "y": 90
+    },
+    "bloom=false,facing=north": {
+      "model": "minecraft:block/sculk_catalyst",
+      "x": 90
+    },
+    "bloom=false,facing=south": {
+      "model": "minecraft:block/sculk_catalyst",
+      "x": 90,
+      "y": 180
+    },
+    "bloom=false,facing=up": {
+      "model": "minecraft:block/sculk_catalyst"
+    },
+    "bloom=false,facing=west": {
+      "model": "minecraft:block/sculk_catalyst",
+      "x": 90,
+      "y": 270
+    },
+    "bloom=true,facing=down": {
+      "model": "minecraft:block/sculk_catalyst_bloom",
+      "x": 180
+    },
+    "bloom=true,facing=east": {
+      "model": "minecraft:block/sculk_catalyst_bloom",
+      "x": 90,
+      "y": 90
+    },
+    "bloom=true,facing=north": {
+      "model": "minecraft:block/sculk_catalyst_bloom",
+      "x": 90
+    },
+    "bloom=true,facing=south": {
+      "model": "minecraft:block/sculk_catalyst_bloom",
+      "x": 90,
+      "y": 180
+    },
+    "bloom=true,facing=up": {
+      "model": "minecraft:block/sculk_catalyst_bloom"
+    },
+    "bloom=true,facing=west": {
+      "model": "minecraft:block/sculk_catalyst_bloom",
+      "x": 90,
+      "y": 270
+    }
+  }
+}
