@@ -5,6 +5,10 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.sculk.SculkBehavior;
 import net.minecraft.block.sculk.SculkBlock;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvent;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.random.RandomGenerator;
 import net.minecraft.world.WorldAccess;
@@ -14,7 +18,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.teamvoided.dusk_debris.block.not_blocks.SculkDirectionalStuff;
 
-import static net.minecraft.Bootstrap.println;
 @Debug(export = true)
 @Mixin(SculkBlock.class)
 public class SculkBlockMixin {
@@ -28,8 +31,20 @@ public class SculkBlockMixin {
         return SculkDirectionalStuff.tryUseChargeSpreadRewrite(world, pos, charge, sculkChargeHandler, random, sculkChargeHandler.isWorldGen());
     }
 
+    /* - But Here's the Stopper -*/
+
     @Redirect(method = "tryUseCharge", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/sculk/SculkBlock;getRandomGrowthState(Lnet/minecraft/world/WorldAccess;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/random/RandomGenerator;Z)Lnet/minecraft/block/BlockState;"))
     private BlockState theStopper(SculkBlock instance, WorldAccess world, BlockPos pos, RandomGenerator random, boolean randomize) {
-        return Blocks.GLOWSTONE.getDefaultState(); //instance.getRandomGrowthState(world, pos, random, randomize);
+        return Blocks.WHITE_STAINED_GLASS.getDefaultState(); //instance.getRandomGrowthState(world, pos, random, randomize);
+    }
+
+    @Redirect(method = "tryUseCharge", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/WorldAccess;setBlockState(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;I)Z"))
+    private boolean theStopper(WorldAccess world, BlockPos blockPos, BlockState blockState, int flag) {
+        return false; // world.setBlockState(blockPos, blockState, flag);
+    }
+
+    @Redirect(method = "tryUseCharge", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/WorldAccess;playSound(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/sound/SoundEvent;Lnet/minecraft/sound/SoundCategory;FF)V"))
+    private void theStopper(WorldAccess world, PlayerEntity playerEntity, BlockPos blockPos, SoundEvent soundEvent, SoundCategory soundCategory, float v, float p) {
+        //world.playSound((PlayerEntity)null, blockPos, soundEvent, soundCategory, v, p);
     }
 }

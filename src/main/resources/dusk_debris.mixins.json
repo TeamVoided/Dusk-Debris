@@ -23,6 +23,7 @@
     "directional_sculk.blockstates.SculkShriekerBlockEntityMixin",
     "directional_sculk.blockstates.SculkShriekerBlockMixin",
     "directional_sculk.spreading.SculkBlockMixin",
+    "directional_sculk.spreading.SculkPatchFeatureMixin",
     "fluid_tag.BucketItemMixin",
     "fluid_tag.EntityMixin",
     "fluid_tag.FluidBlockMixin",

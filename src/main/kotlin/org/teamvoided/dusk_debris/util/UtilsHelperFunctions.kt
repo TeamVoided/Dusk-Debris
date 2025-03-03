@@ -8,6 +8,8 @@ import net.minecraft.registry.HolderSet
 import net.minecraft.registry.tag.TagKey
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.server.world.ServerWorld
+import net.minecraft.state.property.BooleanProperty
+import net.minecraft.state.property.Properties
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Box
 import net.minecraft.util.math.Direction
@@ -139,3 +141,14 @@ fun rotateVoxelShape(times: Int, shape: VoxelShape): VoxelShape {
 }
 
 fun VoxelShape.rotate(times: Int) = rotateVoxelShape(times, this)
+
+fun Direction.asProperty(): BooleanProperty {
+    return when (this) {
+        Direction.UP -> Properties.UP
+        Direction.DOWN -> Properties.DOWN
+        Direction.NORTH -> Properties.NORTH
+        Direction.SOUTH -> Properties.SOUTH
+        Direction.WEST -> Properties.WEST
+        Direction.EAST -> Properties.EAST
+    }
+}

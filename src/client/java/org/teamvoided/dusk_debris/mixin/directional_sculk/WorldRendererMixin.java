@@ -24,12 +24,11 @@ import static net.minecraft.Bootstrap.println;
 @Mixin(WorldRenderer.class)
 public class WorldRendererMixin {
     @Shadow
-    @Nullable
     private ClientWorld world;
 
     @Inject(method = "processWorldEvent", at = @At("HEAD"), cancellable = true)
     private void changeShriekParticles(int eventId, BlockPos pos, int data, CallbackInfo ci) {
-        if (world != null && eventId == 3007 && this.world.getBlockState(pos).contains(Properties.FACING)) {
+        if (eventId == 3007 && this.world.getBlockState(pos).contains(Properties.FACING)) {
             BlockState blockState = this.world.getBlockState(pos);
             Direction direction = blockState.get(Properties.FACING);
             var center = pos.ofCenter();
@@ -37,24 +36,17 @@ public class WorldRendererMixin {
                 this.world.addParticle(
                         new ShriekDirectionalParticleEffect(direction, count * 5),
                         false,
-                        center.x,
-                        center.y,
-                        center.z,
-                        0.0,
-                        0.0,
-                        0.0
+                        center.x, center.y, center.z,
+                        0.0, 0.0, 0.0
                 );
             }
-            boolean bl2 = blockState.contains(Properties.WATERLOGGED) && blockState.get(Properties.WATERLOGGED);
-            if (!bl2) {
+            boolean silent = blockState.contains(Properties.WATERLOGGED) && blockState.get(Properties.WATERLOGGED);
+            if (!silent) {
                 world.playSound(
-                        center.x,
-                        center.y,
-                        center.z,
+                        center.x, center.y, center.z,
                         SoundEvents.BLOCK_SCULK_SHRIEKER_SHRIEK,
                         SoundCategory.BLOCKS,
-                        2.0F,
-                        0.6F + world.random.nextFloat() * 0.4F,
+                        2F, 0.6F + world.random.nextFloat() * 0.4F,
                         false
                 );
             }
