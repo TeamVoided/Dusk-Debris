@@ -92,6 +92,11 @@ class BlockTagsProvider(output: FabricDataOutput, registriesFuture: CompletableF
         getOrCreateTagBuilder(DuskBlockTags.MIDAS_GILDED_BLACKSTONE)
             .forceAddTag(ConventionalBlockTags.NETHERITE_SCRAP_ORES)
 
+
+        getOrCreateTagBuilder(DuskBlockTags.SCULK_SPREAD_SEARCH)
+            .add(Blocks.SCULK_SENSOR)
+            .add(Blocks.SCULK_SHRIEKER)
+
     }
 
     private fun vanillaTags() {

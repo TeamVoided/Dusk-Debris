@@ -33,6 +33,8 @@ object DuskBlockTags {
     val CONVENTIONAL_NETHERRACK_ORES = create("c", "netherrack_ores")
     val CONVENTIONAL_RAW_ORE_BLOCKS = create("c", "raw_ore_blocks")
 
+    val SCULK_SPREAD_SEARCH = create("sculk_spread_search")
+
 
     fun create(id: String): TagKey<Block> = TagKey.of(RegistryKeys.BLOCK, DuskDebris.id(id))
     fun create(modId: String, path: String): TagKey<Block> = TagKey.of(
