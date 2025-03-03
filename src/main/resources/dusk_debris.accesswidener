@@ -71,3 +71,4 @@ accessible field net/minecraft/world/gen/surfacebuilder/SurfaceRules$Context ran
 
 accessible method net/minecraft/client/particle/ShriekParticle <init> (Lnet/minecraft/client/world/ClientWorld;DDDI)V
 accessible field net/minecraft/client/particle/ShriekParticle delay I
+accessible method net/minecraft/block/sculk/SculkBlock getRandomGrowthState (Lnet/minecraft/world/WorldAccess;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/random/RandomGenerator;Z)Lnet/minecraft/block/BlockState;

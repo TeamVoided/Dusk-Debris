@@ -45,12 +45,14 @@ public class SculkSensorBlockMixin extends Block implements Waterloggable {
 
     @Inject(method = "<init>", at = @At("TAIL"))
     public void addDefaultState(Settings settings, CallbackInfo ci) {
-        this.setDefaultState(this.getDefaultState().with(Properties.FACING, Direction.UP));
+        if (SculkDirectionalStuff.isNotCalibrated(this.asBlock())) {
+            this.setDefaultState(this.getDefaultState().with(Properties.FACING, Direction.UP));
+        }
     }
 
     @Inject(method = "onSteppedOn", at = @At("HEAD"), cancellable = true)
     public void onSteppedOnIfUp(World world, BlockPos pos, BlockState state, Entity entity, CallbackInfo ci) {
-        if (SculkDirectionalStuff.isNotUp(state)) {
+        if (SculkDirectionalStuff.isNotUpCalibrated(state)) {
             super.onSteppedOn(world, pos, state, entity);
             ci.cancel();
         }
@@ -58,7 +60,7 @@ public class SculkSensorBlockMixin extends Block implements Waterloggable {
 
     @Override
     protected void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity) {
-        if (SculkDirectionalStuff.isNotUp(state) && !world.isClient() && isInactive(state) && entity.getType() != EntityType.WARDEN) {
+        if (SculkDirectionalStuff.isNotUpCalibrated(state) && !world.isClient() && isInactive(state) && entity.getType() != EntityType.WARDEN && SculkDirectionalStuff.noCreativeFlightAnnoyance(entity)) {
             BlockEntity blockEntity = world.getBlockEntity(pos);
             if (blockEntity instanceof SculkSensorBlockEntity sculkSensorBlockEntity) {
                 if (world instanceof ServerWorld serverWorld) {
@@ -73,79 +75,97 @@ public class SculkSensorBlockMixin extends Block implements Waterloggable {
 
     @Inject(method = "getStrongRedstonePower", at = @At("HEAD"), cancellable = true)
     public void addDirectionalRedstone(BlockState state, BlockView world, BlockPos pos, Direction direction, CallbackInfoReturnable<Integer> cir) {
-        var facing = state.get(Properties.FACING);
-        if (facing != Direction.UP)
-            cir.setReturnValue(direction == facing ? state.getWeakRedstonePower(world, pos, direction) : 0);
+        if (SculkDirectionalStuff.isNotCalibrated(this.asBlock())) {
+            var facing = state.get(Properties.FACING);
+            if (facing != Direction.UP)
+                cir.setReturnValue(direction == facing ? state.getWeakRedstonePower(world, pos, direction) : 0);
+        }
     }
 
     @Inject(method = "getOutlineShape", at = @At("HEAD"), cancellable = true)
     public void getDirectionalShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context, CallbackInfoReturnable<VoxelShape> cir) {
-        SculkDirectionalStuff.getDirectionalSlabShape(state, cir);
+        if (SculkDirectionalStuff.isNotCalibrated(this.asBlock())) {
+            SculkDirectionalStuff.getDirectionalSlabShape(state, cir);
+        }
     }
 
     @Inject(method = "randomDisplayTick", at = @At("HEAD"), cancellable = true)
     public void addDirectionalRandomDisplayTick(BlockState state, World world, BlockPos pos, RandomGenerator random, CallbackInfo ci) {
-        var facing = state.get(Properties.FACING);
-        if (facing != Direction.UP) {
-            if (SculkSensorBlock.getPhase(state) == SculkSensorPhase.ACTIVE) {
-                Direction direction = Direction.random(random);
-                if (direction != facing && direction != facing.getOpposite()) {
-                    Vec3d posFacing = toVec3d(pos);
-                    Vec3d velFacing = Vec3d.ZERO;
-                    double x = 0.5 + (direction.getOffsetX() == 0 ? 0.5 - random.nextDouble() : (double) direction.getOffsetX() * 0.6);
-                    double y = 0.25;
-                    double z = 0.5 + (direction.getOffsetZ() == 0 ? 0.5 - random.nextDouble() : (double) direction.getOffsetZ() * 0.6);
-                    double yVel = (double) random.nextFloat() * 0.04;
-                    switch (facing) {
-                        case Direction.DOWN:
-                            posFacing = posFacing.add(x, -y, z);
-                            velFacing = velFacing.add(0.0, -yVel, 0.0);
-                            break;
-                        case Direction.NORTH:
-                            posFacing = posFacing.add(x, z, -y);
-                            velFacing = velFacing.add(0.0, 0.0, -yVel);
-                            break;
-                        case Direction.SOUTH:
-                            posFacing = posFacing.add(x, z, y);
-                            velFacing = velFacing.add(0.0, 0.0, yVel);
-                            break;
-                        case Direction.WEST:
-                            posFacing = posFacing.add(-y, x, z);
-                            velFacing = velFacing.add(-yVel, 0.0, 0.0);
-                            break;
-                        case Direction.EAST:
-                            posFacing = posFacing.add(y, x, z);
-                            velFacing = velFacing.add(yVel, 0.0, 0.0);
-                            break;
+        if (SculkDirectionalStuff.isNotCalibrated(this.asBlock())) {
+            var facing = state.get(Properties.FACING);
+            if (facing != Direction.UP) {
+                if (SculkSensorBlock.getPhase(state) == SculkSensorPhase.ACTIVE) {
+                    Direction direction = Direction.random(random);
+                    if (direction != facing && direction != facing.getOpposite()) {
+                        Vec3d posFacing = toVec3d(pos);
+                        Vec3d velFacing = Vec3d.ZERO;
+                        double x = 0.5 + (direction.getOffsetX() == 0 ? 0.5 - random.nextDouble() : (double) direction.getOffsetX() * 0.6);
+                        double y = 0.25;
+                        double z = 0.5 + (direction.getOffsetZ() == 0 ? 0.5 - random.nextDouble() : (double) direction.getOffsetZ() * 0.6);
+                        double yVel = (double) random.nextFloat() * 0.04;
+                        switch (facing) {
+                            case Direction.DOWN:
+                                posFacing = posFacing.add(x, -y, z);
+                                velFacing = velFacing.add(0.0, -yVel, 0.0);
+                                break;
+                            case Direction.NORTH:
+                                posFacing = posFacing.add(x, z, -y);
+                                velFacing = velFacing.add(0.0, 0.0, -yVel);
+                                break;
+                            case Direction.SOUTH:
+                                posFacing = posFacing.add(x, z, y);
+                                velFacing = velFacing.add(0.0, 0.0, yVel);
+                                break;
+                            case Direction.WEST:
+                                posFacing = posFacing.add(-y, x, z);
+                                velFacing = velFacing.add(-yVel, 0.0, 0.0);
+                                break;
+                            case Direction.EAST:
+                                posFacing = posFacing.add(y, x, z);
+                                velFacing = velFacing.add(yVel, 0.0, 0.0);
+                                break;
+                        }
+                        world.addParticle(
+                                DustColorTransitionParticleEffect.DEFAULT,
+                                posFacing.x, posFacing.y, posFacing.z,
+                                velFacing.x, velFacing.y, velFacing.z
+                        );
                     }
-                    world.addParticle(
-                            DustColorTransitionParticleEffect.DEFAULT,
-                            posFacing.x, posFacing.y, posFacing.z,
-                            velFacing.x, velFacing.y, velFacing.z
-                    );
                 }
+                ci.cancel();
             }
-            ci.cancel();
         }
     }
 
     @Inject(method = "getPlacementState", at = @At("RETURN"), cancellable = true)
     public void addDirectionalPlacement(ItemPlacementContext ctx, CallbackInfoReturnable<BlockState> cir) {
-        cir.setReturnValue(SculkDirectionalStuff.getPlacementState(cir.getReturnValue(), ctx));
+        if (SculkDirectionalStuff.isNotCalibrated(this.asBlock())) {
+            cir.setReturnValue(SculkDirectionalStuff.getPlacementState(cir.getReturnValue(), ctx));
+        }
     }
 
     @Override
     protected BlockState rotate(BlockState state, BlockRotation rotation) {
-        return SculkDirectionalStuff.spin(state, rotation);
+        if (SculkDirectionalStuff.isNotCalibrated(this.asBlock())) {
+            return SculkDirectionalStuff.spin(state, rotation);
+        } else {
+            return super.rotate(state, rotation);
+        }
     }
 
     @Override
     protected BlockState mirror(BlockState state, BlockMirror mirror) {
-        return SculkDirectionalStuff.spin(state, mirror);
+        if (SculkDirectionalStuff.isNotCalibrated(this.asBlock())) {
+            return SculkDirectionalStuff.spin(state, mirror);
+        } else {
+            return super.mirror(state, mirror);
+        }
     }
 
     @Inject(method = "appendProperties", at = @At("TAIL"))
     public void addDirectionalProperties(StateManager.Builder<Block, BlockState> builder, CallbackInfo ci) {
-        builder.add(Properties.FACING);
+        if (SculkDirectionalStuff.isNotCalibrated(this.asBlock())) {
+            builder.add(Properties.FACING);
+        }
     }
 }

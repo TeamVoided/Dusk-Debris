@@ -20,13 +20,13 @@ public class CalibratedSculkSensorBlockMixin extends SculkSensorBlock {
 
     @Redirect(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/BlockState;with(Lnet/minecraft/state/property/Property;Ljava/lang/Comparable;)Ljava/lang/Object;"))
     public Object addDefaultState(BlockState instance, Property property, Comparable comparable) {
-        return instance.with(Properties.FACING, Direction.UP);
+        return instance.with(property, comparable);
     }
 
     @Inject(method = "appendProperties", at = @At("HEAD"), cancellable = true)
     public void addDirectionalProperties(StateManager.Builder<Block, BlockState> builder, CallbackInfo ci) {
-        super.appendProperties(builder);
-        ci.cancel();
+//        super.appendProperties(builder);
+//        ci.cancel();
 //        builder.add(Properties.FACING);
     }
 }
