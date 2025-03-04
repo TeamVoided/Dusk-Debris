@@ -10,9 +10,9 @@ import org.teamvoided.dusk_debris.block.not_blocks.DuskProperties
 
 class StrongScaffoldingBlock(settings: Settings) : ScaffoldingBlock(settings) {
 
-    override fun appendProperties(builder: StateManager.Builder<Block, BlockState>) {
-        builder.add(DuskProperties.DISTANCE_0_14, Properties.WATERLOGGED, Properties.BOTTOM)
-    }
+//    override fun appendProperties(builder: StateManager.Builder<Block, BlockState>) {
+//        builder.add(DuskProperties.DISTANCE_0_14, Properties.WATERLOGGED, Properties.BOTTOM)
+//    }
 
     companion object {
         @JvmStatic

@@ -1,4 +1,4 @@
-package org.teamvoided.dusk_debris.block.not_blocks
+package org.teamvoided.dusk_debris.block.mixin
 
 import net.minecraft.block.Block
 import net.minecraft.block.BlockState
@@ -27,7 +27,6 @@ import net.minecraft.world.gen.feature.SculkPatchFeatureConfig
 import net.minecraft.world.gen.feature.util.FeatureContext
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import org.teamvoided.dusk_debris.data.tags.DuskBlockTags
-import org.teamvoided.dusk_debris.util.asProperty
 import org.teamvoided.dusk_debris.util.rotateVoxelShape
 
 object SculkDirectionalStuff {

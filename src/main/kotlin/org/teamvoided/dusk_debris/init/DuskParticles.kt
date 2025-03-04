@@ -60,6 +60,9 @@ object DuskParticles {
     val SHRIEK_DIRECTIONAL: ParticleType<ShriekDirectionalParticleEffect> =
         FabricParticleTypes.complex(ShriekDirectionalParticleEffect.CODEC, ShriekDirectionalParticleEffect.PACKET_CODEC)
 
+    val BETWEEN_POINTS: ParticleType<BetweenPointsParticleEffect> =
+        FabricParticleTypes.complex(BetweenPointsParticleEffect.CODEC, BetweenPointsParticleEffect.PACKET_CODEC)
+
 
     fun init() {
         Registry.register(Registries.PARTICLE_TYPE, id("toxic_smoke_particle"), TOXIC_SMOKE_PARTICLE)
@@ -88,5 +91,7 @@ object DuskParticles {
         Registry.register(Registries.PARTICLE_TYPE, id("goop_landed"), ASTRAS_LANDED_GOOP)
 
         Registry.register(Registries.PARTICLE_TYPE, id("shriek_directional"), SHRIEK_DIRECTIONAL)
+
+        Registry.register(Registries.PARTICLE_TYPE, id("between_points"), BETWEEN_POINTS)
     }
 }

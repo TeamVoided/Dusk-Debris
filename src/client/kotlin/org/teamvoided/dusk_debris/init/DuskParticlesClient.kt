@@ -49,5 +49,7 @@ object DuskParticlesClient {
 
         ParticleFactoryRegistry.getInstance()
             .register(DuskParticles.SHRIEK_DIRECTIONAL, ShriekDirectionalParticle::Factory)
+
+        ParticleFactoryRegistry.getInstance().register(DuskParticles.BETWEEN_POINTS, BetweenPointsParticle.Factory())
     }
 }

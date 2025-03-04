@@ -24,9 +24,9 @@ import java.util.UUID;
 @Mixin(TrialSpawnerState.class)
 public abstract class TrialSpawnerStateMixin {
     @Shadow @Final private boolean spawnCapable;
-    @Inject(method = "tick", at = @At("TAIL"))
+    @Inject(method = "tick", at = @At("RETURN"))
     public void tickEntityConnection(BlockPos pos, TrialSpawnerLogic logic, ServerWorld world, CallbackInfoReturnable<TrialSpawnerState> cir) {
         if (world.random.nextInt(100) == 0 && this.spawnCapable)
-            TrialSpawnerParticlesMixin.Companion.trialSpawnerParticles(pos, logic, world);
+            TrialSpawnerParticlesMixin.trialSpawnerParticles(pos, logic, world);
     }
 }

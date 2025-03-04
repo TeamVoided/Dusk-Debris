@@ -2,16 +2,13 @@ package org.teamvoided.dusk_debris.mixin.directional_sculk.blockstates;
 
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.block.entity.SculkSensorBlockEntity;
-import net.minecraft.block.entity.SculkShriekerBlockEntity;
 import net.minecraft.block.enums.SculkSensorPhase;
 import net.minecraft.block.sculk.SculkSensorBlock;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.particle.DustColorTransitionParticleEffect;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.Properties;
@@ -30,10 +27,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.teamvoided.dusk_debris.block.not_blocks.SculkDirectionalStuff;
+import org.teamvoided.dusk_debris.block.mixin.SculkDirectionalStuff;
 
 import static net.minecraft.block.sculk.SculkSensorBlock.isInactive;
-import static org.teamvoided.dusk_debris.util.UtilsHelperFunctionsKt.rotateVoxelShape;
 import static org.teamvoided.dusk_debris.util.UtilsHelperFunctionsKt.toVec3d;
 
 @Mixin(SculkSensorBlock.class)
