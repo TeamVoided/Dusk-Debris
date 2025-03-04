@@ -1,9 +1,8 @@
 package org.teamvoided.dusk_debris.block.not_blocks
 
-import net.minecraft.state.property.EnumProperty
 import net.minecraft.util.StringIdentifiable
 
-enum class ExplosiveBubblePhase(val phaseName: String, val id: Int) : StringIdentifiable {
+enum class SquishablePhases(val phaseName: String, val id: Int) : StringIdentifiable {
     SQUISHED("squished", 0),
     BRIMMING("brimming", 1),
     VOLATILE("volatile", 2);
@@ -17,7 +16,7 @@ enum class ExplosiveBubblePhase(val phaseName: String, val id: Int) : StringIden
     }
 
     companion object {
-        fun fromInt(int: Int): ExplosiveBubblePhase {
+        fun fromInt(int: Int): SquishablePhases {
             return when (int) {
                 0 -> SQUISHED
                 1 -> BRIMMING

@@ -61,7 +61,7 @@ public class SculkShriekerBlockMixin extends Block {
     protected void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity) {
         if (SculkDirectionalStuff.isNotUp(state) && world instanceof ServerWorld serverWorld) {
             ServerPlayerEntity serverPlayerEntity = SculkShriekerBlockEntity.findResponsiblePlayerFromEntity(entity);
-            if (serverPlayerEntity != null) {
+            if (serverPlayerEntity != null && SculkDirectionalStuff.noCreativeFlightAnnoyance(serverPlayerEntity)) {
                 serverWorld.getBlockEntity(pos, BlockEntityType.SCULK_SHRIEKER).ifPresent((blockEntity) -> blockEntity.shriek(serverWorld, serverPlayerEntity));
             }
         }

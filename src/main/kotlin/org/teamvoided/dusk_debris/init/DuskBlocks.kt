@@ -42,6 +42,8 @@ object DuskBlocks {
 
     val TEST_BLOCK = register("test_block", EntityTestParticleBlock(copy(STONE)))
 
+    val STRONG_SCAFFOLDING = register("strong_scaffolding", StrongScaffoldingBlock(copy(Blocks.SCAFFOLDING)))
+
     val ACID = registerNoItem("acid", FluidBlock(DuskFluids.ACID, copy(WATER).mapColor(MapColor.LIME)))
     val FOG_BUBBLE = registerNoItem(
         "fog_bubble", BubbleBlock(

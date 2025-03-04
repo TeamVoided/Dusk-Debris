@@ -12,6 +12,7 @@
     "MangroveRootsBlockMixin",
     "PaintingEntityMixin",
     "PillagerSpawnerMixin",
+    "ScaffoldingBlockMixin",
     "SnifferEntityMixin",
     "SpreadableBlockMixin",
     "TrialSpawnerStateMixin",

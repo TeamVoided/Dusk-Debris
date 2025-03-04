@@ -4,13 +4,13 @@ import net.minecraft.block.Block
 import net.minecraft.block.BlockState
 import net.minecraft.block.Blocks
 import net.minecraft.block.CalibratedSculkSensorBlock
-import net.minecraft.block.sculk.SculkBehavior
 import net.minecraft.block.sculk.SculkBlock
 import net.minecraft.block.sculk.SculkShriekerBlock
 import net.minecraft.entity.Entity
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.fluid.Fluids
 import net.minecraft.item.ItemPlacementContext
+import net.minecraft.registry.tag.BlockTags
 import net.minecraft.sound.SoundCategory
 import net.minecraft.state.property.DirectionProperty
 import net.minecraft.state.property.Properties
@@ -23,6 +23,8 @@ import net.minecraft.util.random.RandomGenerator
 import net.minecraft.util.shape.VoxelShape
 import net.minecraft.world.StructureWorldAccess
 import net.minecraft.world.WorldAccess
+import net.minecraft.world.gen.feature.SculkPatchFeatureConfig
+import net.minecraft.world.gen.feature.util.FeatureContext
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import org.teamvoided.dusk_debris.data.tags.DuskBlockTags
 import org.teamvoided.dusk_debris.util.asProperty
@@ -80,16 +82,14 @@ object SculkDirectionalStuff {
     fun tryUseChargeSpreadRewrite(
         world: WorldAccess,
         pos: BlockPos,
-        chargeCursor: SculkBehavior.ChargeCursor,
-        behavior: SculkBehavior,
+        charge: Int,
+        cost: Int,
         random: RandomGenerator,
         canSummon: Boolean
     ): Boolean {
         val worldState = world.getBlockState(pos)
         val worldBlock = worldState.block
         if (worldBlock is SculkBlock) {
-            val charge = chargeCursor.charge
-            val cost: Int = behavior.growthSpawnCost
             if (random.nextInt(cost) < charge) {
                 Direction.entries.forEach {
                     val posOffset: BlockPos = pos.offset(it)
@@ -183,32 +183,42 @@ object SculkDirectionalStuff {
 
     /* - - - FEATURE FUNCTIONS - - - */
     @JvmStatic
-    fun extraGrowthCatalyst(structureWorldAccess: StructureWorldAccess, blockPos: BlockPos): Boolean {
+    fun featureCatalystAndShrieker(context: FeatureContext<SculkPatchFeatureConfig>) {
+        val config = context.config
+        val random = context.random
+        val world = context.world
+        val blockPos = context.origin
+
         //blockPos is sculk block it is placing on
-        if (structureWorldAccess.getBlockState(blockPos).isFullCube(structureWorldAccess, blockPos)) {
-            Direction.entries.forEach {
-                println(it)
-                val posOffset = blockPos.offset(it)
-                if (structureWorldAccess.getBlockState(posOffset).isAir) {
-                    structureWorldAccess.setBlockState(
-                        posOffset,
-                        Blocks.SCULK_CATALYST.defaultState.with(Properties.FACING, it),
-                        3
-                    )
-                    return true
-                }
-                structureWorldAccess.setBlockState(
-                    posOffset,
-                    Blocks.BEACON.defaultState,//.with(it.asProperty(), true),
-                    3
-                )
-            }
+        if (random.nextFloat() <= config.catalystChance()) {
+            extraGrowthCatalyst(world, blockPos)
         }
-        return false
+
+        val extraGrowths = config.extraRareGrowths[random]
+        for (loop in 0 until extraGrowths) {
+            extraGrowthShrieker(world, random, blockPos)
+        }
     }
 
-    @JvmStatic
-    fun extraGrowthShrieker(
+
+    private fun extraGrowthCatalyst(world: StructureWorldAccess, blockPos: BlockPos) {
+        Direction.entries.forEach {
+            val posOffset = blockPos.offset(it)
+            if (
+                world.getBlockState(posOffset).isFullCube(world, posOffset) &&
+                (it == Direction.DOWN || world.getBlockState(blockPos).isIn(BlockTags.REPLACEABLE))
+            ) {
+                world.setBlockState(
+                    blockPos,
+                    Blocks.SCULK_CATALYST.defaultState.with(Properties.FACING, it.opposite),
+                    3
+                )
+                return
+            }
+        }
+    }
+
+    private fun extraGrowthShrieker(
         world: StructureWorldAccess,
         random: RandomGenerator,
         blockPos: BlockPos
@@ -216,11 +226,14 @@ object SculkDirectionalStuff {
         Direction.entries.forEach {
             val blockPosRand = blockPos.getRandomOffset(random, it)
             if (world.getBlockState(blockPosRand).isAir &&
-                world.getBlockState(blockPosRand).isSideSolidFullSquare(world, blockPos.offset(it), it.opposite)
+                world.getBlockState(blockPosRand.offset(it))
+                    .isSideSolidFullSquare(world, blockPosRand.offset(it), it.opposite)
             ) {
                 world.setBlockState(
                     blockPosRand,
-                    Blocks.SCULK_SHRIEKER.defaultState.with(SculkShriekerBlock.CAN_SUMMON, true),
+                    Blocks.SCULK_SHRIEKER.defaultState
+                        .with(Properties.FACING, it.opposite)
+                        .with(SculkShriekerBlock.CAN_SUMMON, true),
                     3
                 )
                 return

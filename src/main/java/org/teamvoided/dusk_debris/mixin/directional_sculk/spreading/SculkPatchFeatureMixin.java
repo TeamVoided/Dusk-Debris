@@ -10,31 +10,21 @@ import net.minecraft.util.random.RandomGenerator;
 import net.minecraft.world.StructureWorldAccess;
 import net.minecraft.world.gen.feature.SculkPatchFeature;
 import net.minecraft.world.gen.feature.SculkPatchFeatureConfig;
+import net.minecraft.world.gen.feature.util.FeatureContext;
 import org.spongepowered.asm.mixin.Debug;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.teamvoided.dusk_debris.block.not_blocks.SculkDirectionalStuff;
 
 @Debug(export = true)
 @Mixin(SculkPatchFeature.class)
 public class SculkPatchFeatureMixin {
-    @Redirect(method = "place", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/StructureWorldAccess;getBlockState(Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/block/BlockState;", ordinal = 0))
-    private BlockState extraGrowthCatalyst(StructureWorldAccess structureWorldAccess, BlockPos blockPos, @Local RandomGenerator random) {
-        var retrn = SculkDirectionalStuff.extraGrowthCatalyst(structureWorldAccess, blockPos);
-        if (!retrn) {
-            return structureWorldAccess.getBlockState(blockPos);
-        } else {
-            return Blocks.AIR.getDefaultState();
-        }
-    }
-
-    @Redirect(method = "place", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/gen/feature/SculkPatchFeatureConfig;extraRareGrowths()Lnet/minecraft/util/math/int_provider/IntProvider;"))
-    private IntProvider extraGrowthShrieker(SculkPatchFeatureConfig config, @Local StructureWorldAccess structureWorldAccess, @Local RandomGenerator random, @Local(ordinal = 0) BlockPos blockPos) {
-        int k = config.extraRareGrowths().get(random);
-        for (int l = 0; l < k; ++l) {
-            SculkDirectionalStuff.extraGrowthShrieker(structureWorldAccess, random, blockPos);
-        }
-        return ConstantIntProvider.create(-10);
+    @Inject(method = "place", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/math/BlockPos;down()Lnet/minecraft/util/math/BlockPos;", ordinal = 0), cancellable = true)
+    private void catalystAndShrieker(FeatureContext<SculkPatchFeatureConfig> context, CallbackInfoReturnable<Boolean> cir) {
+        SculkDirectionalStuff.featureCatalystAndShrieker(context);
+        cir.setReturnValue(true);
     }
 }
