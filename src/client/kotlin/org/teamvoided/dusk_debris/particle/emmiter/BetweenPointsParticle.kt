@@ -1,4 +1,4 @@
-package org.teamvoided.dusk_debris.particle
+package org.teamvoided.dusk_debris.particle.emmiter
 
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
@@ -6,14 +6,9 @@ import net.minecraft.client.particle.*
 import net.minecraft.client.world.ClientWorld
 import net.minecraft.particle.ParticleEffect
 import net.minecraft.particle.ParticleTypes
-import net.minecraft.particle.VibrationParticleEffect
 import net.minecraft.util.math.MathHelper
 import net.minecraft.util.math.Vec3d
-import net.minecraft.world.event.PositionSource
-import org.teamvoided.dusk_debris.block.mixin.TrialSpawnerParticlesMixin
-import org.teamvoided.dusk_debris.util.addParticle
-import org.teamvoided.dusk_debris.util.spawnParticles
-import kotlin.math.sqrt
+import org.teamvoided.dusk_debris.particle.BetweenPointsParticleEffect
 
 class BetweenPointsParticle(
     world: ClientWorld,

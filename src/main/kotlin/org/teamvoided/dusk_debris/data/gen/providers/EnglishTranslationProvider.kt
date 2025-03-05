@@ -10,7 +10,8 @@ import net.minecraft.registry.Registries
 import net.minecraft.util.Identifier
 import org.teamvoided.dusk_debris.data.gen.providers.english_translation.DamageTypeTranslations
 import org.teamvoided.dusk_debris.data.gen.providers.english_translation.PaintingTranslations
-import org.teamvoided.dusk_debris.entity.DuskEntityLists
+import org.teamvoided.dusk_debris.data.tags.DuskFluidTags
+import org.teamvoided.dusk_debris.data.tags.DuskItemTags
 import org.teamvoided.dusk_debris.init.*
 import org.teamvoided.dusk_debris.init.DuskTabs.getKey
 import java.util.concurrent.CompletableFuture
@@ -23,6 +24,9 @@ class EnglishTranslationProvider(o: FabricDataOutput, r: CompletableFuture<Holde
         DuskItems.ITEMS.forEach { gen.add(it.translationKey, genLang(it.id)) }
 //        DuskBlocks.BLOCKS.forEach { gen.add(it.translationKey, genLang(it.id)) }
         DuskEntities.ENTITIES.forEach { gen.add(it.translationKey, genLang(it.id)) }
+        DuskItemTags.ITEM_TAGS.forEach { gen.add(it.translationKey, genLang(it.id)) }
+        DuskFluidTags.FLUID_TAGS.forEach { gen.add(it.translationKey, genLang(it.id)) }
+
 
         gen.add("container.treasure_chest", "Treasure Chest")
 

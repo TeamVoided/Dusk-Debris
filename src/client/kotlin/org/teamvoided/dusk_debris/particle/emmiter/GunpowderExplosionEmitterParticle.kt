@@ -1,4 +1,4 @@
-package org.teamvoided.dusk_debris.particle
+package org.teamvoided.dusk_debris.particle.emmiter
 
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
@@ -8,8 +8,9 @@ import net.minecraft.client.particle.ParticleFactory
 import net.minecraft.client.world.ClientWorld
 import net.minecraft.util.math.MathHelper
 import net.minecraft.util.math.Vec3d
+import org.teamvoided.dusk_debris.particle.GunpowderExplosionEmitterParticleEffect
+import org.teamvoided.dusk_debris.particle.GunpowderExplosionSmokeParticleEffect
 import java.awt.Color
-import kotlin.math.sqrt
 
 @Environment(EnvType.CLIENT)
 class GunpowderExplosionEmitterParticle(

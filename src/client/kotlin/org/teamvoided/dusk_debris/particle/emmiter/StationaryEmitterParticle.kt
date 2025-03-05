@@ -1,10 +1,11 @@
-package org.teamvoided.dusk_debris.particle
+package org.teamvoided.dusk_debris.particle.emmiter
 
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import net.minecraft.client.particle.*
 import net.minecraft.client.world.ClientWorld
 import net.minecraft.particle.ParticleEffect
+import org.teamvoided.dusk_debris.particle.StationaryEmitterParticleEffect
 
 class StationaryEmitterParticle(
     world: ClientWorld,

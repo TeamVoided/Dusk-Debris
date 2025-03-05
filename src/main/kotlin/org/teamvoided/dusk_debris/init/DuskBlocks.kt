@@ -10,6 +10,7 @@ import net.minecraft.block.piston.PistonBehavior
 import net.minecraft.entity.effect.StatusEffects
 import net.minecraft.item.BlockItem
 import net.minecraft.item.Item
+import net.minecraft.item.TallBlockItem
 import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
 import net.minecraft.sound.BlockSoundGroup
@@ -32,6 +33,7 @@ import org.teamvoided.dusk_debris.block.voided.sign.VoidSignBlock
 import org.teamvoided.dusk_debris.block.voided.sign.VoidWallHangingSignBlock
 import org.teamvoided.dusk_debris.block.voided.sign.VoidWallSignBlock
 import org.teamvoided.dusk_debris.data.worldgen.DuskConfiguredFeatures
+import org.teamvoided.dusk_debris.item.StrongScaffoldingItem
 import org.teamvoided.dusk_debris.util.*
 
 @Suppress("HasPlatformType", "MemberVisibilityCanBePrivate", "unused", "DEPRECATION")
@@ -42,7 +44,8 @@ object DuskBlocks {
 
     val TEST_BLOCK = register("test_block", EntityTestParticleBlock(copy(STONE)))
 
-    val STRONG_SCAFFOLDING = register("strong_scaffolding", StrongScaffoldingBlock(copy(Blocks.SCAFFOLDING)))
+    val STRONG_SCAFFOLDING =
+        registerStrongScaffolding("strong_scaffolding", StrongScaffoldingBlock(copy(SCAFFOLDING))).cutout()
 
     val ACID = registerNoItem("acid", FluidBlock(DuskFluids.ACID, copy(WATER).mapColor(MapColor.LIME)))
     val FOG_BUBBLE = registerNoItem(
@@ -518,7 +521,7 @@ object DuskBlocks {
     )
     val CYPRESS_STAIRS = register("cypress_stairs", legacyStairsOf(CYPRESS_PLANKS))
     val CYPRESS_SLAB = register("cypress_slab", SlabBlock(copy(CYPRESS_PLANKS)))
-    val CYPRESS_DOOR = registerNoItem(
+    val CYPRESS_DOOR = registerDoor(
         "cypress_door",
         DoorBlock(
             DuskBlockSetType.CYPRESS_BLOCK_SET_TYPE,
@@ -616,7 +619,7 @@ object DuskBlocks {
     )
     val SEQUOIA_STAIRS = register("sequoia_stairs", legacyStairsOf(SEQUOIA_PLANKS))
     val SEQUOIA_SLAB = register("sequoia_slab", SlabBlock(copy(SEQUOIA_PLANKS)))
-    val SEQUOIA_DOOR = registerNoItem(
+    val SEQUOIA_DOOR = registerDoor(
         "sequoia_door", DoorBlock(
             DuskBlockSetType.SEQUOIA_BLOCK_SET_TYPE,
             AbstractBlock.Settings.create().mapColor(charredPlanksColor).instrument(NoteBlockInstrument.BASS)
@@ -794,7 +797,7 @@ object DuskBlocks {
                 .strength(2.0f, 3.0f).sounds(BlockSoundGroup.WOOD)
         )
     )
-    val CHARRED_DOOR = registerNoItem(
+    val CHARRED_DOOR = registerDoor(
         "charred_door",
         DoorBlock(
             DuskBlockSetType.CHARRED_BLOCK_SET_TYPE,
@@ -894,6 +897,18 @@ object DuskBlocks {
     fun register(id: String, maxCount: Int, block: Block): Block {
         val regBlock = registerNoItem(id, block)
         DuskItems.register(id, BlockItem(regBlock, Item.Settings().maxCount(maxCount)))
+        return regBlock
+    }
+
+    fun registerStrongScaffolding(id: String, block: Block): Block {
+        val regBlock = registerNoItem(id, block)
+        DuskItems.register(id, StrongScaffoldingItem(regBlock, Item.Settings()))
+        return regBlock
+    }
+
+    fun registerDoor(id: String, block: Block): Block {
+        val regBlock = registerNoItem(id, block)
+        DuskItems.register(id, TallBlockItem(regBlock, Item.Settings()))
         return regBlock
     }
 

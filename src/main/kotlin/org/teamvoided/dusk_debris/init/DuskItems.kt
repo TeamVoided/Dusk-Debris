@@ -121,7 +121,6 @@ object DuskItems {
         PowderSnowBucketItem(DuskBlocks.BOG_MUD, SoundEvents.ITEM_BUCKET_EMPTY, Item.Settings())
     )
 
-    val CYPRESS_DOOR = register("cypress_door", TallBlockItem(DuskBlocks.CYPRESS_DOOR, Item.Settings()))
     val CYPRESS_SIGN = register(
         "cypress_sign",
         SignItem((Item.Settings()).maxCount(16), DuskBlocks.CYPRESS_SIGN, DuskBlocks.CYPRESS_WALL_SIGN)
@@ -135,7 +134,6 @@ object DuskItems {
         )
     )
 
-    val SEQUOIA_DOOR = register("sequoia_door", TallBlockItem(DuskBlocks.SEQUOIA_DOOR, Item.Settings()))
     val SEQUOIA_SIGN = register(
         "sequoia_sign",
         SignItem((Item.Settings()).maxCount(16), DuskBlocks.SEQUOIA_SIGN, DuskBlocks.SEQUOIA_WALL_SIGN)
@@ -149,7 +147,6 @@ object DuskItems {
         )
     )
 
-    val CHARRED_DOOR = register("charred_door", TallBlockItem(DuskBlocks.CHARRED_DOOR, Item.Settings()))
     val CHARRED_SIGN = register(
         "charred_sign",
         SignItem((Item.Settings()).maxCount(16), DuskBlocks.CHARRED_SIGN, DuskBlocks.CHARRED_WALL_SIGN)
