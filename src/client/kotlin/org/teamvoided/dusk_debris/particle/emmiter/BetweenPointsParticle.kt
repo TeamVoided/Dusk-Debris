@@ -37,7 +37,7 @@ class BetweenPointsParticle(
             world.addParticle(
                 particle,
                 targetPos.x, targetPos.y, targetPos.z,
-                velocityX, velocityY, velocityZ
+                0.0, 0.0, 0.0
             )
             this.markDead()
         } else if (age % rate == 0) {
@@ -55,7 +55,7 @@ class BetweenPointsParticle(
                 this.x + (random.nextDouble() - 0.5),
                 this.y + (random.nextDouble() - 0.5),
                 this.z + (random.nextDouble() - 0.5),
-                velocityX, velocityY, velocityZ
+                0.0, 0.0, 0.0
             )
         }
     }
