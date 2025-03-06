@@ -16,7 +16,7 @@ import org.teamvoided.dusk_debris.util.model
 fun BlockStateModelGenerator.stoneChest(block: Block) {
     this.blockStateCollector.accept(
         VariantsBlockStateSupplier.create(block)
-//            .coordinate(BlockStateModelGenerator.createNorthDefaultHorizontalRotationStates())
+            .coordinate(BlockStateModelGenerator.createSouthDefaultHorizontalRotationStates())
             .coordinate(this.chestPhases(block))
     )
 }
@@ -39,17 +39,9 @@ fun BlockStateModelGenerator.chestPhases(block: Block): BlockStateVariantMap.Tri
                 model = this.stoneChestModel(block, typeS, phaseS)
             }
 
-            variants.register(
-                type,
-                phase,
-                false,
-                BlockStateVariant.create().put(VariantSettings.MODEL, model)
-            ).register(
-                type,
-                phase,
-                true,
-                BlockStateVariant.create().put(VariantSettings.MODEL, lidModel)
-            )
+            variants
+                .register(type, phase, false, BlockStateVariant.create().put(VariantSettings.MODEL, model))
+                .register(type, phase, true, BlockStateVariant.create().put(VariantSettings.MODEL, lidModel))
         }
     }
     return variants
@@ -60,22 +52,20 @@ private fun BlockStateModelGenerator.stoneChestModel(
     variant: String = "",
     part: String = ""
 ): Identifier {
-    val topOpen = if (part == "_open") "_open" else ""
-    val bottomOpen = if (part == "_lid") "_open" else ""
-//    val texture: Texture = Texture()
-//        .put(TextureKey.FRONT, block.model("_front$variant"))
-//        .put(TextureKey.SIDE, block.model("_side"))
-//        .put(TextureKey.BACK, block.model("_back$variant"))
-//        .put(TextureKey.TOP, block.model("_top$variant$topOpen"))
-//        .put(TextureKey.BOTTOM, block.model("_bottom$variant$bottomOpen"))
-
-    val bloc = Blocks.STONE_BRICKS
     val texture: Texture = Texture()
-        .put(TextureKey.FRONT, bloc.model())
-        .put(TextureKey.SIDE, bloc.model())
-        .put(TextureKey.BACK, bloc.model())
-        .put(TextureKey.TOP, bloc.model())
-        .put(TextureKey.BOTTOM, bloc.model())
+        .put(TextureKey.FRONT, block.model("_front$variant"))
+        .put(TextureKey.SIDE, block.model("_side"))
+        .put(TextureKey.BACK, block.model("_back$variant"))
+        .put(TextureKey.TOP, block.model("_top$variant" + if (part == "_open") "_open" else ""))
+        .put(TextureKey.BOTTOM, block.model("_bottom$variant" + if (part == "_lid") "_open" else ""))
+
+//    val bloc = Blocks.STONE_BRICKS
+//    val texture: Texture = Texture()
+//        .put(TextureKey.FRONT, bloc.model())
+//        .put(TextureKey.SIDE, bloc.model())
+//        .put(TextureKey.BACK, bloc.model())
+//        .put(TextureKey.TOP, bloc.model())
+//        .put(TextureKey.BOTTOM, bloc.model())
     return block(
         "parent/stone_chest$variant$part",
         TextureKey.FRONT,

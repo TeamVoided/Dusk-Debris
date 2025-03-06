@@ -9,12 +9,14 @@ import net.minecraft.block.entity.BlockEntityTicker
 import net.minecraft.block.entity.BlockEntityType
 import net.minecraft.block.entity.ChestBlockEntity
 import net.minecraft.item.ItemPlacementContext
+import net.minecraft.server.world.ServerWorld
 import net.minecraft.stat.Stat
 import net.minecraft.stat.Stats
 import net.minecraft.state.StateManager
 import net.minecraft.state.property.Properties
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.BlockPos
+import net.minecraft.util.random.RandomGenerator
 import net.minecraft.world.World
 import org.teamvoided.dusk_debris.block.entity.StoneChestBlockEntity
 import org.teamvoided.dusk_debris.block.not_blocks.ChestPhase

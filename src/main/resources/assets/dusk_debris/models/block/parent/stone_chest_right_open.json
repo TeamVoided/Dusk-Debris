@@ -5,11 +5,11 @@
 	"elements": [
 		{
 			"from": [1, 0, 1],
-			"to": [16, 9, 15],
+			"to": [16, 10, 15],
 			"faces": {
-				"north": {"uv": [0, 7, 15, 16], "texture": "#front"},
-				"south": {"uv": [1, 7, 16, 16], "texture": "#back"},
-				"west": {"uv": [1, 7, 15, 16], "texture": "#side"},
+				"north": {"uv": [0, 6, 15, 16], "texture": "#front"},
+				"south": {"uv": [1, 6, 16, 16], "texture": "#back"},
+				"west": {"uv": [1, 6, 15, 16], "texture": "#side"},
 				"up": {"uv": [1, 1, 16, 15], "texture": "#top"},
 				"down": {"uv": [1, 1, 16, 15], "texture": "#bottom"}
 			}
