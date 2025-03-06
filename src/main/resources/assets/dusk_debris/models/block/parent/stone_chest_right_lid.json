@@ -1,0 +1,18 @@
+{
+	"textures": {
+		"particle": "#front"
+	},
+	"elements": [
+		{
+			"from": [1, 9, 1],
+			"to": [16, 14, 15],
+			"faces": {
+				"north": {"uv": [0, 2, 15, 7], "texture": "#front"},
+				"south": {"uv": [1, 2, 16, 7], "texture": "#back"},
+				"west": {"uv": [1, 2, 15, 7], "texture": "#side"},
+				"up": {"uv": [1, 1, 16, 15], "texture": "#top"},
+				"down": {"uv": [1, 1, 16, 15], "texture": "#bottom"}
+			}
+		}
+	]
+}

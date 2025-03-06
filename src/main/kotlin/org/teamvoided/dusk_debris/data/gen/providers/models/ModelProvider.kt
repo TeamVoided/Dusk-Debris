@@ -10,6 +10,7 @@ import net.minecraft.util.Identifier
 import org.teamvoided.dusk_debris.block.DuskBlockFamilies
 import org.teamvoided.dusk_debris.block.DuskBlockLists
 import org.teamvoided.dusk_debris.data.gen.providers.models.MinecraftModelProvider.generateAlternativeMinecraftModels
+import org.teamvoided.dusk_debris.data.gen.providers.models.StoneModelProvider.generateStoneModels
 import org.teamvoided.dusk_debris.data.gen.providers.models.WoodModelProvider.generateWoodModels
 import org.teamvoided.dusk_debris.init.DuskBlocks
 import org.teamvoided.dusk_debris.init.DuskItems
@@ -47,6 +48,7 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
             gen.generateAlternativeMinecraftModels()
         }
         gen.generateWoodModels()
+        gen.generateStoneModels()
 
         DuskItemLists.SPAWN_EGGS_ITEM_LIST.forEach {
             gen.registerParentedItemModel(it, Identifier.ofDefault("item/template_spawn_egg"))

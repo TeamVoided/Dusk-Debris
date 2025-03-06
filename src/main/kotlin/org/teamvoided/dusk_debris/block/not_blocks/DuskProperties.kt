@@ -13,6 +13,11 @@ object DuskProperties {
     val DISTANCE_0_14: IntProperty = IntProperty.of("distance", 0, 14)
 
     val SQUISHED: BooleanProperty = BooleanProperty.of("squished")
+    val LID: BooleanProperty = BooleanProperty.of("lid")
+
+
+    val CHEST_PHASE: EnumProperty<ChestPhase> = EnumProperty.of("chest_phase", ChestPhase::class.java)
+
     val SQUISHED_VOLATILE: EnumProperty<SquishablePhases> =
         EnumProperty.of("bubble_phase", SquishablePhases::class.java)
     val GODHOME_BRONZE_PHASE: EnumProperty<GodhomeBronzePhase> =

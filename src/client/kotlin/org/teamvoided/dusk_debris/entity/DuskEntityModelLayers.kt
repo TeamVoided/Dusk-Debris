@@ -3,19 +3,17 @@ package org.teamvoided.dusk_debris.entity
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry
 import net.minecraft.client.model.Dilation
 import net.minecraft.client.model.TexturedModelData
-import net.minecraft.client.render.entity.model.BipedArmorEntityModel
-import net.minecraft.client.render.entity.model.BipedEntityModel
-import net.minecraft.client.render.entity.model.EntityModelLayer
-import net.minecraft.client.render.entity.model.HorseEntityModel
+import net.minecraft.client.render.entity.model.*
 import org.teamvoided.dusk_debris.DuskDebris.id
+import org.teamvoided.dusk_debris.entity.block.treasure_chest.TreasureChestBlockEntityModel
 import org.teamvoided.dusk_debris.entity.jellyfish.tiny.model.TinyEnemyJellyfishCoreModel
 import org.teamvoided.dusk_debris.entity.jellyfish.tiny.model.TinyEnemyJellyfishModel
+import org.teamvoided.dusk_debris.entity.jellyfish.volaphyra.model.VolaphyraCoreModel
+import org.teamvoided.dusk_debris.entity.jellyfish.volaphyra.model.VolaphyraMesogleaModel
 import org.teamvoided.dusk_debris.entity.skeleton.render.GloomEntityModel
 import org.teamvoided.dusk_debris.entity.skeleton.render.SkeletonWolfEntityModel.Companion.texturedModelData
 import org.teamvoided.dusk_debris.entity.tuff_golem.model.TuffGolemCloakModel
 import org.teamvoided.dusk_debris.entity.tuff_golem.model.TuffGolemEntityModel
-import org.teamvoided.dusk_debris.entity.jellyfish.volaphyra.model.VolaphyraCoreModel
-import org.teamvoided.dusk_debris.entity.jellyfish.volaphyra.model.VolaphyraMesogleaModel
 
 object DuskEntityModelLayers {
     val GLOOM: EntityModelLayer = registerMain("gloomed")
@@ -37,6 +35,10 @@ object DuskEntityModelLayers {
     val TINY_ENEMY_JELLYFISH: EntityModelLayer = registerMain("tiny_enemy_jellyfish")
     val TINY_ENEMY_JELLYFISH_MESOGLEA: EntityModelLayer = register("tiny_enemy_jellyfish", "mesoglea")
 
+    val TREASURE_CHEST: EntityModelLayer = registerMain("treasure_chest")
+    val TREASURE_CHEST_LEFT: EntityModelLayer = registerMain("treasure_chest_left")
+    val TREASURE_CHEST_RIGHT: EntityModelLayer = registerMain("treasure_chest_right")
+
 
     fun init() {
         EntityModelLayerRegistry.registerModelLayer(GLOOM, GloomEntityModel::texturedModelData)
@@ -57,6 +59,11 @@ object DuskEntityModelLayers {
 
         EntityModelLayerRegistry.registerModelLayer(TINY_ENEMY_JELLYFISH, TinyEnemyJellyfishCoreModel::texturedModelData)
         EntityModelLayerRegistry.registerModelLayer(TINY_ENEMY_JELLYFISH_MESOGLEA, TinyEnemyJellyfishModel::texturedModelData)
+
+
+        EntityModelLayerRegistry.registerModelLayer(TREASURE_CHEST, TreasureChestBlockEntityModel::singleTexturedModelData)
+        EntityModelLayerRegistry.registerModelLayer(TREASURE_CHEST_LEFT, TreasureChestBlockEntityModel::leftDoubleTexturedModelData)
+        EntityModelLayerRegistry.registerModelLayer(TREASURE_CHEST_RIGHT, TreasureChestBlockEntityModel::rightDoubleTexturedModelData)
     }
 
     private fun createInnerArmor(): TexturedModelData =
