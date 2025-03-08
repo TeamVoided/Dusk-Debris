@@ -42,7 +42,7 @@ class StoneChestBlockEntityRenderer<T>(ctx: BlockEntityRendererFactory.Context) 
         if (world != null && blockEntity is StoneChestBlockEntity) {
             val blockState = blockEntity.cachedState
             val phase = blockState.get(DuskProperties.CHEST_PHASE)
-            if (blockEntity.shouldRenderLid() ) {
+            if (blockEntity.shouldRenderLid()) {
                 val animProg = animProg(blockEntity, phase.ordinal, tickDelta)
 
                 matrices.push()
@@ -63,15 +63,15 @@ class StoneChestBlockEntityRenderer<T>(ctx: BlockEntityRendererFactory.Context) 
 
     fun MatrixStack.animateLid(state: BlockState, progress: Float) {
         val one = 0.0625f
-        val fifteen = 0.9375f
+        val fifteen = 1f - one//0.9375f
         val type = state.get(Properties.CHEST_TYPE)
         val isDouble = if (type != ChestType.SINGLE) Utils.rotate45 / 2 else Utils.rotate45
         val isRight = if (type == ChestType.RIGHT) 1f else 0f
         val point = when (state.get(Properties.HORIZONTAL_FACING)) {
-            Direction.NORTH -> Vector2f(one, fifteen)
-            Direction.SOUTH -> Vector2f(fifteen, one)
-            Direction.WEST -> Vector2f(fifteen, fifteen)
-            Direction.EAST -> Vector2f(one, one)
+            Direction.NORTH -> Vector2f(one - isRight, fifteen)
+            Direction.SOUTH -> Vector2f(fifteen + isRight, one)
+            Direction.WEST -> Vector2f(fifteen, fifteen + isRight)
+            Direction.EAST -> Vector2f(one, one - isRight)
             else -> Vector2f(0f, 0f)
         }
         this.rotateAround(Axis.Y_NEGATIVE.rotation(isDouble * progress), point.x, 0.625f, point.y)

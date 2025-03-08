@@ -1,4 +1,4 @@
-package org.teamvoided.dusk_debris.data.gen.world.gen
+package org.teamvoided.dusk_debris.data.gen.world.gen.biome
 
 import net.minecraft.client.sound.MusicType
 import net.minecraft.entity.EntityType
@@ -11,16 +11,15 @@ import net.minecraft.world.biome.*
 import net.minecraft.world.gen.GenerationStep
 import net.minecraft.world.gen.feature.DefaultBiomeFeatures
 import net.minecraft.world.gen.feature.VegetationPlacedFeatures
-import org.teamvoided.dusk_debris.data.gen.world.gen.biome_creators.HollowKnightBiomeCreators.createFogCanyon
-import org.teamvoided.dusk_debris.data.gen.world.gen.biome_creators.NetherBiomeCreators.createBasaltDeltas
-import org.teamvoided.dusk_debris.data.gen.world.gen.biome_creators.NetherBiomeCreators.createCrimsonForest
-import org.teamvoided.dusk_debris.data.gen.world.gen.biome_creators.NetherBiomeCreators.createNetherTest
-import org.teamvoided.dusk_debris.data.gen.world.gen.biome_creators.NetherBiomeCreators.createNetherWastes
-import org.teamvoided.dusk_debris.data.gen.world.gen.biome_creators.NetherBiomeCreators.createSoulSandValley
-import org.teamvoided.dusk_debris.data.gen.world.gen.biome_creators.NetherBiomeCreators.createWarpedForest
+import org.teamvoided.dusk_debris.data.gen.world.gen.biome.creators.HollowKnightBiomeCreators.createFogCanyon
+import org.teamvoided.dusk_debris.data.gen.world.gen.biome.creators.NetherBiomeCreators.createBasaltDeltas
+import org.teamvoided.dusk_debris.data.gen.world.gen.biome.creators.NetherBiomeCreators.createCrimsonForest
+import org.teamvoided.dusk_debris.data.gen.world.gen.biome.creators.NetherBiomeCreators.createNetherTest
+import org.teamvoided.dusk_debris.data.gen.world.gen.biome.creators.NetherBiomeCreators.createNetherWastes
+import org.teamvoided.dusk_debris.data.gen.world.gen.biome.creators.NetherBiomeCreators.createSoulSandValley
+import org.teamvoided.dusk_debris.data.gen.world.gen.biome.creators.NetherBiomeCreators.createWarpedForest
 import org.teamvoided.dusk_debris.data.worldgen.DuskConfiguredCarvers
 import org.teamvoided.dusk_debris.data.worldgen.DuskPlacedFeatures
-import org.teamvoided.dusk_debris.init.DuskParticles
 import org.teamvoided.dusk_debris.data.worldgen.DuskBiomes
 
 object BiomeCreator {

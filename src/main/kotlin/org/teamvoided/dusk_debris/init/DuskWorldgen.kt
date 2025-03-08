@@ -1,10 +1,7 @@
 package org.teamvoided.dusk_debris.init
 
 import org.teamvoided.dusk_debris.data.worldgen.DuskBiomes
-import org.teamvoided.dusk_debris.init.worldgen.DuskCarvers
-import org.teamvoided.dusk_debris.init.worldgen.DuskDensityFunction
-import org.teamvoided.dusk_debris.init.worldgen.DuskFeatures
-import org.teamvoided.dusk_debris.init.worldgen.DuskSurfaceRules
+import org.teamvoided.dusk_debris.init.worldgen.*
 import org.teamvoided.dusk_debris.init.worldgen.trees.DuskTreeStuff
 
 object DuskWorldgen {
@@ -13,7 +10,9 @@ object DuskWorldgen {
         DuskBiomes.init()
         DuskCarvers.init()
         DuskFeatures.init()
+        DuskStructureType.init()
         DuskDensityFunction.init()
         DuskSurfaceRules.init()
+        DuskStructurePieceType.init()
     }
 }

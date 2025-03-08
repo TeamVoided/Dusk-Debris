@@ -5,6 +5,7 @@ import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalBiomeTags
 import net.minecraft.registry.HolderLookup
 import net.minecraft.registry.RegistryKeys
+import net.minecraft.registry.tag.BiomeTags
 import net.minecraft.world.biome.Biome
 import net.minecraft.world.biome.Biomes
 import org.teamvoided.dusk_debris.data.tags.DuskBiomeTags
@@ -22,7 +23,7 @@ class BiomeTagsProvider(o: FabricDataOutput, r: CompletableFuture<HolderLookup.P
 
     fun duskTags() {
         getOrCreateTagBuilder(DuskBiomeTags.TEST)
-            .add(Biomes.SOUL_SAND_VALLEY)
+            .forceAddTag(BiomeTags.OVERWORLD)
 
         getOrCreateTagBuilder(DuskBiomeTags.WORLDNOISE_WATER)
             .forceAddTag(ConventionalBiomeTags.IS_RIVER)

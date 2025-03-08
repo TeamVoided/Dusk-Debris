@@ -13,13 +13,8 @@ import net.minecraft.entity.ai.brain.MemoryModuleType
 import net.minecraft.entity.ai.brain.sensor.Sensor
 import net.minecraft.entity.ai.brain.sensor.SensorType
 import net.minecraft.entity.ai.brain.task.*
-import net.minecraft.entity.mob.MobEntity
-import net.minecraft.server.world.ServerWorld
-import net.minecraft.sound.SoundEvents
-import net.minecraft.util.Unit
 import net.minecraft.util.dynamic.GlobalPos
 import org.teamvoided.dusk_debris.init.brain.DuskSensorType
-import java.util.*
 import java.util.Set
 
 object GiantEnemyJellyfishBrain {

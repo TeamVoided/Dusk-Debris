@@ -1,4 +1,4 @@
-package org.teamvoided.dusk_debris.data.gen.world.gen.biome_creators
+package org.teamvoided.dusk_debris.data.gen.world.gen.biome.creators
 
 import net.minecraft.client.sound.MusicType
 import net.minecraft.entity.EntityType

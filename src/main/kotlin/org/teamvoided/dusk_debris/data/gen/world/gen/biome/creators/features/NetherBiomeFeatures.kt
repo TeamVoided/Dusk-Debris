@@ -1,4 +1,4 @@
-package org.teamvoided.dusk_debris.data.gen.world.gen.biome_creators.features
+package org.teamvoided.dusk_debris.data.gen.world.gen.biome.creators.features
 
 import net.minecraft.world.biome.GenerationSettings
 import net.minecraft.world.gen.GenerationStep

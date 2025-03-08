@@ -15,7 +15,7 @@ import org.teamvoided.dusk_debris.init.DuskBlockEntities
 class StoneChestBlockEntity(pos: BlockPos, state: BlockState) :
     ChestBlockEntity(DuskBlockEntities.STONE_CHEST, pos, state) {
     var lidOpeningTicks = 0
-    var renderingDelay = 0
+    var renderingDelay = false
 
     override fun onOpen(player: PlayerEntity) {
         super.onOpen(player)
@@ -41,24 +41,21 @@ class StoneChestBlockEntity(pos: BlockPos, state: BlockState) :
         const val MAX_OPENING_TICKS = 20
         fun tick(world: World, pos: BlockPos, state: BlockState, blockEntity: StoneChestBlockEntity) {
             val phase = state.get(DuskProperties.CHEST_PHASE)
-            if (phase.ordinal != 0 || blockEntity.lidOpeningTicks > 0) {
-                blockEntity.renderingDelay = 1
-                if (phase.ordinal == 2) {
-                    if (blockEntity.lidOpeningTicks < MAX_OPENING_TICKS)
-                        blockEntity.lidOpeningTicks++
-                } else {
-                    blockEntity.lidOpeningTicks--
-                }
-                if (blockEntity.lidOpeningTicks <= 0) {
-                    blockEntity.setOpen(state, 0)
-                }
-            } else if (blockEntity.renderingDelay > 0) {
-                blockEntity.renderingDelay--
+            if (phase.ordinal == 2) {
+                blockEntity.renderingDelay = true
+                if (blockEntity.lidOpeningTicks < MAX_OPENING_TICKS)
+                    blockEntity.lidOpeningTicks++
+            } else if (blockEntity.lidOpeningTicks > 0) {
+                blockEntity.lidOpeningTicks--
+            } else if (phase.ordinal != 0) {
+                blockEntity.setOpen(state, 0)
+            } else if (blockEntity.renderingDelay) {
+                blockEntity.renderingDelay = false
             }
         }
 
         fun StoneChestBlockEntity.shouldRenderLid(): Boolean {
-            return this.renderingDelay > 0 || this.lidOpeningTicks > 0 || this.cachedState.get(DuskProperties.CHEST_PHASE) != ChestPhase.CLOSED
+            return this.renderingDelay || this.lidOpeningTicks > 0 || this.cachedState.get(DuskProperties.CHEST_PHASE) != ChestPhase.CLOSED
         }
     }
 }
