@@ -3,6 +3,7 @@ package org.teamvoided.dusk_debris.world.gen.structure.piece
 import com.mojang.logging.LogUtils
 import com.mojang.serialization.DataResult
 import com.mojang.serialization.DynamicOps
+import net.minecraft.block.Blocks
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.nbt.NbtElement
 import net.minecraft.nbt.NbtOps
@@ -117,6 +118,24 @@ class PoolNoJigsawStructurePiece : StructurePiece {
             this.liquidSettings,
             keepJigsaws
         )
+        world.setBlocksBoxCorners(boundingBox)
+//        net.minecraft.structure.piece.StructurePiece.createBox
+    }
+
+    private fun StructureWorldAccess.setBlocksBoxCorners(box: BlockBox) {
+        val poses = listOf(
+            BlockPos(box.minX, box.minY, box.minZ),
+            BlockPos(box.maxX, box.minY, box.minZ),
+            BlockPos(box.minX, box.minY, box.maxZ),
+            BlockPos(box.maxX, box.minY, box.maxZ),
+            BlockPos(box.minX, box.maxY, box.minZ),
+            BlockPos(box.maxX, box.maxY, box.minZ),
+            BlockPos(box.minX, box.maxY, box.maxZ),
+            BlockPos(box.maxX, box.maxY, box.maxZ)
+        )
+        poses.forEach {
+            this.setBlockState(it, Blocks.TINTED_GLASS.defaultState, 2)
+        }
     }
 
     override fun translate(x: Int, y: Int, z: Int) {
@@ -125,7 +144,7 @@ class PoolNoJigsawStructurePiece : StructurePiece {
     }
 
     override fun getRotation(): BlockRotation {
-        return this.rotation
+        return this.rotationSet
     }
 
     override fun toString(): String {

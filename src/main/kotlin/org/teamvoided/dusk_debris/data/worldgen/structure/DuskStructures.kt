@@ -12,6 +12,7 @@ object DuskStructures {
     val TEST = create("test")
 
     val CAVE_FOSSIL = create("cave_fossil")
+    val ANCIENT_STRUCTURES = create("ancient_structures")
 
     fun init() {}
 

@@ -23,12 +23,27 @@ object StructurePoolCreator {
             DuskStructurePools.NETHER_FOSSILS,
             poolEmpty,
             StructurePool.Projection.RIGID,
-            legacySingle("village/swamp/villagers/baby", procEmpty),
-            legacySingle("village/swamp/villagers/nitwit", procEmpty),
-            legacySingle("village/swamp/villagers/unemployed", procEmpty, 10)
+            legacySingleMC("nether_fossils/fossil_1", procEmpty),
+            legacySingleMC("nether_fossils/fossil_2", procEmpty),
+            legacySingleMC("nether_fossils/fossil_3", procEmpty),
+            legacySingleMC("nether_fossils/fossil_4", procEmpty),
+            legacySingleMC("nether_fossils/fossil_5", procEmpty),
+            legacySingleMC("nether_fossils/fossil_6", procEmpty),
+            legacySingleMC("nether_fossils/fossil_7", procEmpty),
+            legacySingleMC("nether_fossils/fossil_8", procEmpty),
+            legacySingleMC("nether_fossils/fossil_9", procEmpty),
+            legacySingleMC("nether_fossils/fossil_10", procEmpty),
+            legacySingleMC("nether_fossils/fossil_11", procEmpty),
+            legacySingleMC("nether_fossils/fossil_12", procEmpty),
+            legacySingleMC("nether_fossils/fossil_13", procEmpty),
+            legacySingleMC("nether_fossils/fossil_14", procEmpty),
         )
-
-
+        c.register(
+            DuskStructurePools.TEST,
+            poolEmpty,
+            StructurePool.Projection.RIGID,
+            legacySingle("test", procEmpty)
+        )
     }
 
     fun BootstrapContext<StructurePool>.register(
@@ -37,17 +52,12 @@ object StructurePoolCreator {
         projection: StructurePool.Projection,
         vararg piece: Pair<Function<StructurePool.Projection, out StructurePoolElement>, Int>
     ): Holder.Reference<StructurePool> {
-        return this.register(
-            key,
-            StructurePool(
-                fallback,
-                piece.toList(),
-                projection
-            )
-        )
+        return this.register(key, StructurePool(fallback, piece.toList(), projection))
     }
 
-    fun id(str: String) = "$MODID:$str"
+    private fun id(str: String) = "$MODID:$str"
+    private fun mc(str: String) = "minecraft:$str"
+
     private fun single(
         str: String,
         processors: Holder<StructureProcessorList>,
@@ -61,6 +71,13 @@ object StructurePoolCreator {
         weight: Int = 1
     ): Pair<Function<StructurePool.Projection, out StructurePoolElement>, Int> =
         Pair(StructurePoolElement.ofProcessedLegacySingle(id(str), processors), weight)
+
+    private fun legacySingleMC(
+        str: String,
+        processors: Holder<StructureProcessorList>,
+        weight: Int = 1
+    ): Pair<Function<StructurePool.Projection, out StructurePoolElement>, Int> =
+        Pair(StructurePoolElement.ofProcessedLegacySingle(mc(str), processors), weight)
 
 
     private fun feature(

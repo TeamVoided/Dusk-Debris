@@ -14,6 +14,7 @@ import org.teamvoided.dusk_debris.data.gen.providers.variants.SnifferVariants
 import org.teamvoided.dusk_debris.data.gen.world.gen.*
 import org.teamvoided.dusk_debris.data.gen.world.gen.biome.BiomeCreator
 import org.teamvoided.dusk_debris.data.gen.world.gen.structure.StructureCreator
+import org.teamvoided.dusk_debris.data.gen.world.gen.structure.StructurePoolCreator
 import org.teamvoided.dusk_debris.data.gen.world.gen.structure.StructureSetCreator
 import org.teamvoided.dusk_debris.init.DuskRegistries
 
@@ -50,6 +51,7 @@ class DuskDebrisData : DataGeneratorEntrypoint {
         gen.add(RegistryKeys.DENSITY_FUNCTION, DensityFunctionCreator::bootstrap)
         gen.add(RegistryKeys.CHUNK_GENERATOR_SETTINGS, NoiseSettingsGenerator::bootstrap)
 
+        gen.add(RegistryKeys.STRUCTURE_POOL, StructurePoolCreator::bootstrap)
         gen.add(RegistryKeys.STRUCTURE_FEATURE, StructureCreator::bootstrap)
         gen.add(RegistryKeys.STRUCTURE_SET, StructureSetCreator::bootstrap)
 

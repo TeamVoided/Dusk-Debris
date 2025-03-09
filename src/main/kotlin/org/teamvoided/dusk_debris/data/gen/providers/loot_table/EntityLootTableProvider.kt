@@ -63,13 +63,13 @@ class EntityLootTableProvider(o: FabricDataOutput, val r: CompletableFuture<Hold
             LootTable.builder().pool(
                 LootPool.builder().rolls(Utils.constantNum(1))
                     .with(EmptyEntry.builder().weight(1000))
-                    .with(LootTableEntry.method_428(DuskLootTables.ENDERMAN_OVERWORLD_GENERIC).weight(25))
+                    .with(LootTableEntry.method_428(DuskLootTables.ENDERMAN_OVERWORLD_GENERIC).weight(5))
                     .with(DuskLootTables.ENDERMAN_NETHER_GENERIC, ConventionalBiomeTags.IS_NETHER)
                     .with(DuskLootTables.ENDERMAN_END_GENERIC, ConventionalBiomeTags.IS_END)
-                    .with(DuskLootTables.ENDERMAN_OVERWORLD_FLOWER, ConventionalBiomeTags.IS_FLORAL, 50)
-                    .with(DuskLootTables.ENDERMAN_OVERWORLD_ICE, ConventionalBiomeTags.IS_COLD_OVERWORLD, 25)
-                    .with(DuskLootTables.ENDERMAN_OVERWORLD_DESERT, ConventionalBiomeTags.IS_DESERT, 25)
-                    .with(DuskLootTables.ENDERMAN_OVERWORLD_BADLANDS, ConventionalBiomeTags.IS_BADLANDS, 25)
+                    .with(DuskLootTables.ENDERMAN_OVERWORLD_FLOWER, ConventionalBiomeTags.IS_FLORAL, 2)
+                    .with(DuskLootTables.ENDERMAN_OVERWORLD_ICE, ConventionalBiomeTags.IS_COLD_OVERWORLD, 5)
+                    .with(DuskLootTables.ENDERMAN_OVERWORLD_DESERT, ConventionalBiomeTags.IS_DESERT, 5)
+                    .with(DuskLootTables.ENDERMAN_OVERWORLD_BADLANDS, ConventionalBiomeTags.IS_BADLANDS, 5)
             )
         )
         this.endermanHolding(

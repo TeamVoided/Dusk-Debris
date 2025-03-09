@@ -23,7 +23,7 @@ class BiomeTagsProvider(o: FabricDataOutput, r: CompletableFuture<HolderLookup.P
 
     fun duskTags() {
         getOrCreateTagBuilder(DuskBiomeTags.TEST)
-            .forceAddTag(BiomeTags.OVERWORLD)
+            .add(DuskBiomes.NETHER_TEST)
 
         getOrCreateTagBuilder(DuskBiomeTags.WORLDNOISE_WATER)
             .forceAddTag(ConventionalBiomeTags.IS_RIVER)

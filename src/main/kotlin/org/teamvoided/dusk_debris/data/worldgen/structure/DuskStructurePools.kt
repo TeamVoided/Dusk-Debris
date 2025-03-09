@@ -10,6 +10,7 @@ import org.teamvoided.dusk_debris.DuskDebris.id
 
 object DuskStructurePools {
     val NETHER_FOSSILS = create("nether_fossils")
+    val TEST = create("test")
 
     fun init() {}
 
