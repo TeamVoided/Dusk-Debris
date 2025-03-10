@@ -45,8 +45,9 @@ object StructureCreator {
             BiomeTags.HAS_ANCIENT_CITY_STRUCTURE,
             StructurePools.createKey("ancient_city/structures"),
             3,
-            ConstantHeightProvider.create(YOffset.aboveBottom(100)),
-            DimensionPadding(16)
+            ConstantHeightProvider.create(YOffset.aboveBottom(17)),
+            DimensionPadding(16, 128),
+            true
         )
     }
 
@@ -57,6 +58,7 @@ object StructureCreator {
         size: Int,
         heightProvider: HeightProvider,
         dimensionPadding: DimensionPadding,
+        bottomUpSearch: Boolean
     ) {
         val biomes: HolderProvider<Biome> = this.getRegistryLookup(RegistryKeys.BIOME)
         val pool: HolderProvider<StructurePool> = this.getRegistryLookup(RegistryKeys.STRUCTURE_POOL)
@@ -68,12 +70,13 @@ object StructureCreator {
                     biomes.getTagOrThrow(biomeTag),
                     Map.of(),
                     GenerationStep.Feature.UNDERGROUND_STRUCTURES,
-                    TerrainAdjustment.BEARD_THIN
+                    TerrainAdjustment.BEARD_BOX
                 ),
                 pool.getHolderOrThrow(structurePool),
                 size,
                 heightProvider,
-                dimensionPadding
+                dimensionPadding,
+                bottomUpSearch
             )
         )
     }

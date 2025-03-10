@@ -2,12 +2,11 @@ package org.teamvoided.dusk_debris.init
 
 import net.minecraft.block.entity.BlockEntity
 import net.minecraft.block.entity.BlockEntityType
-import net.minecraft.datafixer.TypeReferences
 import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
-import net.minecraft.util.Util
 import org.teamvoided.dusk_debris.block.entity.StoneChestBlockEntity
 import org.teamvoided.dusk_debris.block.entity.TreasureChestBlockEntity
+import org.teamvoided.dusk_debris.block.temp.entity.DuskChestBlockEntity
 
 object DuskBlockEntities {
     fun init() {}
@@ -19,9 +18,16 @@ object DuskBlockEntities {
         )
     )
 
-    val STONE_CHEST: BlockEntityType<StoneChestBlockEntity> = register(
-        "stone_chest", BlockEntityType.Builder.create(
+    val STONE_CHEST_OLD: BlockEntityType<StoneChestBlockEntity> = register(
+        "stone_chest_old", BlockEntityType.Builder.create(
             ::StoneChestBlockEntity,
+            DuskBlocks.STONE_CHEST
+        )
+    )
+
+    val STONE_CHEST: BlockEntityType<DuskChestBlockEntity> = register(
+        "stone_chest", BlockEntityType.Builder.create(
+            ::DuskChestBlockEntity,
             DuskBlocks.STONE_CHEST
         )
     )

@@ -1,13 +1,11 @@
 //package org.teamvoided.dusk_debris.block.temp
 //
 //import com.mojang.serialization.MapCodec
-//import it.unimi.dsi.fastutil.floats.Float2FloatFunction
 //import net.minecraft.block.*
 //import net.minecraft.block.entity.BlockEntity
 //import net.minecraft.block.entity.BlockEntityTicker
 //import net.minecraft.block.entity.BlockEntityType
 //import net.minecraft.block.enums.ChestType
-//import net.minecraft.client.block.ChestAnimationProgress
 //import net.minecraft.entity.ai.pathing.NavigationType
 //import net.minecraft.entity.mob.PiglinBrain
 //import net.minecraft.entity.passive.CatEntity
@@ -38,14 +36,14 @@
 //import net.minecraft.world.BlockView
 //import net.minecraft.world.World
 //import net.minecraft.world.WorldAccess
-//import org.teamvoided.dusk_debris.block.temp.entity.ChestBlockEntity
+//import org.teamvoided.dusk_debris.block.temp.entity.ChestDBlockEntity
 //import java.util.*
+//import java.util.function.BiPredicate
 //import java.util.function.Supplier
-//import kotlin.math.max
 //
-//class ChestBlock(settings: Settings, supplier: Supplier<BlockEntityType<out ChestBlockEntity>>) :
-//    AbstractChestBlock<ChestBlockEntity>(settings, supplier), Waterloggable {
-//    public override fun getCodec(): MapCodec<out ChestBlock> {
+//class ChestDBlock(settings: Settings, supplier: Supplier<BlockEntityType<out ChestDBlockEntity>>) :
+//    AbstractDuskChestBlock<ChestDBlockEntity>(settings, supplier), Waterloggable {
+//    public override fun getCodec(): MapCodec<out ChestDBlock> {
 //        return CODEC
 //    }
 //
@@ -67,10 +65,9 @@
 //
 //        if (neighborState.isOf(this) && direction.axis.isHorizontal) {
 //            val chestType = neighborState.get(CHEST_TYPE)
-//            if (state.get(CHEST_TYPE) == ChestType.SINGLE &&
-//                chestType != ChestType.SINGLE &&
-//                state.get(FACING) == neighborState.get(FACING) &&
-//                getFacing(neighborState) == direction.opposite
+//            if (state.get(CHEST_TYPE) == ChestType.SINGLE && chestType != ChestType.SINGLE && state.get(
+//                    FACING
+//                ) == neighborState.get(FACING) && getFacing(neighborState) == direction.opposite
 //            ) {
 //                return state.with(CHEST_TYPE, chestType.opposite)
 //            }
@@ -100,7 +97,7 @@
 //        }
 //    }
 //
-//    override fun getPlacementState(ctx: ItemPlacementContext): BlockState {
+//    override fun getPlacementState(ctx: ItemPlacementContext): BlockState? {
 //        var chestType = ChestType.SINGLE
 //        var direction = ctx.playerFacing.opposite
 //        val fluidState = ctx.world.getFluidState(ctx.blockPos)
@@ -111,8 +108,7 @@
 //            if (direction3 != null && direction3.axis !== direction2.axis) {
 //                direction = direction3
 //                chestType =
-//                    if (direction3.rotateYCounterclockwise() == direction2.opposite) ChestType.RIGHT
-//                    else ChestType.LEFT
+//                    if (direction3.rotateYCounterclockwise() == direction2.opposite) ChestType.RIGHT else ChestType.LEFT
 //            }
 //        }
 //
@@ -136,8 +132,7 @@
 //
 //    private fun getNeighborChestDirection(ctx: ItemPlacementContext, dir: Direction): Direction? {
 //        val blockState = ctx.world.getBlockState(ctx.blockPos.offset(dir))
-//        return if (blockState.isOf(this) && blockState.get(CHEST_TYPE) == ChestType.SINGLE) blockState.get(FACING)
-//        else null
+//        return if (blockState.isOf(this) && blockState.get(CHEST_TYPE) == ChestType.SINGLE) blockState.get(FACING) else null
 //    }
 //
 //    override fun onStateReplaced(state: BlockState, world: World, pos: BlockPos, newState: BlockState, moved: Boolean) {
@@ -166,31 +161,60 @@
 //        }
 //    }
 //
-//    val openStat: Stat<Identifier>
+//    protected val openStat: Stat<Identifier>
 //        get() = Stats.CUSTOM.getOrCreateStat(Stats.OPEN_CHEST)
 //
-//    val expectedEntityType: BlockEntityType<out ChestBlockEntity>
+//    val expectedEntityType: BlockEntityType<out ChestDBlockEntity>
 //        get() = entityTypeRetriever.get()
+//
+//    override fun getBlockEntitySource(
+//        state: BlockState,
+//        world: World,
+//        pos: BlockPos,
+//        ignoreBlocked: Boolean
+//    ): DoubleBlockProperties.PropertySource<out ChestDBlockEntity> {
+//        val biPredicate: BiPredicate<WorldAccess, BlockPos>
+//        if (ignoreBlocked) {
+//            biPredicate = BiPredicate { _, _ -> false }
+//        } else {
+//            biPredicate = BiPredicate(ChestDBlock::isChestBlocked)
+//        }
+//
+//        return DoubleBlockProperties.toPropertySource(
+//            this.entityTypeRetriever.get(),
+//            ChestDBlock::getDoubleBlockType,
+//            ChestDBlock::getFacing,
+//            FACING,
+//            state,
+//            world,
+//            pos,
+//            biPredicate
+//        );
+//    }
 //
 //    override fun createScreenHandlerFactory(
 //        state: BlockState,
 //        world: World,
 //        pos: BlockPos
-//    ): NamedScreenHandlerFactory {
-//        return (getBlockEntitySource(state, world, pos, false).apply(NAME_RETRIEVER)).orElse(null)
+//    ): NamedScreenHandlerFactory? {
+//        return getBlockEntitySource(state, world, pos, false)
+//            .apply(NAME_RETRIEVER)
+//            .orElse(null)
 //    }
 //
-//    override fun createBlockEntity(pos: BlockPos, state: BlockState): BlockEntity {
-//        return ChestBlockEntity(pos, state)
+//    override fun createBlockEntity(pos: BlockPos, state: BlockState): BlockEntity? {
+//        return ChestDBlockEntity(pos, state)
 //    }
 //
-//    override fun <T : BlockEntity?> getTicker(
+//    override fun <T : BlockEntity> getTicker(
 //        world: World,
 //        state: BlockState,
 //        type: BlockEntityType<T>
 //    ): BlockEntityTicker<T>? {
-//        return if (world.isClient) checkType(type, expectedEntityType, ChestBlockEntity::clientTick)
-//        else null
+//        return if (world.isClient) checkType(
+//            type,
+//            expectedEntityType, ChestDBlockEntity::clientTick
+//        ) else null
 //    }
 //
 //    override fun hasComparatorOutput(state: BlockState): Boolean {
@@ -198,9 +222,7 @@
 //    }
 //
 //    override fun getComparatorOutput(state: BlockState, world: World, pos: BlockPos): Int {
-//        return ScreenHandler.calculateComparatorOutput(
-//            getInventory(this, state, world, pos, false)
-//        )
+//        return ScreenHandler.calculateComparatorOutput(getInventory(this, state, world, pos, false))
 //    }
 //
 //    override fun rotate(state: BlockState, rotation: BlockRotation): BlockState {
@@ -211,19 +233,19 @@
 //        return state.rotate(mirror.getRotation(state.get(FACING)))
 //    }
 //
+//    override fun appendProperties(builder: StateManager.Builder<Block, BlockState>) {
+//        builder.add(*arrayOf<Property<*>>(FACING, CHEST_TYPE, WATERLOGGED))
+//    }
+//
 //    override fun canPathfindThrough(state: BlockState, navigationType: NavigationType): Boolean {
 //        return false
 //    }
 //
 //    override fun scheduledTick(state: BlockState, world: ServerWorld, pos: BlockPos, random: RandomGenerator) {
 //        val blockEntity = world.getBlockEntity(pos)!!
-//        if (blockEntity is ChestBlockEntity) {
+//        if (blockEntity is ChestDBlockEntity) {
 //            blockEntity.onScheduledTick()
 //        }
-//    }
-//
-//    override fun appendProperties(builder: StateManager.Builder<Block, BlockState>) {
-//        builder.add(FACING, CHEST_TYPE, WATERLOGGED)
 //    }
 //
 //    init {
@@ -235,8 +257,8 @@
 //    }
 //
 //    companion object {
-//        val CODEC: MapCodec<ChestBlock> =
-//            createCodec { settings: Settings -> ChestBlock(settings) { BlockEntityType.CHEST } }
+//        val CODEC: MapCodec<ChestDBlock> =
+//            createCodec { settings: Settings -> ChestDBlock(settings) { BlockEntityType.CHEST } }
 //        val FACING: DirectionProperty = HorizontalFacingBlock.FACING
 //        val CHEST_TYPE: EnumProperty<ChestType> = Properties.CHEST_TYPE
 //        val WATERLOGGED: BooleanProperty = Properties.WATERLOGGED
@@ -253,16 +275,16 @@
 //            createCuboidShape(1.0, 0.0, 1.0, 16.0, 14.0, 15.0)
 //        protected val SINGLE_SHAPE: VoxelShape =
 //            createCuboidShape(1.0, 0.0, 1.0, 15.0, 14.0, 15.0)
-//        private val INVENTORY_RETRIEVER: DoubleBlockProperties.PropertyRetriever<ChestBlockEntity, Optional<Inventory>> =
-//            object : DoubleBlockProperties.PropertyRetriever<ChestBlockEntity, Optional<Inventory>> {
+//        private val INVENTORY_RETRIEVER: DoubleBlockProperties.PropertyRetriever<ChestDBlockEntity, Optional<Inventory>> =
+//            object : DoubleBlockProperties.PropertyRetriever<ChestDBlockEntity, Optional<Inventory>> {
 //                override fun getFromBoth(
-//                    chestBlockEntity: ChestBlockEntity,
-//                    chestBlockEntity2: ChestBlockEntity
+//                    chestBlockEntity: ChestDBlockEntity,
+//                    chestBlockEntity2: ChestDBlockEntity
 //                ): Optional<Inventory> {
 //                    return Optional.of(DoubleInventory(chestBlockEntity, chestBlockEntity2))
 //                }
 //
-//                override fun getFrom(chestBlockEntity: ChestBlockEntity): Optional<Inventory> {
+//                override fun getFrom(chestBlockEntity: ChestDBlockEntity): Optional<Inventory> {
 //                    return Optional.of(chestBlockEntity)
 //                }
 //
@@ -270,47 +292,41 @@
 //                    return Optional.empty()
 //                }
 //            }
-//        private val NAME_RETRIEVER: DoubleBlockProperties.PropertyRetriever<ChestBlockEntity, Optional<NamedScreenHandlerFactory>> =
-//            object : DoubleBlockProperties.PropertyRetriever<ChestBlockEntity, Optional<NamedScreenHandlerFactory>> {
+//        private val NAME_RETRIEVER: DoubleBlockProperties.PropertyRetriever<ChestDBlockEntity, Optional<NamedScreenHandlerFactory>> =
+//            object : DoubleBlockProperties.PropertyRetriever<ChestDBlockEntity, Optional<NamedScreenHandlerFactory>> {
 //                override fun getFromBoth(
-//                    chestBlockEntity: ChestBlockEntity,
-//                    chestBlockEntity2: ChestBlockEntity
+//                    chestBlockEntity: ChestDBlockEntity,
+//                    chestBlockEntity2: ChestDBlockEntity
 //                ): Optional<NamedScreenHandlerFactory> {
 //                    val inventory: Inventory = DoubleInventory(chestBlockEntity, chestBlockEntity2)
-//                    return Optional.of<NamedScreenHandlerFactory>(
-//                        object : NamedScreenHandlerFactory {
-//                            override fun createMenu(
-//                                syncId: Int,
-//                                playerInventory: PlayerInventory,
-//                                playerEntity: PlayerEntity
-//                            ): ScreenHandler? {
-//                                if (chestBlockEntity.checkUnlocked(playerEntity) &&
-//                                    chestBlockEntity2.checkUnlocked(playerEntity)
-//                                ) {
-//                                    chestBlockEntity.setupLoot(playerInventory.player)
-//                                    chestBlockEntity2.setupLoot(playerInventory.player)
-//                                    return GenericContainerScreenHandler.createGeneric9x6(
-//                                        syncId,
-//                                        playerInventory,
-//                                        inventory
-//                                    )
-//                                } else {
-//                                    return null
-//                                }
+//                    return Optional.of<NamedScreenHandlerFactory>(object : NamedScreenHandlerFactory {
+//                        override fun createMenu(
+//                            i: Int,
+//                            playerInventory: PlayerInventory,
+//                            playerEntity: PlayerEntity
+//                        ): ScreenHandler? {
+//                            if (chestBlockEntity.checkUnlocked(playerEntity) &&
+//                                chestBlockEntity2.checkUnlocked(playerEntity)
+//                            ) {
+//                                chestBlockEntity.setupLoot(playerInventory.player)
+//                                chestBlockEntity2.setupLoot(playerInventory.player)
+//                                return GenericContainerScreenHandler.createGeneric9x6(i, playerInventory, inventory)
+//                            } else {
+//                                return null
 //                            }
+//                        }
 //
-//                            override fun getDisplayName(): Text {
-//                                return if (chestBlockEntity.hasCustomName())
-//                                    chestBlockEntity.displayName
-//                                else if (chestBlockEntity2.hasCustomName())
-//                                    chestBlockEntity2.displayName
-//                                else
-//                                    Text.translatable("container.chestDouble")
-//                            }
-//                        })
+//                        override fun getDisplayName(): Text {
+//                            return if (chestBlockEntity.hasCustomName())
+//                                chestBlockEntity.displayName
+//                            else if (chestBlockEntity2.hasCustomName())
+//                                chestBlockEntity2.displayName
+//                            else Text.translatable("container.chestDouble")
+//                        }
+//                    })
 //                }
 //
-//                override fun getFrom(chestBlockEntity: ChestBlockEntity): Optional<NamedScreenHandlerFactory> {
+//                override fun getFrom(chestBlockEntity: ChestDBlockEntity): Optional<NamedScreenHandlerFactory> {
 //                    return Optional.of(chestBlockEntity)
 //                }
 //
@@ -336,7 +352,7 @@
 //        }
 //
 //        fun getInventory(
-//            block: ChestBlock,
+//            block: ChestDBlock,
 //            state: BlockState,
 //            world: World,
 //            pos: BlockPos,
@@ -344,33 +360,6 @@
 //        ): Inventory? {
 //            return (block.getBlockEntitySource(state, world, pos, ignoreBlocked)
 //                .apply(INVENTORY_RETRIEVER)).orElse(null)
-//        }
-//
-//        fun getAnimationProgressRetriever(progress: ChestAnimationProgress): DoubleBlockProperties.PropertyRetriever<ChestBlockEntity, Float2FloatFunction> {
-//            return object : DoubleBlockProperties.PropertyRetriever<ChestBlockEntity, Float2FloatFunction> {
-//                override fun getFromBoth(
-//                    chestBlockEntity: ChestBlockEntity,
-//                    chestBlockEntity2: ChestBlockEntity
-//                ): Float2FloatFunction {
-//                    return Float2FloatFunction { tickDelta: Float ->
-//                        max(
-//                            chestBlockEntity.getAnimationProgress(tickDelta).toDouble(),
-//                            chestBlockEntity2.getAnimationProgress(tickDelta).toDouble()
-//                        )
-//                            .toFloat()
-//                    }
-//                }
-//
-//                override fun getFrom(chestBlockEntity: ChestBlockEntity): Float2FloatFunction {
-//                    Objects.requireNonNull(chestBlockEntity)
-//                    return Float2FloatFunction { chestBlockEntity.getAnimationProgress(it) }
-//                }
-//
-//                override fun getFallback(): Float2FloatFunction {
-//                    Objects.requireNonNull(progress)
-//                    return Float2FloatFunction { progress.getAnimationProgress(it) }
-//                }
-//            }
 //        }
 //
 //        fun isChestBlocked(world: WorldAccess, pos: BlockPos): Boolean {
@@ -395,8 +384,10 @@
 //                )
 //            )
 //            if (list.isNotEmpty()) {
-//                list.forEach {
-//                    val catEntity = it
+//                val var3: Iterator<CatEntity> = list.iterator()
+//
+//                while (var3.hasNext()) {
+//                    val catEntity = var3.next()
 //                    if (catEntity.isInSittingPose) {
 //                        return true
 //                    }

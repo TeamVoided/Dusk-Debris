@@ -23,21 +23,30 @@ import net.minecraft.util.collection.DefaultedList
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.BlockView
 import net.minecraft.world.World
+import org.teamvoided.dusk_debris.block.entity.StoneChestBlockEntity
+import org.teamvoided.dusk_debris.block.not_blocks.ChestPhase
+import org.teamvoided.dusk_debris.block.not_blocks.DuskProperties
+import org.teamvoided.dusk_debris.init.DuskBlockEntities
 
-class ChestBlockEntity constructor(blockEntityType: BlockEntityType<*>, pos: BlockPos, state: BlockState) :
+class DuskChestBlockEntity constructor(blockEntityType: BlockEntityType<*>, pos: BlockPos, state: BlockState) :
     LootableContainerBlockEntity(blockEntityType, pos, state) {
     private var inventory: DefaultedList<ItemStack>
     private val stateManager: ViewerCountManager
+    var lidOpeningTicks = 0
+
+    constructor(pos: BlockPos, state: BlockState) : this(DuskBlockEntities.STONE_CHEST, pos, state)
 
     init {
-        this.inventory = DefaultedList.ofSize(27, ItemStack.EMPTY)
+        this.inventory = DefaultedList.ofSize(size(), ItemStack.EMPTY)
         this.stateManager = object : ViewerCountManager() {
             override fun onContainerOpen(world: World, pos: BlockPos, state: BlockState) {
                 playSound(world, pos, state, SoundEvents.BLOCK_CHEST_OPEN)
+                setOpen(state, 2)
             }
 
             override fun onContainerClose(world: World, pos: BlockPos, state: BlockState) {
                 playSound(world, pos, state, SoundEvents.BLOCK_CHEST_CLOSE)
+                setOpen(state, 1)
             }
 
             override fun onViewerCountUpdate(
@@ -47,7 +56,7 @@ class ChestBlockEntity constructor(blockEntityType: BlockEntityType<*>, pos: Blo
                 oldViewerCount: Int,
                 newViewerCount: Int
             ) {
-                this@ChestBlockEntity.onInvOpenOrClose(world, pos, state, oldViewerCount, newViewerCount)
+                onInvOpenOrClose(world, pos, state, oldViewerCount, newViewerCount)
             }
 
             override fun isPlayerViewing(player: PlayerEntity): Boolean {
@@ -55,19 +64,19 @@ class ChestBlockEntity constructor(blockEntityType: BlockEntityType<*>, pos: Blo
                     return false
                 } else {
                     val inventory = (player.currentScreenHandler as GenericContainerScreenHandler).inventory
-                    return inventory == this@ChestBlockEntity || inventory is DoubleInventory && inventory.isPart(this@ChestBlockEntity)
+                    return inventory == this@DuskChestBlockEntity || inventory is DoubleInventory && inventory.isPart(
+                        this@DuskChestBlockEntity
+                    )
                 }
             }
         }
     }
 
-    override fun size(): Int {
-        return 27
-    }
+    override fun size(): Int = 27
 
-    override fun getContainerName(): Text {
-        return Text.translatable("container.chest")
-    }
+    override fun getContainerName(): Text = Text.translatable("container.chest")
+
+    fun getDoubleContainerName(): Text = Text.translatable("container.chestDouble")
 
     override fun readNbtImpl(nbt: NbtCompound, lookupProvider: HolderLookup.Provider) {
         super.readNbtImpl(nbt, lookupProvider)
@@ -96,9 +105,32 @@ class ChestBlockEntity constructor(blockEntityType: BlockEntityType<*>, pos: Blo
         }
     }
 
-    override fun getInventory(): DefaultedList<ItemStack> {
-        return this.inventory
+    private fun setOpen(state: BlockState, open: Int) {
+        world!!.setBlockState(this.getPos(), state.with(DuskProperties.CHEST_PHASE, ChestPhase.fromInt(open)), 3)
+        if (open == 0) lidOpeningTicks = 0
     }
+
+    override fun onSyncedBlockEvent(type: Int, data: Int): Boolean {
+        when (type) {
+            CLOSED_COUNT_EVENT -> {
+                setOpen(cachedState, 0)
+                return true
+            }
+
+            CLOSING_COUNT_EVENT -> {
+                setOpen(cachedState, 1)
+                return true
+            }
+
+            OPEN_COUNT_EVENT -> {
+                setOpen(cachedState, 2)
+                return true
+            }
+        }
+        return super.onSyncedBlockEvent(type, data)
+    }
+
+    override fun getInventory(): DefaultedList<ItemStack> = this.inventory
 
     override fun setInventory(stacks: DefaultedList<ItemStack>) {
         this.inventory = stacks
@@ -114,21 +146,37 @@ class ChestBlockEntity constructor(blockEntityType: BlockEntityType<*>, pos: Blo
         }
     }
 
-    protected fun onInvOpenOrClose(
+    fun onInvOpenOrClose(
         world: World,
-        pos: BlockPos?,
+        pos: BlockPos,
         state: BlockState,
         oldViewerCount: Int,
         newViewerCount: Int
     ) {
         val block = state.block
-        world.addSyncedBlockEvent(pos, block, SET_OPEN_COUNT_EVENT, newViewerCount)
+        world.addSyncedBlockEvent(
+            pos,
+            block,
+            if (newViewerCount > 0) OPEN_COUNT_EVENT
+            else CLOSING_COUNT_EVENT,
+            newViewerCount
+        )
     }
 
     companion object {
-        private const val SET_OPEN_COUNT_EVENT = 1
-        fun clientTick(world: World, pos: BlockPos, state: BlockState, blockEntity: ChestBlockEntity) {
-
+        private const val CLOSED_COUNT_EVENT = 0
+        private const val CLOSING_COUNT_EVENT = 1
+        private const val OPEN_COUNT_EVENT = 2
+        fun tick(world: World, pos: BlockPos, state: BlockState, blockEntity: DuskChestBlockEntity) {
+            val phase = state.get(DuskProperties.CHEST_PHASE)
+            if (phase.ordinal == 2) {
+                if (blockEntity.lidOpeningTicks < StoneChestBlockEntity.MAX_OPENING_TICKS)
+                    blockEntity.lidOpeningTicks++
+            } else if (blockEntity.lidOpeningTicks > 0) {
+                blockEntity.lidOpeningTicks--
+            } else if (phase.ordinal != 0) {
+                world.addSyncedBlockEvent(pos, state.block, CLOSED_COUNT_EVENT, 0)
+            }
         }
 
         fun playSound(world: World, pos: BlockPos, state: BlockState, soundEvent: SoundEvent?) {
@@ -158,7 +206,7 @@ class ChestBlockEntity constructor(blockEntityType: BlockEntityType<*>, pos: Blo
             val blockState = world.getBlockState(pos)
             if (blockState.hasBlockEntity()) {
                 val blockEntity = world.getBlockEntity(pos)
-                if (blockEntity is ChestBlockEntity) {
+                if (blockEntity is DuskChestBlockEntity) {
                     return blockEntity.stateManager.viewerCount
                 }
             }
@@ -166,7 +214,7 @@ class ChestBlockEntity constructor(blockEntityType: BlockEntityType<*>, pos: Blo
             return 0
         }
 
-        fun copyInventory(from: ChestBlockEntity, to: ChestBlockEntity) {
+        fun copyInventory(from: DuskChestBlockEntity, to: DuskChestBlockEntity) {
             val defaultedList = from.getInventory()
             from.setInventory(to.getInventory())
             to.setInventory(defaultedList)

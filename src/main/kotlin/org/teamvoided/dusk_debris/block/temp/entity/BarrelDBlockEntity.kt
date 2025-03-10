@@ -21,7 +21,7 @@ import net.minecraft.util.collection.DefaultedList
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
 
-class BarrelBlockEntity(pos: BlockPos, state: BlockState) :
+class BarrelDBlockEntity(pos: BlockPos, state: BlockState) :
     LootableContainerBlockEntity(BlockEntityType.BARREL, pos, state) {
     private var inventory: DefaultedList<ItemStack>
     private val stateManager: ViewerCountManager
@@ -30,13 +30,13 @@ class BarrelBlockEntity(pos: BlockPos, state: BlockState) :
         this.inventory = DefaultedList.ofSize(27, ItemStack.EMPTY)
         this.stateManager = object : ViewerCountManager() {
             override fun onContainerOpen(world: World, pos: BlockPos, state: BlockState) {
-                this@BarrelBlockEntity.playSound(state, SoundEvents.BLOCK_BARREL_OPEN)
-                this@BarrelBlockEntity.setOpen(state, true)
+                this@BarrelDBlockEntity.playSound(state, SoundEvents.BLOCK_BARREL_OPEN)
+                this@BarrelDBlockEntity.setOpen(state, true)
             }
 
             override fun onContainerClose(world: World, pos: BlockPos, state: BlockState) {
-                this@BarrelBlockEntity.playSound(state, SoundEvents.BLOCK_BARREL_CLOSE)
-                this@BarrelBlockEntity.setOpen(state, false)
+                this@BarrelDBlockEntity.playSound(state, SoundEvents.BLOCK_BARREL_CLOSE)
+                this@BarrelDBlockEntity.setOpen(state, false)
             }
 
             override fun onViewerCountUpdate(
@@ -53,7 +53,7 @@ class BarrelBlockEntity(pos: BlockPos, state: BlockState) :
                 val currentScreenHandler = player.currentScreenHandler
                 if (currentScreenHandler is GenericContainerScreenHandler) {
                     val inventory = currentScreenHandler.inventory
-                    return inventory == this@BarrelBlockEntity
+                    return inventory == this@BarrelDBlockEntity
                 } else {
                     return false
                 }

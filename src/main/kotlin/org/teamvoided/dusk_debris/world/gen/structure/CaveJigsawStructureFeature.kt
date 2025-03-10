@@ -4,6 +4,7 @@ import com.mojang.serialization.Codec
 import com.mojang.serialization.DataResult
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
+import net.minecraft.block.BlockState
 import net.minecraft.block.Blocks
 import net.minecraft.registry.Holder
 import net.minecraft.structure.StructureType
@@ -15,7 +16,6 @@ import net.minecraft.util.Identifier
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
 import net.minecraft.world.EmptyBlockView
-import net.minecraft.world.Heightmap
 import net.minecraft.world.gen.HeightContext
 import net.minecraft.world.gen.feature.DimensionPadding
 import net.minecraft.world.gen.feature.JigsawFeature
@@ -32,7 +32,7 @@ class CaveJigsawStructureFeature(
     private val startJigsawName: Optional<Identifier>,
     private val size: Int,
     private val startHeight: HeightProvider,
-    private val useExpansionHack: Boolean = false,
+    private val bottomUpSearch: Boolean = false,
     private val maxDistanceFromCenter: Int = 80,
     private val poolAliases: List<StructurePoolAliasBinding> = listOf(),
     private val dimensionPadding: DimensionPadding = JigsawFeature.DEFAULT_PADDING,
@@ -43,14 +43,15 @@ class CaveJigsawStructureFeature(
         startPool: Holder<StructurePool>,
         size: Int,
         startHeight: HeightProvider,
-        dimensionPadding: DimensionPadding
+        dimensionPadding: DimensionPadding,
+        bottomUpSearch: Boolean = false
     ) : this(
         settings,
         startPool,
         Optional.empty(),
         size,
         startHeight,
-        false,
+        bottomUpSearch,
         80,
         listOf<StructurePoolAliasBinding>(),
         dimensionPadding,
@@ -61,15 +62,14 @@ class CaveJigsawStructureFeature(
         settings: StructureSettings,
         startPool: Holder<StructurePool>,
         size: Int,
-        startHeight: HeightProvider,
-        useExpansionHack: Boolean = false
+        startHeight: HeightProvider
     ) : this(
         settings,
         startPool,
         Optional.empty(),
         size,
         startHeight,
-        useExpansionHack,
+        false,
         80,
         listOf<StructurePoolAliasBinding>(),
         JigsawFeature.DEFAULT_PADDING,
@@ -82,6 +82,7 @@ class CaveJigsawStructureFeature(
 
         var posY = startHeight
         val minY = dimensionPadding.bottom
+        val maxY = dimensionPadding.top
 
         val verticalBlockSample = context.chunkGenerator().getColumnSample(
             chunkPos.startX,
@@ -89,22 +90,32 @@ class CaveJigsawStructureFeature(
             context.world(),
             context.randomState()
         )
+
         val mutable = BlockPos.Mutable(chunkPos.startX, posY, chunkPos.startZ)
 
-        while (posY > minY) {
-            val blockState = verticalBlockSample.getState(posY)
-            --posY
-            val blockState2 = verticalBlockSample.getState(posY)
-            if (blockState.isAir &&
-                (blockState2.isSideSolidFullSquare(EmptyBlockView.INSTANCE, mutable.setY(posY), Direction.UP) ||
-                        blockState2.isOf(Blocks.SOUL_SAND)) &&
-                !blockState2.isOf(Blocks.BEDROCK)
-            ) {
-                break
+        if (bottomUpSearch) {
+            while (posY < maxY) {
+                val blockStateSolid = verticalBlockSample.getState(posY)
+                ++posY
+                val blockStateAir = verticalBlockSample.getState(posY)
+                mutable.setY(posY)
+                if (checkIfCanPlace(mutable, blockStateSolid, blockStateAir)) {
+                    break
+                }
+            }
+        } else {
+            while (posY > minY) {
+                val blockStateAir = verticalBlockSample.getState(posY)
+                --posY
+                val blockStateSolid = verticalBlockSample.getState(posY)
+                mutable.setY(posY)
+                if (checkIfCanPlace(mutable, blockStateSolid, blockStateAir)) {
+                    break
+                }
             }
         }
 
-        if (posY <= minY) {
+        if (posY <= minY || posY >= maxY) {
             return Optional.empty()
         } else {
             val blockPos = BlockPos(chunkPos.startX, posY, chunkPos.startZ)
@@ -114,7 +125,7 @@ class CaveJigsawStructureFeature(
                 this.startJigsawName,
                 this.size,
                 blockPos,
-                this.useExpansionHack,
+                false,
                 Optional.empty(),
                 this.maxDistanceFromCenter,
                 StructurePoolAliasLookup.create(this.poolAliases, blockPos, context.seed()),
@@ -122,6 +133,14 @@ class CaveJigsawStructureFeature(
                 this.liquidSettings
             )
         }
+    }
+
+    fun checkIfCanPlace(pos: BlockPos.Mutable, solid: BlockState, air: BlockState): Boolean {
+        return (air.isAir &&
+                (solid.isSideSolidFullSquare(EmptyBlockView.INSTANCE, pos, Direction.UP) ||
+                        solid.isOf(Blocks.SOUL_SAND)) &&
+                !solid.isOf(Blocks.BEDROCK)
+                )
     }
 
     override fun getType(): StructureType<*> {
@@ -140,7 +159,7 @@ class CaveJigsawStructureFeature(
                     Identifier.CODEC.optionalFieldOf("start_jigsaw_name").forGetter { it.startJigsawName },
                     Codec.intRange(0, 20).fieldOf("size").forGetter { it.size },
                     HeightProvider.CODEC.fieldOf("start_height").forGetter { it.startHeight },
-                    Codec.BOOL.fieldOf("use_expansion_hack").forGetter { it.useExpansionHack },
+                    Codec.BOOL.fieldOf("use_inverted_search").orElse(false).forGetter { it.bottomUpSearch },
                     Codec.intRange(1, 128).fieldOf("max_distance_from_center").forGetter { it.maxDistanceFromCenter },
                     Codec.list(StructurePoolAliasBinding.CODEC)
                         .optionalFieldOf("pool_aliases", listOf<StructurePoolAliasBinding>())

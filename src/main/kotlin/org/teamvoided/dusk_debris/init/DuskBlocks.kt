@@ -5,7 +5,6 @@ import net.minecraft.block.*
 import net.minecraft.block.AbstractBlock.Settings.copy
 import net.minecraft.block.Blocks.*
 import net.minecraft.block.Oxidizable.OxidizationLevel
-import net.minecraft.block.entity.BlockEntityType
 import net.minecraft.block.enums.NoteBlockInstrument
 import net.minecraft.block.piston.PistonBehavior
 import net.minecraft.entity.effect.StatusEffects
@@ -47,7 +46,7 @@ object DuskBlocks {
 
     val STRONG_SCAFFOLDING =
         registerStrongScaffolding("strong_scaffolding", StrongScaffoldingBlock(copy(SCAFFOLDING))).cutout()
-    val STONE_CHEST = register("stone_chest", StoneChestBlock(copy(CHEST)) { DuskBlockEntities.STONE_CHEST })
+    val STONE_CHEST = register("stone_chest", StoneChestBlock(copy(CHEST)) { DuskBlockEntities.STONE_CHEST_OLD })
 
     val ACID = registerNoItem("acid", FluidBlock(DuskFluids.ACID, copy(WATER).mapColor(MapColor.LIME)))
     val FOG_BUBBLE = registerNoItem(

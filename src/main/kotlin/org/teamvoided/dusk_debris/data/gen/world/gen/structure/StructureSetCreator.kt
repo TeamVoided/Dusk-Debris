@@ -26,8 +26,8 @@ object StructureSetCreator {
         c.register(
             DuskStructureSets.ANCIENT_RUINS,
             DuskStructures.ANCIENT_STRUCTURES,
-            8,
             4,
+            2,
             10006666
         )
     }

@@ -4,7 +4,6 @@ import net.minecraft.block.BlockState
 import net.minecraft.block.entity.ChestBlockEntity
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.registry.Registries
-import net.minecraft.state.property.Properties
 import net.minecraft.text.Text
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
@@ -13,7 +12,7 @@ import org.teamvoided.dusk_debris.block.not_blocks.DuskProperties
 import org.teamvoided.dusk_debris.init.DuskBlockEntities
 
 class StoneChestBlockEntity(pos: BlockPos, state: BlockState) :
-    ChestBlockEntity(DuskBlockEntities.STONE_CHEST, pos, state) {
+    ChestBlockEntity(DuskBlockEntities.STONE_CHEST_OLD, pos, state) {
     var lidOpeningTicks = 0
     var renderingDelay = false
 
