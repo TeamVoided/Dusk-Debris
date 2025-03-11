@@ -4,9 +4,8 @@ import net.minecraft.block.entity.BlockEntity
 import net.minecraft.block.entity.BlockEntityType
 import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
-import org.teamvoided.dusk_debris.block.entity.StoneChestBlockEntity
 import org.teamvoided.dusk_debris.block.entity.TreasureChestBlockEntity
-import org.teamvoided.dusk_debris.block.temp.entity.DuskChestBlockEntity
+import org.teamvoided.dusk_debris.block.entity.DuskChestBlockEntity
 
 object DuskBlockEntities {
     fun init() {}
@@ -18,12 +17,12 @@ object DuskBlockEntities {
         )
     )
 
-    val STONE_CHEST_OLD: BlockEntityType<StoneChestBlockEntity> = register(
-        "stone_chest_old", BlockEntityType.Builder.create(
-            ::StoneChestBlockEntity,
-            DuskBlocks.STONE_CHEST
-        )
-    )
+//    val STONE_CHEST_OLD: BlockEntityType<StoneChestBlockEntity> = register(
+//        "stone_chest_old", BlockEntityType.Builder.create(
+//            ::StoneChestBlockEntity,
+//            DuskBlocks.STONE_CHEST
+//        )
+//    )
 
     val STONE_CHEST: BlockEntityType<DuskChestBlockEntity> = register(
         "stone_chest", BlockEntityType.Builder.create(

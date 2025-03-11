@@ -1,4 +1,4 @@
-package org.teamvoided.dusk_debris.block.temp.entity
+package org.teamvoided.dusk_debris.block.entity
 
 import net.minecraft.block.BlockState
 import net.minecraft.block.ChestBlock
@@ -13,6 +13,7 @@ import net.minecraft.inventory.Inventories
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.registry.HolderLookup
+import net.minecraft.registry.Registries
 import net.minecraft.screen.GenericContainerScreenHandler
 import net.minecraft.screen.ScreenHandler
 import net.minecraft.sound.SoundCategory
@@ -23,7 +24,6 @@ import net.minecraft.util.collection.DefaultedList
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.BlockView
 import net.minecraft.world.World
-import org.teamvoided.dusk_debris.block.entity.StoneChestBlockEntity
 import org.teamvoided.dusk_debris.block.not_blocks.ChestPhase
 import org.teamvoided.dusk_debris.block.not_blocks.DuskProperties
 import org.teamvoided.dusk_debris.init.DuskBlockEntities
@@ -74,9 +74,15 @@ class DuskChestBlockEntity constructor(blockEntityType: BlockEntityType<*>, pos:
 
     override fun size(): Int = 27
 
-    override fun getContainerName(): Text = Text.translatable("container.chest")
+    override fun getContainerName(): Text {
+        val blockName = Registries.BLOCK.getId(this.cachedState.block).path //this.cachedState.block.name
+        return Text.translatable("container.$blockName")
+    }
 
-    fun getDoubleContainerName(): Text = Text.translatable("container.chestDouble")
+    fun getDoubleContainerName(): Text {
+        val blockName = Registries.BLOCK.getId(this.cachedState.block).path //this.cachedState.block.name
+        return Text.translatable("container.$blockName" + "_double")
+    }
 
     override fun readNbtImpl(nbt: NbtCompound, lookupProvider: HolderLookup.Provider) {
         super.readNbtImpl(nbt, lookupProvider)
@@ -106,8 +112,9 @@ class DuskChestBlockEntity constructor(blockEntityType: BlockEntityType<*>, pos:
     }
 
     private fun setOpen(state: BlockState, open: Int) {
+//        this.cachedState = state.with(DuskProperties.CHEST_PHASE, ChestPhase.fromInt(open))
         world!!.setBlockState(this.getPos(), state.with(DuskProperties.CHEST_PHASE, ChestPhase.fromInt(open)), 3)
-        if (open == 0) lidOpeningTicks = 0
+//        if (open == 0) lidOpeningTicks = 0
     }
 
     override fun onSyncedBlockEvent(type: Int, data: Int): Boolean {
@@ -153,39 +160,48 @@ class DuskChestBlockEntity constructor(blockEntityType: BlockEntityType<*>, pos:
         oldViewerCount: Int,
         newViewerCount: Int
     ) {
-        val block = state.block
-        world.addSyncedBlockEvent(
-            pos,
-            block,
-            if (newViewerCount > 0) OPEN_COUNT_EVENT
-            else CLOSING_COUNT_EVENT,
-            newViewerCount
-        )
+        if (oldViewerCount != newViewerCount) {
+            val block = state.block
+            world.addSyncedBlockEvent(
+                pos,
+                block,
+                if (newViewerCount > 0) OPEN_COUNT_EVENT else CLOSING_COUNT_EVENT,
+                newViewerCount
+            )
+        }
     }
 
     companion object {
         private const val CLOSED_COUNT_EVENT = 0
         private const val CLOSING_COUNT_EVENT = 1
         private const val OPEN_COUNT_EVENT = 2
+        const val MAX_OPENING_TICKS = 20
         fun tick(world: World, pos: BlockPos, state: BlockState, blockEntity: DuskChestBlockEntity) {
             val phase = state.get(DuskProperties.CHEST_PHASE)
-            if (phase.ordinal == 2) {
-                if (blockEntity.lidOpeningTicks < StoneChestBlockEntity.MAX_OPENING_TICKS)
-                    blockEntity.lidOpeningTicks++
-            } else if (blockEntity.lidOpeningTicks > 0) {
-                blockEntity.lidOpeningTicks--
-            } else if (phase.ordinal != 0) {
-                world.addSyncedBlockEvent(pos, state.block, CLOSED_COUNT_EVENT, 0)
+            if (phase.ordinal != 0) {
+                if (phase.ordinal == 2) {
+                    if (blockEntity.lidOpeningTicks < MAX_OPENING_TICKS)
+                        blockEntity.lidOpeningTicks++
+                } else if (blockEntity.lidOpeningTicks > 0) {
+                    blockEntity.lidOpeningTicks--
+                } else {
+                    world.addSyncedBlockEvent(pos, state.block, CLOSED_COUNT_EVENT, 0)
+                }
             }
+        }
+
+
+        fun DuskChestBlockEntity.shouldRenderLid(): Boolean {
+            return this.cachedState.get(DuskProperties.CHEST_PHASE) != ChestPhase.CLOSED || lidOpeningTicks > -5
         }
 
         fun playSound(world: World, pos: BlockPos, state: BlockState, soundEvent: SoundEvent?) {
             val chestType = state.get(ChestBlock.CHEST_TYPE)
-            if (chestType != ChestType.LEFT) {
+            if (chestType != ChestType.RIGHT) {
                 var posX = pos.x.toDouble() + 0.5
                 val posY = pos.y.toDouble() + 0.5
                 var posZ = pos.z.toDouble() + 0.5
-                if (chestType == ChestType.RIGHT) {
+                if (chestType == ChestType.LEFT) {
                     val direction = ChestBlock.getFacing(state)
                     posX += direction.offsetX.toDouble() * 0.5
                     posZ += direction.offsetZ.toDouble() * 0.5

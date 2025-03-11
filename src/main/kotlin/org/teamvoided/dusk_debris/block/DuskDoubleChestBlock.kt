@@ -1,4 +1,4 @@
-package org.teamvoided.dusk_debris.block.temp
+package org.teamvoided.dusk_debris.block
 
 import com.mojang.serialization.MapCodec
 import net.minecraft.block.*
@@ -37,7 +37,8 @@ import net.minecraft.world.World
 import net.minecraft.world.WorldAccess
 import org.teamvoided.dusk_debris.block.not_blocks.ChestPhase
 import org.teamvoided.dusk_debris.block.not_blocks.DuskProperties
-import org.teamvoided.dusk_debris.block.temp.entity.DuskChestBlockEntity
+import org.teamvoided.dusk_debris.block.entity.DuskChestBlockEntity
+import org.teamvoided.dusk_debris.block.temp.AbstractDuskChestBlock
 import org.teamvoided.dusk_debris.init.DuskBlockEntities
 import org.teamvoided.dusk_debris.util.rotate
 import java.util.*
@@ -58,9 +59,7 @@ class DuskDoubleChestBlock(settings: Settings, supplier: Supplier<BlockEntityTyp
 
     public override fun getCodec(): MapCodec<out DuskDoubleChestBlock> = CODEC
 
-    override fun getRenderType(state: BlockState): BlockRenderType {
-        return BlockRenderType.ANIMATED
-    }
+    override fun getRenderType(state: BlockState): BlockRenderType = BlockRenderType.MODEL
 
     override fun getStateForNeighborUpdate(
         state: BlockState,
@@ -96,14 +95,14 @@ class DuskDoubleChestBlock(settings: Settings, supplier: Supplier<BlockEntityTyp
         pos: BlockPos,
         context: ShapeContext
     ): VoxelShape {
-        if (state.get(Properties.CHEST_TYPE) == ChestType.SINGLE) {
-            return SINGLE_SHAPE
+        return if (state.get(Properties.CHEST_TYPE) == ChestType.SINGLE) {
+            SINGLE_SHAPE
         } else {
-            return when (getFacing(state)) {
-                Direction.NORTH -> DOUBLE_SHAPE
-                Direction.SOUTH -> DOUBLE_SHAPE.rotate(2)
-                Direction.WEST -> DOUBLE_SHAPE.rotate(1)
-                Direction.EAST -> DOUBLE_SHAPE.rotate(3)
+            when (getFacing(state)) {
+                Direction.NORTH -> DOUBLE_SHAPE.rotate(2)
+                Direction.SOUTH -> DOUBLE_SHAPE
+                Direction.WEST -> DOUBLE_SHAPE.rotate(3)
+                Direction.EAST -> DOUBLE_SHAPE.rotate(1)
                 else -> DOUBLE_SHAPE
             }
         }
@@ -112,27 +111,27 @@ class DuskDoubleChestBlock(settings: Settings, supplier: Supplier<BlockEntityTyp
     override fun getPlacementState(ctx: ItemPlacementContext): BlockState? {
         var chestType = ChestType.SINGLE
         var direction = ctx.playerFacing.opposite
-        val fluidState = ctx.world.getFluidState(ctx.blockPos)
         val bl = ctx.shouldCancelInteraction()
-        val direction2 = ctx.side
-        if (direction2.axis.isHorizontal && bl) {
-            val neighborChestDir = this.getNeighborChestDirection(ctx, direction2.opposite)
-            if (neighborChestDir != null && neighborChestDir.axis !== direction2.axis) {
+        val placeSide = ctx.side
+        if (placeSide.axis.isHorizontal && bl) {
+            val neighborChestDir = this.getNeighborChestDirection(ctx, placeSide.opposite)
+            if (neighborChestDir != null && neighborChestDir.axis != placeSide.axis) {
                 direction = neighborChestDir
                 chestType =
-                    if (neighborChestDir.rotateYCounterclockwise() == direction2.opposite) ChestType.RIGHT
-                    else ChestType.LEFT
+                    if (neighborChestDir.rotateYCounterclockwise() == placeSide.opposite) ChestType.LEFT
+                    else ChestType.RIGHT
             }
         }
 
         if (chestType == ChestType.SINGLE && !bl) {
             if (direction == this.getNeighborChestDirection(ctx, direction.rotateYClockwise())) {
-                chestType = ChestType.LEFT
-            } else if (direction == this.getNeighborChestDirection(ctx, direction.rotateYCounterclockwise())) {
                 chestType = ChestType.RIGHT
+            } else if (direction == this.getNeighborChestDirection(ctx, direction.rotateYCounterclockwise())) {
+                chestType = ChestType.LEFT
             }
         }
 
+        val fluidState = ctx.world.getFluidState(ctx.blockPos)
         return defaultState
             .with(Properties.HORIZONTAL_FACING, direction)
             .with(Properties.CHEST_TYPE, chestType)
@@ -145,9 +144,9 @@ class DuskDoubleChestBlock(settings: Settings, supplier: Supplier<BlockEntityTyp
 
     private fun getNeighborChestDirection(ctx: ItemPlacementContext, dir: Direction): Direction? {
         val blockState = ctx.world.getBlockState(ctx.blockPos.offset(dir))
-        return if (blockState.isOf(this) && blockState.get(Properties.CHEST_TYPE) == ChestType.SINGLE) blockState.get(
-            Properties.HORIZONTAL_FACING
-        ) else null
+        return if (blockState.isOf(this) && blockState.get(Properties.CHEST_TYPE) == ChestType.SINGLE)
+            blockState.get(Properties.HORIZONTAL_FACING)
+        else null
     }
 
     override fun onStateReplaced(state: BlockState, world: World, pos: BlockPos, newState: BlockState, moved: Boolean) {
@@ -192,13 +191,13 @@ class DuskDoubleChestBlock(settings: Settings, supplier: Supplier<BlockEntityTyp
             if (ignoreBlocked) {
                 BiPredicate { _, _ -> false }
             } else {
-                BiPredicate(DuskDoubleChestBlock::isChestBlocked)
+                BiPredicate(Companion::isChestBlocked)
             }
 
         return DoubleBlockProperties.toPropertySource(
             this.entityTypeRetriever.get(),
-            DuskDoubleChestBlock::getDoubleBlockType,
-            DuskDoubleChestBlock::getFacing,
+            Companion::getDoubleBlockType,
+            Companion::getFacing,
             Properties.HORIZONTAL_FACING,
             state,
             world,
@@ -224,10 +223,7 @@ class DuskDoubleChestBlock(settings: Settings, supplier: Supplier<BlockEntityTyp
         state: BlockState,
         type: BlockEntityType<T>
     ): BlockEntityTicker<T>? {
-        return if (world.isClient) checkType(
-            type,
-            expectedEntityType, DuskChestBlockEntity::tick
-        ) else null
+        return checkType(type, expectedEntityType, DuskChestBlockEntity::tick)
     }
 
     override fun hasComparatorOutput(state: BlockState): Boolean = true
@@ -340,14 +336,14 @@ class DuskDoubleChestBlock(settings: Settings, supplier: Supplier<BlockEntityTyp
             return if (chestType == ChestType.SINGLE) {
                 DoubleBlockProperties.Type.SINGLE
             } else {
-                if (chestType == ChestType.RIGHT) DoubleBlockProperties.Type.FIRST
+                if (chestType == ChestType.LEFT) DoubleBlockProperties.Type.FIRST
                 else DoubleBlockProperties.Type.SECOND
             }
         }
 
         fun getFacing(state: BlockState): Direction {
             val direction = state.get(Properties.HORIZONTAL_FACING)
-            return if (state.get(Properties.CHEST_TYPE) == ChestType.LEFT) direction.rotateYClockwise()
+            return if (state.get(Properties.CHEST_TYPE) == ChestType.RIGHT) direction.rotateYClockwise()
             else direction.rotateYCounterclockwise()
         }
 
@@ -358,8 +354,9 @@ class DuskDoubleChestBlock(settings: Settings, supplier: Supplier<BlockEntityTyp
             pos: BlockPos,
             ignoreBlocked: Boolean
         ): Inventory? {
-            return (block.getBlockEntitySource(state, world, pos, ignoreBlocked)
-                .apply(INVENTORY_RETRIEVER)).orElse(null)
+            return block.getBlockEntitySource(state, world, pos, ignoreBlocked)
+                .apply(INVENTORY_RETRIEVER)
+                .orElse(null)
         }
 
         fun isChestBlocked(world: WorldAccess, pos: BlockPos): Boolean {
@@ -384,11 +381,8 @@ class DuskDoubleChestBlock(settings: Settings, supplier: Supplier<BlockEntityTyp
                 )
             )
             if (list.isNotEmpty()) {
-                val var3: Iterator<CatEntity> = list.iterator()
-
-                while (var3.hasNext()) {
-                    val catEntity = var3.next()
-                    if (catEntity.isInSittingPose) {
+                list.forEach {
+                    if (it.isInSittingPose) {
                         return true
                     }
                 }

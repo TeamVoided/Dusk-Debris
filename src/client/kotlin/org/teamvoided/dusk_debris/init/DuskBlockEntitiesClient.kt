@@ -8,6 +8,6 @@ object DuskBlockEntitiesClient {
     fun init() {
 //        BuiltinItemRendererRegistry.INSTANCE.register(DuskItems.STRAY_SKULL)
         BlockEntityRendererFactories.register(DuskBlockEntities.TREASURE_CHEST, ::TreasureChestBlockEntityRenderer)
-        BlockEntityRendererFactories.register(DuskBlockEntities.STONE_CHEST_OLD, ::StoneChestBlockEntityRenderer)
+        BlockEntityRendererFactories.register(DuskBlockEntities.STONE_CHEST, ::StoneChestBlockEntityRenderer)
     }
 }

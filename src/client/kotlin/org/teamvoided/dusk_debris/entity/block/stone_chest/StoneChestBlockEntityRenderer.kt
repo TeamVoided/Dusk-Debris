@@ -18,16 +18,15 @@ import org.joml.Quaternionf
 import org.joml.Vector2f
 import org.joml.Vector3f
 import org.teamvoided.dusk_debris.DuskDebris.log
-import org.teamvoided.dusk_debris.block.StoneChestBlock
-import org.teamvoided.dusk_debris.block.entity.StoneChestBlockEntity
-import org.teamvoided.dusk_debris.block.entity.StoneChestBlockEntity.Companion.shouldRenderLid
+import org.teamvoided.dusk_debris.block.entity.DuskChestBlockEntity
+import org.teamvoided.dusk_debris.block.entity.DuskChestBlockEntity.Companion.shouldRenderLid
 import org.teamvoided.dusk_debris.block.not_blocks.DuskProperties
 import org.teamvoided.dusk_debris.util.Utils
 import kotlin.math.max
 import kotlin.math.min
 
 class StoneChestBlockEntityRenderer<T>(ctx: BlockEntityRendererFactory.Context) :
-    BlockEntityRenderer<T> where T : BlockEntity, T : ChestAnimationProgress {
+    BlockEntityRenderer<T> where T : BlockEntity {
     private val blockRenderManager: BlockRenderManager = ctx.renderManager
 
     override fun render(
@@ -39,10 +38,10 @@ class StoneChestBlockEntityRenderer<T>(ctx: BlockEntityRendererFactory.Context) 
         overlay: Int
     ) {
         val world = blockEntity.world
-        if (world != null && blockEntity is StoneChestBlockEntity) {
+        if (world != null && blockEntity is DuskChestBlockEntity) {
             val blockState = blockEntity.cachedState
             val phase = blockState.get(DuskProperties.CHEST_PHASE)
-            if (blockEntity.shouldRenderLid()) {
+            if (blockEntity.shouldRenderLid() ) {
                 val animProg = animProg(blockEntity, phase.ordinal, tickDelta)
 
                 matrices.push()
@@ -53,9 +52,9 @@ class StoneChestBlockEntityRenderer<T>(ctx: BlockEntityRendererFactory.Context) 
         }
     }
 
-    fun animProg(blockEntity: StoneChestBlockEntity, state: Int, tickDelta: Float): Float {
+    fun animProg(blockEntity: DuskChestBlockEntity, state: Int, tickDelta: Float): Float {
         val tockDelta = if (state == 2) tickDelta else -tickDelta
-        var animProg = (max(blockEntity.lidOpeningTicks + tockDelta, 0f) / StoneChestBlockEntity.MAX_OPENING_TICKS)
+        var animProg = (max(blockEntity.lidOpeningTicks + tockDelta, 0f) / DuskChestBlockEntity.MAX_OPENING_TICKS)
         animProg = 1.0f - animProg
         animProg = 1.0f - animProg * animProg * animProg
         return animProg
@@ -63,10 +62,10 @@ class StoneChestBlockEntityRenderer<T>(ctx: BlockEntityRendererFactory.Context) 
 
     fun MatrixStack.animateLid(state: BlockState, progress: Float) {
         val one = 0.0625f
-        val fifteen = 1f - one//0.9375f
+        val fifteen = 1f - one //0.9375f
         val type = state.get(Properties.CHEST_TYPE)
         val isDouble = if (type != ChestType.SINGLE) Utils.rotate45 / 2 else Utils.rotate45
-        val isRight = if (type == ChestType.RIGHT) 1f else 0f
+        val isRight = if (type == ChestType.LEFT) 1f else 0f
         val point = when (state.get(Properties.HORIZONTAL_FACING)) {
             Direction.NORTH -> Vector2f(one - isRight, fifteen)
             Direction.SOUTH -> Vector2f(fifteen + isRight, one)

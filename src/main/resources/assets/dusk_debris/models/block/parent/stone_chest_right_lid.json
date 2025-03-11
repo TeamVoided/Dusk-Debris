@@ -1,16 +1,17 @@
 {
+	"parent": "minecraft:block/block",
 	"textures": {
 		"particle": "#front"
 	},
 	"elements": [
 		{
-			"from": [1, 9, 1],
+			"from": [1, 10, 1],
 			"to": [16, 14, 15],
 			"faces": {
-				"north": {"uv": [0, 2, 15, 7], "texture": "#front"},
-				"south": {"uv": [1, 2, 16, 7], "texture": "#back"},
-				"west": {"uv": [1, 2, 15, 7], "texture": "#side"},
-				"up": {"uv": [1, 1, 16, 15], "texture": "#top"},
+				"north": {"uv": [0, 2, 15, 6], "texture": "#front"},
+				"south": {"uv": [1, 2, 16, 6], "texture": "#back"},
+				"west": {"uv": [1, 2, 15, 6], "texture": "#side"},
+				"up": {"uv": [0, 1, 15, 15], "rotation": 180, "texture": "#top"},
 				"down": {"uv": [1, 1, 16, 15], "texture": "#bottom"}
 			}
 		}
