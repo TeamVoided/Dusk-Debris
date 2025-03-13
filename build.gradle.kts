@@ -42,6 +42,7 @@ dependencies {
 
     modImplementation(fileTree("libs"))
     modImplementation(libs.modmenu)
+    modImplementation(libs.reef)
 //    modImplementation("software.bernie.geckolib:geckolib-fabric-1.20.6:${geckolib_version}")
 }
 
