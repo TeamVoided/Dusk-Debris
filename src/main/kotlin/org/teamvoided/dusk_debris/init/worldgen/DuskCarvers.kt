@@ -5,12 +5,15 @@ import net.minecraft.registry.Registry
 import net.minecraft.world.gen.carver.Carver
 import net.minecraft.world.gen.carver.CarverConfig
 import org.teamvoided.dusk_debris.DuskDebris.id
+import org.teamvoided.dusk_debris.world.gen.configured_carver.GeodeCarver
 import org.teamvoided.dusk_debris.world.gen.configured_carver.LakeCarver
+import org.teamvoided.dusk_debris.world.gen.configured_carver.config.GeodeCarverConfig
 import org.teamvoided.dusk_debris.world.gen.configured_carver.config.LakeCarverConfig
 
 object DuskCarvers {
 
     val LAKE_CARVER = register("lake_carver", LakeCarver(LakeCarverConfig.CODEC))
+    val GEODE_CARVER = register("geode_carver", GeodeCarver(GeodeCarverConfig.CODEC))
 
     fun init() {}
     private fun <C : CarverConfig, F : Carver<C>> register(name: String, carver: F): F =

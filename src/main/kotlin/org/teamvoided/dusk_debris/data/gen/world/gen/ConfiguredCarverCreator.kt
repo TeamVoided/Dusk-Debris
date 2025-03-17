@@ -2,12 +2,17 @@ package org.teamvoided.dusk_debris.data.gen.world.gen
 
 import net.minecraft.block.*
 import net.minecraft.registry.*
+import net.minecraft.registry.tag.BlockTags
+import net.minecraft.util.math.float_provider.UniformFloatProvider
+import net.minecraft.util.math.int_provider.UniformIntProvider
 import net.minecraft.world.gen.YOffset
 import net.minecraft.world.gen.carver.*
 import net.minecraft.world.gen.heightprovider.UniformHeightProvider
 import org.teamvoided.dusk_debris.data.worldgen.DuskConfiguredCarvers
 import org.teamvoided.dusk_debris.init.worldgen.DuskCarvers
+import org.teamvoided.dusk_debris.world.gen.configured_carver.config.GeodeCarverConfig
 import org.teamvoided.dusk_debris.world.gen.configured_carver.config.LakeCarverConfig
+import org.teamvoided.dusk_debris.world.gen.configured_carver.config.debug.LakeCarverDebugConfig
 
 @Suppress("DEPRECATION")
 object ConfiguredCarverCreator {
@@ -31,6 +36,18 @@ object ConfiguredCarverCreator {
                 block,
                 UniformHeightProvider.create(YOffset.aboveBottom(8), YOffset.fixed(0)),
                 Blocks.LAVA.defaultState
+            )
+        )
+        c.registerConfiguredCarver(
+            DuskConfiguredCarvers.AMETHYST_GEODE,
+            DuskCarvers.GEODE_CARVER,
+            GeodeCarverConfig(
+                0.015f,
+                UniformHeightProvider.create(YOffset.aboveBottom(8), YOffset.fixed(180)),
+                UniformFloatProvider.create(0.4f, 1f),
+                YOffset.aboveBottom(8),
+                block.getTagOrThrow(BlockTags.OVERWORLD_CARVER_REPLACEABLES),
+                UniformIntProvider.create(10, 30),
             )
         )
 

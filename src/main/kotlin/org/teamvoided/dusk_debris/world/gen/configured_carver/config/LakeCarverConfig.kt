@@ -69,31 +69,36 @@ class LakeCarverConfig(
     )
 
     companion object {
-        fun defaultWithFluid(block: HolderProvider<Block>, heightProvider: HeightProvider, fluidState: BlockState): LakeCarverConfig {
+        fun defaultWithFluid(
+            block: HolderProvider<Block>,
+            heightProvider: HeightProvider = UniformHeightProvider.create(YOffset.aboveBottom(8), YOffset.fixed(180)),
+            fluidState: BlockState = Blocks.WATER.defaultState
+        ): LakeCarverConfig {
             return LakeCarverConfig(
                 0.15f, //0.015f,
-                UniformHeightProvider.create(YOffset.aboveBottom(8), YOffset.fixed(180)),
+                heightProvider,
                 UniformFloatProvider.create(0.4f, 1f),
                 YOffset.aboveBottom(8),
                 LakeCarverDebugConfig.default(),
                 block.getTagOrThrow(BlockTags.OVERWORLD_CARVER_REPLACEABLES),
 
                 UniformIntProvider.create(10, 30),
-                Blocks.WATER.defaultState,
+                fluidState,
                 UniformFloatProvider.create(-0.8f, 0.2f)
             )
         }
+
         val CODEC: Codec<LakeCarverConfig> =
             RecordCodecBuilder.create { instance: RecordCodecBuilder.Instance<LakeCarverConfig> ->
                 instance.group(
-                    CarverConfig.CODEC.forGetter { config: LakeCarverConfig -> config },
+                    CarverConfig.CODEC.forGetter { it },
                     IntProvider.VALUE_CODEC.fieldOf("horizontal_radius")
                         .forGetter { it.horizontalRadius },
                     BlockState.CODEC.optionalFieldOf("fluid_state", Blocks.WATER.defaultState)
                         .forGetter { it.fluidState },
                     FloatProvider.createValidatedCodec(-1.0f, 1.0f).fieldOf("water_level")
-                        .forGetter { it.waterLevel })
-                    .apply(instance, ::LakeCarverConfig)
+                        .forGetter { it.waterLevel }
+                ).apply(instance, ::LakeCarverConfig)
             }
     }
 }

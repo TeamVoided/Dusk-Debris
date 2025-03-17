@@ -11,7 +11,7 @@ object DuskGameRules {
     fun init() = Unit
 
 //    val TUFF_GOLEM_DISABLE = register("dusk_debris.disableTuffGolem", Category.MOBS, createBooleanRule(false))
-    val MAX_ENTITY_SHIFT = register("dusk_debris.max_entity_shift", Category.MOBS, createIntRule(20))
+    val MAX_ENTITY_SHIFT = register("duskDebris.maxEntityShift", Category.MOBS, createIntRule(20))
 
 //    fun <T : GameRules.AbstractGameRule<T>> World.getRule(key: GameRules.Key<T>): T = gameRules.get(key)
 

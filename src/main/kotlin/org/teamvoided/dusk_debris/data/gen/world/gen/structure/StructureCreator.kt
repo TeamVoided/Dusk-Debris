@@ -17,7 +17,6 @@ import net.minecraft.world.gen.heightprovider.ConstantHeightProvider
 import net.minecraft.world.gen.heightprovider.HeightProvider
 import net.minecraft.world.gen.heightprovider.UniformHeightProvider
 import net.minecraft.world.gen.structure.TerrainAdjustment
-import org.teamvoided.dusk_debris.data.gen.world.gen.structure.StructureCreator.register
 import org.teamvoided.dusk_debris.data.tags.DuskBiomeTags
 import org.teamvoided.dusk_debris.data.worldgen.structure.DuskStructurePools
 import org.teamvoided.dusk_debris.data.worldgen.structure.DuskStructures
@@ -58,7 +57,8 @@ object StructureCreator {
         size: Int,
         heightProvider: HeightProvider,
         dimensionPadding: DimensionPadding,
-        bottomUpSearch: Boolean
+        bottomUpSearch: Boolean,
+        placeIfReachLimit: Boolean = false
     ) {
         val biomes: HolderProvider<Biome> = this.getRegistryLookup(RegistryKeys.BIOME)
         val pool: HolderProvider<StructurePool> = this.getRegistryLookup(RegistryKeys.STRUCTURE_POOL)
@@ -75,8 +75,9 @@ object StructureCreator {
                 pool.getHolderOrThrow(structurePool),
                 size,
                 heightProvider,
-                dimensionPadding,
-                bottomUpSearch
+                placeIfReachLimit,
+                bottomUpSearch,
+                dimensionPadding
             )
         )
     }

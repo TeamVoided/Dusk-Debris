@@ -10,6 +10,7 @@ object DuskConfiguredCarvers {
 
     val LAKE = create("lake")
     val LAVA_LAKE = create("lava_lake")
+    val AMETHYST_GEODE = create("amethyst_geode")
 
     private fun create(id: String): RegistryKey<ConfiguredCarver<*>> =
         RegistryKey.of(RegistryKeys.CONFIGURED_CARVER, id(id))

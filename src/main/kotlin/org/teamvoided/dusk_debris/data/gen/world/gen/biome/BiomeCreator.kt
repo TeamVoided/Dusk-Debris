@@ -89,8 +89,7 @@ object BiomeCreator {
             c.getRegistryLookup(RegistryKeys.CONFIGURED_CARVER)
         )
 
-        generationSettings.carver(GenerationStep.Carver.AIR, DuskConfiguredCarvers.LAKE)
-        generationSettings.carver(GenerationStep.Carver.AIR, DuskConfiguredCarvers.LAVA_LAKE)
+        generationSettings.carver(GenerationStep.Carver.AIR, DuskConfiguredCarvers.AMETHYST_GEODE)
 
         DefaultBiomeFeatures.addDefaultDisks(generationSettings)
         generationSettings.feature(GenerationStep.Feature.VEGETAL_DECORATION, VegetationPlacedFeatures.TREES_PLAINS)

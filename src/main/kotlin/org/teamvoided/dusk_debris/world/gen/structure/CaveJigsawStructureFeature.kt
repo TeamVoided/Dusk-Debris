@@ -33,6 +33,7 @@ class CaveJigsawStructureFeature(
     private val size: Int,
     private val startHeight: HeightProvider,
     private val bottomUpSearch: Boolean = false,
+    private val placeIfReachRange: Boolean = false,
     private val maxDistanceFromCenter: Int = 80,
     private val poolAliases: List<StructurePoolAliasBinding> = listOf(),
     private val dimensionPadding: DimensionPadding = JigsawFeature.DEFAULT_PADDING,
@@ -43,8 +44,10 @@ class CaveJigsawStructureFeature(
         startPool: Holder<StructurePool>,
         size: Int,
         startHeight: HeightProvider,
-        dimensionPadding: DimensionPadding,
-        bottomUpSearch: Boolean = false
+        bottomUpSearch: Boolean = false,
+        placeIfReachRange: Boolean = false,
+        dimensionPadding: DimensionPadding = JigsawFeature.DEFAULT_PADDING,
+        liquidSettings: LiquidSettings = JigsawFeature.DEFAULT_LIQUID_SETTING
     ) : this(
         settings,
         startPool,
@@ -52,28 +55,11 @@ class CaveJigsawStructureFeature(
         size,
         startHeight,
         bottomUpSearch,
+        placeIfReachRange,
         80,
         listOf<StructurePoolAliasBinding>(),
         dimensionPadding,
-        JigsawFeature.DEFAULT_LIQUID_SETTING
-    )
-
-    constructor(
-        settings: StructureSettings,
-        startPool: Holder<StructurePool>,
-        size: Int,
-        startHeight: HeightProvider
-    ) : this(
-        settings,
-        startPool,
-        Optional.empty(),
-        size,
-        startHeight,
-        false,
-        80,
-        listOf<StructurePoolAliasBinding>(),
-        JigsawFeature.DEFAULT_PADDING,
-        JigsawFeature.DEFAULT_LIQUID_SETTING
+        liquidSettings
     )
 
     public override fun findGenerationPos(context: GenerationContext): Optional<GenerationStub> {
@@ -84,22 +70,18 @@ class CaveJigsawStructureFeature(
         val minY = dimensionPadding.bottom
         val maxY = dimensionPadding.top
 
-        val verticalBlockSample = context.chunkGenerator().getColumnSample(
-            chunkPos.startX,
-            chunkPos.startZ,
-            context.world(),
-            context.randomState()
-        )
+        val verticalBlockSample = context.chunkGenerator()
+            .getColumnSample(chunkPos.startX, chunkPos.startZ, context.world(), context.randomState())
 
-        val mutable = BlockPos.Mutable(chunkPos.startX, posY, chunkPos.startZ)
+        val mutablePos = BlockPos.Mutable(chunkPos.startX, posY, chunkPos.startZ)
 
         if (bottomUpSearch) {
             while (posY < maxY) {
                 val blockStateSolid = verticalBlockSample.getState(posY)
                 ++posY
                 val blockStateAir = verticalBlockSample.getState(posY)
-                mutable.setY(posY)
-                if (checkIfCanPlace(mutable, blockStateSolid, blockStateAir)) {
+                mutablePos.setY(posY)
+                if (checkIfCanPlace(mutablePos, blockStateSolid, blockStateAir)) {
                     break
                 }
             }
@@ -108,58 +90,52 @@ class CaveJigsawStructureFeature(
                 val blockStateAir = verticalBlockSample.getState(posY)
                 --posY
                 val blockStateSolid = verticalBlockSample.getState(posY)
-                mutable.setY(posY)
-                if (checkIfCanPlace(mutable, blockStateSolid, blockStateAir)) {
+                mutablePos.setY(posY)
+                if (checkIfCanPlace(mutablePos, blockStateSolid, blockStateAir)) {
                     break
                 }
             }
         }
 
-        if (posY <= minY || posY >= maxY) {
+        if (!placeIfReachRange && (posY <= minY || posY >= maxY)) {
             return Optional.empty()
         } else {
-            val blockPos = BlockPos(chunkPos.startX, posY, chunkPos.startZ)
             return StructurePoolBasedGenerator.method_30419(
                 context,
                 this.startPool,
                 this.startJigsawName,
                 this.size,
-                blockPos,
+                mutablePos,
                 false,
                 Optional.empty(),
                 this.maxDistanceFromCenter,
-                StructurePoolAliasLookup.create(this.poolAliases, blockPos, context.seed()),
+                StructurePoolAliasLookup.create(this.poolAliases, mutablePos, context.seed()),
                 this.dimensionPadding,
                 this.liquidSettings
             )
         }
     }
 
-    fun checkIfCanPlace(pos: BlockPos.Mutable, solid: BlockState, air: BlockState): Boolean {
-        return (air.isAir &&
-                (solid.isSideSolidFullSquare(EmptyBlockView.INSTANCE, pos, Direction.UP) ||
-                        solid.isOf(Blocks.SOUL_SAND)) &&
-                !solid.isOf(Blocks.BEDROCK)
-                )
+    private fun checkIfCanPlace(pos: BlockPos.Mutable, solid: BlockState, air: BlockState): Boolean {
+        val airCheck = air.isAir
+        val solidCheck = (solid.isSideSolidFullSquare(EmptyBlockView.INSTANCE, pos, Direction.UP) ||
+                solid.isOf(Blocks.SOUL_SAND))
+        return airCheck && solidCheck
     }
 
-    override fun getType(): StructureType<*> {
-        return DuskStructureType.CAVE_JIGSAW
-    }
+    override fun getType(): StructureType<*> = DuskStructureType.CAVE_JIGSAW
 
     companion object {
-        const val MAX_TOTAL_STRUCTURE_RANGE: Int = 128
-        const val MIN_DEPTH: Int = 0
-        const val MAX_DEPTH: Int = 20
         private val RAW_CODEC: MapCodec<CaveJigsawStructureFeature> =
             RecordCodecBuilder.mapCodec { instance ->
                 instance.group(
                     settingsCodec(instance),
                     StructurePool.REGISTRY_CODEC.fieldOf("start_pool").forGetter { it.startPool },
                     Identifier.CODEC.optionalFieldOf("start_jigsaw_name").forGetter { it.startJigsawName },
-                    Codec.intRange(0, 20).fieldOf("size").forGetter { it.size },
+                    Codec.intRange(0, JigsawFeature.MAX_DEPTH).fieldOf("size").forGetter { it.size },
                     HeightProvider.CODEC.fieldOf("start_height").forGetter { it.startHeight },
                     Codec.BOOL.fieldOf("use_inverted_search").orElse(false).forGetter { it.bottomUpSearch },
+                    Codec.BOOL.fieldOf("place_if_reach_range").orElse(false).forGetter { it.placeIfReachRange },
                     Codec.intRange(1, 128).fieldOf("max_distance_from_center").forGetter { it.maxDistanceFromCenter },
                     Codec.list(StructurePoolAliasBinding.CODEC)
                         .optionalFieldOf("pool_aliases", listOf<StructurePoolAliasBinding>())
@@ -176,12 +152,13 @@ class CaveJigsawStructureFeature(
             val var10000: Byte = when (feature.terrainAdaptation) {
                 TerrainAdjustment.NONE -> 0
                 TerrainAdjustment.BURY, TerrainAdjustment.BEARD_THIN, TerrainAdjustment.BEARD_BOX, TerrainAdjustment.ENCAPSULATE -> 12
-                else -> throw MatchException(null, null)
+                else -> 12 //throw MatchException(null, null)
             }
             val i = var10000.toInt()
-            return if (feature.maxDistanceFromCenter + i > 128) DataResult.error { "Structure size including terrain adaptation must not exceed 128" } else DataResult.success(
-                feature
-            )
+            return if (feature.maxDistanceFromCenter + i > JigsawFeature.MAX_TOTAL_STRUCTURE_RANGE)
+                DataResult.error { "Structure size including terrain adaptation must not exceed 128" }
+            else
+                DataResult.success(feature)
         }
     }
 }

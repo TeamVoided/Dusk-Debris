@@ -64,6 +64,12 @@ object DuskBiomeModifications {
 //            DuskConfiguredCarvers.LAKE,
 //            BiomeTags.OVERWORLD
 //        )
+
+        addCarver(
+            "add_amethyst_geode_carver",
+            DuskConfiguredCarvers.AMETHYST_GEODE,
+            BiomeTags.OVERWORLD
+        )
     }
 
     private fun addFeature(

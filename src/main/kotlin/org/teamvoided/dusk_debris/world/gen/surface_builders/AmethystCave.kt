@@ -26,7 +26,7 @@ object AmethystCave {
         biomeTag: TagKey<Biome>
     ) {
 //        if (glacierIce == null) glacierIce = random.getOrCreateNoiseSampler(DnDNoise.GLACIER_ICE_PICKER)
-        if (finalDensity == null) finalDensity = chunk.settings
+//        if (finalDensity == null) finalDensity = chunk.settings
 
         val y = chunk.sampleHeightmap(Heightmap.Type.OCEAN_FLOOR_WG, x, z) + 1
         if (biome.getBiome(BlockPos(x, y, z)).isIn(biomeTag)) {
