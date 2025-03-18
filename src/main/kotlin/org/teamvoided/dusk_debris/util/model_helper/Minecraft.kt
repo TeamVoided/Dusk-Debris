@@ -6,13 +6,14 @@ import net.minecraft.block.enums.SculkSensorPhase
 import net.minecraft.data.client.model.*
 import net.minecraft.state.property.Properties
 import net.minecraft.util.math.Direction
+import org.teamvoided.dusk_debris.util.model
 
 
 fun BlockStateModelGenerator.sculkCatalystRotate(block: Block) {
     val identifier = ModelIds.getBlockModelId(block)
     val identifierBloom = ModelIds.getBlockSubModelId(block, "_bloom")
     blockStateCollector.accept(
-        VariantsBlockStateSupplier.create(Blocks.SCULK_CATALYST)
+        VariantsBlockStateSupplier.create(block)
             .coordinate(
                 BlockStateVariantMap.create(Properties.BLOOM).register {
                     BlockStateVariant.create().put(VariantSettings.MODEL, if (it) identifierBloom else identifier)
@@ -48,13 +49,8 @@ fun BlockStateModelGenerator.sculkSensorRotate(block: Block) {
     )
 }
 
-fun BlockStateModelGenerator.addAxis(block: Block) {
-    val identifier = ModelIds.getBlockModelId(block)
-    this.blockStateCollector.accept(
-        BlockStateModelGenerator.createAxisRotatedBlockState(block, identifier)
-    )
-}
-
+fun BlockStateModelGenerator.addAxis(block: Block) =
+    this.blockStateCollector.accept(BlockStateModelGenerator.createAxisRotatedBlockState(block, block.model()))
 
 fun createUpDefaultRotationStates(): BlockStateVariantMap {
     return BlockStateVariantMap.create(Properties.FACING)

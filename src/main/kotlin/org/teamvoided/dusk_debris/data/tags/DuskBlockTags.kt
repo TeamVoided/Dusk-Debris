@@ -35,6 +35,8 @@ object DuskBlockTags {
 
     val SCULK_SPREAD_SEARCH = create("sculk_spread_search")
 
+    val OVERWORLD_GEODE_CARVER_REPLACEABLES = create("geode_carver_replaceables/overworld")
+
 
     fun create(id: String): TagKey<Block> = TagKey.of(RegistryKeys.BLOCK, DuskDebris.id(id))
     fun create(modId: String, path: String): TagKey<Block> = TagKey.of(

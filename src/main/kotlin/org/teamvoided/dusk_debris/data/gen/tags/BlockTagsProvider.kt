@@ -97,6 +97,32 @@ class BlockTagsProvider(output: FabricDataOutput, registriesFuture: CompletableF
             .add(Blocks.SCULK_SENSOR)
             .add(Blocks.SCULK_SHRIEKER)
 
+        getOrCreateTagBuilder(DuskBlockTags.OVERWORLD_GEODE_CARVER_REPLACEABLES)
+            .forceAddTag(BlockTags.BASE_STONE_OVERWORLD)
+            .forceAddTag(BlockTags.DIRT)
+            .forceAddTag(BlockTags.SAND)
+            .forceAddTag(BlockTags.TERRACOTTA)
+            .forceAddTag(BlockTags.IRON_ORES)
+            .forceAddTag(BlockTags.COPPER_ORES)
+            .forceAddTag(BlockTags.SNOW)
+            .forceAddTag(DuskBlockTags.CONVENTIONAL_RAW_ORE_BLOCKS)
+            .forceAddTag(ConventionalBlockTags.BUDS)
+            .add(Blocks.GRAVEL)
+            .add(Blocks.SANDSTONE)
+            .add(Blocks.RED_SANDSTONE)
+            .add(Blocks.PACKED_ICE)
+            .add(Blocks.SMOOTH_BASALT)
+            .add(Blocks.CALCITE)
+            .add(Blocks.AMETHYST_BLOCK)
+            .add(Blocks.BUDDING_AMETHYST)
+
+            .forceAddTag(BlockTags.BASE_STONE_NETHER)
+            .forceAddTag(BlockTags.NYLIUM)
+            .forceAddTag(BlockTags.WART_BLOCKS)
+            .add(Blocks.SOUL_SAND)
+            .add(Blocks.SOUL_SOIL)
+
+            .add(Blocks.END_STONE)
     }
 
     private fun vanillaTags() {

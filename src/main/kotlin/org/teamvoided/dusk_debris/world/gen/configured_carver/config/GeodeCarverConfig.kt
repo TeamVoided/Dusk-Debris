@@ -10,6 +10,7 @@ import net.minecraft.world.gen.YOffset
 import net.minecraft.world.gen.carver.CarverConfig
 import net.minecraft.world.gen.carver.CarverDebugConfig
 import net.minecraft.world.gen.heightprovider.HeightProvider
+import net.minecraft.world.gen.stateprovider.BlockStateProvider
 import org.teamvoided.dusk_debris.world.gen.configured_carver.config.debug.LakeCarverDebugConfig
 
 class GeodeCarverConfig(
@@ -20,14 +21,23 @@ class GeodeCarverConfig(
     debugConfig: CarverDebugConfig,
     replaceableBlocks: HolderSet<Block>,
     val horizontalRadius: IntProvider,
+    val outerLayerBlock: BlockStateProvider,
+    val middleLayerBlock: BlockStateProvider,
+    val innerLayerBlock: BlockStateProvider,
+    val extraInnerBlock: BlockStateProvider,
 ) : CarverConfig(probability, y, yScale, lavaLevel, debugConfig, replaceableBlocks) {
+
     constructor(
         probability: Float,
         y: HeightProvider,
         yScale: FloatProvider,
         lavaLevel: YOffset,
         replaceableBlocks: HolderSet<Block>,
-        horizontalRadiusMultiplier: IntProvider
+        horizontalRadiusMultiplier: IntProvider,
+        outerLayerBlock: BlockStateProvider,
+        middleLayerBlock: BlockStateProvider,
+        innerLayerBlock: BlockStateProvider,
+        extraInnerBlock: BlockStateProvider,
     ) : this(
         probability,
         y,
@@ -35,12 +45,20 @@ class GeodeCarverConfig(
         lavaLevel,
         LakeCarverDebugConfig.default(),
         replaceableBlocks,
-        horizontalRadiusMultiplier
+        horizontalRadiusMultiplier,
+        outerLayerBlock,
+        middleLayerBlock,
+        innerLayerBlock,
+        extraInnerBlock
     )
 
     constructor(
         config: CarverConfig,
-        horizontalRadiusMultiplier: IntProvider
+        horizontalRadiusMultiplier: IntProvider,
+        outerLayerBlock: BlockStateProvider,
+        middleLayerBlock: BlockStateProvider,
+        innerLayerBlock: BlockStateProvider,
+        extraInnerBlock: BlockStateProvider,
     ) : this(
         config.probability,
         config.y,
@@ -48,7 +66,11 @@ class GeodeCarverConfig(
         config.lavaLevel,
         config.debugConfig,
         config.replaceable,
-        horizontalRadiusMultiplier
+        horizontalRadiusMultiplier,
+        outerLayerBlock,
+        middleLayerBlock,
+        innerLayerBlock,
+        extraInnerBlock
     )
 
     companion object {
@@ -56,7 +78,19 @@ class GeodeCarverConfig(
             RecordCodecBuilder.create { instance: RecordCodecBuilder.Instance<GeodeCarverConfig> ->
                 instance.group(
                     CarverConfig.CODEC.forGetter { it },
-                    IntProvider.VALUE_CODEC.fieldOf("horizontal_radius").forGetter { it.horizontalRadius }
+                    IntProvider.VALUE_CODEC.fieldOf("horizontal_radius").forGetter { it.horizontalRadius },
+                    BlockStateProvider.TYPE_CODEC
+                        .fieldOf("outer_layer")
+                        .forGetter { it.outerLayerBlock },
+                    BlockStateProvider.TYPE_CODEC
+                        .fieldOf("middle_inner")
+                        .forGetter { it.middleLayerBlock },
+                    BlockStateProvider.TYPE_CODEC
+                        .fieldOf("inner_inner")
+                        .forGetter { it.innerLayerBlock },
+                    BlockStateProvider.TYPE_CODEC
+                        .fieldOf("extra_inner_layer")
+                        .forGetter { it.extraInnerBlock },
                 ).apply(instance, ::GeodeCarverConfig)
             }
     }

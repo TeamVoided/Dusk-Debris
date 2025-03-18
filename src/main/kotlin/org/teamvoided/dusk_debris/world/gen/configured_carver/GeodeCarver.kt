@@ -4,8 +4,10 @@ import com.mojang.serialization.Codec
 import net.minecraft.block.BlockState
 import net.minecraft.block.Blocks
 import net.minecraft.registry.Holder
+import net.minecraft.state.property.Properties
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.ChunkPos
+import net.minecraft.util.math.Direction
 import net.minecraft.util.math.MathHelper
 import net.minecraft.util.math.noise.DoublePerlinNoiseSampler
 import net.minecraft.util.random.LegacySimpleRandom
@@ -48,12 +50,12 @@ class GeodeCarver(codec: Codec<GeodeCarverConfig>) : Carver<GeodeCarverConfig>(c
 //        chunk.setBlockState(Vec3d(posX, posY, posZ).toBlockPos(), Blocks.GLOWSTONE.defaultState, false)
 
         val skipPredicate =
-            SkipOrWaterPredicate { context: CarverContext, scaledRelativeX: Double, scaledRelativeY: Double, scaledRelativeZ: Double, y: Int, dps: Double ->
+            SkipOrWaterPredicate { scaledRelativeX: Double, scaledRelativeY: Double, scaledRelativeZ: Double, dps: Double ->
                 getState(scaledRelativeX, scaledRelativeY, scaledRelativeZ, dps)
             }
 
-        val height: Double = config.yScale.get(random).toDouble() //radius*this+2
-        val radius: Float = config.horizontalRadius.get(random).toFloat() //2*this+2 //1.0f + random.nextFloat() * 6.0f
+        val height: Double = config.yScale.get(random).toDouble()
+        val radius: Float = config.horizontalRadius.get(random).toFloat()
         this.carveCave(
             carverContext,
             config,
@@ -156,8 +158,7 @@ class GeodeCarver(codec: Codec<GeodeCarverConfig>) : Carver<GeodeCarverConfig>(c
                             val funY = (loopY - 0.5 - y) / verticalScale
 
                             val sample = dps.sample(chunkX.toDouble(), loopY * 0.25, chunkZ.toDouble())
-                            val sampleMathed = abs(sample)
-                            val output = predicate.shouldSkip(context, funX, funY, funZ, loopY, sampleMathed)
+                            val output = predicate.shouldSkip(funX, funY, funZ, sample)
                             if (output != 0 && (!mask[loopX, loopY, loopZ] || isDebug(config))) {
                                 mask[loopX, loopY] = loopZ
                                 mutable[chunkX, loopY] = chunkZ
@@ -194,11 +195,21 @@ class GeodeCarver(codec: Codec<GeodeCarverConfig>) : Carver<GeodeCarverConfig>(c
         if (!this.canReplaceBlock(config, blockState) && !isDebug(config)) {
             return false
         } else {
-            val blockState2 =
-                this.getState(context, config, random, pos, sampler, predicateResult)
+            var blockState2 = this.getState(context, config, random, pos, sampler, predicateResult)
             if (blockState2 == null) {
                 return false
             } else {
+                if (predicateResult == 4 && random.nextInt(20) == 0 && !blockState2.isOf(Blocks.LAVA)) {
+                    val crysDir = crystalDirection(
+                        chunk,
+                        pos,
+                        config.extraInnerBlock.getBlockState(random, pos),
+                        blockState2 == Blocks.WATER.defaultState
+                    )
+                    if (crysDir != null)
+                        blockState2 = crysDir
+                }
+
                 chunk.setBlockState(pos, blockState2, false)
                 if (sampler.needsFluidTick() && !blockState2.fluidState.isEmpty) {
                     chunk.markBlockForPostProcessing(pos)
@@ -217,17 +228,12 @@ class GeodeCarver(codec: Codec<GeodeCarverConfig>) : Carver<GeodeCarverConfig>(c
         sampler: AquiferSampler,
         predicateResult: Int,
     ): BlockState? {
-        val amethyst =
-            if (random.nextInt(10) == 0)
-                Blocks.BUDDING_AMETHYST.defaultState
-            else
-                Blocks.AMETHYST_BLOCK.defaultState
         val state = when (predicateResult) {
-            1 -> Blocks.SMOOTH_BASALT.defaultState
-            2 -> Blocks.CALCITE.defaultState
-            3 -> amethyst
-            4 -> Blocks.AIR.defaultState
-            else -> Blocks.AIR.defaultState
+            1 -> config.outerLayerBlock.getBlockState(random, pos)
+            2 -> config.middleLayerBlock.getBlockState(random, pos)
+            3 -> config.innerLayerBlock.getBlockState(random, pos)
+            4, 5 -> Blocks.CAVE_AIR.defaultState
+            else -> Blocks.CAVE_AIR.defaultState
         }
 
         val debug = isDebug(config)
@@ -235,19 +241,44 @@ class GeodeCarver(codec: Codec<GeodeCarverConfig>) : Carver<GeodeCarverConfig>(c
             return LAVA.blockState
         } else {
             val aquiferState = sampler.apply(DensityFunction.SinglePointContext(pos.x, pos.y, pos.z), 0.0)
-            if (aquiferState == null) {
-                return if (debug) config.debugConfig.barrierState
-                else if (state.isAir) amethyst
-                else state
+            return if (aquiferState == null) {
+                if (debug)
+                    config.debugConfig.barrierState
+                else if (state.isAir)
+                    config.innerLayerBlock.getBlockState(random, pos)
+                else
+                    state
             } else {
                 if (state.isAir) {
-                    return if (debug) getDebugState(config, aquiferState)
+                    if (debug) getDebugState(config, aquiferState)
                     else aquiferState
-                }
-
-                return state
+                } else
+                    state
             }
         }
+    }
+
+    private fun crystalDirection(
+        chunk: Chunk,
+        pos: BlockPos,
+        crystal: BlockState,
+        waterlogged: Boolean = false
+    ): BlockState? {
+        var retorn = crystal
+        Direction.entries.forEach {
+            if (chunk.getBlockState(pos.offset(it.opposite)).isFullCube(chunk, pos)) {
+                if (crystal.contains(Properties.FACING)) {
+                    retorn = retorn.with(Properties.FACING, it)
+                }
+
+                if (crystal.contains(Properties.WATERLOGGED)) {
+                    retorn = retorn.with(Properties.WATERLOGGED, waterlogged)
+                }
+
+                return retorn
+            }
+        }
+        return null
     }
 
     private fun getState(
@@ -256,29 +287,22 @@ class GeodeCarver(codec: Codec<GeodeCarverConfig>) : Carver<GeodeCarverConfig>(c
         scaledRelativeZ: Double,
         dps: Double
     ): Int {
-        val value =
-            scaledRelativeX * scaledRelativeX + scaledRelativeY * scaledRelativeY + scaledRelativeZ * scaledRelativeZ + dps
+        val distance =
+            scaledRelativeX * scaledRelativeX + scaledRelativeY * scaledRelativeY + scaledRelativeZ * scaledRelativeZ
+        val value = distance + (dps * (1 - (distance * 0.9)))
 
-        return if (value <= 1.0) {
-            if (value <= 0.8) {
-                if (value <= 0.65) {
-                    if (value <= 0.5) {
-                        4
-                    } else 3
-                } else 2
-            } else 1
-        } else 0
-
-
-        // 0 means nothing
-        // 1 means smooth basalt
-        // 2 means calcite
-        // 3 means amethyst
-        // 4 means air
+        return when {
+            value > 1.00 -> 0         // Nothing
+            value > 0.85 -> 1         // Smooth Basalt
+            value > 0.75 -> 2         // Calcite
+            value > 0.60 -> 3         // Amethyst
+            value > 0.55 -> 4         // Random Inner Decorator
+            else -> 5                 // Air
+        }
     }
 
 
     fun interface SkipOrWaterPredicate {
-        fun shouldSkip(carverContext: CarverContext, x: Double, y: Double, z: Double, waterY: Int, sample: Double): Int
+        fun shouldSkip( x: Double, y: Double, z: Double, sample: Double): Int
     }
 }
