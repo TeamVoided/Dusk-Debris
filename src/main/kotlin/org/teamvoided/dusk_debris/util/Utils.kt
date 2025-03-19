@@ -11,19 +11,26 @@ import net.minecraft.world.StructureWorldAccess
 import java.util.function.BiConsumer
 
 object Utils {
-    const val pi = 3.1415927f
-    const val degToRad = 0.017453292f
-    const val radToDeg = 57.295776f
-    const val rotate30 = 0.5236f
-    const val rotate45 = 0.7854f
-    const val rotate60 = 1.0472f
-    const val rotate90 = 1.571f
-    const val rotate135 = 2.356f
-    const val rotate180 = 3.142f
-    const val rotate225 = 3.927f
-    const val rotate270 = 4.712f
-    const val rotate315 = 5.498f
-    const val rotate360 = 6.284f
+    const val PI = 3.1415927f
+    const val DEG_TO_RAD = 0.017453292f
+    const val RAD_TO_DEG = 57.295776f
+    const val rotate30 = PI / 6f
+    const val rotate45 = PI / 4f
+    const val rotate60 = PI / 3f
+    const val rotate90 = PI / 2f
+    const val rotate120 = rotate90 + rotate30
+    const val rotate135 = rotate90 + rotate45
+    const val rotate150 = rotate90 + rotate60
+    const val rotate180 = PI
+    const val rotate210 = rotate180 + rotate30
+    const val rotate225 = rotate180 + rotate45
+    const val rotate240 = rotate180 + rotate60
+    const val rotate270 = PI * (3f / 2f)
+    const val rotate300 = rotate270 + rotate30
+    const val rotate315 = rotate270 + rotate45
+    const val rotate330 = rotate270 + rotate60
+    const val rotate360 = PI * 2f
+
     fun setCount(x: Number, y: Number) = SetCountLootFunction.builder(uniformNum(x, y))
 
     fun uniformNum(x: Number, y: Number): UniformLootNumberProvider =

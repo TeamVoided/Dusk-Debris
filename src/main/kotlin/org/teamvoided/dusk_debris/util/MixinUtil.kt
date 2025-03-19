@@ -6,7 +6,7 @@ import net.minecraft.entity.passive.SnifferEntity
 import net.minecraft.registry.Holder
 import net.minecraft.util.math.Vec3d
 import org.teamvoided.dusk_debris.entity.helper.DuskVelocityWind
-import org.teamvoided.dusk_debris.entity.sniffer.SnifferVariant
+import org.teamvoided.dusk_debris.entity.variant.SnifferVariant
 
 var SnifferEntity.variant: Holder<SnifferVariant>
     get() = (this as VariantProvider<Holder<SnifferVariant>>).getVariant()

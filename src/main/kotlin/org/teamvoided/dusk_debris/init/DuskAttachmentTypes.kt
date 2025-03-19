@@ -6,7 +6,7 @@ import net.fabricmc.fabric.api.attachment.v1.AttachmentType
 import net.minecraft.registry.RegistryKey
 import org.teamvoided.dusk_debris.DuskDebris
 import org.teamvoided.dusk_debris.data.gen.providers.variants.SnifferVariants
-import org.teamvoided.dusk_debris.entity.sniffer.SnifferVariant
+import org.teamvoided.dusk_debris.entity.variant.SnifferVariant
 
 object DuskAttachmentTypes {
     fun init() {}

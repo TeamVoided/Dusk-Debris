@@ -14,6 +14,7 @@ import net.minecraft.sound.SoundEvents
 import net.minecraft.util.Unit
 import org.teamvoided.dusk_debris.entity.GiantEnemyJellyfishEntity
 import org.teamvoided.dusk_debris.entity.LightningCloudEntity
+import org.teamvoided.dusk_debris.init.DuskParticles
 
 class JellyfishElectricChaseTask @VisibleForTesting constructor(runTime: Int) : Task<GiantEnemyJellyfishEntity>(
     ImmutableMap.of(
@@ -78,6 +79,7 @@ class JellyfishElectricChaseTask @VisibleForTesting constructor(runTime: Int) : 
             jellyfish.lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, target.pos)
             if (time.toInt() % 20 == 0) {
                 val cloudEntity = LightningCloudEntity(world, target.x, target.y, target.z)
+                cloudEntity.particle = DuskParticles.SPARK
                 jellyfish.playSound(SoundEvents.ENTITY_BREEZE_SHOOT, 1.5f, 0.0f)
                 world.spawnEntity(cloudEntity)
             }

@@ -13,11 +13,13 @@ import org.teamvoided.dusk_debris.entity.skeleton.WitherSkeletonWolfEntityRender
 import org.teamvoided.dusk_debris.entity.tuff_golem.TuffGolemEntityRenderer
 import org.teamvoided.dusk_debris.entity.jellyfish.volaphyra.VolaphyraCoreEntityRenderer
 import org.teamvoided.dusk_debris.entity.jellyfish.volaphyra.VolaphyraEntityRenderer
+import org.teamvoided.dusk_debris.entity.lazer.LazerEntityRenderer
 
 object DuskEntitiesClient {
     fun init() {
         EntityRendererRegistry.register(DuskEntities.BOX_AREA_EFFECT_CLOUD, ::EmptyEntityRenderer)
         EntityRendererRegistry.register(DuskEntities.LIGHTNING_CLOUD, ::EmptyEntityRenderer)
+        EntityRendererRegistry.register(DuskEntities.LAZER_ENTITY, ::LazerEntityRenderer)
         EntityRendererRegistry.register(DuskEntities.GUNPOWDER_BARREL, ::GunpowderBarrelEntityRenderer)
         EntityRendererRegistry.register(DuskEntities.GLOOM, ::GloomEntityRenderer)
         EntityRendererRegistry.register(DuskEntities.SKELETON_WOLF, ::SkeletonWolfEntityRenderer)

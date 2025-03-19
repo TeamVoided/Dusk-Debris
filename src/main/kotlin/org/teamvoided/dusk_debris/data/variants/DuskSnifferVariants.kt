@@ -2,7 +2,7 @@ package org.teamvoided.dusk_debris.data.variants
 
 import net.minecraft.registry.RegistryKey
 import org.teamvoided.dusk_debris.DuskDebris.id
-import org.teamvoided.dusk_debris.entity.sniffer.SnifferVariant
+import org.teamvoided.dusk_debris.entity.variant.SnifferVariant
 import org.teamvoided.dusk_debris.init.DuskRegistries
 
 object DuskSnifferVariants {

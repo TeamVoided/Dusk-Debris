@@ -2,7 +2,7 @@
 // Source code recreated from a .class file by IntelliJ IDEA
 // (powered by FernFlower decompiler)
 //
-package org.teamvoided.dusk_debris.entity.sniffer
+package org.teamvoided.dusk_debris.entity.variant
 
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment

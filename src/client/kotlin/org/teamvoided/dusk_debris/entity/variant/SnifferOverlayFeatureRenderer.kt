@@ -1,4 +1,4 @@
-package org.teamvoided.dusk_debris.entity.sniffer
+package org.teamvoided.dusk_debris.entity.variant
 
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment

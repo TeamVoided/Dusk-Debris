@@ -4,11 +4,9 @@
 //
 package org.teamvoided.dusk_debris.entity
 
-import com.google.common.collect.Maps
 import com.mojang.logging.LogUtils
 import net.minecraft.block.piston.PistonBehavior
 import net.minecraft.entity.*
-import net.minecraft.entity.damage.DamageSource
 import net.minecraft.entity.data.DataTracker
 import net.minecraft.entity.data.TrackedData
 import net.minecraft.entity.data.TrackedDataHandlerRegistry
@@ -24,9 +22,10 @@ import org.slf4j.Logger
 import org.teamvoided.dusk_debris.data.DuskDamageTypes
 import org.teamvoided.dusk_debris.init.DuskEntities
 import org.teamvoided.dusk_debris.init.DuskParticles
+import org.teamvoided.dusk_debris.util.Utils
 import java.util.*
 
-class LightningCloudEntity(entityType: EntityType<out LightningCloudEntity>, world: World) :
+open class LightningCloudEntity(entityType: EntityType<out LightningCloudEntity>, world: World) :
     Entity(entityType, world), Ownable {
     var duration: Int = 20
     var waitTime: Int = 20
@@ -37,6 +36,10 @@ class LightningCloudEntity(entityType: EntityType<out LightningCloudEntity>, wor
         this.setPosition(x, y, z)
     }
 
+    init {
+        this.noClip = true
+    }
+
     override fun initDataTracker(builder: DataTracker.Builder) {
         builder.add(RADIUS, DEFAULT_RADIUS)
         builder.add(DAMAGE, DEFAULT_DAMAGE)
@@ -44,8 +47,26 @@ class LightningCloudEntity(entityType: EntityType<out LightningCloudEntity>, wor
         builder.add(PARTICLE_ID, ColoredParticleEffect.create(ParticleTypes.ENTITY_EFFECT, -1))
     }
 
-    init {
-        this.noClip = true
+    override fun readCustomDataFromNbt(nbt: NbtCompound) {
+        this.age = nbt.getInt("Age")
+        this.duration = nbt.getInt("Duration")
+        this.waitTime = nbt.getInt("WaitTime")
+        this.radius = nbt.getFloat("Radius")
+        this.damage = nbt.getFloat("Damage")
+        if (nbt.containsUuid("Owner")) {
+            this.ownerUuid = nbt.getUuid("Owner")
+        }
+    }
+
+    override fun writeCustomDataToNbt(nbt: NbtCompound) {
+        nbt.putInt("Age", this.age)
+        nbt.putInt("Duration", this.duration)
+        nbt.putInt("WaitTime", this.waitTime)
+        nbt.putFloat("Radius", this.radius)
+        nbt.putFloat("Damage", this.damage)
+        if (this.ownerUuid != null) {
+            nbt.putUuid("Owner", this.ownerUuid)
+        }
     }
 
     override fun calculateDimensions() {
@@ -74,76 +95,76 @@ class LightningCloudEntity(entityType: EntityType<out LightningCloudEntity>, wor
 
     var isWaiting: Boolean
         get() = getDataTracker().get(WAITING) as Boolean
-        protected set(waiting) {
+        set(waiting) {
             getDataTracker().set(WAITING, waiting)
+        }
+
+    var particle: ParticleEffect
+        get() = getDataTracker().get(PARTICLE_ID)
+        set(particle) {
+            getDataTracker().set(PARTICLE_ID, particle)
         }
 
     override fun tick() {
         super.tick()
         val wait = this.isWaiting
         if (world.isClient) {
-            val setRadius = this.radius
-            if (wait && random.nextBoolean()) {
-                return
-            }
-
-            val particleEffect = DuskParticles.SPARK
-            val count: Int
-            val radius: Float
-            if (wait) {
-                count = 2
-                radius = 0.2f
-            } else {
-                count = MathHelper.ceil((3.1415927f * setRadius * setRadius) / 5)
-                radius = setRadius
-            }
-
-            for (j in 0 until count) {
-                val randInRadius = MathHelper.sqrt(random.nextFloat()) * radius * 1.5f
-                val inSphere = Vec3d(
-                    random.nextDouble() - random.nextDouble(),
-                    random.nextDouble() - random.nextDouble(),
-                    random.nextDouble() - random.nextDouble()
-                ).normalize().multiply(randInRadius.toDouble()).add(x, y + setRadius / 2, z)
-                world.addParticle(particleEffect, inSphere.x, inSphere.y, inSphere.z, 0.0, 0.0, 0.0)
-            }
+            tickClient(wait)
         } else {
-            if (this.age >= this.waitTime + this.duration) {
-                this.discard()
-                return
-            }
+            tickServer(wait)
+        }
+    }
 
-            if (wait != this.age < this.waitTime) {
-                this.isWaiting = wait
-            }
+    open fun tickClient(wait: Boolean) {
+        val setRadius = this.radius
+        if (wait && random.nextBoolean()) {
+            return
+        }
 
-            if (wait) {
-                return
-            }
+        val count: Int
+        val radius: Float
+        if (wait) {
+            count = 2
+            radius = 0.2f
+        } else {
+            count = MathHelper.ceil((Utils.rotate180 * setRadius * setRadius) / 5)
+            radius = setRadius
+        }
 
-//            if (this.radiusGrowth != 0.0f) {
-//                rad += this.radiusGrowth
-//                if (rad < 0.5f) {
-//                    this.discard()
-//                    return
-//                }
-//
-//                this.radius = rad
-//            }
+        for (j in 0 until count) {
+            val randInRadius = MathHelper.sqrt(random.nextFloat()) * radius * 1.5f
+            val inSphere = Vec3d(
+                random.nextDouble() - random.nextDouble(),
+                random.nextDouble() - random.nextDouble(),
+                random.nextDouble() - random.nextDouble()
+            ).normalize().multiply(randInRadius.toDouble()).add(x, y + setRadius / 2, z)
+            world.addParticle(particle, inSphere.x, inSphere.y, inSphere.z, 0.0, 0.0, 0.0)
+        }
+    }
 
-            if (this.age % delayBetweenDamage == 0) {
-                val source = if (owner != null) {
-                    this.damageSources.create(DuskDamageTypes.INDIRECT_ELECTRICITY, owner)
-                } else {
-                    this.damageSources.create(DuskDamageTypes.ELECTRICITY)
-                }
-                val list2 = world.getNonSpectatingEntities(LivingEntity::class.java, this.bounds)
-                if (list2.isNotEmpty()) {
-                    list2.forEach {
-                        if (it.squaredDistanceTo(pos) <= radius)
-                            it.damage(source, damage)
-                    }
-                }
+    open fun tickServer(wait: Boolean) {
+        if (this.age >= this.waitTime + this.duration) {
+            this.discard()
+            return
+        }
+
+        if (wait != this.age < this.waitTime) this.isWaiting = wait
+        if (wait) return
+
+        if (this.age % delayBetweenDamage == 0) doDamage()
+    }
+
+    open fun doDamage() {
+        val source = if (owner != null) {
+            this.damageSources.create(DuskDamageTypes.INDIRECT_ELECTRICITY, owner)
+        } else {
+            this.damageSources.create(DuskDamageTypes.ELECTRICITY)
+        }
+        val list2 = world.getNonSpectatingEntities(LivingEntity::class.java, this.bounds)
+        if (list2.isNotEmpty()) {
+            list2.forEach {
+                if (it.squaredDistanceTo(pos) <= radius)
+                    it.damage(source, damage)
             }
         }
     }
@@ -164,28 +185,6 @@ class LightningCloudEntity(entityType: EntityType<out LightningCloudEntity>, wor
         return this.owner
     }
 
-    override fun readCustomDataFromNbt(nbt: NbtCompound) {
-        this.age = nbt.getInt("Age")
-        this.duration = nbt.getInt("Duration")
-        this.waitTime = nbt.getInt("WaitTime")
-        this.radius = nbt.getFloat("Radius")
-        this.damage = nbt.getFloat("Damage")
-        if (nbt.containsUuid("Owner")) {
-            this.ownerUuid = nbt.getUuid("Owner")
-        }
-    }
-
-    override fun writeCustomDataToNbt(nbt: NbtCompound) {
-        nbt.putInt("Age", this.age)
-        nbt.putInt("Duration", this.duration)
-        nbt.putInt("WaitTime", this.waitTime)
-        nbt.putFloat("Radius", this.radius)
-        nbt.putFloat("Damage", this.damage)
-        if (this.ownerUuid != null) {
-            nbt.putUuid("Owner", this.ownerUuid)
-        }
-    }
-
     override fun onTrackedDataSet(data: TrackedData<*>) {
         if (RADIUS == data) {
             this.calculateDimensions()
@@ -193,9 +192,7 @@ class LightningCloudEntity(entityType: EntityType<out LightningCloudEntity>, wor
         super.onTrackedDataSet(data)
     }
 
-    override fun getPistonBehavior(): PistonBehavior {
-        return PistonBehavior.IGNORE
-    }
+    override fun getPistonBehavior(): PistonBehavior = PistonBehavior.IGNORE
 
     override fun getDimensions(pose: EntityPose): EntityDimensions {
         val dimensions = radius * 2f
@@ -223,7 +220,5 @@ class LightningCloudEntity(entityType: EntityType<out LightningCloudEntity>, wor
         private const val MIN_RADIUS = 0.25f
         private const val DEFAULT_RADIUS = 3f
         private const val DEFAULT_DAMAGE = 4f
-        const val DEFAULT_WIDTH: Float = 6f
-        const val HEIGHT: Float = 0.5f
     }
 }

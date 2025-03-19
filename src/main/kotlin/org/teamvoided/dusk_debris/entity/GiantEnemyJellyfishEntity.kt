@@ -22,9 +22,8 @@ import net.minecraft.util.math.int_provider.UniformIntProvider
 import net.minecraft.util.random.RandomGenerator
 import net.minecraft.world.*
 import org.teamvoided.dusk_debris.data.tags.DuskFluidTags
-import org.teamvoided.dusk_debris.util.Utils.degToRad
+import org.teamvoided.dusk_debris.util.Utils.DEG_TO_RAD
 import java.util.*
-import java.util.function.IntUnaryOperator
 
 class GiantEnemyJellyfishEntity(entityType: EntityType<GiantEnemyJellyfishEntity>, world: World) :
     AbstractJellyfishEntity(entityType, world) {
@@ -149,10 +148,10 @@ class GiantEnemyJellyfishEntity(entityType: EntityType<GiantEnemyJellyfishEntity
     }
 
     private fun launchFromFacing(entity: Entity, mult: Float) {
-        val pitchSin: Double = MathHelper.sin(entity.pitch * degToRad).toDouble()
-        val pitchCos: Double = MathHelper.cos(entity.pitch * degToRad).toDouble()
-        val yawSin: Double = MathHelper.sin(entity.yaw * degToRad).toDouble()
-        val yawCos: Double = MathHelper.cos(entity.yaw * degToRad).toDouble()
+        val pitchSin: Double = MathHelper.sin(entity.pitch * DEG_TO_RAD).toDouble()
+        val pitchCos: Double = MathHelper.cos(entity.pitch * DEG_TO_RAD).toDouble()
+        val yawSin: Double = MathHelper.sin(entity.yaw * DEG_TO_RAD).toDouble()
+        val yawCos: Double = MathHelper.cos(entity.yaw * DEG_TO_RAD).toDouble()
         entity.addVelocity(
             -yawSin * pitchCos * mult,
             -pitchSin * mult,

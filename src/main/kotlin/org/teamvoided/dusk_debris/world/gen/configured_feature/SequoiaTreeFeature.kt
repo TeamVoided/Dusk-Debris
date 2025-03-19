@@ -17,10 +17,9 @@ import net.minecraft.world.gen.feature.Feature
 import net.minecraft.world.gen.feature.util.FeatureContext
 import net.minecraft.world.gen.stateprovider.SimpleBlockStateProvider
 import org.teamvoided.dusk_debris.init.DuskBlocks
-import org.teamvoided.dusk_debris.util.Utils.pi
+import org.teamvoided.dusk_debris.util.Utils.PI
 import org.teamvoided.dusk_debris.util.Utils.rotate135
 import org.teamvoided.dusk_debris.util.Utils.rotate315
-import org.teamvoided.dusk_debris.util.Utils.rotate360
 import org.teamvoided.dusk_debris.util.Utils.rotate45
 import org.teamvoided.dusk_debris.util.Utils.rotate90
 import kotlin.math.abs
@@ -223,7 +222,7 @@ class SequoiaTreeFeature(codec: Codec<DefaultFeatureConfig>) : Feature<DefaultFe
             var posY2 = 0
             val angleY = 2 + random.nextInt(3)
             for (side in 0..3) {
-                val axis = if ((rotation + rotate45) % pi > rotate90) {
+                val axis = if ((rotation + rotate45) % PI > rotate90) {
                     Direction.Axis.Z
                 } else {
                     Direction.Axis.X

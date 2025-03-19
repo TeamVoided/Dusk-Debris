@@ -2,19 +2,13 @@ package org.teamvoided.dusk_debris.entity
 
 import net.minecraft.entity.*
 import net.minecraft.entity.data.DataTracker
-import net.minecraft.entity.projectile.ProjectileEntity
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.server.world.ServerWorld
-import net.minecraft.text.Text
-import net.minecraft.util.hit.EntityHitResult
-import net.minecraft.util.math.Box
 import net.minecraft.util.math.MathHelper
 import net.minecraft.util.math.Vec3d
 import net.minecraft.world.World
 import org.teamvoided.dusk_debris.init.DuskEntities
 import org.teamvoided.dusk_debris.init.DuskParticles
-import org.teamvoided.dusk_debris.util.Utils.degToRad
-import org.teamvoided.dusk_debris.util.Utils.radToDeg
 import org.teamvoided.dusk_debris.util.addParticle
 import java.util.*
 import kotlin.math.cos

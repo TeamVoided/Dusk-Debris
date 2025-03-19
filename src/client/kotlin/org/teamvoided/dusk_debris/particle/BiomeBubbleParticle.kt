@@ -8,8 +8,7 @@ import net.minecraft.client.render.Camera
 import net.minecraft.client.world.ClientWorld
 import net.minecraft.particle.DefaultParticleType
 import org.teamvoided.dusk_debris.util.Utils
-import org.teamvoided.dusk_debris.util.Utils.pi
-import kotlin.math.min
+import org.teamvoided.dusk_debris.util.Utils.PI
 
 class BiomeBubbleParticle(
     world: ClientWorld,
@@ -25,7 +24,7 @@ class BiomeBubbleParticle(
         this.scale = random.nextFloat() * 0.85f + 0.15f
         this.angle = (random.nextFloat()) * Utils.rotate90 - Utils.rotate45
         this.prevAngle = angle
-        this.spinSpeed = (random.nextFloat() - 0.5f) * 0.01f * pi
+        this.spinSpeed = (random.nextFloat() - 0.5f) * 0.01f * PI
         this.velocityX = (random.nextDouble() - 0.5f) * 0.005
         this.velocityY = (random.nextDouble() - 0.5f) * 0.02
         this.velocityZ = (random.nextDouble() - 0.5f) * 0.005

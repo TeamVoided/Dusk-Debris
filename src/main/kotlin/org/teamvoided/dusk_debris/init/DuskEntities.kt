@@ -43,6 +43,10 @@ object DuskEntities {
         "lightning_cloud",
         EntityType.Builder.create(EntityType.EntityFactory(::LightningCloudEntity), SpawnGroup.MISC).makeFireImmune()
     )
+    val LAZER_ENTITY = register(
+        "lazer_entity",
+        EntityType.Builder.create(EntityType.EntityFactory(::LazerEntity), SpawnGroup.MISC).makeFireImmune()
+    )
     val GUNPOWDER_BARREL = register(
         "gunpowder_barrel",
         EntityType.Builder.create(EntityType.EntityFactory(::GunpowderBarrelEntity), SpawnGroup.MISC)

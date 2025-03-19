@@ -6,8 +6,7 @@ import net.minecraft.client.particle.*
 import net.minecraft.client.world.ClientWorld
 import net.minecraft.particle.DefaultParticleType
 import org.teamvoided.dusk_debris.util.Utils
-import org.teamvoided.dusk_debris.util.Utils.pi
-import org.teamvoided.dusk_debris.util.Utils.rotate90
+import org.teamvoided.dusk_debris.util.Utils.PI
 
 class DrainedSoulParticle(
     world: ClientWorld,
@@ -27,7 +26,7 @@ class DrainedSoulParticle(
         this.scale = random.nextFloat() * 0.667f + 0.333f
         this.angle = (random.nextFloat()) * Utils.rotate360
         this.prevAngle = angle
-        this.spinSpeed = (random.nextFloat() - 0.5f) * 0.2f * pi
+        this.spinSpeed = (random.nextFloat() - 0.5f) * 0.2f * PI
         this.velocityMultiplier = 0.9f
         this.velocityX = velX
         this.velocityY = velY

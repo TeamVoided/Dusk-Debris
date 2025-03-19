@@ -11,9 +11,8 @@ import net.minecraft.world.biome.Biome;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Debug;
 import org.spongepowered.asm.mixin.Mixin;
-import org.teamvoided.dusk_debris.DuskDebris;
 import org.teamvoided.dusk_debris.data.gen.providers.variants.SnifferVariants;
-import org.teamvoided.dusk_debris.entity.sniffer.SnifferVariant;
+import org.teamvoided.dusk_debris.entity.variant.SnifferVariant;
 import org.teamvoided.dusk_debris.init.DuskAttachmentTypes;
 import org.teamvoided.dusk_debris.init.DuskRegistries;
 

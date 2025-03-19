@@ -4,7 +4,7 @@ import net.fabricmc.fabric.api.event.registry.DynamicRegistries
 import net.minecraft.registry.Registry
 import net.minecraft.registry.RegistryKey
 import org.teamvoided.dusk_debris.DuskDebris.id
-import org.teamvoided.dusk_debris.entity.sniffer.SnifferVariant
+import org.teamvoided.dusk_debris.entity.variant.SnifferVariant
 import org.teamvoided.dusk_debris.world.FogModifier
 
 object DuskRegistries {

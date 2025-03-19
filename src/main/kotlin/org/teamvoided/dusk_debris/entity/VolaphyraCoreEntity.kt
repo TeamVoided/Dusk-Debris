@@ -15,7 +15,7 @@ import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.math.MathHelper
 import net.minecraft.util.math.Vec3d
 import net.minecraft.world.World
-import org.teamvoided.dusk_debris.util.Utils.radToDeg
+import org.teamvoided.dusk_debris.util.Utils.RAD_TO_DEG
 import org.teamvoided.dusk_debris.world.explosion.custom.DuskExplosion
 
 class VolaphyraCoreEntity(entityType: EntityType<VolaphyraCoreEntity>, world: World) :
@@ -39,7 +39,7 @@ class VolaphyraCoreEntity(entityType: EntityType<VolaphyraCoreEntity>, world: Wo
         if (target != null) {
             val lookX: Double = this.target!!.x - this.x
             val lookY: Double = this.target!!.z - this.z
-            this.yaw = MathHelper.atan2(lookX, lookY).toFloat() * -radToDeg
+            this.yaw = MathHelper.atan2(lookX, lookY).toFloat() * -RAD_TO_DEG
             this.bodyYaw = this.yaw
 
 //            this.getLookControl().lookAt(target!!.x, target!!.eyeY, target!!.z)
