@@ -9,9 +9,10 @@ import net.minecraft.client.render.entity.EntityRenderer
 import net.minecraft.client.render.entity.EntityRendererFactory
 import net.minecraft.client.util.ColorUtil
 import net.minecraft.client.util.math.MatrixStack
-import net.minecraft.client.util.math.Vector2f
+import org.joml.Vector2f
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.Axis
+import net.minecraft.util.math.Box
 import net.minecraft.util.math.MathHelper
 import net.minecraft.util.math.Vec3d
 import org.teamvoided.dusk_debris.entity.LazerEntity
@@ -29,19 +30,15 @@ class LazerEntityRenderer(ctx: EntityRendererFactory.Context) : EntityRenderer<L
         y: Double,
         z: Double
     ): Boolean {
-        return true
-
-
-//        if (super.shouldRender(entity, frustum, x, y, z)) {
-//            return true
-//        } else {
-//            val dir = entity.getRotationVec(1f)
-//            val vec3d = entity.pos.add(0.0, entity.height / 2.0, 0.0)
-//            val vec3d2 = vec3d.add(entity.length * dir.x, entity.length * dir.y, entity.length * dir.z)
-//            val box = Box(vec3d, vec3d2)
-
-//            return frustum.isVisible(box)
-//        }
+        if (entity.age <= 1) return false
+        if (super.shouldRender(entity, frustum, x, y, z)) {
+            return true
+        } else {
+            val eyePos = entity.eyePos
+            val target = entity.target
+            val box = Box(eyePos, target)
+            return frustum.isVisible(box)
+        }
     }
 
     override fun render(
@@ -54,39 +51,32 @@ class LazerEntityRenderer(ctx: EntityRendererFactory.Context) : EntityRenderer<L
     ) {
         val tim = entity.age.toLong()
 
-        val target = this.fromLerpedPosition(entity.prevTarget, entity.getTarget(), tickDelta)
-        val position = this.fromLerpedPosition(entity, entity.height / 2.0, tickDelta)
+        val target = entity.fromLerpedPosition(entity.prevTarget, entity.target, tickDelta)
+        val position = this.fromLerpedPosition(entity, entity.standingEyeHeight, tickDelta)
         var vec3d3 = target.subtract(position)
-        val len = (vec3d3.length()).toFloat()
+        val len = vec3d3.length().toFloat()
         vec3d3 = vec3d3.normalize()
-        val n = acos(vec3d3.y)
-        val o = atan2(vec3d3.z, vec3d3.x)
-        val dir = Vector2f(n.toFloat(), o.toFloat())
+        val dir = entity.getRotationPitchYaw(vec3d3)
+        val rad = entity.getBeamRadius(tickDelta)
         drawSegment(
             matrices,
             vertexConsumers,
+            getTexture(entity),
             tickDelta,
             tim,
             dir,
             0f,
             len,
-            2f / 8f,
-            3f / 8f
+            rad.first,
+            rad.second
         )
         super.render(entity, yaw, tickDelta, matrices, vertexConsumers, light)
     }
 
-    private fun fromLerpedPosition(entity: LazerEntity, yOffset: Double, delta: Float): Vec3d {
+    private fun fromLerpedPosition(entity: LazerEntity, yOffset: Float, delta: Float): Vec3d {
         val d = MathHelper.lerp(delta.toDouble(), entity.lastRenderX, entity.x)
         val e = MathHelper.lerp(delta.toDouble(), entity.lastRenderY, entity.y) + yOffset
         val f = MathHelper.lerp(delta.toDouble(), entity.lastRenderZ, entity.z)
-        return Vec3d(d, e, f)
-    }
-
-    private fun fromLerpedPosition(pos1: Vec3d, pos2: Vec3d, delta: Float): Vec3d {
-        val d = MathHelper.lerp(delta.toDouble(), pos1.x, pos2.x)
-        val e = MathHelper.lerp(delta.toDouble(), pos1.y, pos2.y)
-        val f = MathHelper.lerp(delta.toDouble(), pos1.z, pos2.z)
         return Vec3d(d, e, f)
     }
 
@@ -126,15 +116,13 @@ class LazerEntityRenderer(ctx: EntityRendererFactory.Context) : EntityRenderer<L
 //    }
 
 
-    override fun getTexture(entity: LazerEntity): Identifier = BEAM_TEXTURE
+    override fun getTexture(entity: LazerEntity): Identifier = entity.getTexture()
 
     companion object {
-        val BEAM_TEXTURE: Identifier = Identifier.ofDefault("textures/entity/beacon_beam.png")
-        const val MAX_BEAM_HEIGHT: Int = 1024
-
         private fun drawSegment(
             matrices: MatrixStack,
             vertexConsumers: VertexConsumerProvider,
+            texture: Identifier,
             tickDelta: Float,
             time: Long,
             direction: Vector2f,
@@ -143,11 +131,10 @@ class LazerEntityRenderer(ctx: EntityRendererFactory.Context) : EntityRenderer<L
             innerRadius: Float,
             outerRadius: Float,
         ) {
-            val segmentLength = (segmentBottom + segmentHeight)
             drawSegment(
                 matrices,
                 vertexConsumers,
-                BEAM_TEXTURE,
+                texture,
                 tickDelta,
                 1f,
                 time,
@@ -187,8 +174,8 @@ class LazerEntityRenderer(ctx: EntityRendererFactory.Context) : EntityRenderer<L
             renderBeamLayer(
                 matrices,
                 vertexConsumers,
-                texture.suffix("_inner_side"),
-                texture.suffix("_inner_end"),
+                texture,
+                texture,
                 false,
                 -1,
                 segmentBottom,
@@ -212,8 +199,8 @@ class LazerEntityRenderer(ctx: EntityRendererFactory.Context) : EntityRenderer<L
             renderBeamLayer(
                 matrices,
                 vertexConsumers,
-                texture.suffix("_outer_side"),
-                texture.suffix("_outer_end"),
+                texture,
+                texture,
                 true,
                 ColorUtil.Argb32.of(32, -1),
                 segmentBottom - outer2,

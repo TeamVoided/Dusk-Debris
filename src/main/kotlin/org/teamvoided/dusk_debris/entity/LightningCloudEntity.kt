@@ -27,8 +27,6 @@ import java.util.*
 
 open class LightningCloudEntity(entityType: EntityType<out LightningCloudEntity>, world: World) :
     Entity(entityType, world), Ownable {
-    var duration: Int = 20
-    var waitTime: Int = 20
     private var owner: LivingEntity? = null
     private var ownerUuid: UUID? = null
 
@@ -41,9 +39,11 @@ open class LightningCloudEntity(entityType: EntityType<out LightningCloudEntity>
     }
 
     override fun initDataTracker(builder: DataTracker.Builder) {
+        builder.add(WAIT_TIME, DEFAULT_WAIT_TIME)
+        builder.add(DURATION, DEFAULT_DURATION)
         builder.add(RADIUS, DEFAULT_RADIUS)
         builder.add(DAMAGE, DEFAULT_DAMAGE)
-        builder.add(WAITING, false)
+        builder.add(DELAY_BETWEEN_ACTION, DEFAULT_DELAY_BETWEEN)
         builder.add(PARTICLE_ID, ColoredParticleEffect.create(ParticleTypes.ENTITY_EFFECT, -1))
     }
 
@@ -53,6 +53,7 @@ open class LightningCloudEntity(entityType: EntityType<out LightningCloudEntity>
         this.waitTime = nbt.getInt("WaitTime")
         this.radius = nbt.getFloat("Radius")
         this.damage = nbt.getFloat("Damage")
+        this.delayBetweenAction = nbt.getInt("DelayBetweenAction")
         if (nbt.containsUuid("Owner")) {
             this.ownerUuid = nbt.getUuid("Owner")
         }
@@ -64,6 +65,7 @@ open class LightningCloudEntity(entityType: EntityType<out LightningCloudEntity>
         nbt.putInt("WaitTime", this.waitTime)
         nbt.putFloat("Radius", this.radius)
         nbt.putFloat("Damage", this.damage)
+        nbt.putInt("DelayBetweenAction", this.delayBetweenAction)
         if (this.ownerUuid != null) {
             nbt.putUuid("Owner", this.ownerUuid)
         }
@@ -78,25 +80,32 @@ open class LightningCloudEntity(entityType: EntityType<out LightningCloudEntity>
     }
 
     var radius: Float
-        get() = getDataTracker().get(RADIUS)
-        set(radius) {
-            if (!world.isClient) {
-                getDataTracker().set(RADIUS, MathHelper.clamp(radius, MIN_RADIUS, MAX_RADIUS))
-            }
+        get() = getDataTracker().get(RADIUS) as Float
+        set(float) {
+            if (!world.isClient) getDataTracker().set(RADIUS, MathHelper.clamp(float, MIN_RADIUS, MAX_RADIUS))
         }
 
     var damage: Float
-        get() = getDataTracker().get(DAMAGE)
-        set(damage) {
-            if (!world.isClient) {
-                getDataTracker().set(DAMAGE, damage)
-            }
+        get() = getDataTracker().get(DAMAGE) as Float
+        set(float) {
+            if (!world.isClient) getDataTracker().set(DAMAGE, float)
         }
 
-    var isWaiting: Boolean
-        get() = getDataTracker().get(WAITING) as Boolean
-        set(waiting) {
-            getDataTracker().set(WAITING, waiting)
+    var delayBetweenAction: Int
+        get() = getDataTracker().get(DELAY_BETWEEN_ACTION) as Int
+        set(int) {
+            if (!world.isClient) getDataTracker().set(DELAY_BETWEEN_ACTION, int)
+        }
+
+    var waitTime: Int
+        get() = getDataTracker().get(WAIT_TIME) as Int
+        set(int) {
+            if (!world.isClient) getDataTracker().set(WAIT_TIME, int)
+        }
+    var duration: Int
+        get() = getDataTracker().get(DURATION) as Int
+        set(int) {
+            if (!world.isClient) getDataTracker().set(DURATION, int)
         }
 
     var particle: ParticleEffect
@@ -107,11 +116,11 @@ open class LightningCloudEntity(entityType: EntityType<out LightningCloudEntity>
 
     override fun tick() {
         super.tick()
-        val wait = this.isWaiting
+        val isWaiting = age < waitTime
         if (world.isClient) {
-            tickClient(wait)
+            tickClient(isWaiting)
         } else {
-            tickServer(wait)
+            tickServer(isWaiting)
         }
     }
 
@@ -125,7 +134,7 @@ open class LightningCloudEntity(entityType: EntityType<out LightningCloudEntity>
         val radius: Float
         if (wait) {
             count = 2
-            radius = 0.2f
+            radius = setRadius * 0.2f
         } else {
             count = MathHelper.ceil((Utils.rotate180 * setRadius * setRadius) / 5)
             radius = setRadius
@@ -147,11 +156,8 @@ open class LightningCloudEntity(entityType: EntityType<out LightningCloudEntity>
             this.discard()
             return
         }
-
-        if (wait != this.age < this.waitTime) this.isWaiting = wait
         if (wait) return
-
-        if (this.age % delayBetweenDamage == 0) doDamage()
+        if (delayBetweenAction == 0 || (this.age % delayBetweenAction == 0)) doDamage()
     }
 
     open fun doDamage() {
@@ -196,22 +202,25 @@ open class LightningCloudEntity(entityType: EntityType<out LightningCloudEntity>
 
     override fun getDimensions(pose: EntityPose): EntityDimensions {
         val dimensions = radius * 2f
-        return EntityDimensions.changing(dimensions, dimensions)
+        return EntityDimensions.changing(dimensions, dimensions).withEyeHeight(radius)
     }
 
     companion object {
-        private val delayBetweenDamage = 5
-
         private val LOGGER: Logger = LogUtils.getLogger()
-        private const val APPLY_EFFECT_PER_TICK = 5
         private val RADIUS: TrackedData<Float> = DataTracker.registerData(
             LightningCloudEntity::class.java, TrackedDataHandlerRegistry.FLOAT
         )
         private val DAMAGE: TrackedData<Float> = DataTracker.registerData(
             LightningCloudEntity::class.java, TrackedDataHandlerRegistry.FLOAT
         )
-        private val WAITING: TrackedData<Boolean> = DataTracker.registerData(
-            LightningCloudEntity::class.java, TrackedDataHandlerRegistry.BOOLEAN
+        private val DELAY_BETWEEN_ACTION: TrackedData<Int> = DataTracker.registerData(
+            LightningCloudEntity::class.java, TrackedDataHandlerRegistry.INTEGER
+        )
+        private val DURATION: TrackedData<Int> = DataTracker.registerData(
+            LightningCloudEntity::class.java, TrackedDataHandlerRegistry.INTEGER
+        )
+        private val WAIT_TIME: TrackedData<Int> = DataTracker.registerData(
+            LightningCloudEntity::class.java, TrackedDataHandlerRegistry.INTEGER
         )
         private val PARTICLE_ID: TrackedData<ParticleEffect> = DataTracker.registerData(
             LightningCloudEntity::class.java, TrackedDataHandlerRegistry.PARTICLE
@@ -220,5 +229,9 @@ open class LightningCloudEntity(entityType: EntityType<out LightningCloudEntity>
         private const val MIN_RADIUS = 0.25f
         private const val DEFAULT_RADIUS = 3f
         private const val DEFAULT_DAMAGE = 4f
+        private const val DEFAULT_DELAY_BETWEEN = 5
+        private const val DEFAULT_DURATION = 20
+        private const val DEFAULT_WAIT_TIME = 20
+
     }
 }
