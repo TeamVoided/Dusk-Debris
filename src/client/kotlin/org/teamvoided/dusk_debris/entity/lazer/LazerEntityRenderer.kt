@@ -14,6 +14,7 @@ import net.minecraft.util.Identifier
 import net.minecraft.util.math.Axis
 import net.minecraft.util.math.Box
 import net.minecraft.util.math.MathHelper
+import net.minecraft.util.math.MathHelper.lerp
 import net.minecraft.util.math.Vec3d
 import org.teamvoided.dusk_debris.entity.LazerEntity
 import org.teamvoided.dusk_debris.util.suffix
@@ -30,13 +31,12 @@ class LazerEntityRenderer(ctx: EntityRendererFactory.Context) : EntityRenderer<L
         y: Double,
         z: Double
     ): Boolean {
-        if (entity.age <= 1) return false
         if (super.shouldRender(entity, frustum, x, y, z)) {
             return true
         } else {
             val eyePos = entity.eyePos
             val target = entity.target
-            val box = Box(eyePos, target)
+            val box = Box(eyePos, target).expand(entity.displayRadius.second.toDouble())
             return frustum.isVisible(box)
         }
     }
@@ -50,14 +50,13 @@ class LazerEntityRenderer(ctx: EntityRendererFactory.Context) : EntityRenderer<L
         light: Int
     ) {
         val tim = entity.age.toLong()
-
         val target = entity.fromLerpedPosition(entity.prevTarget, entity.target, tickDelta)
         val position = this.fromLerpedPosition(entity, entity.standingEyeHeight, tickDelta)
         var vec3d3 = target.subtract(position)
         val len = vec3d3.length().toFloat()
         vec3d3 = vec3d3.normalize()
         val dir = entity.getRotationPitchYaw(vec3d3)
-        val rad = entity.getBeamRadius(tickDelta)
+        val rad = entity.lerpRadius(tickDelta) // entity.getBeamRadius(tickDelta)
         drawSegment(
             matrices,
             vertexConsumers,
@@ -67,6 +66,7 @@ class LazerEntityRenderer(ctx: EntityRendererFactory.Context) : EntityRenderer<L
             dir,
             0f,
             len,
+            entity.standingEyeHeight.toDouble(),
             rad.first,
             rad.second
         )
@@ -128,6 +128,7 @@ class LazerEntityRenderer(ctx: EntityRendererFactory.Context) : EntityRenderer<L
             direction: Vector2f,
             segmentBottom: Float,
             segmentHeight: Float,
+            entityRadius: Double,
             innerRadius: Float,
             outerRadius: Float,
         ) {
@@ -141,6 +142,7 @@ class LazerEntityRenderer(ctx: EntityRendererFactory.Context) : EntityRenderer<L
                 direction,
                 segmentBottom,
                 segmentHeight,
+                entityRadius,
                 innerRadius,
                 outerRadius
             )
@@ -156,13 +158,14 @@ class LazerEntityRenderer(ctx: EntityRendererFactory.Context) : EntityRenderer<L
             direction: Vector2f,
             segmentBottom: Float,
             segmentHeight: Float,
+            entityRadius: Double,
             innerRadius: Float,
             outerRadius: Float
         ) {
             val segmentTop = segmentBottom + segmentHeight
             matrices.push()
-            matrices.translate(0.0, 0.25, 0.0)
-            val spinRate = 0f// Math.floorMod(time, 40) + tickDelta
+            matrices.translate(0.0, entityRadius, 0.0)
+            val spinRate = time + tickDelta
             val spinDir = if (segmentHeight < 0) spinRate else -spinRate
             val spinDec = MathHelper.fractionalPart(spinDir * 0.1f)
 
@@ -178,7 +181,7 @@ class LazerEntityRenderer(ctx: EntityRendererFactory.Context) : EntityRenderer<L
                 texture,
                 false,
                 -1,
-                segmentBottom,
+                segmentBottom - innerRadius,
                 segmentTop,
                 innerRadius,
                 innerRadius,
@@ -191,20 +194,20 @@ class LazerEntityRenderer(ctx: EntityRendererFactory.Context) : EntityRenderer<L
                 .5f + innerRadius,
                 .5f - innerRadius,
                 textureAnim,
-                spinDecInv
+                spinDecInv - innerRadius
             )
             matrices.pop()
             matrices.rotateBeam(direction)
-            val outer2 = (outerRadius / 2f)
+            val outerRadius2 = outerRadius / 2f
             renderBeamLayer(
                 matrices,
                 vertexConsumers,
                 texture,
                 texture,
                 true,
-                ColorUtil.Argb32.of(32, -1),
-                segmentBottom - outer2,
-                segmentTop + outer2,
+                -1,//ColorUtil.Argb32.of(32, -1),
+                segmentBottom - outerRadius,
+                segmentTop + outerRadius2,
                 -outerRadius,
                 -outerRadius,
                 outerRadius,
@@ -215,8 +218,8 @@ class LazerEntityRenderer(ctx: EntityRendererFactory.Context) : EntityRenderer<L
                 outerRadius,
                 .5f + outerRadius,
                 .5f - outerRadius,
-                textureAnim + outer2,
-                spinDecInv - outer2
+                textureAnim + outerRadius2,
+                spinDecInv - outerRadius
             )
             matrices.pop()
         }
@@ -254,18 +257,19 @@ class LazerEntityRenderer(ctx: EntityRendererFactory.Context) : EntityRenderer<L
 
 
             val end = vertexConsumers.getBuffer(RenderLayer.getBeaconBeam(endTexture, invert))
+            val sB = if (invert) segmentBottom else -segmentBottom
+            val sT = if (invert) -segmentTop else segmentTop
             val radius = u1 - 0.5f
             matrices.rotate(Axis.X_POSITIVE.rotationDegrees(if (invert) -90f else 90f))
             renderBeamFace(
                 matrices.peek(), end, argb,
                 -radius, radius,
-                -radius, segmentBottom,
-                radius, segmentBottom,
+                -radius, sB,
+                radius, sB,
                 u1, u2,
                 u1, u2
             )
             matrices.rotate(Axis.X_POSITIVE.rotationDegrees(180f))
-            val sT = if (invert) -segmentTop else segmentTop
             renderBeamFace(
                 matrices.peek(), end, argb,
                 -radius, radius,

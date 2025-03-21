@@ -17,21 +17,23 @@ import net.minecraft.particle.ParticleTypes
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.math.MathHelper
 import net.minecraft.util.math.Vec3d
+import net.minecraft.world.LocalDifficulty
+import net.minecraft.world.ServerWorldAccess
 import net.minecraft.world.World
 import org.slf4j.Logger
 import org.teamvoided.dusk_debris.data.DuskDamageTypes
 import org.teamvoided.dusk_debris.init.DuskEntities
-import org.teamvoided.dusk_debris.init.DuskParticles
 import org.teamvoided.dusk_debris.util.Utils
+import java.lang.Integer.max
 import java.util.*
 
 open class LightningCloudEntity(entityType: EntityType<out LightningCloudEntity>, world: World) :
-    Entity(entityType, world), Ownable {
+    Entity(entityType, world), Ownable, Initialize {
     private var owner: LivingEntity? = null
     private var ownerUuid: UUID? = null
 
     constructor(world: World, x: Double, y: Double, z: Double) : this(DuskEntities.LIGHTNING_CLOUD, world) {
-        this.setPosition(x, y, z)
+        this.setPosition(x, y - radius, z)
     }
 
     init {
@@ -48,15 +50,20 @@ open class LightningCloudEntity(entityType: EntityType<out LightningCloudEntity>
     }
 
     override fun readCustomDataFromNbt(nbt: NbtCompound) {
-        this.age = nbt.getInt("Age")
-        this.duration = nbt.getInt("Duration")
-        this.waitTime = nbt.getInt("WaitTime")
-        this.radius = nbt.getFloat("Radius")
-        this.damage = nbt.getFloat("Damage")
-        this.delayBetweenAction = nbt.getInt("DelayBetweenAction")
-        if (nbt.containsUuid("Owner")) {
+        if (nbt.contains("Age"))
+            this.age = nbt.getInt("Age")
+        if (nbt.contains("Duration"))
+            this.duration = nbt.getInt("Duration")
+        if (nbt.contains("WaitTime"))
+            this.waitTime = nbt.getInt("WaitTime")
+        if (nbt.contains("Radius"))
+            this.radius = nbt.getFloat("Radius")
+        if (nbt.contains("Damage"))
+            this.damage = nbt.getFloat("Damage")
+        if (nbt.contains("DelayBetweenAction"))
+            this.delayBetweenAction = nbt.getInt("DelayBetweenAction")
+        if (nbt.containsUuid("Owner"))
             this.ownerUuid = nbt.getUuid("Owner")
-        }
     }
 
     override fun writeCustomDataToNbt(nbt: NbtCompound) {
@@ -82,40 +89,40 @@ open class LightningCloudEntity(entityType: EntityType<out LightningCloudEntity>
     var radius: Float
         get() = getDataTracker().get(RADIUS) as Float
         set(float) {
-            if (!world.isClient) getDataTracker().set(RADIUS, MathHelper.clamp(float, MIN_RADIUS, MAX_RADIUS))
+            val old = radius
+            val new = MathHelper.clamp(float, MIN_RADIUS, MAX_RADIUS)
+            this.lastRenderY = this.y
+            this.setPosition(this.x, this.y - ((new - old)), this.z)
+            getDataTracker().set(RADIUS, new)
         }
+
 
     var damage: Float
         get() = getDataTracker().get(DAMAGE) as Float
-        set(float) {
-            if (!world.isClient) getDataTracker().set(DAMAGE, float)
-        }
+        set(float) = getDataTracker().set(DAMAGE, float)
 
     var delayBetweenAction: Int
         get() = getDataTracker().get(DELAY_BETWEEN_ACTION) as Int
-        set(int) {
-            if (!world.isClient) getDataTracker().set(DELAY_BETWEEN_ACTION, int)
-        }
+        set(int) = getDataTracker().set(DELAY_BETWEEN_ACTION, max(1, int))
+
 
     var waitTime: Int
         get() = getDataTracker().get(WAIT_TIME) as Int
-        set(int) {
-            if (!world.isClient) getDataTracker().set(WAIT_TIME, int)
-        }
+        set(int) = getDataTracker().set(WAIT_TIME, int)
+
     var duration: Int
         get() = getDataTracker().get(DURATION) as Int
-        set(int) {
-            if (!world.isClient) getDataTracker().set(DURATION, int)
-        }
+        set(int) = getDataTracker().set(DURATION, int)
+
 
     var particle: ParticleEffect
-        get() = getDataTracker().get(PARTICLE_ID)
-        set(particle) {
-            getDataTracker().set(PARTICLE_ID, particle)
-        }
+        get() = getDataTracker().get(PARTICLE_ID) as ParticleEffect
+        set(particle) = getDataTracker().set(PARTICLE_ID, particle)
+
 
     override fun tick() {
         super.tick()
+        calculateDimensions()
         val isWaiting = age < waitTime
         if (world.isClient) {
             tickClient(isWaiting)
@@ -134,30 +141,30 @@ open class LightningCloudEntity(entityType: EntityType<out LightningCloudEntity>
         val radius: Float
         if (wait) {
             count = 2
-            radius = setRadius * 0.2f
+            radius = standingEyeHeight
         } else {
             count = MathHelper.ceil((Utils.rotate180 * setRadius * setRadius) / 5)
             radius = setRadius
         }
 
         for (j in 0 until count) {
-            val randInRadius = MathHelper.sqrt(random.nextFloat()) * radius * 1.5f
+            val randInRadius = MathHelper.sqrt(random.nextFloat()) * radius * 2f
             val inSphere = Vec3d(
                 random.nextDouble() - random.nextDouble(),
                 random.nextDouble() - random.nextDouble(),
                 random.nextDouble() - random.nextDouble()
-            ).normalize().multiply(randInRadius.toDouble()).add(x, y + setRadius / 2, z)
+            ).normalize().multiply(randInRadius.toDouble()).add(x, eyeY, z)
             world.addParticle(particle, inSphere.x, inSphere.y, inSphere.z, 0.0, 0.0, 0.0)
         }
     }
 
     open fun tickServer(wait: Boolean) {
-        if (this.age >= this.waitTime + this.duration) {
+        if (this.age >= maxAge()) {
             this.discard()
             return
         }
         if (wait) return
-        if (delayBetweenAction == 0 || (this.age % delayBetweenAction == 0)) doDamage()
+        if ((this.age % delayBetweenAction == 0) && !firstUpdate) doDamage()
     }
 
     open fun doDamage() {
@@ -189,6 +196,18 @@ open class LightningCloudEntity(entityType: EntityType<out LightningCloudEntity>
         }
 
         return this.owner
+    }
+
+    fun maxAge(): Int = this.waitTime + this.duration
+
+    override fun initialize(
+        world: ServerWorldAccess,
+        difficulty: LocalDifficulty,
+        spawnReason: SpawnReason,
+        entityData: EntityData
+    ): EntityData? {
+
+        return entityData
     }
 
     override fun onTrackedDataSet(data: TrackedData<*>) {

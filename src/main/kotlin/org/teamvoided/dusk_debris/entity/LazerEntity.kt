@@ -1,7 +1,9 @@
 package org.teamvoided.dusk_debris.entity
 
+import net.minecraft.entity.EntityData
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.LivingEntity
+import net.minecraft.entity.SpawnReason
 import net.minecraft.entity.damage.DamageTypes
 import net.minecraft.entity.data.DataTracker
 import net.minecraft.nbt.NbtCompound
@@ -9,63 +11,80 @@ import net.minecraft.util.Identifier
 import net.minecraft.util.hit.HitResult
 import net.minecraft.util.math.Box
 import net.minecraft.util.math.MathHelper
+import net.minecraft.util.math.MathHelper.lerp
 import net.minecraft.util.math.Vec3d
+import net.minecraft.world.LocalDifficulty
 import net.minecraft.world.RaycastContext
+import net.minecraft.world.ServerWorldAccess
 import net.minecraft.world.World
 import org.joml.Vector2f
 import org.teamvoided.dusk_debris.data.DuskDamageTypes
 import org.teamvoided.dusk_debris.init.DuskEntities
 import kotlin.math.acos
 import kotlin.math.atan2
+import kotlin.math.floor
 import kotlin.math.sin
 
 class LazerEntity(entityType: EntityType<out LazerEntity>, world: World) :
     LightningCloudEntity(entityType, world) {
     var target: Vec3d
     var prevTarget: Vec3d
+    var displayRadius: Pair<Float, Float>
+    var prevDisplayRadius: Pair<Float, Float>
 
     constructor(world: World, x: Double, y: Double, z: Double) : this(DuskEntities.LAZER_ENTITY, world) {
         this.setPosition(x, y, z)
-        this.target = this.pos
-        this.prevTarget = this.target
     }
 
     init {
-        this.target = this.pos
+        this.target = Vec3d.ZERO
         this.prevTarget = this.target
-    }
-
-    override fun initDataTracker(builder: DataTracker.Builder) {
-        super.initDataTracker(builder)
-    }
-
-    override fun readCustomDataFromNbt(nbt: NbtCompound) {
-        super.readCustomDataFromNbt(nbt)
-    }
-
-    override fun writeCustomDataToNbt(nbt: NbtCompound) {
-        super.writeCustomDataToNbt(nbt)
+        this.displayRadius = (0f to 0f)
+        this.prevDisplayRadius = this.displayRadius
     }
 
     override fun tick() {
-        super.tick()
-        this.pitch = 0f//sin(age / 20f) * 45f + 90f
-        this.yaw = 0f//sin(age / 90f) * 90f
         this.prevTarget = this.target
-        if ((age % 20 == 1)) {
+        if (age % delayBetweenAction == 0) {
             val raycast = this.raycast(MAX_LENGTH, 1f, false)
             this.target = raycast.pos
         }
-        if (prevTarget != target) {
-            val vec3d = target.subtract(pos).normalize()
-            setRotationPitchYaw(vec3d)
+        super.tick()
+        this.pitch = 0f//sin(age / 20f) * 45f + 90f
+        this.yaw = 0f//sin(age / 90f) * 90f
+    }
+
+    override fun tickClient(wait: Boolean) {
+        this.prevDisplayRadius = this.displayRadius
+        this.displayRadius = getBeamRadius()
+    }
+
+    override fun tickServer(wait: Boolean) {
+        super.tickServer(wait)
+    }
+
+    override fun doDamage() {
+        val box = Box(this.eyePos, this.target).expand(this.radius.toDouble())
+        val owner = if (this.owner != null) this.owner else this
+        val source = this.damageSources.create(DamageTypes.INDIRECT_MAGIC, owner)
+
+//        val source = if (this.owner != null) {
+//            this.damageSources.create(DuskDamageTypes.INDIRECT_ELECTRICITY, this.owner)
+//        } else {
+//            this.damageSources.create(DuskDamageTypes.ELECTRICITY)
+//        }
+        val entities = world.getNonSpectatingEntities(LivingEntity::class.java, box)
+        if (entities.isNotEmpty()) {
+            entities.forEach {
+                it.damage(source, damage)
+            }
         }
     }
 
     fun fromLerpedPosition(pos1: Vec3d, pos2: Vec3d, delta: Float): Vec3d {
-        val x = MathHelper.lerp(delta.toDouble(), pos1.x, pos2.x)
-        val y = MathHelper.lerp(delta.toDouble(), pos1.y, pos2.y)
-        val z = MathHelper.lerp(delta.toDouble(), pos1.z, pos2.z)
+        val x = lerp(delta.toDouble(), pos1.x, pos2.x)
+        val y = lerp(delta.toDouble(), pos1.y, pos2.y)
+        val z = lerp(delta.toDouble(), pos1.z, pos2.z)
         return Vec3d(x, y, z)
     }
 
@@ -81,54 +100,57 @@ class LazerEntity(entityType: EntityType<out LazerEntity>, world: World) :
         this.yaw = pitchYaw.y
     }
 
-    override fun tickClient(wait: Boolean) {
-
-    }
-
-    override fun tickServer(wait: Boolean) {
-        super.tickServer(wait)
-    }
-
-    override fun doDamage() {
-        val box = Box(this.eyePos, this.target)//.expand(radius.toDouble())
-//        val source = if (owner != null) {
-//            this.damageSources.create(DuskDamageTypes.INDIRECT_ELECTRICITY, owner)
-//        } else {
-//            this.damageSources.create(DuskDamageTypes.ELECTRICITY)
-//        }
-        val list2 = world.getNonSpectatingEntities(LivingEntity::class.java, box)
-        if (list2.isNotEmpty()) {
-            list2.forEach {
-                it.damage(this.damageSources.create(DamageTypes.SONIC_BOOM), damage)
-            }
-        }
-    }
-
-//    var texture: Identifier
+    //    var texture: Identifier
 //        get() = getDataTracker().get(PARTICLE_ID)
 //        set(texture) {
 //            getDataTracker().set(PARTICLE_ID, texture)
 //        }
+//        if (prevTarget != target) {
+//            val vec3d = target.subtract(pos).normalize()
+//            setRotationPitchYaw(vec3d)
+//        }
+    override fun initialize(
+        world: ServerWorldAccess,
+        difficulty: LocalDifficulty,
+        spawnReason: SpawnReason,
+        entityData: EntityData
+    ): EntityData? {
+        var entityData2 = super.initialize(world, difficulty, spawnReason, entityData)
+
+        val raycast = this.raycast(MAX_LENGTH, 1f, false)
+        this.target = raycast.pos
+        this.prevTarget = this.target
+
+        return entityData2
+    }
 
     fun getTexture(): Identifier = Identifier.ofDefault("textures/entity/beacon_beam.png")
 
-    fun getBeamRadius(tickDelta: Float = 1f): Pair<Float, Float> {
-        val inner: Float
-        val outer: Float
-        val s = 10
-        val threshold = this.waitTime + this.duration - s
-        if (this.age >= threshold) {
-            val t = (s + 1 - ((age + tickDelta) - threshold)) / s
-            inner = this.radius * t
-            outer = 5f
-        } else if (this.age < this.waitTime) {
-            inner = 0.5f
-            outer = 1f
-        } else {
-            val t = this.radius * (1f + sin((age + tickDelta) * 1.5f) * 0.1f)
-            inner = t
-            outer = t + (1f / 8f)
-        }
+    private fun getBeamRadius(): Pair<Float, Float> {
+        return (radius to floor(radius * 1.25f * 16f) / 16f)
+//        val inner: Float
+//        val outer: Float
+//        val s = 10
+//        val threshold = this.waitTime + this.duration - s
+//        if (this.age >= threshold) {
+//            val t = (s + 1 - ((age + tickDelta) - threshold)) / s
+//            inner = this.radius * t
+//            outer = 5f
+//        } else if (this.age < this.waitTime) {
+//            inner = 0.5f
+//            outer = 1f
+//        } else {
+//            val u = 1 / 16f
+//            val t = this.radius + (sin((age + tickDelta) * 1.5f) * u)
+//            inner = t
+//            outer = t + (1f / 8f)
+//        }
+//        return (inner to outer)
+    }
+
+    fun lerpRadius(tickDelta: Float): Pair<Float, Float> {
+        val inner = lerp(tickDelta, this.prevDisplayRadius.first, this.displayRadius.first)
+        val outer = lerp(tickDelta, this.prevDisplayRadius.second, this.displayRadius.second)
         return (inner to outer)
     }
 
