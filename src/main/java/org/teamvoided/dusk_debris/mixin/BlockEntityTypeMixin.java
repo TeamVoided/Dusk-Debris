@@ -13,8 +13,8 @@ import org.teamvoided.dusk_debris.init.DuskBlocks;
 public class BlockEntityTypeMixin {
     @Inject(method = "supports", at = @At("HEAD"), cancellable = true)
     private void supports(BlockState state, CallbackInfoReturnable<Boolean> cir) {
-        if (state.isOf(DuskBlocks.getSUSPICIOUS_VOLCANIC_SAND())) {
-            cir.setReturnValue(true);
-        } else if (state.getBlock() instanceof VoidSign) cir.setReturnValue(true);
+        if (state.isOf(DuskBlocks.getSUSPICIOUS_VOLCANIC_SAND())) cir.setReturnValue(true);
+        else if (state.getBlock() instanceof VoidSign) cir.setReturnValue(true);
+        else if (state.isOf(DuskBlocks.INSTANCE.getPOT_O_SCREAMS())) cir.setReturnValue(true);
     }
 }

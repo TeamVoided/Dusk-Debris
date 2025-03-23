@@ -6,11 +6,13 @@
   "mixins": [
     "BiomeMixin",
     "BlockEntityTypeMixin",
+    "BlockWithEntityAccessor",
     "ChunkNoiseSamplerMixin",
     "EntityWindLogicMixin",
     "FreezeTopLayerFeatureMixin",
     "MangroveRootsBlockMixin",
     "PaintingEntityMixin",
+    "PersistentProjectileEntityAccessor",
     "PillagerSpawnerMixin",
     "SnifferEntityMixin",
     "SpreadableBlockMixin",
