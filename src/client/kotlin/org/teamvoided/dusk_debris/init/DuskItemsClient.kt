@@ -3,6 +3,7 @@ package org.teamvoided.dusk_debris.init
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry
 import net.minecraft.client.color.world.FoliageColors
 import net.minecraft.client.item.ModelPredicateProviderRegistry
+import net.minecraft.client.item.UnclampedModelPredicateProvider
 import net.minecraft.component.type.DyedColorComponent
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack

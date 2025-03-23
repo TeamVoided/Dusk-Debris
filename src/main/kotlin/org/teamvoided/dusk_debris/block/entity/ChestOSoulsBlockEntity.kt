@@ -20,11 +20,11 @@ import net.minecraft.util.collection.DefaultedList
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.MathHelper
 import net.minecraft.world.World
-import org.teamvoided.dusks_and_dungeons.init.DnDBlockEntities
-import org.teamvoided.dusks_and_dungeons.init.DnDBlocks
+import org.teamvoided.dusk_debris.init.DuskBlockEntities
+import org.teamvoided.dusk_debris.init.DuskBlocks
 
 class ChestOSoulsBlockEntity(pos: BlockPos?, state: BlockState?) :
-    LootableContainerBlockEntity(DnDBlockEntities.CHEST_O_SOULS, pos, state), ChestAnimationProgress {
+    LootableContainerBlockEntity(DuskBlockEntities.CHEST_O_SOULS, pos, state), ChestAnimationProgress {
 
     private var openTicks = 0
     private val lidAnimator = ChestLidAnimator()
@@ -41,7 +41,7 @@ class ChestOSoulsBlockEntity(pos: BlockPos?, state: BlockState?) :
             oldViewerCount: Int,
             newViewerCount: Int
         ) {
-            world.addSyncedBlockEvent(pos, DnDBlocks.CHEST_O_SOULS, 1, newViewerCount)
+            world.addSyncedBlockEvent(pos, DuskBlocks.CHEST_O_SOULS, 1, newViewerCount)
         }
 
         override fun isPlayerViewing(player: PlayerEntity?): Boolean = isOpen()

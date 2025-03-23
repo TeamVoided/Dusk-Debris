@@ -19,7 +19,6 @@ import org.teamvoided.dusk_debris.entity.dice.DiceEntityRenderer
 import org.teamvoided.dusk_debris.entity.dust_bunny.DustBunnyEntityRenderer
 import org.teamvoided.dusk_debris.entity.flying_pumpkin.FlyingBlockItemEntityRenderer
 import org.teamvoided.dusk_debris.entity.piffling.PifflingPumpkinEntityRenderer
-i
 
 object DuskEntitiesClient {
     fun init() {

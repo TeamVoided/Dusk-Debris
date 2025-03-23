@@ -8,10 +8,14 @@ import net.minecraft.client.render.entity.EntityRendererFactory
 import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.MathHelper
+import org.teamvoided.dusk_debris.DuskDebris.id
+import org.teamvoided.dusk_debris.entity.DiceEntity
+import org.teamvoided.dusk_debris.entity.DuskEntityModelLayers
+import org.teamvoided.dusk_debris.entity.dice.render.DiceEntityModel
 
 class DiceEntityRenderer(context: EntityRendererFactory.Context) :
     EntityRenderer<DiceEntity>(context) {
-    private val model = DiceEntityModel(context.getPart(DnDEntityModelLayers.DICE))
+    private val model = DiceEntityModel(context.getPart(DuskEntityModelLayers.DICE))
 
     override fun render(
         entity: DiceEntity,

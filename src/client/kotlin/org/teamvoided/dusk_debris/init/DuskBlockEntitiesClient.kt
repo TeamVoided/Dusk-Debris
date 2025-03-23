@@ -2,10 +2,15 @@ package org.teamvoided.dusk_debris.init
 
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry
 import net.minecraft.block.entity.DecoratedPotBlockEntity
+import net.minecraft.client.MinecraftClient
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactories
+import net.minecraft.client.render.block.entity.ChestBlockEntityRenderer
 import net.minecraft.util.math.BlockPos
+import org.teamvoided.dusk_debris.entity.block.CelestalBellBlockEntityRenderer
 import org.teamvoided.dusk_debris.entity.block.stone_chest.StoneChestBlockEntityRenderer
 import org.teamvoided.dusk_debris.entity.block.treasure_chest.TreasureChestBlockEntityRenderer
+import org.teamvoided.dusks_and_dungeons.block.entity.ChestOSoulsBlockEntity
+import org.teamvoided.dusks_and_dungeons.entity.block.QuarterBlockPileBlockEntityRenderer
 
 object DuskBlockEntitiesClient {
     private var decoratedPotBlockEntity = DecoratedPotBlockEntity(BlockPos.ORIGIN, DuskBlocks.POT_O_SCREAMS.defaultState)
@@ -15,7 +20,7 @@ object DuskBlockEntitiesClient {
 //        BuiltinItemRendererRegistry.INSTANCE.register(DuskItems.STRAY_SKULL)
         BlockEntityRendererFactories.register(DuskBlockEntities.TREASURE_CHEST, ::TreasureChestBlockEntityRenderer)
         BlockEntityRendererFactories.register(DuskBlockEntities.STONE_CHEST, ::StoneChestBlockEntityRenderer)
-        
+
         // DnD
         BlockEntityRendererFactories.register(DuskBlockEntities.CELESTAL_BELL, ::CelestalBellBlockEntityRenderer)
         BlockEntityRendererFactories.register(DuskBlockEntities.CHEST_O_SOULS, ::ChestBlockEntityRenderer)

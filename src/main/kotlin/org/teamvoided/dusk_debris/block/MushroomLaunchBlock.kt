@@ -28,9 +28,9 @@ import net.minecraft.util.shape.VoxelShape
 import net.minecraft.util.shape.VoxelShapes
 import net.minecraft.world.BlockView
 import net.minecraft.world.World
-import org.teamvoided.dusks_and_dungeons.init.DnDParticles
-import org.teamvoided.dusks_and_dungeons.mixin.PersistentProjectileEntityAccessor
-import org.teamvoided.dusks_and_dungeons.util.degToRad
+import org.teamvoided.dusk_debris.init.DuskParticles
+import org.teamvoided.dusk_debris.mixin.PersistentProjectileEntityAccessor
+import org.teamvoided.dusk_debris.util.Utils.DEG_TO_RAD
 
 class MushroomLaunchBlock(settings: Settings) : Block(settings) {
     override fun onLandedUpon(world: World, state: BlockState, pos: BlockPos, entity: Entity, fallDistance: Float) {
@@ -142,10 +142,10 @@ class MushroomLaunchBlock(settings: Settings) : Block(settings) {
     }
 
     private fun launchFromFacing(entity: Entity, mult: Double) {
-        val pitchSin: Double = MathHelper.sin(entity.pitch * degToRad).toDouble()
-        val pitchCos: Double = MathHelper.cos(entity.pitch * degToRad).toDouble()
-        val yawSin: Double = MathHelper.sin(entity.yaw * degToRad).toDouble()
-        val yawCos: Double = MathHelper.cos(entity.yaw * degToRad).toDouble()
+        val pitchSin: Double = MathHelper.sin(entity.pitch * DEG_TO_RAD).toDouble()
+        val pitchCos: Double = MathHelper.cos(entity.pitch * DEG_TO_RAD).toDouble()
+        val yawSin: Double = MathHelper.sin(entity.yaw * DEG_TO_RAD).toDouble()
+        val yawCos: Double = MathHelper.cos(entity.yaw * DEG_TO_RAD).toDouble()
         entity.addVelocity(
             -yawSin * pitchCos * mult,
             -pitchSin * mult,
@@ -169,7 +169,7 @@ class MushroomLaunchBlock(settings: Settings) : Block(settings) {
                 (rand.nextDouble() - rand.nextDouble()) * multiplier,
             )
             world.addParticle(
-                DnDParticles.MUSHROOM_LAUNCH,
+                DuskParticles.MUSHROOM_LAUNCH,
                 centerBlock.x,
                 centerBlock.y,
                 centerBlock.z,

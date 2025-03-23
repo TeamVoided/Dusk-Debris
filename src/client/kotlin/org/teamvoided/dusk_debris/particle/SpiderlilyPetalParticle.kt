@@ -3,7 +3,6 @@ package org.teamvoided.dusk_debris.particle
 import net.minecraft.client.particle.*
 import net.minecraft.client.world.ClientWorld
 import net.minecraft.particle.DefaultParticleType
-import org.teamvoided.dusks_and_dungeons.util.pi
 import java.util.*
 
 class SpiderlilyPetalParticle(
@@ -51,7 +50,7 @@ class SpiderlilyPetalParticle(
                 age += 4
             } else {
                 this.prevAngle = this.angle
-                this.angle += pi * rotationSpeed * 2.0f
+                this.angle += Math.PI.toFloat() * rotationSpeed * 2.0f
             }
             this.move(this.velocityX, this.velocityY, this.velocityZ)
             this.velocityX =

@@ -17,10 +17,10 @@ import net.minecraft.registry.RegistryOps
 import net.minecraft.util.ItemInteractionResult
 import net.minecraft.util.collection.DefaultedList
 import net.minecraft.util.math.BlockPos
-import org.teamvoided.dusks_and_dungeons.init.DnDBlockEntities
+import org.teamvoided.dusk_debris.init.DuskBlockEntities
 
 class QuarterBlockPileBlockEntity(pos: BlockPos?, state: BlockState?) :
-    BlockEntity(DnDBlockEntities.QUARTER_BLOCK_PILE, pos, state) {
+    BlockEntity(DuskBlockEntities.QUARTER_BLOCK_PILE, pos, state) {
 
     val blocks: DefaultedList<Block> = DefaultedList.ofSize(3, Blocks.AIR)
 

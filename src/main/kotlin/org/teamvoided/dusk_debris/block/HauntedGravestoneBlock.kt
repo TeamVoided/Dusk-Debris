@@ -18,9 +18,9 @@ import net.minecraft.util.math.MathHelper
 import net.minecraft.util.random.RandomGenerator
 import net.minecraft.util.shape.VoxelShape
 import net.minecraft.world.World
+import org.teamvoided.dusk_debris.init.DuskBlockEntities
+import org.teamvoided.dusk_debris.mixin.BlockWithEntityAccessor
 import org.teamvoided.dusks_and_dungeons.block.entity.HauntedGravestoneBlockEntity
-import org.teamvoided.dusks_and_dungeons.init.DnDBlockEntities
-import org.teamvoided.dusks_and_dungeons.mixin.BlockWithEntityAccessor
 
 open class HauntedGravestoneBlock(shape: VoxelShape, centerShape: VoxelShape, settings: Settings) :
     GravestoneBlock(shape, centerShape, settings), BlockEntityProvider {
@@ -50,7 +50,7 @@ open class HauntedGravestoneBlock(shape: VoxelShape, centerShape: VoxelShape, se
     ): BlockEntityTicker<T>? {
         return BlockWithEntityAccessor.checkType(
             type,
-            DnDBlockEntities.HAUNTED_GRAVESTONE_BLOCK,
+            DuskBlockEntities.HAUNTED_GRAVESTONE_BLOCK,
             HauntedGravestoneBlockEntity::serverTick
         )
     }

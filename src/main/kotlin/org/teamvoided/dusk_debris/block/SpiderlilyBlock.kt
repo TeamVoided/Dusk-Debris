@@ -11,7 +11,7 @@ import net.minecraft.state.property.BooleanProperty
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.random.RandomGenerator
 import net.minecraft.world.World
-import org.teamvoided.dusks_and_dungeons.init.DnDParticles
+import org.teamvoided.dusk_debris.init.DuskParticles
 
 class SpiderlilyBlock(settings: Settings) : TallFlowerBlock(settings) {
     init {
@@ -68,7 +68,7 @@ class SpiderlilyBlock(settings: Settings) : TallFlowerBlock(settings) {
             val random = world.random
             repeat(10) {
                 world.addParticle(
-                    DnDParticles.SPIDERLILY,
+                    DuskParticles.SPIDERLILY,
                     true,
                     pos.x + random.nextDouble(),
                     pos.y + random.nextDouble(),

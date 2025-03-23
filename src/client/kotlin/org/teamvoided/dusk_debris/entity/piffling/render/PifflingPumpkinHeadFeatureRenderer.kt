@@ -11,8 +11,10 @@ import net.minecraft.client.render.model.json.ModelTransformationMode
 import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.entity.EquipmentSlot
 import net.minecraft.item.ItemStack
+import net.minecraft.item.Items
 import net.minecraft.util.math.Axis
 import org.joml.Quaternionf
+import org.teamvoided.dusk_debris.entity.PifflingPumpkinEntity
 import org.teamvoided.dusk_debris.entity.piffling.model.PifflingPumpkinModel
 
 class PifflingPumpkinHeadFeatureRenderer(
@@ -33,7 +35,7 @@ class PifflingPumpkinHeadFeatureRenderer(
     ) {
         var headStack = entity.getEquippedStack(EquipmentSlot.HEAD)
         if (headStack.isEmpty) {
-            headStack = DnDBlocks.SMALL_CARVED_PUMPKIN.asItem().defaultStack
+            headStack = Items.HEAVY_CORE.defaultStack //DnDBlocks.SMALL_CARVED_PUMPKIN.asItem().defaultStack
         }
         if ((!entity.isInvisible || (MinecraftClient.getInstance().hasOutline(entity) && entity.isInvisible))) {
             matrices.push()

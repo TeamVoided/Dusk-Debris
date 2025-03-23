@@ -17,8 +17,8 @@ import net.minecraft.util.shape.VoxelShape
 import net.minecraft.util.shape.VoxelShapes
 import net.minecraft.world.BlockView
 import net.minecraft.world.World
+import org.teamvoided.dusk_debris.util.rotate
 import org.teamvoided.dusks_and_dungeons.block.entity.QuarterBlockPileBlockEntity
-import org.teamvoided.dusks_and_dungeons.util.rotate
 
 class QuarterBlockPileBlock(settings: Settings?) : HorizontalFacingBlock(settings), BlockEntityProvider {
 
@@ -45,7 +45,7 @@ class QuarterBlockPileBlock(settings: Settings?) : HorizontalFacingBlock(setting
         val item = stack.item
         if (item is BlockItem) {
             val block = item.block
-            if (block is SmallPumpkinBlock || block is SmallCarvedPumpkinBlock) {
+            if (block is HeavyCoreBlock /*SmallPumpkinBlock || block is SmallCarvedPumpkinBlock*/) {
                 val blockEntity = world.getBlockEntity(pos)
                 if (blockEntity is QuarterBlockPileBlockEntity) {
                     if (world.isClient) {

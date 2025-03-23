@@ -5,13 +5,14 @@ import net.minecraft.client.render.entity.MobEntityRenderer
 import net.minecraft.client.render.entity.feature.HeldItemFeatureRenderer
 import net.minecraft.client.texture.SpriteAtlasTexture
 import net.minecraft.util.Identifier
+import org.teamvoided.dusk_debris.entity.DuskEntityModelLayers
 import org.teamvoided.dusk_debris.entity.DustBunnyEntity
 import org.teamvoided.dusk_debris.entity.dust_bunny.render.DustBunnyEntityModel
 
 class DustBunnyEntityRenderer(context: EntityRendererFactory.Context) :
     MobEntityRenderer<DustBunnyEntity, DustBunnyEntityModel>(
         context,
-        DustBunnyEntityModel(context.getPart(DnDEntityModelLayers.DUST_BUNNY)),
+        DustBunnyEntityModel(context.getPart(DuskEntityModelLayers.DUST_BUNNY)),
         0f
     ) {
     init {

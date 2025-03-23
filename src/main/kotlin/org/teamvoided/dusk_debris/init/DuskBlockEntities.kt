@@ -7,8 +7,10 @@ import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
 import net.minecraft.util.Util
 import org.teamvoided.dusk_debris.DuskDebris.id
+import org.teamvoided.dusk_debris.block.entity.BunnyGraveBlockEntity
 import org.teamvoided.dusk_debris.block.entity.TreasureChestBlockEntity
 import org.teamvoided.dusk_debris.block.entity.DuskChestBlockEntity
+import org.teamvoided.dusks_and_dungeons.block.entity.*
 
 object DuskBlockEntities {
     fun init() {}
@@ -36,18 +38,18 @@ object DuskBlockEntities {
     
     // DnD
     val CELESTAL_BELL: BlockEntityType<CelestalBellBlockEntity> =
-        register("celestal_bell", BlockEntityType.Builder.create(::CelestalBellBlockEntity, DuskBlock.CELESTAL_BELL))
+        register("celestal_bell", BlockEntityType.Builder.create(::CelestalBellBlockEntity, DuskBlocks.CELESTAL_BELL))
 
     val CHEST_O_SOULS: BlockEntityType<ChestOSoulsBlockEntity> =
-        register("chest_o_souls", BlockEntityType.Builder.create(::ChestOSoulsBlockEntity, DuskBlock.CHEST_O_SOULS))
+        register("chest_o_souls", BlockEntityType.Builder.create(::ChestOSoulsBlockEntity, DuskBlocks.CHEST_O_SOULS))
 
     val QUARTER_BLOCK_PILE: BlockEntityType<QuarterBlockPileBlockEntity> = register(
         "quarter_block_pile",
-        BlockEntityType.Builder.create(::QuarterBlockPileBlockEntity, DuskBlock.QUARTER_BLOCK_PILE)
+        BlockEntityType.Builder.create(::QuarterBlockPileBlockEntity, DuskBlocks.QUARTER_BLOCK_PILE)
     )
 
     val BUNNY_GRAVE: BlockEntityType<BunnyGraveBlockEntity> =
-        register("bunny_grave", BlockEntityType.Builder.create(::BunnyGraveBlockEntity, DuskBlock.BUNNY_GRAVE))
+        register("bunny_grave", BlockEntityType.Builder.create(::BunnyGraveBlockEntity, DuskBlocks.BUNNY_GRAVE))
 
     val HAUNTED_BLOCK: BlockEntityType<HauntedBlockEntity> = register(
         "hauted_block", BlockEntityType.Builder.create(
@@ -57,14 +59,14 @@ object DuskBlockEntities {
     val HAUNTED_GRAVESTONE_BLOCK: BlockEntityType<HauntedGravestoneBlockEntity> = register(
         "haunted_gravestone_block", BlockEntityType.Builder.create(
             ::HauntedGravestoneBlockEntity,
-            DuskBlock.HAUNTED_GRAVESTONE,
-            DuskBlock.SMALL_HAUNTED_GRAVESTONE,
-            DuskBlock.HAUNTED_DEEPSLATE_GRAVESTONE,
-            DuskBlock.SMALL_HAUNTED_DEEPSLATE_GRAVESTONE,
-            DuskBlock.HAUNTED_TUFF_GRAVESTONE,
-            DuskBlock.SMALL_HAUNTED_TUFF_GRAVESTONE,
-            DuskBlock.HAUNTED_BLACKSTONE_GRAVESTONE,
-            DuskBlock.SMALL_HAUNTED_BLACKSTONE_GRAVESTONE
+            DuskBlocks.HAUNTED_GRAVESTONE,
+            DuskBlocks.SMALL_HAUNTED_GRAVESTONE,
+            DuskBlocks.HAUNTED_DEEPSLATE_GRAVESTONE,
+            DuskBlocks.SMALL_HAUNTED_DEEPSLATE_GRAVESTONE,
+            DuskBlocks.HAUNTED_TUFF_GRAVESTONE,
+            DuskBlocks.SMALL_HAUNTED_TUFF_GRAVESTONE,
+            DuskBlocks.HAUNTED_BLACKSTONE_GRAVESTONE,
+            DuskBlocks.SMALL_HAUNTED_BLACKSTONE_GRAVESTONE
         )
     )
 

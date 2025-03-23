@@ -6,11 +6,11 @@ import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.EntityDetector
 import net.minecraft.world.World
-import org.teamvoided.dusks_and_dungeons.block.HauntedGravestoneBlock
-import org.teamvoided.dusks_and_dungeons.init.DnDBlockEntities
+import org.teamvoided.dusk_debris.block.HauntedGravestoneBlock
+import org.teamvoided.dusk_debris.init.DuskBlockEntities
 
 open class HauntedBlockEntity(pos: BlockPos, state: BlockState) :
-    BlockEntity(DnDBlockEntities.HAUNTED_BLOCK, pos, state) {
+    BlockEntity(DuskBlockEntities.HAUNTED_BLOCK, pos, state) {
 
     companion object {
         fun serverTick(world: World, pos: BlockPos, state: BlockState, blockEntity: HauntedBlockEntity) {

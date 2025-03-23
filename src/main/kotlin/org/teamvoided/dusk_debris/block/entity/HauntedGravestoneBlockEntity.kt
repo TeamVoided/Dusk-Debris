@@ -11,13 +11,13 @@ import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Vec3d
 import net.minecraft.world.EntityDetector
 import net.minecraft.world.World
-import org.teamvoided.dusks_and_dungeons.block.HauntedGravestoneBlock
-import org.teamvoided.dusks_and_dungeons.init.DnDBlockEntities
+import org.teamvoided.dusk_debris.block.HauntedGravestoneBlock
+import org.teamvoided.dusk_debris.init.DuskBlockEntities
 import kotlin.math.cos
 import kotlin.math.sin
 
 class HauntedGravestoneBlockEntity(pos: BlockPos, state: BlockState) :
-    BlockEntity(DnDBlockEntities.HAUNTED_GRAVESTONE_BLOCK, pos, state) {
+    BlockEntity(DuskBlockEntities.HAUNTED_GRAVESTONE_BLOCK, pos, state) {
     var cursedPlayer: PlayerEntity? = null
     var cursePos: Vec3d = pos.ofCenter()
     var curseTime = 0

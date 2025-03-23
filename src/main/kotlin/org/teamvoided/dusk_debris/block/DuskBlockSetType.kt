@@ -67,6 +67,18 @@ object DuskBlockSetType {
             .register(id("charred"))
     val CHARRED_WOOD_TYPE: WoodType = WoodType.register(WoodType(id("charred"), CHARRED_BLOCK_SET_TYPE))
 
+    val GALLERY_MAPLE_BLOCK_SET_TYPE: BlockSetType = BlockSetTypeBuilder().register(id("gallery_maple"))
+    val GALLERY_MAPLE_WOOD_TYPE = registerWoodType("gallery_maple", WoodType.MANGROVE, GALLERY_MAPLE_BLOCK_SET_TYPE)
+
+    val BONEWOOD_BLOCK_SET_TYPE: BlockSetType = BlockSetTypeBuilder().register(id("bonewood"))
+    val BONEWOOD_WOOD_TYPE = registerWoodType("bonewood", WoodType.SPRUCE, BONEWOOD_BLOCK_SET_TYPE)
+    val WITHERING_BONEWOOD_BLOCK_SET_TYPE: BlockSetType = BlockSetTypeBuilder().register(id("withering_bonewood"))
+    val WITHERING_BONEWOOD_WOOD_TYPE =
+        registerWoodType("withering_bonewood", BONEWOOD_WOOD_TYPE, WITHERING_BONEWOOD_BLOCK_SET_TYPE)
+
+
+    private fun registerWoodType(id: String, woodType: WoodType, blockSet: BlockSetType): WoodType =
+        WoodTypeBuilder.copyOf(woodType).register(id(id), blockSet)
 
     private fun WoodType(id: Identifier, blockSetType: BlockSetType): WoodType =
         WoodType.register(WoodType(id.toString(), blockSetType))

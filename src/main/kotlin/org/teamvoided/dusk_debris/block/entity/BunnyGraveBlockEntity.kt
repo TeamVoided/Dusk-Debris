@@ -1,4 +1,4 @@
-package org.teamvoided.dusks_and_dungeons.block.entity
+package org.teamvoided.dusk_debris.block.entity
 
 import net.minecraft.block.BlockState
 import net.minecraft.block.entity.BlockEntity
@@ -13,14 +13,14 @@ import net.minecraft.registry.HolderLookup
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
-import org.teamvoided.dusks_and_dungeons.block.BunnyGraveBlock
-import org.teamvoided.dusks_and_dungeons.entity.DustBunnyEntity
-import org.teamvoided.dusks_and_dungeons.init.DnDBlockEntities
-import org.teamvoided.dusks_and_dungeons.init.DnDEntities
+import org.teamvoided.dusk_debris.block.BunnyGraveBlock
+import org.teamvoided.dusk_debris.entity.DustBunnyEntity
+import org.teamvoided.dusk_debris.init.DuskBlockEntities
+import org.teamvoided.dusk_debris.init.DuskEntities
 import java.util.*
 
 open class BunnyGraveBlockEntity(pos: BlockPos?, state: BlockState?) :
-    BlockEntity(DnDBlockEntities.BUNNY_GRAVE, pos, state) {
+    BlockEntity(DuskBlockEntities.BUNNY_GRAVE, pos, state) {
     private val bunnyIds = mutableListOf<UUID>()
     var dustBunnies: MutableList<Entity> = mutableListOf()
         get() {
@@ -44,7 +44,7 @@ open class BunnyGraveBlockEntity(pos: BlockPos?, state: BlockState?) :
     fun summonBunny() {
         val blockPos = this.getPos()
         if (world != null) {
-            val entity = DustBunnyEntity(DnDEntities.DUST_BUNNY, world!!)
+            val entity = DustBunnyEntity(DuskEntities.DUST_BUNNY, world!!)
             entity.refreshPositionAndAngles(blockPos.ofCenter(), 0f, 0f)
             entity.summonedPos = blockPos
             entity.initialize(

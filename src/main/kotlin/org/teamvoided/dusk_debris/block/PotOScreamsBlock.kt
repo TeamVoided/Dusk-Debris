@@ -15,7 +15,7 @@ import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.MathHelper
 import net.minecraft.world.World
 import net.minecraft.world.WorldView
-import org.teamvoided.dusks_and_dungeons.init.DnDBlocks
+import org.teamvoided.dusk_debris.init.DuskBlocks
 
 class PotOScreamsBlock(settings: Settings) : DecoratedPotBlock(settings) {
 
@@ -74,7 +74,7 @@ class PotOScreamsBlock(settings: Settings) : DecoratedPotBlock(settings) {
     }
 
     override fun getPickStack(world: WorldView, pos: BlockPos, state: BlockState): ItemStack {
-        val stack = ItemStack(DnDBlocks.POT_O_SCREAMS)
+        val stack = ItemStack(DuskBlocks.POT_O_SCREAMS)
         stack.applyComponents(super.getPickStack(world, pos, state).components)
         return stack
     }

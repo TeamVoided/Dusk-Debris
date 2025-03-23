@@ -24,8 +24,8 @@ import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.MathHelper
 import net.minecraft.util.math.Vec3d
 import net.minecraft.world.World
-import org.teamvoided.dusks_and_dungeons.block.entity.BunnyGraveBlockEntity
-import org.teamvoided.dusks_and_dungeons.particle.DustBunnyParticleEffect
+import org.teamvoided.dusk_debris.block.entity.BunnyGraveBlockEntity
+import org.teamvoided.dusk_debris.particle.DustBunnyParticleEffect
 import java.util.*
 import kotlin.jvm.optionals.getOrNull
 

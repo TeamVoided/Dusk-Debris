@@ -2,12 +2,10 @@ package org.teamvoided.dusk_debris.init.misc
 
 import net.minecraft.block.AbstractBlock.OffsetType
 import net.minecraft.block.AbstractBlock.Settings
-import net.minecraft.block.AbstractBlock.Settings.copy
-import net.minecraft.block.Blocks
-import net.minecraft.block.Blocks.BROWN_MUSHROOM_BLOCK
 import net.minecraft.block.MapColor
 import net.minecraft.block.piston.PistonBehavior
 import net.minecraft.sound.BlockSoundGroup
+import org.teamvoided.dusk_debris.util.luminance
 
 object DuskBlockSettings {
     val MOONCORE: Settings = Settings.create()

@@ -9,7 +9,6 @@ import net.minecraft.util.math.BlockPos
 import net.minecraft.util.shape.VoxelShape
 import net.minecraft.util.shape.VoxelShapes
 import net.minecraft.world.BlockView
-import org.teamvoided.dusks_and_dungeons.data.tags.DnDEntityTypeTags
 
 class WaterFernBlock(settings: Settings) : AbstractPlantBlock(settings) {
     override fun getCodec(): MapCodec<out AbstractPlantBlock> = CODEC
@@ -18,7 +17,7 @@ class WaterFernBlock(settings: Settings) : AbstractPlantBlock(settings) {
         state: BlockState, world: BlockView, pos: BlockPos, context: ShapeContext
     ): VoxelShape {
         val entity = (context as EntityShapeContext).entity
-        return if (entity != null && (entity.type.isIn(DnDEntityTypeTags.NO_COLLIDE_WATER_FERN) || entity is ProjectileEntity)) VoxelShapes.empty()
+        return if (entity != null && (/*entity.type.isIn(DuskEntityTypeTags.NO_COLLIDE_WATER_FERN) ||*/ entity is ProjectileEntity)) VoxelShapes.empty()
         else super.getCollisionShape(state, world, pos, context)
     }
 

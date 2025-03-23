@@ -23,13 +23,12 @@ import net.minecraft.util.random.RandomGenerator
 import net.minecraft.util.shape.VoxelShape
 import net.minecraft.world.BlockView
 import net.minecraft.world.World
+import org.teamvoided.dusk_debris.init.DuskBlockEntities
 import org.teamvoided.dusks_and_dungeons.block.entity.ChestOSoulsBlockEntity
-import org.teamvoided.dusks_and_dungeons.init.DnDBlockEntities
 
 class ChestOSoulsBlock(
     settings: Settings?,
-) :
-    AbstractChestBlock<ChestOSoulsBlockEntity>(settings, { DnDBlockEntities.CHEST_O_SOULS }) {
+) : AbstractChestBlock<ChestOSoulsBlockEntity>(settings, { DuskBlockEntities.CHEST_O_SOULS }) {
 
     init {
         defaultState = stateManager.defaultState.with(FACING, Direction.NORTH)
@@ -77,7 +76,7 @@ class ChestOSoulsBlock(
         state: BlockState?,
         type: BlockEntityType<T>?
     ): BlockEntityTicker<T>? =
-        checkType(type, DnDBlockEntities.CHEST_O_SOULS, ChestOSoulsBlockEntity::tick)
+        checkType(type, DuskBlockEntities.CHEST_O_SOULS, ChestOSoulsBlockEntity::tick)
 
     override fun getBlockEntitySource(
         state: BlockState, world: World, pos: BlockPos, ignoreBlocked: Boolean

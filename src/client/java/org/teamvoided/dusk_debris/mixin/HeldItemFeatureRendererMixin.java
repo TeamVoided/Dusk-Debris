@@ -14,14 +14,14 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.teamvoided.dusks_and_dungeons.init.DnDItems;
+import org.teamvoided.dusk_debris.init.DuskItems;
 
 @Mixin(HeldItemFeatureRenderer.class)
 public class HeldItemFeatureRendererMixin {
 
     @Inject(method = "renderItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/math/MatrixStack;translate(FFF)V"))
     private void renderItem(LivingEntity entity, ItemStack stack, ModelTransformationMode transformationMode, Arm arm, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
-        if (stack.isOf(DnDItems.INSTANCE.getBROOM()) && entity instanceof PlayerEntity player) {
+        if (stack.isOf(DuskItems.INSTANCE.getBROOM()) && entity instanceof PlayerEntity player) {
             float g = (float) (player.getItemUseTimeLeft() % 10);
             float h = g - 0 + 1F;
             float i = 1F - h / 10F;

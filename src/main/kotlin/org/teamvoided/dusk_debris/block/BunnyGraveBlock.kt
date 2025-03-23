@@ -22,9 +22,9 @@ import net.minecraft.util.shape.VoxelShapes
 import net.minecraft.world.BlockView
 import net.minecraft.world.World
 import net.minecraft.world.WorldAccess
-import org.teamvoided.dusks_and_dungeons.block.entity.BunnyGraveBlockEntity
-import org.teamvoided.dusks_and_dungeons.init.DnDBlockEntities
-import org.teamvoided.dusks_and_dungeons.util.rotate
+import org.teamvoided.dusk_debris.init.DuskBlockEntities
+import org.teamvoided.dusk_debris.util.rotate
+import org.teamvoided.dusk_debris.block.entity.BunnyGraveBlockEntity
 
 class BunnyGraveBlock(settings: Settings) : BlockWithEntity(settings), Waterloggable {
     init {
@@ -51,7 +51,7 @@ class BunnyGraveBlock(settings: Settings) : BlockWithEntity(settings), Waterlogg
     ): BlockEntityTicker<T>? {
         return checkType(
             type,
-            DnDBlockEntities.BUNNY_GRAVE,
+            DuskBlockEntities.BUNNY_GRAVE,
             if (!world.isClient)
                 BunnyGraveBlockEntity::serverTick
             else null

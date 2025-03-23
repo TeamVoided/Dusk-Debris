@@ -11,8 +11,8 @@ import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
 import net.minecraft.world.World
 import net.minecraft.world.event.GameEvent
+import org.teamvoided.dusk_debris.init.DuskSoundEvents
 import org.teamvoided.dusks_and_dungeons.block.entity.CelestalBellBlockEntity
-import org.teamvoided.dusks_and_dungeons.init.DnDSoundEvents
 
 class CelestalBellBlock(settings: Settings) : BellBlock(settings) {
     override fun ring(entity: Entity?, world: World, pos: BlockPos, direction: Direction?): Boolean {
@@ -27,7 +27,7 @@ class CelestalBellBlock(settings: Settings) : BellBlock(settings) {
             world.playSound(
                 null,
                 pos,
-                DnDSoundEvents.BLOCK_CELESTAL_BELL_USE,
+                DuskSoundEvents.BLOCK_CELESTAL_BELL_USE,
                 SoundCategory.BLOCKS,
                 2.0f,
                 1.0f
@@ -51,7 +51,7 @@ class CelestalBellBlock(settings: Settings) : BellBlock(settings) {
     ): BlockEntityTicker<T>? {
         return null /*checkType(
             type,
-            DnDBlockEntities.CELESTAL_BELL,
+            DuskBlockEntities.CELESTAL_BELL,
             if (world.isClient) BlockEntityTicker { world: World?, pos: BlockPos?, state: BlockState?, blockEntity: BellBlockEntity? ->
                 CelestalBellBlockEntity.clientTick(
                     world,

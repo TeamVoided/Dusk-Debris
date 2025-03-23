@@ -204,7 +204,7 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
         gen.registerGalleryRose(DuskBlocks.PAINTED_ROSE, TintType.NOT_TINTED)
         gen.registerSpiderlilly(DuskBlocks.SPIDERLILY, TintType.NOT_TINTED)
 
-        gen.registerBigChain(DuskBlocks.BIG_CELESTAL_CHAIN)
+//        gen.registerBigChain(DuskBlocks.BIG_CELESTAL_CHAIN)
         val bottomModel = id("block/big_celestal_lantern_bottom")
         gen.registerBigLantern(DuskBlocks.BIG_MOON_LANTERN, bottomModel)
         gen.registerBigLantern(DuskBlocks.BIG_EARTH_LANTERN, bottomModel)
@@ -244,15 +244,6 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
             DuskBlocks.GALLERY_MAPLE_WALL_HANGING_SIGN
         )
         gen.registerSingleton(DuskBlocks.GALLERY_MAPLE_LEAVES, TexturedModel.LEAVES)
-
-        gen.genPsudoFamily(
-            DuskBlocks.GALLERY_MAPLE_WOOD_STAIRS,
-            DuskBlocks.GALLERY_MAPLE_WOOD_SLAB,
-            DuskBlocks.GALLERY_MAPLE_WOOD_WALL,
-            DuskBlocks.GALLERY_MAPLE_LOG,
-            DuskBlocks.GALLERY_MAPLE_WOOD
-        )
-
     }
 
     private fun BlockStateModelGenerator.fogCanyonModels() {

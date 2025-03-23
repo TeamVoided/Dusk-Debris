@@ -25,6 +25,7 @@ import net.minecraft.util.math.Vec3d
 import net.minecraft.world.World
 import net.minecraft.world.explosion.ExplosionBehavior
 import net.minecraft.world.explosion.SimpleExplosionBehavior
+import org.teamvoided.dusk_debris.data.tags.DuskBlockTags
 import org.teamvoided.dusk_debris.data.tags.DuskEntityTypeTags
 import org.teamvoided.dusk_debris.data.tags.DuskItemTags
 import org.teamvoided.dusk_debris.init.DuskEntities
@@ -94,7 +95,7 @@ class ChillChargeEntity : ExplosiveProjectileEntity, FlyingItemEntity {
             if (world is ServerWorld && world.isChunkLoaded(this.blockPos)) {
                 // TODO replace with voidlib
 //                (world as ServerWorld).spawnParticles(
-//                    DnDParticles.SNOWFLAKE, pos, Vec3d(
+//                    DuskParticles.SNOWFLAKE, pos, Vec3d(
 //                        (random.nextDouble() * 2.0 - 1.0) * 0.05,
 //                        (random.nextDouble() * 2.0 - 1.0) * 0.05,
 //                        (random.nextDouble() * 2.0 - 1.0) * 0.05
@@ -110,7 +111,7 @@ class ChillChargeEntity : ExplosiveProjectileEntity, FlyingItemEntity {
             // TODO replace with voidlib
 //            repeat(90) {
 //                serverWorld.spawnParticles(
-//                    DnDParticles.SNOWFLAKE, pos, Vec3d(
+//                    DuskParticles.SNOWFLAKE, pos, Vec3d(
 //                        (random.nextDouble() * 2.0 - 1.0),
 //                        (random.nextDouble() * 2.0 - 1.0),
 //                        (random.nextDouble() * 2.0 - 1.0)
@@ -142,7 +143,7 @@ class ChillChargeEntity : ExplosiveProjectileEntity, FlyingItemEntity {
                         world.setBlockState(blockPos, Blocks.FROSTED_ICE.defaultState)
                     } else if (state.isOf(Blocks.FROSTED_ICE)) {
                         world.setBlockState(blockPos, Blocks.FROSTED_ICE.defaultState)
-                    } else if (state.isIn(DnDBlockTags.CHILL_CHARGE_AFFECTS) && state.contains(Properties.LIT)) {
+                    } else if (/*state.isIn(DuskBlockTags.CHILL_CHARGE_AFFECTS) &&*/ state.contains(Properties.LIT)) {
                         world.setBlockState(blockPos, state.with(Properties.LIT, false))
                     }
                 }

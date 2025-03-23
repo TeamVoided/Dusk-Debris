@@ -8,6 +8,7 @@ import net.minecraft.client.render.block.entity.BlockEntityRendererFactory
 import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.state.property.Properties
 import net.minecraft.util.math.Axis
+import org.teamvoided.dusks_and_dungeons.block.entity.QuarterBlockPileBlockEntity
 
 class QuarterBlockPileBlockEntityRenderer(
     ctx: BlockEntityRendererFactory.Context,

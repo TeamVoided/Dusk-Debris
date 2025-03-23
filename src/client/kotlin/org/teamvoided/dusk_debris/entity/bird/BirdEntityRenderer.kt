@@ -5,6 +5,7 @@ import net.minecraft.client.render.entity.MobEntityRenderer
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.MathHelper
 import org.teamvoided.dusk_debris.entity.BirdEntity
+import org.teamvoided.dusk_debris.entity.DuskEntityModelLayers
 import org.teamvoided.dusk_debris.entity.bird.render.BirdEntityModel
 
 class BirdEntityRenderer(context: EntityRendererFactory.Context) :

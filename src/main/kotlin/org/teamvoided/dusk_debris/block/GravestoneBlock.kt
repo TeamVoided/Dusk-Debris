@@ -14,6 +14,9 @@ import net.minecraft.util.math.Direction
 import net.minecraft.util.shape.VoxelShape
 import net.minecraft.world.BlockView
 import net.minecraft.world.WorldAccess
+import org.teamvoided.dusk_debris.util.centerGravestoneShape
+import org.teamvoided.dusk_debris.util.gravestoneShape
+import org.teamvoided.dusk_debris.util.rotate
 
 open class GravestoneBlock(val shape: VoxelShape, val centerShape: VoxelShape, settings: Settings) :
     HorizontalFacingBlock(settings), Waterloggable {

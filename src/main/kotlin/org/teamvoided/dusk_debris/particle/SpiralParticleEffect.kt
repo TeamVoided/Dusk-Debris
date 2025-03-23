@@ -7,13 +7,13 @@ import net.minecraft.network.codec.PacketCodec
 import net.minecraft.network.codec.PacketCodecs
 import net.minecraft.particle.ParticleEffect
 import net.minecraft.particle.ParticleType
-import org.teamvoided.dusks_and_dungeons.init.DnDParticles
+import org.teamvoided.dusk_debris.init.DuskParticles
 import java.awt.Color
 
 class SpiralParticleEffect(val color1: Color, val color2: Color) : ParticleEffect {
     constructor(color1: Int, color2: Int) : this(Color(color1), Color(color2))
 
-    override fun getType(): ParticleType<SpiralParticleEffect> = DnDParticles.SPIRAL
+    override fun getType(): ParticleType<SpiralParticleEffect> = DuskParticles.SPIRAL
 
     companion object {
         val CODEC: MapCodec<SpiralParticleEffect> = RecordCodecBuilder.mapCodec { inst ->

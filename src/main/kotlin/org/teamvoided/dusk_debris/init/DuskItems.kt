@@ -165,21 +165,21 @@ object DuskItems {
 
     // DnD Items
     val GALLERY_MAPLE_DOOR =
-        register("gallery_maple_door", TallBlockItem(DnDBlocks.GALLERY_MAPLE_DOOR, Item.Settings()))
+        register("gallery_maple_door", TallBlockItem(DuskBlocks.GALLERY_MAPLE_DOOR, Item.Settings()))
 
     val GALLERY_MAPLE_SIGN = register(
         "gallery_maple_sign",
-        SignItem(CountSettings(16), DnDBlocks.GALLERY_MAPLE_SIGN, DnDBlocks.GALLERY_MAPLE_WALL_SIGN)
+        SignItem(CountSettings(16), DuskBlocks.GALLERY_MAPLE_SIGN, DuskBlocks.GALLERY_MAPLE_WALL_SIGN)
     )
     val GALLERY_MAPLE_HANGING_SIGN = register(
         "gallery_maple_hanging_sign", HangingSignItem(
-            DnDBlocks.GALLERY_MAPLE_HANGING_SIGN, DnDBlocks.GALLERY_MAPLE_WALL_HANGING_SIGN, CountSettings(16)
+            DuskBlocks.GALLERY_MAPLE_HANGING_SIGN, DuskBlocks.GALLERY_MAPLE_WALL_HANGING_SIGN, CountSettings(16)
         )
     )
-    val BONEWOOD_DOOR = register("bonewood_door", TallBlockItem(DnDBlocks.BONEWOOD_DOOR, Item.Settings()))
+    val BONEWOOD_DOOR = register("bonewood_door", TallBlockItem(DuskBlocks.BONEWOOD_DOOR, Item.Settings()))
 
     val WITHERING_BONEWOOD_DOOR =
-        register("withering_bonewood_door", TallBlockItem(DnDBlocks.WITHERING_BONEWOOD_DOOR, Item.Settings()))
+        register("withering_bonewood_door", TallBlockItem(DuskBlocks.WITHERING_BONEWOOD_DOOR, Item.Settings()))
 
 
     val WITCH_HAT = register("witch_hat", EquipableItem(CountSettings(1)))
@@ -192,7 +192,7 @@ object DuskItems {
         )
     )
 
-    val WATER_FERN = register("water_fern", WaterPlaceableBlockItem(DnDBlocks.WATER_FERN, Item.Settings()))
+    val WATER_FERN = register("water_fern", WaterPlaceableBlockItem(DuskBlocks.WATER_FERN, Item.Settings()))
 
 
     val FREEZE_ROD = register("freeze_rod", Item(Item.Settings()))

@@ -117,12 +117,6 @@ object DuskBlockFamilies {
             .group("bonewood")
             .unlockCriterionName("has_bonewood")
             .build()
-    private val GALLERY_MAPLE_WOOD_FAMILY: BlockFamily =
-        BlockFamilies.register(DuskBlocks.GALLERY_MAPLE_WOOD)
-            .stairs(DuskBlocks.GALLERY_MAPLE_WOOD_STAIRS)
-            .slab(DuskBlocks.GALLERY_MAPLE_WOOD_SLAB)
-            .wall(DuskBlocks.GALLERY_MAPLE_WOOD_WALL)
-            .build()
 
     val blockFamilies = listOf(
         CUT_BRONZE_FAMILY,
