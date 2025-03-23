@@ -7,6 +7,7 @@ import net.minecraft.block.Blocks
 import net.minecraft.data.client.ItemModelGenerator
 import net.minecraft.data.client.model.*
 import net.minecraft.util.Identifier
+import org.teamvoided.dusk_debris.DuskDebris.id
 import org.teamvoided.dusk_debris.block.DuskBlockFamilies
 import org.teamvoided.dusk_debris.block.DuskBlockLists
 import org.teamvoided.dusk_debris.data.gen.providers.models.MinecraftModelProvider.generateAlternativeMinecraftModels
@@ -19,6 +20,7 @@ import org.teamvoided.dusk_debris.util.*
 import org.teamvoided.dusk_debris.util.model_helper.bubbleBlock
 import org.teamvoided.dusk_debris.util.model_helper.bubbleBlossomBlock
 import org.teamvoided.dusk_debris.util.model_helper.carpetStairs
+import java.util.*
 
 class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
     val minecraft = false
@@ -202,9 +204,23 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
         this.bubbleBlossomBlock(DuskBlocks.PURPLE_BUBBLE_BLOSSOM)
     }
 
+    private val single = listOf(DuskItems.DIE_ITEM, DuskItems.CHILL_CHARGE)
     override fun generateItemModels(gen: ItemModelGenerator) {
+        single.forEach { gen.register(it, Models.SINGLE_LAYER_ITEM) }
+        gen.register(DuskItems.FREEZE_ROD, Models.HANDHELD_ROD)
+        gen.register(DuskItems.HARVESTER_SCYTHE, item("parent/handheld_32", TextureKey.LAYER0))
+
+        val webWeaver = item("web_weaver", TextureKey.LAYER0)
+        gen.register(DuskItems.WEB_WEAVER, "_0", webWeaver)
+        gen.register(DuskItems.WEB_WEAVER, "_1", webWeaver)
+        gen.register(DuskItems.WEB_WEAVER, "_2", webWeaver)
+
 //        gen.register(DuskItems.STRAY_SKULL, parentedItemModel(mc("template_skull")))
 //        gen.register(DuskItems.BOGGED_SKULL, parentedItemModel(mc("template_skull")))
 //        gen.register(DuskItems.GLOOM_SKULL, parentedItemModel(mc("template_skull")))
     }
+
+    // TODO replace with voidlib
+    private fun item(parent: String, vararg requiredTextures: TextureKey): Model =
+        Model(Optional.of(id("item/$parent")), Optional.empty(), *requiredTextures)
 }

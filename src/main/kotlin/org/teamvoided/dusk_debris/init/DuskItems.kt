@@ -4,10 +4,11 @@ import net.minecraft.block.Block
 import net.minecraft.block.dispenser.DispenserBlock
 import net.minecraft.block.dispenser.ItemDispenserBehavior
 import net.minecraft.component.DataComponentTypes
+import net.minecraft.component.type.AttributeModifiersComponent
 import net.minecraft.component.type.DyedColorComponent
 import net.minecraft.component.type.NbtComponent
 import net.minecraft.entity.Entity
-import net.minecraft.entity.EntityType
+import net.minecraft.entity.EquipmentSlot
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.*
@@ -15,6 +16,8 @@ import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
 import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvents
+import net.minecraft.util.Hand
+import net.minecraft.util.TypedActionResult
 import net.minecraft.util.math.BlockPointer
 import net.minecraft.world.World
 import net.minecraft.world.event.GameEvent
@@ -160,13 +163,53 @@ object DuskItems {
         )
     )
 
+    // DnD Items
+    val GALLERY_MAPLE_DOOR =
+        register("gallery_maple_door", TallBlockItem(DnDBlocks.GALLERY_MAPLE_DOOR, Item.Settings()))
+
+    val GALLERY_MAPLE_SIGN = register(
+        "gallery_maple_sign",
+        SignItem(CountSettings(16), DnDBlocks.GALLERY_MAPLE_SIGN, DnDBlocks.GALLERY_MAPLE_WALL_SIGN)
+    )
+    val GALLERY_MAPLE_HANGING_SIGN = register(
+        "gallery_maple_hanging_sign", HangingSignItem(
+            DnDBlocks.GALLERY_MAPLE_HANGING_SIGN, DnDBlocks.GALLERY_MAPLE_WALL_HANGING_SIGN, CountSettings(16)
+        )
+    )
+    val BONEWOOD_DOOR = register("bonewood_door", TallBlockItem(DnDBlocks.BONEWOOD_DOOR, Item.Settings()))
+
+    val WITHERING_BONEWOOD_DOOR =
+        register("withering_bonewood_door", TallBlockItem(DnDBlocks.WITHERING_BONEWOOD_DOOR, Item.Settings()))
+
+
+    val WITCH_HAT = register("witch_hat", EquipableItem(CountSettings(1)))
+
+    @JvmField
+    val VILE_WITCH_HAT = register("vile_witch_hat", EquipableItem(CountSettings(1)))
+    val DIE_ITEM = register(
+        "die", DiceItem(
+            CountSettings(16).component(DataComponentTypes.DYED_COLOR, DyedColorComponent(0xFFFFFF, true))
+        )
+    )
+
+    val WATER_FERN = register("water_fern", WaterPlaceableBlockItem(DnDBlocks.WATER_FERN, Item.Settings()))
+
+
+    val FREEZE_ROD = register("freeze_rod", Item(Item.Settings()))
+    val CHILL_CHARGE = register("chill_charge", ChillChargeItem(Item.Settings()))
+
+    val WEB_WEAVER =
+        register("web_weaver", BowItem(Item.Settings().maxDamage(404)))
+    val HARVESTER_SCYTHE = register(
+        "harvester_scythe", HarvesterScytheItem(AttributeSettings(HarvesterScytheItem.makeAttributes()))
+    )
+    val BROOM = register("broom", BroomItem(CountSettings(1)))
+
     fun init() {
-        DuskBlockLists.THROWABLE_BOMB_BLOCK_LIST.forEach {
-            DispenserBlock.registerBehavior(it.asItem())
-        }
-        DuskBlockLists.GUNPOWDER_BARREL_BLOCK_LIST.forEach {
-            registerGunpowderDispensedBehavior(it)
-        }
+        DuskBlockLists.THROWABLE_BOMB_BLOCK_LIST.forEach { DispenserBlock.registerBehavior(it.asItem()) }
+        DuskBlockLists.GUNPOWDER_BARREL_BLOCK_LIST.forEach { registerGunpowderDispensedBehavior(it) }
+
+        DispenserBlock.registerBehavior(CHILL_CHARGE)
     }
 
     fun registerGunpowderDispensedBehavior(block: Block) =
@@ -212,4 +255,19 @@ object DuskItems {
     }
 
     fun BlockItem(block: Block) = BlockItem(block, Item.Settings())
+
+
+    // TODO replace with voidlib
+    class EquipableItem(settings: Settings, val slot: EquipmentSlot = EquipmentSlot.HEAD) : Item(settings), Equippable {
+        override fun getPreferredSlot(): EquipmentSlot = slot
+        override fun use(world: World, user: PlayerEntity, hand: Hand): TypedActionResult<ItemStack> =
+            this.use(this, world, user, hand)
+    }
+
+    @Suppress("FunctionName")
+    fun AttributeSettings(comp: AttributeModifiersComponent): Item.Settings =
+        Item.Settings().attributeModifiersComponent(comp)
+
+    @Suppress("FunctionName")
+    fun CountSettings(count: Int): Item.Settings = Item.Settings().maxCount(count)
 }

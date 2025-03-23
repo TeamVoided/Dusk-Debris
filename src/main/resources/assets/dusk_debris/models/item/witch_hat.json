@@ -1,0 +1,72 @@
+{
+	"texture_size": [64, 128],
+	"parent": "minecraft:block/block",
+	"textures": {
+		"hat": "minecraft:entity/witch",
+		"particle": "minecraft:block/black_wool"
+	},
+	"elements": [
+		{
+			"name": "hat",
+			"from": [3, 0.05, 3],
+			"to": [13, 2.05, 13],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, -32, 8]},
+			"faces": {
+				"north": {"uv": [2.5, 9.25, 5, 9.5], "texture": "#hat"},
+				"east": {"uv": [0, 9.25, 2.5, 9.5], "texture": "#hat"},
+				"south": {"uv": [7.5, 9.25, 10, 9.5], "texture": "#hat"},
+				"west": {"uv": [5, 9.25, 7.5, 9.5], "texture": "#hat"},
+				"up": {"uv": [5, 9.25, 2.5, 8], "texture": "#hat"},
+				"down": {"uv": [7.5, 8, 5, 9.25], "texture": "#hat"}
+			}
+		},
+		{
+			"name": "hat2",
+			"from": [4.25, 1.5, 5.5],
+			"to": [11.25, 5.5, 12.5],
+			"rotation": {"angle": 0, "axis": "x", "origin": [7.75, 3.5, 9]},
+			"faces": {
+				"north": {"uv": [1.75, 10.375, 3.5, 10.875], "texture": "#hat"},
+				"east": {"uv": [0, 10.375, 1.75, 10.875], "texture": "#hat"},
+				"south": {"uv": [5.25, 10.375, 7, 10.875], "texture": "#hat"},
+				"west": {"uv": [3.5, 10.375, 5.25, 10.875], "texture": "#hat"},
+				"up": {"uv": [3.5, 10.375, 1.75, 9.5], "texture": "#hat"},
+				"down": {"uv": [5.25, 9.5, 3.5, 10.375], "texture": "#hat"}
+			}
+		},
+		{
+			"name": "hat3",
+			"from": [5.25, 4.5, 7.5],
+			"to": [9.25, 8.5, 11.5],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8.75, -17, 6]},
+			"faces": {
+				"north": {"uv": [1, 11.375, 2, 11.875], "texture": "#hat"},
+				"east": {"uv": [0, 11.375, 1, 11.875], "texture": "#hat"},
+				"south": {"uv": [3, 11.375, 4, 11.875], "texture": "#hat"},
+				"west": {"uv": [2, 11.375, 3, 11.875], "texture": "#hat"},
+				"up": {"uv": [2, 11.375, 1, 10.875], "texture": "#hat"},
+				"down": {"uv": [3, 10.875, 2, 11.375], "texture": "#hat"}
+			}
+		},
+		{
+			"name": "hat4",
+			"from": [6, 8.25, 9.25],
+			"to": [7.5, 10.75, 10.75],
+			"rotation": {"angle": 0, "axis": "y", "origin": [9.75, -17, 3]},
+			"faces": {
+				"north": {"uv": [0.25, 12, 0.5, 12.25], "texture": "#hat"},
+				"east": {"uv": [0, 12, 0.25, 12.25], "texture": "#hat"},
+				"south": {"uv": [0.75, 12, 1, 12.25], "texture": "#hat"},
+				"west": {"uv": [0.5, 12, 0.75, 12.25], "texture": "#hat"},
+				"up": {"uv": [0.5, 12, 0.25, 11.875], "texture": "#hat"},
+				"down": {"uv": [0.75, 11.875, 0.5, 12], "texture": "#hat"}
+			}
+		}
+	],
+	"display": {
+		"head": {
+			"translation": [0, 17.5, 0],
+			"scale": [1.5, 1.5, 1.5]
+		}
+	}
+}

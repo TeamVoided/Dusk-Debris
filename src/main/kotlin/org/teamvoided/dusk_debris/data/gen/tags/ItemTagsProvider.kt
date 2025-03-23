@@ -16,11 +16,12 @@ class ItemTagsProvider(
 ) : FabricTagProvider.ItemTagProvider(output, registriesFuture, blockTags) {
     override fun configure(arg: HolderLookup.Provider) {
         duskTags()
+        dnd()
         vanillaTags()
         conventionTags()
     }
 
-    fun duskTags() {
+    private fun duskTags() {
         getOrCreateTagBuilder(DuskItemTags.TUFF_GOLEM_CLOAK)
             .forceAddTag(ItemTags.WOOL_CARPETS)
             .add(Items.MOSS_CARPET)
@@ -39,8 +40,15 @@ class ItemTagsProvider(
 //            .addOptionalTag(ConventionalItemTags.RAW_FISHES_FOODS)
 //            .add(Items.ROTTEN_FLESH)
     }
+    private fun dnd(){
+        getOrCreateTagBuilder(DuskItemTags.HARVESTER_SCYTHE_AMMO)
+            .add(Items.HEAVY_CORE)
+//            .forceAddTag(DnDItemTags.SMALL_PUMPKINS)
+//            .forceAddTag(DnDItemTags.SMALL_CARVED_PUMPKINS)
+//            .forceAddTag(DnDItemTags.SMALL_GLOWING_PUMPKINS)
+    }
 
-    fun vanillaTags() {}
+    private fun vanillaTags() {}
 
-    fun conventionTags() {}
+    private fun conventionTags() {}
 }
