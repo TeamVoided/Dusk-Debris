@@ -115,7 +115,7 @@ class LazerEntity(entityType: EntityType<out LazerEntity>, world: World) :
         spawnReason: SpawnReason,
         entityData: EntityData
     ): EntityData? {
-        var entityData2 = super.initialize(world, difficulty, spawnReason, entityData)
+        val entityData2 = super.initialize(world, difficulty, spawnReason, entityData)
 
         val raycast = this.raycast(MAX_LENGTH, 1f, false)
         this.target = raycast.pos
@@ -127,7 +127,7 @@ class LazerEntity(entityType: EntityType<out LazerEntity>, world: World) :
     fun getTexture(): Identifier = Identifier.ofDefault("textures/entity/beacon_beam.png")
 
     private fun getBeamRadius(): Pair<Float, Float> {
-        return (radius to floor(radius * 1.25f * 16f) / 16f)
+        return (radius to radius * 1.25f)
 //        val inner: Float
 //        val outer: Float
 //        val s = 10
