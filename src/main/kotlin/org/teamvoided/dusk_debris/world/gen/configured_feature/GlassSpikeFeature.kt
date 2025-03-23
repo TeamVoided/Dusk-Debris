@@ -3,10 +3,7 @@ package org.teamvoided.dusk_debris.world.gen.configured_feature
 import com.google.common.collect.Lists
 import com.mojang.datafixers.util.Pair
 import com.mojang.serialization.Codec
-import net.minecraft.block.Block
-import net.minecraft.block.BlockState
 import net.minecraft.block.Blocks
-import net.minecraft.registry.tag.TagKey
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.MathHelper
 import net.minecraft.util.math.Vec3i
@@ -17,7 +14,6 @@ import net.minecraft.world.gen.feature.Feature
 import net.minecraft.world.gen.feature.util.FeatureContext
 import org.teamvoided.dusk_debris.util.inBlockTagPredicate
 import org.teamvoided.dusk_debris.world.gen.configured_feature.config.GlassSpikeFeatureConfig
-import java.util.function.Predicate
 
 class GlassSpikeFeature(codec: Codec<GlassSpikeFeatureConfig>) :
     Feature<GlassSpikeFeatureConfig>(codec) {

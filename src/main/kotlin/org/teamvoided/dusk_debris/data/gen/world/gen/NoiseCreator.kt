@@ -3,7 +3,6 @@ package org.teamvoided.dusk_debris.data.gen.world.gen
 import net.minecraft.registry.BootstrapContext
 import net.minecraft.registry.RegistryKey
 import net.minecraft.util.math.noise.DoublePerlinNoiseSampler.NoiseParameters
-import org.teamvoided.dusk_debris.data.gen.world.gen.NoiseCreator.register
 import org.teamvoided.dusk_debris.data.worldgen.DuskNoiseParametersKeys
 
 object NoiseCreator {

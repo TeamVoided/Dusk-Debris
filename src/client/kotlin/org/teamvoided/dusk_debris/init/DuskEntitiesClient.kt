@@ -4,21 +4,21 @@ import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry
 import net.minecraft.client.render.entity.EmptyEntityRenderer
 import net.minecraft.client.render.entity.FlyingItemEntityRenderer
 import org.teamvoided.dusk_debris.entity.DuskEntityLists
+import org.teamvoided.dusk_debris.entity.chill_charge.ChillChargeEntityRenderer
+import org.teamvoided.dusk_debris.entity.dice.DiceEntityRenderer
+import org.teamvoided.dusk_debris.entity.dust_bunny.DustBunnyEntityRenderer
+import org.teamvoided.dusk_debris.entity.flying_pumpkin.FlyingBlockItemEntityRenderer
 import org.teamvoided.dusk_debris.entity.gunpowder_barrel.GunpowderBarrelEntityRenderer
 import org.teamvoided.dusk_debris.entity.jellyfish.tiny.TinyEnemyJellyfishEntityRenderer
+import org.teamvoided.dusk_debris.entity.jellyfish.volaphyra.VolaphyraCoreEntityRenderer
+import org.teamvoided.dusk_debris.entity.jellyfish.volaphyra.VolaphyraEntityRenderer
+import org.teamvoided.dusk_debris.entity.lazer.LazerEntityRenderer
+import org.teamvoided.dusk_debris.entity.piffling.PifflingPumpkinEntityRenderer
 import org.teamvoided.dusk_debris.entity.skeleton.GloomEntityRenderer
 import org.teamvoided.dusk_debris.entity.skeleton.SkeletonWolfEntityRenderer
 import org.teamvoided.dusk_debris.entity.skeleton.WitherSkeletonHorseEntityRenderer
 import org.teamvoided.dusk_debris.entity.skeleton.WitherSkeletonWolfEntityRenderer
 import org.teamvoided.dusk_debris.entity.tuff_golem.TuffGolemEntityRenderer
-import org.teamvoided.dusk_debris.entity.jellyfish.volaphyra.VolaphyraCoreEntityRenderer
-import org.teamvoided.dusk_debris.entity.jellyfish.volaphyra.VolaphyraEntityRenderer
-import org.teamvoided.dusk_debris.entity.lazer.LazerEntityRenderer
-import org.teamvoided.dusk_debris.entity.chill_charge.ChillChargeEntityRenderer
-import org.teamvoided.dusk_debris.entity.dice.DiceEntityRenderer
-import org.teamvoided.dusk_debris.entity.dust_bunny.DustBunnyEntityRenderer
-import org.teamvoided.dusk_debris.entity.flying_pumpkin.FlyingBlockItemEntityRenderer
-import org.teamvoided.dusk_debris.entity.piffling.PifflingPumpkinEntityRenderer
 
 object DuskEntitiesClient {
     fun init() {

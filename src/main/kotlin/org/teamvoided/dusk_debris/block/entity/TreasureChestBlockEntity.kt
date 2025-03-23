@@ -1,12 +1,9 @@
 package org.teamvoided.dusk_debris.block.entity
 
 import net.minecraft.block.BlockState
-import net.minecraft.block.ChestBlock
-import net.minecraft.block.entity.ChestBlockEntity
 import net.minecraft.block.entity.ChestLidAnimator
 import net.minecraft.block.entity.LootableContainerBlockEntity
 import net.minecraft.block.entity.ViewerCountManager
-import net.minecraft.block.enums.ChestType
 import net.minecraft.client.block.ChestAnimationProgress
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.entity.player.PlayerInventory

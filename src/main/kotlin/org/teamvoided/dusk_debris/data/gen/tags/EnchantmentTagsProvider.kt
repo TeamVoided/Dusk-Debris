@@ -9,7 +9,6 @@ import net.minecraft.registry.RegistryKey
 import net.minecraft.registry.RegistryKeys
 import net.minecraft.registry.tag.EnchantmentTags
 import org.teamvoided.dusk_debris.data.DuskEnchantments
-import org.teamvoided.dusk_debris.data.gen.providers.EnchantmentsProvider
 import org.teamvoided.dusk_debris.data.tags.DuskEnchantmentTags
 import java.util.concurrent.CompletableFuture
 

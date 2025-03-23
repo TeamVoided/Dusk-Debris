@@ -7,7 +7,6 @@ import net.minecraft.item.ItemStack
 import net.minecraft.util.math.Direction
 import net.minecraft.util.math.Position
 import net.minecraft.world.World
-import org.teamvoided.dusk_debris.entity.throwable_bomb.bonecaller.BonechillerEntity
 import org.teamvoided.dusk_debris.entity.throwable_bomb.bonecaller.BonewitherEntity
 import org.teamvoided.dusk_debris.item.throwable_bomb.AbstractThrowableBombItem
 

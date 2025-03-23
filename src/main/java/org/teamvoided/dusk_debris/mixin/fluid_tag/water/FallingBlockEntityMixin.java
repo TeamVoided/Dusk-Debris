@@ -4,7 +4,6 @@ package org.teamvoided.dusk_debris.mixin.fluid_tag.water;
 import net.minecraft.entity.FallingBlockEntity;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.FluidState;
-import net.minecraft.item.GlassBottleItem;
 import net.minecraft.registry.tag.TagKey;
 import org.spongepowered.asm.mixin.Debug;
 import org.spongepowered.asm.mixin.Mixin;

@@ -3,7 +3,6 @@ package org.teamvoided.dusk_debris.data.gen.providers.loot_table
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.SimpleFabricLootTableProvider
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalBiomeTags
-import net.minecraft.entity.EntityType
 import net.minecraft.item.Item
 import net.minecraft.item.Items
 import net.minecraft.loot.LootPool

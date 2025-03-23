@@ -5,7 +5,6 @@ import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import net.minecraft.client.particle.*
 import net.minecraft.client.render.Camera
-import net.minecraft.client.render.entity.WindChargeEntityRenderer
 import net.minecraft.client.world.ClientWorld
 import net.minecraft.particle.DefaultParticleType
 import kotlin.math.max

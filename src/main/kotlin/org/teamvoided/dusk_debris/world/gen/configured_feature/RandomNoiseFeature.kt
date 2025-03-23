@@ -1,10 +1,8 @@
-package org.teamvoided.dusk_debris.world.gen.configured_feature;
+package org.teamvoided.dusk_debris.world.gen.configured_feature
 
 import com.mojang.serialization.Codec
-import it.unimi.dsi.fastutil.doubles.DoubleArrayList
 import net.minecraft.util.math.noise.DoublePerlinNoiseSampler
 import net.minecraft.util.random.LegacySimpleRandom
-import net.minecraft.util.random.RandomGenerator
 import net.minecraft.world.gen.ChunkRandom
 import net.minecraft.world.gen.feature.Feature
 import net.minecraft.world.gen.feature.util.FeatureContext

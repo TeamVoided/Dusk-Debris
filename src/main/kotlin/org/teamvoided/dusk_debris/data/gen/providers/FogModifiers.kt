@@ -1,13 +1,9 @@
 package org.teamvoided.dusk_debris.data.gen.providers
 
-import net.minecraft.entity.passive.WolfVariant
-import net.minecraft.entity.passive.WolfVariants
 import net.minecraft.registry.*
-import net.minecraft.registry.tag.BiomeTags
 import net.minecraft.registry.tag.TagKey
 import net.minecraft.util.Identifier
 import net.minecraft.world.biome.Biome
-import net.minecraft.world.biome.Biomes
 import org.teamvoided.dusk_debris.DuskDebris
 import org.teamvoided.dusk_debris.data.DuskFogModifiers
 import org.teamvoided.dusk_debris.data.tags.DuskBiomeTags

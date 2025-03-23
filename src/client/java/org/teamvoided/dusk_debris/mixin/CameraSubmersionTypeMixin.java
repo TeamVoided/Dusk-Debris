@@ -1,14 +1,8 @@
 package org.teamvoided.dusk_debris.mixin;
 
 import net.minecraft.client.render.CameraSubmersionType;
-import org.spongepowered.asm.mixin.*;
-import org.spongepowered.asm.mixin.gen.Invoker;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import java.util.ArrayList;
-import java.util.Arrays;
+import org.spongepowered.asm.mixin.Debug;
+import org.spongepowered.asm.mixin.Mixin;
 
 @Debug(export = true)
 @Mixin(CameraSubmersionType.class)

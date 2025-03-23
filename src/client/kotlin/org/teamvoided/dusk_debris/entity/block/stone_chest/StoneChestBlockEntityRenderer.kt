@@ -3,7 +3,6 @@ package org.teamvoided.dusk_debris.entity.block.stone_chest
 import net.minecraft.block.BlockState
 import net.minecraft.block.entity.BlockEntity
 import net.minecraft.block.enums.ChestType
-import net.minecraft.client.block.ChestAnimationProgress
 import net.minecraft.client.render.RenderLayers
 import net.minecraft.client.render.VertexConsumerProvider
 import net.minecraft.client.render.block.BlockRenderManager
@@ -13,17 +12,13 @@ import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.state.property.Properties
 import net.minecraft.util.math.Axis
 import net.minecraft.util.math.Direction
-import net.minecraft.util.math.Vec3d
-import org.joml.Quaternionf
 import org.joml.Vector2f
-import org.joml.Vector3f
 import org.teamvoided.dusk_debris.DuskDebris.log
 import org.teamvoided.dusk_debris.block.entity.DuskChestBlockEntity
 import org.teamvoided.dusk_debris.block.entity.DuskChestBlockEntity.Companion.shouldRenderLid
 import org.teamvoided.dusk_debris.block.not_blocks.DuskProperties
 import org.teamvoided.dusk_debris.util.Utils
 import kotlin.math.max
-import kotlin.math.min
 
 class StoneChestBlockEntityRenderer<T>(ctx: BlockEntityRendererFactory.Context) :
     BlockEntityRenderer<T> where T : BlockEntity {

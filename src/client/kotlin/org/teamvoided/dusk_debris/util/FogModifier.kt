@@ -13,7 +13,6 @@ import net.minecraft.world.biome.Biome
 import net.minecraft.world.biome.source.BiomeAccess
 import org.teamvoided.dusk_debris.DuskDebris.id
 import org.teamvoided.dusk_debris.data.gen.providers.FogModifiers
-import org.teamvoided.dusk_debris.data.tags.DuskBiomeTags
 import kotlin.math.cos
 
 fun customizeFog(

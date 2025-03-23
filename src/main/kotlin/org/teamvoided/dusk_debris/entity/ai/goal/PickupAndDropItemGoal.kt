@@ -6,7 +6,6 @@ import net.minecraft.entity.ai.goal.Goal
 import net.minecraft.entity.ai.pathing.EntityNavigation
 import net.minecraft.entity.ai.pathing.Path
 import net.minecraft.entity.mob.MobEntity
-import org.teamvoided.dusk_debris.entity.TuffGolemEntity
 import java.util.*
 
 open class PickupAndDropItemGoal(

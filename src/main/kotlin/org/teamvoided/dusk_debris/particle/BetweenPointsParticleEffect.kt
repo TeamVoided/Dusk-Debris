@@ -3,16 +3,13 @@ package org.teamvoided.dusk_debris.particle
 import com.mojang.serialization.Codec
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
-import net.fabricmc.loader.impl.lib.sat4j.core.Vec
 import net.minecraft.network.RegistryByteBuf
 import net.minecraft.network.codec.PacketCodec
 import net.minecraft.network.codec.PacketCodecs
-import net.minecraft.network.packet.s2c.play.ParticleS2CPacket
 import net.minecraft.particle.ParticleEffect
 import net.minecraft.particle.ParticleType
 import net.minecraft.util.math.Vec3d
 import org.teamvoided.dusk_debris.init.DuskParticles
-import java.awt.Color
 
 class BetweenPointsParticleEffect(
     val targetPosX: Double,

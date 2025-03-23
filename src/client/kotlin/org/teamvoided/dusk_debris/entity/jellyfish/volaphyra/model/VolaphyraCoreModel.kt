@@ -1,11 +1,7 @@
 package org.teamvoided.dusk_debris.entity.jellyfish.volaphyra.model
 
 
-import net.minecraft.client.model.ModelData
-import net.minecraft.client.model.ModelPart
-import net.minecraft.client.model.ModelPartBuilder
-import net.minecraft.client.model.ModelTransform
-import net.minecraft.client.model.TexturedModelData
+import net.minecraft.client.model.*
 import net.minecraft.client.render.entity.model.SinglePartEntityModel
 import org.teamvoided.dusk_debris.entity.AbstractVolaphyraEntity
 import org.teamvoided.dusk_debris.entity.jellyfish.volaphyra.animation.VolaphyraEntityAnimations

@@ -1,7 +1,6 @@
 package org.teamvoided.dusk_debris.particle
 
 import com.mojang.serialization.Codec
-import com.mojang.serialization.DataResult
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.minecraft.network.RegistryByteBuf
@@ -10,8 +9,6 @@ import net.minecraft.network.codec.PacketCodecs
 import net.minecraft.particle.ParticleEffect
 import net.minecraft.particle.ParticleType
 import net.minecraft.util.math.Direction
-import net.minecraft.world.event.EntityPositionSource
-import net.minecraft.world.event.PositionSource
 import org.teamvoided.dusk_debris.init.DuskParticles
 
 class WindParticleEffect(

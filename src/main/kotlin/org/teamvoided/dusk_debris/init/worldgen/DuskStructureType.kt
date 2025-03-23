@@ -4,12 +4,10 @@ import com.mojang.serialization.MapCodec
 import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
 import net.minecraft.structure.StructureType
-import net.minecraft.structure.piece.StructurePieceType
 import net.minecraft.world.gen.feature.StructureFeature
 import org.teamvoided.dusk_debris.DuskDebris
 import org.teamvoided.dusk_debris.world.gen.structure.CaveJigsawStructureFeature
 import org.teamvoided.dusk_debris.world.gen.structure.CaveStructureFeature
-import org.teamvoided.dusk_debris.world.gen.structure.piece.PoolNoJigsawStructurePiece
 
 object DuskStructureType {
 

@@ -5,25 +5,17 @@ import net.minecraft.entity.EntityType
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.SpawnReason
 import net.minecraft.entity.damage.DamageTypes
-import net.minecraft.entity.data.DataTracker
-import net.minecraft.nbt.NbtCompound
 import net.minecraft.util.Identifier
-import net.minecraft.util.hit.HitResult
 import net.minecraft.util.math.Box
-import net.minecraft.util.math.MathHelper
 import net.minecraft.util.math.MathHelper.lerp
 import net.minecraft.util.math.Vec3d
 import net.minecraft.world.LocalDifficulty
-import net.minecraft.world.RaycastContext
 import net.minecraft.world.ServerWorldAccess
 import net.minecraft.world.World
 import org.joml.Vector2f
-import org.teamvoided.dusk_debris.data.DuskDamageTypes
 import org.teamvoided.dusk_debris.init.DuskEntities
 import kotlin.math.acos
 import kotlin.math.atan2
-import kotlin.math.floor
-import kotlin.math.sin
 
 class LazerEntity(entityType: EntityType<out LazerEntity>, world: World) :
     LightningCloudEntity(entityType, world) {

@@ -3,13 +3,11 @@ package org.teamvoided.dusk_debris.data.gen.world.gen
 import net.minecraft.block.Block
 import net.minecraft.block.BlockState
 import net.minecraft.block.Blocks
-import net.minecraft.block.PinkPetalsBlock
 import net.minecraft.registry.BootstrapContext
 import net.minecraft.registry.HolderProvider
 import net.minecraft.registry.RegistryKey
 import net.minecraft.registry.RegistryKeys
 import net.minecraft.util.collection.DataPool
-import net.minecraft.util.math.Direction
 import net.minecraft.util.math.float_provider.UniformFloatProvider
 import net.minecraft.util.math.int_provider.UniformIntProvider
 import net.minecraft.world.gen.YOffset
@@ -25,7 +23,6 @@ import org.teamvoided.dusk_debris.init.worldgen.DuskCarvers
 import org.teamvoided.dusk_debris.world.gen.configured_carver.config.GeodeCarverConfig
 import org.teamvoided.dusk_debris.world.gen.configured_carver.config.LakeCarverConfig
 
-@Suppress("DEPRECATION")
 object ConfiguredCarverCreator {
 
     fun bootstrap(c: BootstrapContext<ConfiguredCarver<*>>) {

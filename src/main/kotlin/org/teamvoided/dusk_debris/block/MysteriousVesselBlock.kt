@@ -13,7 +13,9 @@ import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
 import net.minecraft.util.shape.VoxelShape
 import net.minecraft.util.shape.VoxelShapes
-import net.minecraft.world.*
+import net.minecraft.world.BlockView
+import net.minecraft.world.WorldAccess
+import net.minecraft.world.WorldView
 
 open class MysteriousVesselBlock(settings: Settings) : HorizontalFacingBlock(settings), Waterloggable {
     override fun getCodec(): MapCodec<out HorizontalFacingBlock> {

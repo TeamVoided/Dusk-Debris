@@ -12,7 +12,9 @@ import net.minecraft.world.gen.feature.util.FeatureContext
 import org.teamvoided.dusk_debris.DuskDebris
 import org.teamvoided.dusk_debris.util.Utils.rotate360
 import org.teamvoided.dusk_debris.world.gen.configured_feature.config.TorusFeatureConfig
-import kotlin.math.*
+import kotlin.math.cos
+import kotlin.math.sin
+import kotlin.math.sqrt
 
 class TorusFeature(codec: Codec<TorusFeatureConfig>) :
     Feature<TorusFeatureConfig>(codec) {

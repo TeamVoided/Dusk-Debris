@@ -1,23 +1,13 @@
 package org.teamvoided.dusk_debris.world.gen.configured_feature
 
 import com.mojang.serialization.Codec
-import net.minecraft.block.Blocks
-import net.minecraft.registry.tag.BlockTags
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
-import net.minecraft.util.math.Vec3d
-import net.minecraft.util.math.noise.DoublePerlinNoiseSampler
-import net.minecraft.util.random.LegacySimpleRandom
-import net.minecraft.world.gen.ChunkRandom
 import net.minecraft.world.gen.feature.Feature
 import net.minecraft.world.gen.feature.util.DripstoneHelper
 import net.minecraft.world.gen.feature.util.FeatureContext
-import org.teamvoided.dusk_debris.DuskDebris
-import org.teamvoided.dusk_debris.util.Utils.rotate360
 import org.teamvoided.dusk_debris.world.gen.configured_feature.config.NoiseSurfaceFeatureConfig
-import org.teamvoided.dusk_debris.world.gen.configured_feature.config.TorusFeatureConfig
 import org.teamvoided.dusk_debris.world.gen.noise.FastNoise
-import kotlin.math.*
 
 class NoiseSurfaceFeature(codec: Codec<NoiseSurfaceFeatureConfig>) :
     Feature<NoiseSurfaceFeatureConfig>(codec) {

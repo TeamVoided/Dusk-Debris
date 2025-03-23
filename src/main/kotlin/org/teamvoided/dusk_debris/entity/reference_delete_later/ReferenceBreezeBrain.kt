@@ -13,7 +13,6 @@ import net.minecraft.entity.ai.brain.MemoryModuleType
 import net.minecraft.entity.ai.brain.sensor.Sensor
 import net.minecraft.entity.ai.brain.sensor.SensorType
 import net.minecraft.entity.ai.brain.task.*
-import net.minecraft.entity.mob.BreezeBrain
 import net.minecraft.entity.mob.BreezeEntity
 import net.minecraft.entity.mob.MobEntity
 import net.minecraft.server.world.ServerWorld

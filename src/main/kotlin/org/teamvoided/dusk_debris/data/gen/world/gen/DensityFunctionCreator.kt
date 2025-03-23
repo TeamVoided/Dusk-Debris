@@ -1,11 +1,14 @@
 package org.teamvoided.dusk_debris.data.gen.world.gen
 
-import net.minecraft.registry.*
+import net.minecraft.registry.BootstrapContext
+import net.minecraft.registry.Holder
+import net.minecraft.registry.RegistryKey
+import net.minecraft.registry.RegistryKeys
 import net.minecraft.util.math.Direction
-import net.minecraft.util.math.noise.DoublePerlinNoiseSampler.*
+import net.minecraft.util.math.noise.DoublePerlinNoiseSampler.NoiseParameters
 import net.minecraft.world.biome.source.util.VanillaTerrainParametersCreator
 import net.minecraft.world.gen.DensityFunction
-import net.minecraft.world.gen.DensityFunction.*
+import net.minecraft.world.gen.DensityFunction.NoiseHolder
 import net.minecraft.world.gen.DensityFunctions.*
 import net.minecraft.world.gen.noise.NoiseParametersKeys
 import net.minecraft.world.gen.noise.NoiseRouter

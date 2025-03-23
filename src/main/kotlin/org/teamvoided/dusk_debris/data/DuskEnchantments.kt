@@ -4,7 +4,9 @@ import net.minecraft.enchantment.Enchantment
 import net.minecraft.registry.RegistryKey
 import net.minecraft.registry.RegistryKeys
 import org.teamvoided.dusk_debris.DuskDebris
-import org.teamvoided.dusk_debris.util.*
+import org.teamvoided.dusk_debris.util.curse
+import org.teamvoided.dusk_debris.util.particle
+import org.teamvoided.dusk_debris.util.treasure
 
 object DuskEnchantments {
     val ENCHANTMENTS = mutableSetOf<RegistryKey<Enchantment>>()

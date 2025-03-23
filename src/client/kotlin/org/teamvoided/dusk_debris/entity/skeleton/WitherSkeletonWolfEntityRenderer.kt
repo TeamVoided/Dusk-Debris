@@ -3,7 +3,6 @@ package org.teamvoided.dusk_debris.entity.skeleton
 import net.minecraft.client.render.entity.EntityRendererFactory
 import net.minecraft.client.render.entity.MobEntityRenderer
 import net.minecraft.client.util.math.MatrixStack
-import net.minecraft.entity.mob.WitherSkeletonEntity
 import net.minecraft.util.Identifier
 import org.teamvoided.dusk_debris.DuskDebris
 import org.teamvoided.dusk_debris.entity.DuskEntityModelLayers

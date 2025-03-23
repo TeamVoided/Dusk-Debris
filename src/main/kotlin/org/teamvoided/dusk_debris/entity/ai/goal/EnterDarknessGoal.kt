@@ -1,7 +1,5 @@
 package org.teamvoided.dusk_debris.entity.ai.goal
 
-import jdk.jfr.Threshold
-import net.minecraft.entity.EquipmentSlot
 import net.minecraft.entity.ai.goal.Goal
 import net.minecraft.entity.mob.PathAwareEntity
 import net.minecraft.util.math.Vec3d

@@ -8,18 +8,12 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.teamvoided.dusk_debris.particle.ShriekDirectionalParticleEffect;
-
-import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicReference;
-
-import static net.minecraft.Bootstrap.println;
 
 @Mixin(WorldRenderer.class)
 public class WorldRendererMixin {

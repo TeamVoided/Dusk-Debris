@@ -7,20 +7,14 @@ import net.minecraft.client.render.RenderLayer
 import net.minecraft.client.render.VertexConsumerProvider
 import net.minecraft.client.render.entity.EntityRenderer
 import net.minecraft.client.render.entity.EntityRendererFactory
-import net.minecraft.client.util.ColorUtil
 import net.minecraft.client.util.math.MatrixStack
-import org.joml.Vector2f
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.Axis
 import net.minecraft.util.math.Box
 import net.minecraft.util.math.MathHelper
-import net.minecraft.util.math.MathHelper.lerp
 import net.minecraft.util.math.Vec3d
+import org.joml.Vector2f
 import org.teamvoided.dusk_debris.entity.LazerEntity
-import org.teamvoided.dusk_debris.util.suffix
-import kotlin.math.acos
-import kotlin.math.atan2
-import kotlin.math.floor
 
 class LazerEntityRenderer(ctx: EntityRendererFactory.Context) : EntityRenderer<LazerEntity>(ctx) {
 

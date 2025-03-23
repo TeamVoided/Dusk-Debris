@@ -4,8 +4,6 @@ package org.teamvoided.dusk_debris.mixin.fluid_tag;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.LavaFluid;
-import net.minecraft.item.BucketItem;
-import net.minecraft.registry.tag.FluidTags;
 import net.minecraft.registry.tag.TagKey;
 import org.spongepowered.asm.mixin.Debug;
 import org.spongepowered.asm.mixin.Mixin;

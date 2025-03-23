@@ -1,8 +1,13 @@
 package org.teamvoided.dusk_debris.data.gen.world.gen.structure
 
 import com.mojang.datafixers.util.Pair
-import net.minecraft.registry.*
-import net.minecraft.structure.pool.*
+import net.minecraft.registry.BootstrapContext
+import net.minecraft.registry.Holder
+import net.minecraft.registry.RegistryKey
+import net.minecraft.registry.RegistryKeys
+import net.minecraft.structure.pool.StructurePool
+import net.minecraft.structure.pool.StructurePoolElement
+import net.minecraft.structure.pool.StructurePools
 import net.minecraft.structure.processor.StructureProcessorList
 import net.minecraft.structure.processor.StructureProcessorLists
 import net.minecraft.world.gen.feature.PlacedFeature

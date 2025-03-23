@@ -3,7 +3,9 @@ package org.teamvoided.dusk_debris.structure.pool
 import com.google.common.annotations.VisibleForTesting
 import com.google.common.collect.Lists
 import com.mojang.datafixers.util.Either
-import com.mojang.serialization.*
+import com.mojang.serialization.DataResult
+import com.mojang.serialization.DynamicOps
+import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.minecraft.block.Blocks
 import net.minecraft.block.enums.StructureBlockMode
@@ -17,7 +19,10 @@ import net.minecraft.structure.StructureTemplateManager
 import net.minecraft.structure.pool.StructurePool
 import net.minecraft.structure.pool.StructurePoolElement
 import net.minecraft.structure.pool.StructurePoolElementType
-import net.minecraft.structure.processor.*
+import net.minecraft.structure.processor.BlockIgnoreStructureProcessor
+import net.minecraft.structure.processor.JigsawReplacementStructureProcessor
+import net.minecraft.structure.processor.StructureProcessorList
+import net.minecraft.structure.processor.StructureProcessorType
 import net.minecraft.util.BlockRotation
 import net.minecraft.util.Identifier
 import net.minecraft.util.Nullables

@@ -8,8 +8,8 @@ import net.minecraft.registry.Registry
 import net.minecraft.util.Util
 import org.teamvoided.dusk_debris.DuskDebris.id
 import org.teamvoided.dusk_debris.block.entity.BunnyGraveBlockEntity
-import org.teamvoided.dusk_debris.block.entity.TreasureChestBlockEntity
 import org.teamvoided.dusk_debris.block.entity.DuskChestBlockEntity
+import org.teamvoided.dusk_debris.block.entity.TreasureChestBlockEntity
 import org.teamvoided.dusks_and_dungeons.block.entity.*
 
 object DuskBlockEntities {

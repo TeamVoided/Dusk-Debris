@@ -1,6 +1,9 @@
 package org.teamvoided.dusk_debris.entity
 
-import net.minecraft.entity.*
+import net.minecraft.entity.Entity
+import net.minecraft.entity.EntityType
+import net.minecraft.entity.LivingEntity
+import net.minecraft.entity.Ownable
 import net.minecraft.entity.data.DataTracker
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.server.world.ServerWorld
@@ -143,14 +146,14 @@ class TwistingSoulChargeEntity : Entity, Ownable {
 
     override fun getOwner(): Entity? {
         if (this.owner != null && !this.owner!!.isRemoved) {
-            return this.owner;
+            return this.owner
         } else {
             if (this.ownerUuid != null) {
                 val world: World = this.world
                 if (world is ServerWorld) {
                     val serverWorld: ServerWorld = world
                     this.owner = serverWorld.getEntity(this.ownerUuid)
-                    return this.owner;
+                    return this.owner
                 }
             }
             return null

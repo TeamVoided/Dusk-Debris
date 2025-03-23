@@ -2,14 +2,11 @@ package org.teamvoided.dusk_debris.world
 
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
-import net.minecraft.network.RegistryByteBuf
-import net.minecraft.network.codec.PacketCodec
-import net.minecraft.network.codec.PacketCodecs
-import net.minecraft.registry.*
+import net.minecraft.registry.HolderSet
+import net.minecraft.registry.RegistryCodecs
+import net.minecraft.registry.RegistryKeys
 import net.minecraft.util.Identifier
-import net.minecraft.util.dynamic.RegistryElementCodec
 import net.minecraft.world.biome.Biome
-import org.teamvoided.dusk_debris.init.DuskRegistries.SNIFFER_VARIANT
 import java.util.*
 import kotlin.jvm.optionals.getOrNull
 

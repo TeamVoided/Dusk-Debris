@@ -6,7 +6,6 @@ import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.minecraft.util.StringIdentifiable
 import net.minecraft.util.dynamic.CodecHolder
 import net.minecraft.world.gen.DensityFunction
-import net.minecraft.world.gen.DensityFunctions
 import org.teamvoided.dusk_debris.util.world_helper.makeCodec
 import kotlin.math.ceil
 import kotlin.math.floor

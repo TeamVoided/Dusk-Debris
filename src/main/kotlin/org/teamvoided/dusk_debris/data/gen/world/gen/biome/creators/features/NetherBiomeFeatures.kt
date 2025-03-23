@@ -2,16 +2,16 @@ package org.teamvoided.dusk_debris.data.gen.world.gen.biome.creators.features
 
 import net.minecraft.world.biome.GenerationSettings
 import net.minecraft.world.gen.GenerationStep
-import net.minecraft.world.gen.GenerationStep.Feature.LOCAL_MODIFICATIONS as lm2
-import net.minecraft.world.gen.GenerationStep.Feature.SURFACE_STRUCTURES as ss4
-import net.minecraft.world.gen.GenerationStep.Feature.UNDERGROUND_DECORATION as ud7
-import net.minecraft.world.gen.GenerationStep.Feature.VEGETAL_DECORATION as vd9
 import net.minecraft.world.gen.carver.ConfiguredCarvers
 import net.minecraft.world.gen.feature.DefaultBiomeFeatures
 import net.minecraft.world.gen.feature.NetherPlacedFeatures
 import net.minecraft.world.gen.feature.OrePlacedFeatures
 import net.minecraft.world.gen.feature.VegetationPlacedFeatures
 import org.teamvoided.dusk_debris.data.worldgen.DuskPlacedFeatures
+import net.minecraft.world.gen.GenerationStep.Feature.LOCAL_MODIFICATIONS as lm2
+import net.minecraft.world.gen.GenerationStep.Feature.SURFACE_STRUCTURES as ss4
+import net.minecraft.world.gen.GenerationStep.Feature.UNDERGROUND_DECORATION as ud7
+import net.minecraft.world.gen.GenerationStep.Feature.VEGETAL_DECORATION as vd9
 
 object NetherBiomeFeatures {
     fun addNetherCarvers(generationSettings: GenerationSettings.Builder) {

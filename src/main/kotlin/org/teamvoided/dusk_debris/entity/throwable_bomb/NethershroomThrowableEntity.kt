@@ -3,9 +3,6 @@ package org.teamvoided.dusk_debris.entity.throwable_bomb
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.effect.StatusEffect
-import net.minecraft.entity.effect.StatusEffects
-import net.minecraft.item.Item
-import net.minecraft.item.Items
 import net.minecraft.particle.ParticleEffect
 import net.minecraft.particle.ParticleTypes
 import net.minecraft.registry.Holder
@@ -13,10 +10,6 @@ import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvents
 import net.minecraft.world.World
 import org.teamvoided.dusk_debris.block.NethershroomPlantBlock
-import org.teamvoided.dusk_debris.init.DuskEntities
-import org.teamvoided.dusk_debris.init.DuskItems
-import kotlin.math.cos
-import kotlin.math.sin
 
 open class NethershroomThrowableEntity : AbstractThrwowableBombEntity {
 

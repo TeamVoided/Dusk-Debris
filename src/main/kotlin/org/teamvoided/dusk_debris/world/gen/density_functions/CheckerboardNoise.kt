@@ -5,15 +5,11 @@ import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.minecraft.util.dynamic.CodecHolder
 import net.minecraft.util.math.MathHelper
-import net.minecraft.util.math.MathHelper.lerp
 import net.minecraft.world.gen.DensityFunction
 import net.minecraft.world.gen.DensityFunction.ContextProvider
-import net.minecraft.world.gen.DensityFunctions
 import org.teamvoided.dusk_debris.util.world_helper.makeCodec
-import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.floor
-import kotlin.math.round
 
 class CheckerboardNoise(
     val shiftX: DensityFunction,

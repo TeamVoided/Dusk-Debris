@@ -1,6 +1,5 @@
 package org.teamvoided.dusk_debris.init
 
-import net.fabricmc.fabric.api.particle.v1.FabricParticleTypes
 import net.fabricmc.fabric.api.particle.v1.FabricParticleTypes.complex
 import net.fabricmc.fabric.api.particle.v1.FabricParticleTypes.simple
 import net.minecraft.particle.DefaultParticleType

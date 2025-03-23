@@ -13,7 +13,6 @@ import net.minecraft.util.hit.HitResult
 import net.minecraft.world.World
 import net.minecraft.world.explosion.ExplosionBehavior
 import org.teamvoided.dusk_debris.init.DuskBlocks
-import org.teamvoided.dusk_debris.init.DuskItems
 
 open class AbstractThrwowableBombEntity : ThrownItemEntity {
     constructor(entityType: EntityType<out AbstractThrwowableBombEntity>, world: World) : super(entityType, world)

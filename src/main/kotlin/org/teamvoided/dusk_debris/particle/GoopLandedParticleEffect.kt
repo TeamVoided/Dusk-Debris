@@ -8,7 +8,6 @@ import net.minecraft.network.codec.PacketCodec
 import net.minecraft.network.codec.PacketCodecs
 import net.minecraft.particle.ParticleEffect
 import net.minecraft.particle.ParticleType
-import net.minecraft.particle.ParticleTypes
 import net.minecraft.util.math.Direction
 import org.teamvoided.dusk_debris.init.DuskParticles
 

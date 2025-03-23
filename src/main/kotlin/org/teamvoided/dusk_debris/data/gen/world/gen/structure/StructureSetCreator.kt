@@ -5,12 +5,9 @@ import net.minecraft.structure.RandomSpreadStructurePlacement
 import net.minecraft.structure.RandomSpreadType
 import net.minecraft.world.biome.Biome
 import net.minecraft.world.gen.feature.StructureFeature
-import net.minecraft.world.gen.structure.BuiltInStructureSets
-import net.minecraft.world.gen.structure.BuiltInStructures
 import net.minecraft.world.gen.structure.StructureSet
 import org.teamvoided.dusk_debris.data.worldgen.structure.DuskStructureSets
 import org.teamvoided.dusk_debris.data.worldgen.structure.DuskStructures
-import java.util.*
 
 object StructureSetCreator {
     fun bootstrap(c: BootstrapContext<StructureSet>) {

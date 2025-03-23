@@ -1,6 +1,5 @@
 package org.teamvoided.dusk_debris.particle
 
-import com.ibm.icu.impl.ICUService.Factory
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import net.minecraft.client.particle.Particle
@@ -9,7 +8,6 @@ import net.minecraft.client.particle.ParticleTextureSheet
 import net.minecraft.client.particle.SpriteProvider
 import net.minecraft.client.world.ClientWorld
 import net.minecraft.particle.DefaultParticleType
-import net.minecraft.util.math.Box
 import org.teamvoided.dusk_debris.util.Utils
 import kotlin.math.cos
 import kotlin.math.sin

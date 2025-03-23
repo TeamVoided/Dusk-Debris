@@ -1,12 +1,9 @@
 package org.teamvoided.dusk_debris.world.explosion.custom
 
-import net.minecraft.entity.Entity
-import net.minecraft.entity.EntityType
 import net.minecraft.entity.damage.DamageSource
 import net.minecraft.particle.ParticleEffect
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.math.Vec3d
-import org.teamvoided.dusk_debris.util.getSquaredDistanceToCenter
 import org.teamvoided.dusk_debris.util.box
 import org.teamvoided.dusk_debris.util.spawnParticles
 

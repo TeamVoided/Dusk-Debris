@@ -2,9 +2,11 @@ package org.teamvoided.dusk_debris.entity.tuff_golem.animation
 
 import net.minecraft.client.render.animation.Animation
 import net.minecraft.client.render.animation.AnimationKeyframe
-import net.minecraft.client.render.animation.Animator.*
+import net.minecraft.client.render.animation.Animator.rotate
+import net.minecraft.client.render.animation.Animator.translate
 import net.minecraft.client.render.animation.PartAnimation
-import net.minecraft.client.render.animation.PartAnimation.*
+import net.minecraft.client.render.animation.PartAnimation.AnimationTargets
+import net.minecraft.client.render.animation.PartAnimation.Interpolations
 
 object TuffGolemEntityAnimations {
     val WALK: Animation = Animation.Builder.withLength(2.0f).looping()

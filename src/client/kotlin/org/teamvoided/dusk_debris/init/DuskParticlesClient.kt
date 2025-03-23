@@ -1,7 +1,7 @@
 package org.teamvoided.dusk_debris.init
 
 import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry
-import net.minecraft.client.particle.*
+import net.minecraft.client.particle.BubblePopParticle
 import org.teamvoided.dusk_debris.particle.*
 import org.teamvoided.dusk_debris.particle.emmiter.BetweenPointsParticle
 import org.teamvoided.dusk_debris.particle.emmiter.BlunderbombParticle

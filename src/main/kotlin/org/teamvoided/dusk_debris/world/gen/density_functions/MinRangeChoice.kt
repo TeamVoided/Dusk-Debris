@@ -1,14 +1,5 @@
 package org.teamvoided.dusk_debris.world.gen.density_functions
 
-import com.mojang.serialization.Codec
-import com.mojang.serialization.MapCodec
-import com.mojang.serialization.codecs.RecordCodecBuilder
-import net.minecraft.util.dynamic.CodecHolder
-import net.minecraft.world.gen.DensityFunction
-import org.teamvoided.dusk_debris.util.world_helper.makeCodec
-import kotlin.math.max
-import kotlin.math.min
-
 //class MinRangeChoice(
 //    val inverted: Boolean,
 //    val input: DensityFunction,

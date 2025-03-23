@@ -8,7 +8,6 @@ import net.minecraft.entity.Entity
 import net.minecraft.util.math.Vec3d
 import org.teamvoided.dusk_debris.util.Utils.rotate360
 import kotlin.math.cos
-import kotlin.math.max
 import kotlin.math.sin
 
 class EntityTestParticle(

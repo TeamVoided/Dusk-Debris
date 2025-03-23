@@ -2,15 +2,10 @@ package org.teamvoided.dusk_debris.block
 
 import net.minecraft.block.Block
 import net.minecraft.block.BlockState
-import net.minecraft.entity.Entity
-import net.minecraft.entity.LivingEntity
 import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Box
 import net.minecraft.util.math.Vec3d
 import net.minecraft.util.random.RandomGenerator
 import net.minecraft.world.World
-import org.teamvoided.dusk_debris.data.tags.DuskEntityTypeTags
-import org.teamvoided.dusk_debris.particle.EntityTestParticleEffect
 import org.teamvoided.dusk_debris.particle.GoopFlyingParticleEffect
 import org.teamvoided.dusk_debris.util.addParticle
 

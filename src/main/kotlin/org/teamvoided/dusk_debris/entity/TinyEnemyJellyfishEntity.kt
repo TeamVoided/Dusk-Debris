@@ -6,7 +6,6 @@ import net.minecraft.entity.ai.brain.Brain
 import net.minecraft.entity.ai.control.FlightMoveControl
 import net.minecraft.entity.ai.pathing.BirdNavigation
 import net.minecraft.entity.ai.pathing.EntityNavigation
-import net.minecraft.entity.ai.pathing.SwimNavigation
 import net.minecraft.entity.attribute.DefaultAttributeContainer
 import net.minecraft.entity.attribute.EntityAttributes
 import net.minecraft.entity.data.DataTracker
@@ -41,7 +40,7 @@ class TinyEnemyJellyfishEntity(entityType: EntityType<TinyEnemyJellyfishEntity>,
 
     override fun writeCustomDataToNbt(nbt: NbtCompound) {
         super.writeCustomDataToNbt(nbt)
-        nbt.putBoolean("FromBucket", placed);
+        nbt.putBoolean("FromBucket", placed)
     }
 
     override fun readCustomDataFromNbt(nbt: NbtCompound) {
@@ -87,7 +86,7 @@ class TinyEnemyJellyfishEntity(entityType: EntityType<TinyEnemyJellyfishEntity>,
     }
 
     override fun chooseRandomAngerTime() {
-        this.angerTime = ANGER_TIME_RANGE.get(this.random);
+        this.angerTime = ANGER_TIME_RANGE.get(this.random)
     }
 
     override fun shouldDropXp(): Boolean = false
@@ -151,7 +150,7 @@ class TinyEnemyJellyfishEntity(entityType: EntityType<TinyEnemyJellyfishEntity>,
             DataTracker.registerData(TinyEnemyJellyfishEntity::class.java, TrackedDataHandlerRegistry.BOOLEAN)
 
         fun createAttributes(): DefaultAttributeContainer.Builder {
-            return AbstractJellyfishEntity.createAttributesNoSpecial()
+            return createAttributesNoSpecial()
                 .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.1)
                 .add(EntityAttributes.GENERIC_FLYING_SPEED, 0.1)
                 .add(EntityAttributes.GENERIC_MAX_HEALTH, 4.0)

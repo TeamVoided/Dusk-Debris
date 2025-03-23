@@ -1,15 +1,12 @@
 package org.teamvoided.dusk_debris.entity
 
-import net.minecraft.advancement.criterion.Criteria
 import net.minecraft.component.DataComponentTypes
 import net.minecraft.component.type.NbtComponent
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.mob.MobEntity
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.ItemStack
-import net.minecraft.item.ItemUsage
 import net.minecraft.nbt.NbtCompound
-import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.sound.SoundEvent
 import net.minecraft.util.ActionResult
 import net.minecraft.util.Hand

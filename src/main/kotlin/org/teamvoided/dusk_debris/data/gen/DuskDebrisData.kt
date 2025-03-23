@@ -5,12 +5,15 @@ import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator
 import net.minecraft.registry.RegistryKeys
 import net.minecraft.registry.RegistrySetBuilder
 import org.teamvoided.dusk_debris.DuskDebris.log
-import org.teamvoided.dusk_debris.data.gen.providers.*
+import org.teamvoided.dusk_debris.data.gen.providers.DamageTypeProvider
+import org.teamvoided.dusk_debris.data.gen.providers.EnchantmentsProvider
+import org.teamvoided.dusk_debris.data.gen.providers.EnglishTranslationProvider
+import org.teamvoided.dusk_debris.data.gen.providers.FogModifiers
 import org.teamvoided.dusk_debris.data.gen.providers.loot_table.EntityLootTableProvider
 import org.teamvoided.dusk_debris.data.gen.providers.models.ModelProvider
 import org.teamvoided.dusk_debris.data.gen.providers.variants.PaintingVariants
-import org.teamvoided.dusk_debris.data.gen.tags.*
 import org.teamvoided.dusk_debris.data.gen.providers.variants.SnifferVariants
+import org.teamvoided.dusk_debris.data.gen.tags.*
 import org.teamvoided.dusk_debris.data.gen.world.gen.*
 import org.teamvoided.dusk_debris.data.gen.world.gen.biome.BiomeCreator
 import org.teamvoided.dusk_debris.data.gen.world.gen.structure.StructureCreator

@@ -3,10 +3,8 @@ package org.teamvoided.dusk_debris.entity.block.treasure_chest
 import com.mojang.blaze3d.vertex.VertexConsumer
 import net.minecraft.client.model.*
 import net.minecraft.client.render.RenderLayer
-import net.minecraft.client.util.ModelIdentifier
 import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.entity.Entity
-import org.teamvoided.dusk_debris.DuskDebris.id
 
 class TreasureChestBlockEntityModel(root: ModelPart) : Model(RenderLayer::getEntitySolid) {
     private val singleChestLid: ModelPart = root.getChild("lid")

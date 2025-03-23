@@ -1,8 +1,10 @@
 package org.teamvoided.dusk_debris.util.model_helper
 
 import net.minecraft.block.Block
-import net.minecraft.block.Blocks
-import net.minecraft.data.client.model.*
+import net.minecraft.data.client.model.BlockStateModelGenerator
+import net.minecraft.data.client.model.Texture
+import net.minecraft.data.client.model.TextureKey
+import net.minecraft.data.client.model.VariantsBlockStateSupplier
 import net.minecraft.state.property.Properties
 import net.minecraft.util.Identifier
 import org.teamvoided.dusk_debris.util.block

@@ -3,11 +3,13 @@ package org.teamvoided.dusk_debris.entity.block.treasure_chest
 import com.mojang.blaze3d.vertex.VertexConsumer
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
-import net.minecraft.block.*
+import net.minecraft.block.AbstractChestBlock
+import net.minecraft.block.Blocks
+import net.minecraft.block.ChestBlock
 import net.minecraft.block.entity.BlockEntity
 import net.minecraft.block.enums.ChestType
 import net.minecraft.client.block.ChestAnimationProgress
-import net.minecraft.client.model.*
+import net.minecraft.client.model.ModelPart
 import net.minecraft.client.render.RenderLayer
 import net.minecraft.client.render.TexturedRenderLayers
 import net.minecraft.client.render.VertexConsumerProvider

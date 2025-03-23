@@ -12,8 +12,8 @@ import net.minecraft.item.ItemStack
 import net.minecraft.util.Arm
 import net.minecraft.util.math.Axis
 import org.teamvoided.dusk_debris.entity.PifflingPumpkinEntity
-import org.teamvoided.dusk_debris.entity.piffling.render.PifflingPumpkinHeadFeatureRenderer.Companion.moveRelativeTo
 import org.teamvoided.dusk_debris.entity.piffling.model.PifflingPumpkinModel
+import org.teamvoided.dusk_debris.entity.piffling.render.PifflingPumpkinHeadFeatureRenderer.Companion.moveRelativeTo
 
 class PifflingPumpkinHeldItemFeatureRenderer(
     context: FeatureRendererContext<PifflingPumpkinEntity, PifflingPumpkinModel>,

@@ -1,6 +1,6 @@
 package org.teamvoided.dusk_debris.particle
 
-import com.mojang.blaze3d.vertex.*
+import com.mojang.blaze3d.vertex.VertexConsumer
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.particle.SpriteBillboardParticle
 import net.minecraft.client.render.Camera

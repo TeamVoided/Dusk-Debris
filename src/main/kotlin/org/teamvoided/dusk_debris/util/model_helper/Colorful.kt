@@ -1,7 +1,6 @@
 package org.teamvoided.dusk_debris.util.model_helper
 
 import net.minecraft.block.Block
-import net.minecraft.block.enums.BlockHalf
 import net.minecraft.block.enums.StairShape
 import net.minecraft.data.client.model.*
 import net.minecraft.state.property.Properties
@@ -9,7 +8,6 @@ import net.minecraft.util.Identifier
 import net.minecraft.util.math.Direction
 import org.teamvoided.dusk_debris.util.block
 import org.teamvoided.dusk_debris.util.model
-import org.teamvoided.dusk_debris.util.suffix
 
 
 fun BlockStateModelGenerator.carpetStairs(
@@ -58,7 +56,7 @@ fun BlockStateModelGenerator.carpetStairs(
             } else {
                 rotationY
             }
-            var variant = BlockStateVariant.create()
+            val variant = BlockStateVariant.create()
                 .put(VariantSettings.MODEL, models)
                 .put(VariantSettings.UVLOCK, true)
             if (rotatY != VariantSettings.Rotation.R0) variant.put(VariantSettings.Y, rotatY)

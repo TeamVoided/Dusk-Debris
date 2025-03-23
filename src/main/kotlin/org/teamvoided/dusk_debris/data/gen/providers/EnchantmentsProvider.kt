@@ -4,13 +4,10 @@ import net.minecraft.block.Block
 import net.minecraft.block.Blocks
 import net.minecraft.component.EnchantmentEffectComponentTypes
 import net.minecraft.enchantment.Enchantment
-import net.minecraft.enchantment.Enchantments
 import net.minecraft.enchantment.LevelBasedValue
 import net.minecraft.enchantment.effect.*
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.EquipmentSlotGroup
-import net.minecraft.entity.attribute.EntityAttributeModifier
-import net.minecraft.entity.attribute.EntityAttributes
 import net.minecraft.entity.damage.DamageType
 import net.minecraft.entity.damage.DamageTypes
 import net.minecraft.fluid.Fluid
@@ -22,12 +19,13 @@ import net.minecraft.particle.BlockStateParticleEffect
 import net.minecraft.particle.DustParticleEffect
 import net.minecraft.particle.ParticleEffect
 import net.minecraft.particle.ParticleTypes
-import net.minecraft.predicate.entity.*
+import net.minecraft.predicate.entity.EntityEquipmentPredicate
+import net.minecraft.predicate.entity.EntityPredicate
+import net.minecraft.predicate.entity.LocationPredicate
 import net.minecraft.predicate.item.ItemPredicate
 import net.minecraft.registry.*
 import net.minecraft.registry.tag.*
 import net.minecraft.sound.SoundEvents
-import net.minecraft.util.Identifier
 import net.minecraft.util.math.Vec3d
 import net.minecraft.util.math.Vec3i
 import net.minecraft.util.math.float_provider.ConstantFloatProvider
@@ -39,7 +37,9 @@ import net.minecraft.world.gen.stateprovider.BlockStateProvider
 import org.teamvoided.dusk_debris.data.DuskEnchantments
 import org.teamvoided.dusk_debris.data.tags.DuskBlockTags
 import org.teamvoided.dusk_debris.data.tags.DuskEnchantmentTags
-import org.teamvoided.dusk_debris.util.*
+import org.teamvoided.dusk_debris.util.entityIsInFluidTag
+import org.teamvoided.dusk_debris.util.entityIsInTag
+import org.teamvoided.dusk_debris.util.itemIsInTag
 import java.util.*
 import java.util.function.Function
 

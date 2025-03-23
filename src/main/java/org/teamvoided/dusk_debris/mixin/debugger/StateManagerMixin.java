@@ -1,6 +1,5 @@
 package org.teamvoided.dusk_debris.mixin.debugger;
 
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.state.StateManager;
 import org.spongepowered.asm.mixin.Debug;
 import org.spongepowered.asm.mixin.Mixin;

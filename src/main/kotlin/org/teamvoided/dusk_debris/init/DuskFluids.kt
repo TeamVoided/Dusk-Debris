@@ -1,7 +1,6 @@
 package org.teamvoided.dusk_debris.init
 
 import net.minecraft.block.AbstractBlock
-import net.minecraft.block.Block
 import net.minecraft.block.FluidBlock
 import net.minecraft.block.MapColor
 import net.minecraft.block.piston.PistonBehavior

@@ -3,16 +3,11 @@ package org.teamvoided.dusk_debris.data.gen.world.gen
 import net.minecraft.block.Block
 import net.minecraft.block.Blocks
 import net.minecraft.registry.BootstrapContext
-import net.minecraft.registry.RegistryKey
-import net.minecraft.registry.RegistryKeys
-import net.minecraft.util.math.VerticalSurfaceType
-import net.minecraft.util.math.noise.DoublePerlinNoiseSampler
 import net.minecraft.world.biome.Biomes
 import net.minecraft.world.gen.YOffset
 import net.minecraft.world.gen.chunk.ChunkGeneratorSettings
 import net.minecraft.world.gen.chunk.GenerationShapeConfig
 import net.minecraft.world.gen.noise.NoiseParametersKeys
-import net.minecraft.world.gen.surfacebuilder.SurfaceRules
 import net.minecraft.world.gen.surfacebuilder.SurfaceRules.*
 import org.teamvoided.dusk_debris.data.gen.world.gen.DensityFunctionCreator.createNether
 import org.teamvoided.dusk_debris.data.worldgen.DuskBiomes

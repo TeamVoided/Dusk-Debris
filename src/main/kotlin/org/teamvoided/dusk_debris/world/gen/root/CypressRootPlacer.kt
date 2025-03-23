@@ -14,7 +14,6 @@ import net.minecraft.world.gen.root.AboveRootPlacement
 import net.minecraft.world.gen.root.RootPlacer
 import net.minecraft.world.gen.root.RootPlacerType
 import net.minecraft.world.gen.stateprovider.BlockStateProvider
-import org.teamvoided.dusk_debris.init.DuskWorldgen
 import org.teamvoided.dusk_debris.init.worldgen.trees.DuskTreeStuff
 import org.teamvoided.dusk_debris.util.isInSet
 import org.teamvoided.dusk_debris.util.isInTag

@@ -8,7 +8,6 @@ import net.minecraft.registry.RegistryKey
 import net.minecraft.registry.RegistryKeys
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
-import net.minecraft.util.math.int_provider.ConstantIntProvider
 import net.minecraft.world.gen.YOffset
 import net.minecraft.world.gen.blockpredicate.BlockPredicate
 import net.minecraft.world.gen.decorator.*
@@ -19,7 +18,6 @@ import net.minecraft.world.gen.feature.util.PlacedFeatureUtil
 import org.teamvoided.dusk_debris.data.gen.world.gen.placed_feature_creators.NetherPlacedFeatureCreators.netherPlacedFeatureCreators
 import org.teamvoided.dusk_debris.data.worldgen.DuskConfiguredFeatures
 import org.teamvoided.dusk_debris.data.worldgen.DuskPlacedFeatures
-import org.teamvoided.dusk_debris.data.tags.DuskBlockTags
 
 @Suppress("MagicNumber")
 object PlacedFeatureCreator {

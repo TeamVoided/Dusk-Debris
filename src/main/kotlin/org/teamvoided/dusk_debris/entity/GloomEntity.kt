@@ -29,7 +29,6 @@ import net.minecraft.world.World
 import org.teamvoided.dusk_debris.data.tags.DuskDamageTypeTags
 import org.teamvoided.dusk_debris.data.tags.DuskEntityTypeTags
 import org.teamvoided.dusk_debris.entity.ai.goal.EnterDarknessGoal
-import org.teamvoided.dusk_debris.init.DuskItems
 
 class GloomEntity(entityType: EntityType<out GloomEntity>, world: World) :
     AbstractSkeletonEntity(entityType, world) {

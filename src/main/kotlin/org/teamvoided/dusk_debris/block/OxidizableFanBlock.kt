@@ -1,8 +1,6 @@
 package org.teamvoided.dusk_debris.block
 
-import com.mojang.serialization.MapCodec
 import net.minecraft.block.BlockState
-import net.minecraft.block.CopperGrateBlock
 import net.minecraft.block.Oxidizable
 import net.minecraft.block.Oxidizable.OxidizationLevel
 import net.minecraft.server.world.ServerWorld

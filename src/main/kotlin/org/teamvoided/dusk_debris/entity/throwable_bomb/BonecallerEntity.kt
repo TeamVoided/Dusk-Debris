@@ -18,13 +18,11 @@ import net.minecraft.util.SpawnUtil
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.MathHelper
 import net.minecraft.world.World
-import org.joml.Vector3f
 import org.teamvoided.dusk_debris.init.DuskBlocks
 import org.teamvoided.dusk_debris.init.DuskEntities
 import org.teamvoided.dusk_debris.init.DuskItems
 import org.teamvoided.dusk_debris.particle.BonecallerParticleEffect
 import java.awt.Color
-import kotlin.random.Random
 
 open class BonecallerEntity : AbstractThrwowableBombEntity {
     var owner: LivingEntity? = null

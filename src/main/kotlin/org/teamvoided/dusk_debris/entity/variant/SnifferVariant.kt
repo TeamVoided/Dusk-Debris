@@ -2,7 +2,10 @@ package org.teamvoided.dusk_debris.entity.variant
 
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
-import net.minecraft.registry.*
+import net.minecraft.registry.Holder
+import net.minecraft.registry.HolderSet
+import net.minecraft.registry.RegistryCodecs
+import net.minecraft.registry.RegistryKeys
 import net.minecraft.util.Identifier
 import net.minecraft.world.biome.Biome
 import java.util.*

@@ -6,7 +6,6 @@ import net.minecraft.client.particle.*
 import net.minecraft.client.world.ClientWorld
 import net.minecraft.particle.DefaultParticleType
 import org.teamvoided.dusk_debris.util.Utils.rotate360
-import org.teamvoided.dusk_debris.util.Utils.rotate90
 
 class MoonPhaseParticle(
     world: ClientWorld,

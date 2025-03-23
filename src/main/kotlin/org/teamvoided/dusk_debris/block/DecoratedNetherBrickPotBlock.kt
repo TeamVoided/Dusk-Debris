@@ -1,6 +1,5 @@
 package org.teamvoided.dusk_debris.block
 
-import net.minecraft.block.Block
 import net.minecraft.block.BlockState
 import net.minecraft.block.DecoratedPotBlock
 import net.minecraft.block.entity.BlockEntity

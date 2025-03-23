@@ -1,22 +1,15 @@
 package org.teamvoided.dusk_debris.world.gen.structure
 
-import com.google.common.collect.Lists
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.minecraft.block.Blocks
 import net.minecraft.registry.Holder
-import net.minecraft.structure.StructurePiecesCollector
 import net.minecraft.structure.StructureType
-import net.minecraft.structure.piece.PoolStructurePiece
 import net.minecraft.structure.pool.EmptyPoolElement
 import net.minecraft.structure.pool.StructurePool
-import net.minecraft.structure.pool.StructurePoolBasedGenerator
 import net.minecraft.util.BlockRotation
-import net.minecraft.util.function.BooleanBiFunction
 import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Box
 import net.minecraft.util.math.Direction
-import net.minecraft.util.shape.VoxelShapes
 import net.minecraft.world.EmptyBlockView
 import net.minecraft.world.gen.HeightContext
 import net.minecraft.world.gen.feature.LiquidSettings
@@ -26,10 +19,7 @@ import net.minecraft.world.gen.heightprovider.HeightProvider
 import org.teamvoided.dusk_debris.init.worldgen.DuskStructureType
 import org.teamvoided.dusk_debris.world.gen.structure.piece.PoolNoJigsawStructurePiece
 import java.util.*
-import java.util.function.Consumer
 import kotlin.math.floor
-import kotlin.math.max
-import kotlin.math.min
 
 class CaveStructureFeature(
     settings: StructureSettings,

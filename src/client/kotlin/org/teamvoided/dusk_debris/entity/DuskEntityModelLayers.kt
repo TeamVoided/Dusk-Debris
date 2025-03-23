@@ -3,23 +3,26 @@ package org.teamvoided.dusk_debris.entity
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry
 import net.minecraft.client.model.Dilation
 import net.minecraft.client.model.TexturedModelData
-import net.minecraft.client.render.entity.model.*
+import net.minecraft.client.render.entity.model.BipedArmorEntityModel
+import net.minecraft.client.render.entity.model.BipedEntityModel
+import net.minecraft.client.render.entity.model.EntityModelLayer
+import net.minecraft.client.render.entity.model.HorseEntityModel
 import org.teamvoided.dusk_debris.DuskDebris.id
+import org.teamvoided.dusk_debris.entity.bird.render.BirdEntityModel
+import org.teamvoided.dusk_debris.entity.block.CelestalBellBlockEntityRenderer
 import org.teamvoided.dusk_debris.entity.block.treasure_chest.TreasureChestBlockEntityModel
+import org.teamvoided.dusk_debris.entity.chill_charge.render.ChillChargeEntityModel
+import org.teamvoided.dusk_debris.entity.dice.render.DiceEntityModel
+import org.teamvoided.dusk_debris.entity.dust_bunny.render.DustBunnyEntityModel
 import org.teamvoided.dusk_debris.entity.jellyfish.tiny.model.TinyEnemyJellyfishCoreModel
 import org.teamvoided.dusk_debris.entity.jellyfish.tiny.model.TinyEnemyJellyfishModel
 import org.teamvoided.dusk_debris.entity.jellyfish.volaphyra.model.VolaphyraCoreModel
 import org.teamvoided.dusk_debris.entity.jellyfish.volaphyra.model.VolaphyraMesogleaModel
+import org.teamvoided.dusk_debris.entity.piffling.model.PifflingPumpkinModel
 import org.teamvoided.dusk_debris.entity.skeleton.render.GloomEntityModel
 import org.teamvoided.dusk_debris.entity.skeleton.render.SkeletonWolfEntityModel.Companion.texturedModelData
 import org.teamvoided.dusk_debris.entity.tuff_golem.model.TuffGolemCloakModel
 import org.teamvoided.dusk_debris.entity.tuff_golem.model.TuffGolemEntityModel
-import org.teamvoided.dusk_debris.entity.bird.render.BirdEntityModel
-import org.teamvoided.dusk_debris.entity.block.CelestalBellBlockEntityRenderer
-import org.teamvoided.dusk_debris.entity.chill_charge.render.ChillChargeEntityModel
-import org.teamvoided.dusk_debris.entity.dice.render.DiceEntityModel
-import org.teamvoided.dusk_debris.entity.dust_bunny.render.DustBunnyEntityModel
-import org.teamvoided.dusk_debris.entity.piffling.model.PifflingPumpkinModel
 
 object DuskEntityModelLayers {
     val GLOOM: EntityModelLayer = registerMain("gloomed")

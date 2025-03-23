@@ -1,6 +1,5 @@
 package org.teamvoided.dusk_debris.mixin;
 
-import net.minecraft.registry.Holder;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.noise.OctaveSimplexNoiseSampler;
 import net.minecraft.world.biome.Biome;
@@ -13,7 +12,6 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.teamvoided.dusk_debris.data.tags.DuskBiomeTags;
 import org.teamvoided.dusk_debris.world.WaterColors;
 
 @Mixin(Biome.class)

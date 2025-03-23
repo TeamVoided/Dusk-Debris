@@ -1,11 +1,8 @@
 package org.teamvoided.dusk_debris.module
 
-import net.fabricmc.fabric.api.gamerule.v1.GameRuleFactory.createBooleanRule
 import net.fabricmc.fabric.api.gamerule.v1.GameRuleFactory.createIntRule
 import net.fabricmc.fabric.api.gamerule.v1.GameRuleRegistry.register
-import net.minecraft.world.GameRules
 import net.minecraft.world.GameRules.Category
-import net.minecraft.world.World
 
 object DuskGameRules {
     fun init() = Unit

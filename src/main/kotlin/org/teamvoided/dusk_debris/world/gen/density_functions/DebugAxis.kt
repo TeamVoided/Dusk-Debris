@@ -7,11 +7,8 @@ import net.minecraft.util.dynamic.CodecHolder
 import net.minecraft.util.math.Direction
 import net.minecraft.world.gen.DensityFunction
 import net.minecraft.world.gen.DensityFunction.ContextProvider
-import org.teamvoided.dusk_debris.util.Utils
 import org.teamvoided.dusk_debris.util.world_helper.makeCodec
 import kotlin.math.abs
-import kotlin.math.acos
-import kotlin.math.cos
 
 class DebugAxis(
     val axis: Direction.Axis,

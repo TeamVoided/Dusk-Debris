@@ -8,18 +8,14 @@ import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.SpawnReason
 import net.minecraft.entity.mob.StrayEntity
 import net.minecraft.item.Item
-import net.minecraft.particle.ParticleEffect
 import net.minecraft.scoreboard.Team
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.SpawnUtil
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.MathHelper
 import net.minecraft.world.World
 import org.teamvoided.dusk_debris.entity.throwable_bomb.BonecallerEntity
 import org.teamvoided.dusk_debris.init.DuskBlocks
 import org.teamvoided.dusk_debris.init.DuskEntities
 import org.teamvoided.dusk_debris.init.DuskItems
-import org.teamvoided.dusk_debris.particle.BonecallerParticleEffect
 import java.awt.Color
 
 open class BonechillerEntity : BonecallerEntity {

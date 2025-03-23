@@ -20,6 +20,7 @@ import net.minecraft.world.gen.carver.CarverContext
 import net.minecraft.world.gen.carver.CarvingMask
 import net.minecraft.world.gen.chunk.AquiferSampler
 import org.apache.commons.lang3.mutable.MutableBoolean
+import org.teamvoided.dusk_debris.world.gen.configured_carver.LakeCarver.SkipOrWaterPredicate
 import org.teamvoided.dusk_debris.world.gen.configured_carver.config.LakeCarverConfig
 import org.teamvoided.dusk_debris.world.gen.configured_carver.config.debug.LakeCarverDebugConfig
 import java.util.function.Function

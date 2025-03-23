@@ -3,7 +3,6 @@ package org.teamvoided.dusk_debris.data
 import net.minecraft.loot.LootTable
 import net.minecraft.registry.RegistryKey
 import net.minecraft.registry.RegistryKeys
-import net.minecraft.util.Identifier
 import org.teamvoided.dusk_debris.DuskDebris.id
 
 object DuskLootTables {

@@ -18,9 +18,9 @@ import org.teamvoided.dusk_debris.data.gen.world.gen.biome.creators.NetherBiomeC
 import org.teamvoided.dusk_debris.data.gen.world.gen.biome.creators.NetherBiomeCreators.createNetherWastes
 import org.teamvoided.dusk_debris.data.gen.world.gen.biome.creators.NetherBiomeCreators.createSoulSandValley
 import org.teamvoided.dusk_debris.data.gen.world.gen.biome.creators.NetherBiomeCreators.createWarpedForest
+import org.teamvoided.dusk_debris.data.worldgen.DuskBiomes
 import org.teamvoided.dusk_debris.data.worldgen.DuskConfiguredCarvers
 import org.teamvoided.dusk_debris.data.worldgen.DuskPlacedFeatures
-import org.teamvoided.dusk_debris.data.worldgen.DuskBiomes
 
 object BiomeCreator {
     fun boostrap(c: BootstrapContext<Biome>) {

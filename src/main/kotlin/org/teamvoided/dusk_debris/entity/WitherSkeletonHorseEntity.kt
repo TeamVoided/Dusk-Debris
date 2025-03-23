@@ -3,14 +3,10 @@ package org.teamvoided.dusk_debris.entity
 import net.minecraft.entity.*
 import net.minecraft.entity.attribute.DefaultAttributeContainer
 import net.minecraft.entity.attribute.EntityAttributes
-import net.minecraft.entity.damage.DamageSource
 import net.minecraft.entity.effect.StatusEffectInstance
 import net.minecraft.entity.effect.StatusEffects
 import net.minecraft.entity.mob.SkeletonHorseEntity
 import net.minecraft.entity.passive.AnimalEntity
-import net.minecraft.registry.tag.FluidTags
-import net.minecraft.sound.SoundEvent
-import net.minecraft.sound.SoundEvents
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.random.RandomGenerator
 import net.minecraft.world.EntityView
@@ -19,7 +15,6 @@ import net.minecraft.world.WorldAccess
 import org.teamvoided.dusk_debris.entity.ai.goal.WitherSkeletonHorseTrapTriggerGoal
 import org.teamvoided.dusk_debris.init.DuskEntities
 import java.util.*
-import kotlin.math.min
 
 class WitherSkeletonHorseEntity : SkeletonHorseEntity {
     constructor(

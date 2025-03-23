@@ -1,11 +1,11 @@
 package org.teamvoided.dusk_debris.mixin.directional_sculk.blockstates;
 
-import net.minecraft.block.*;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.CalibratedSculkSensorBlock;
 import net.minecraft.block.sculk.SculkSensorBlock;
 import net.minecraft.state.StateManager;
-import net.minecraft.state.property.Properties;
 import net.minecraft.state.property.Property;
-import net.minecraft.util.math.Direction;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;

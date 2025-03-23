@@ -7,11 +7,9 @@ import net.minecraft.client.particle.*
 import net.minecraft.client.render.Camera
 import net.minecraft.client.world.ClientWorld
 import net.minecraft.particle.DefaultParticleType
-import net.minecraft.util.math.MathHelper
 import org.joml.Quaternionf
 import org.teamvoided.dusk_debris.util.Utils
 import kotlin.math.abs
-import kotlin.math.sqrt
 
 class ElectricityParticle(
     world: ClientWorld,

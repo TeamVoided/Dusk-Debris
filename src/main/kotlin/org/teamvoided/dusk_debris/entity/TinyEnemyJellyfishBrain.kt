@@ -3,8 +3,6 @@ package org.teamvoided.dusk_debris.entity
 import com.google.common.collect.ImmutableList
 import com.google.common.collect.ImmutableSet
 import com.mojang.datafixers.util.Pair
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.ReportingTaskControl
 import net.minecraft.entity.ai.brain.Activity
 import net.minecraft.entity.ai.brain.Brain
 import net.minecraft.entity.ai.brain.MemoryModuleType

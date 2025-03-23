@@ -1,6 +1,7 @@
 package org.teamvoided.dusk_debris.data.gen.providers
 
-import net.minecraft.entity.damage.*
+import net.minecraft.entity.damage.DamageScalingType
+import net.minecraft.entity.damage.DamageType
 import net.minecraft.registry.BootstrapContext
 import org.teamvoided.dusk_debris.data.DuskDamageTypes
 

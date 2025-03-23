@@ -1,6 +1,5 @@
 package org.teamvoided.dusk_debris.block.not_blocks
 
-import net.minecraft.state.property.EnumProperty
 import net.minecraft.util.StringIdentifiable
 
 enum class GodhomeBronzePhase(val phaseName: String, val id: Int) : StringIdentifiable {

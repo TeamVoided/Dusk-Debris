@@ -35,9 +35,9 @@ import net.minecraft.util.shape.VoxelShape
 import net.minecraft.world.BlockView
 import net.minecraft.world.World
 import net.minecraft.world.WorldAccess
+import org.teamvoided.dusk_debris.block.entity.DuskChestBlockEntity
 import org.teamvoided.dusk_debris.block.not_blocks.ChestPhase
 import org.teamvoided.dusk_debris.block.not_blocks.DuskProperties
-import org.teamvoided.dusk_debris.block.entity.DuskChestBlockEntity
 import org.teamvoided.dusk_debris.block.temp.AbstractDuskChestBlock
 import org.teamvoided.dusk_debris.init.DuskBlockEntities
 import org.teamvoided.dusk_debris.util.rotate

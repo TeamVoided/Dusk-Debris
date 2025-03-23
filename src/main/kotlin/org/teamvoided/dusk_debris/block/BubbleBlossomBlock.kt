@@ -4,10 +4,8 @@ import net.minecraft.block.Block
 import net.minecraft.block.BlockState
 import net.minecraft.block.Blocks
 import net.minecraft.block.ShapeContext
-import net.minecraft.entity.EntityType
 import net.minecraft.entity.SpawnGroup
 import net.minecraft.entity.SpawnReason
-import net.minecraft.entity.mob.warden.WardenEntity
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.SpawnUtil
 import net.minecraft.util.math.BlockPos
@@ -19,7 +17,6 @@ import net.minecraft.world.BlockView
 import net.minecraft.world.World
 import net.minecraft.world.WorldAccess
 import net.minecraft.world.WorldView
-import org.teamvoided.dusk_debris.entity.TinyEnemyJellyfishEntity
 import org.teamvoided.dusk_debris.init.DuskEntities
 import org.teamvoided.dusk_debris.init.DuskParticles
 

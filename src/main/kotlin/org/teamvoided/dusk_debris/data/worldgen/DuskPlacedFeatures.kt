@@ -2,7 +2,7 @@ package org.teamvoided.dusk_debris.data.worldgen
 
 import net.minecraft.registry.RegistryKey
 import net.minecraft.registry.RegistryKeys
-import net.minecraft.world.gen.feature.*
+import net.minecraft.world.gen.feature.PlacedFeature
 import org.teamvoided.dusk_debris.DuskDebris.id
 
 @Suppress("MemberVisibilityCanBePrivate")

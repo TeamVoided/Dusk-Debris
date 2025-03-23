@@ -1,6 +1,5 @@
 package org.teamvoided.dusk_debris.block.mixin
 
-import net.minecraft.particle.ParticleTypes
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Vec3d

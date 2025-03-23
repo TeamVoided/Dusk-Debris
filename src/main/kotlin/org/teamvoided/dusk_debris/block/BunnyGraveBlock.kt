@@ -22,9 +22,9 @@ import net.minecraft.util.shape.VoxelShapes
 import net.minecraft.world.BlockView
 import net.minecraft.world.World
 import net.minecraft.world.WorldAccess
+import org.teamvoided.dusk_debris.block.entity.BunnyGraveBlockEntity
 import org.teamvoided.dusk_debris.init.DuskBlockEntities
 import org.teamvoided.dusk_debris.util.rotate
-import org.teamvoided.dusk_debris.block.entity.BunnyGraveBlockEntity
 
 class BunnyGraveBlock(settings: Settings) : BlockWithEntity(settings), Waterloggable {
     init {

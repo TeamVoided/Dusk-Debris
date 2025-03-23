@@ -3,7 +3,6 @@ package org.teamvoided.dusk_debris.entity.ai.brain.task
 import com.google.common.annotations.VisibleForTesting
 import com.google.common.collect.ImmutableMap
 import net.minecraft.command.argument.EntityAnchorArgumentType
-import net.minecraft.entity.BreezeWindChargeEntity
 import net.minecraft.entity.EntityPose
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.ai.brain.MemoryModuleState

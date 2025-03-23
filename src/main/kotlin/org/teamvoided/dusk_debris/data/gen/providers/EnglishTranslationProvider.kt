@@ -12,7 +12,9 @@ import org.teamvoided.dusk_debris.data.gen.providers.english_translation.DamageT
 import org.teamvoided.dusk_debris.data.gen.providers.english_translation.PaintingTranslations
 import org.teamvoided.dusk_debris.data.tags.DuskFluidTags
 import org.teamvoided.dusk_debris.data.tags.DuskItemTags
-import org.teamvoided.dusk_debris.init.*
+import org.teamvoided.dusk_debris.init.DuskEntities
+import org.teamvoided.dusk_debris.init.DuskItems
+import org.teamvoided.dusk_debris.init.DuskTabs
 import org.teamvoided.dusk_debris.init.DuskTabs.getKey
 import java.util.concurrent.CompletableFuture
 

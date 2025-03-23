@@ -3,24 +3,15 @@ package org.teamvoided.dusk_debris.mixin.directional_sculk.blockstates;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.SculkCatalystBlockEntity;
-import net.minecraft.particle.DefaultParticleType;
 import net.minecraft.particle.ParticleEffect;
-import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.gen.DensityFunctions;
-import net.minecraft.world.gen.chunk.AquiferSampler;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import org.teamvoided.dusk_debris.world.gen.CustomAquiferSampler;
-
-import java.util.Objects;
-
-import static org.teamvoided.dusk_debris.util.UtilsHelperFunctionsKt.toVec3d;
 
 @Mixin(SculkCatalystBlockEntity.CatalystListener.class)
 public class SculkCatalystBlockEntityMixin {

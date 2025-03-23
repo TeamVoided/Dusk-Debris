@@ -1,12 +1,10 @@
 package org.teamvoided.dusk_debris.util.model_helper
 
 import net.minecraft.block.Block
-import net.minecraft.block.Blocks
 import net.minecraft.block.enums.ChestType
 import net.minecraft.data.client.model.*
 import net.minecraft.state.property.Properties
 import net.minecraft.util.Identifier
-import net.minecraft.util.math.Direction
 import org.teamvoided.dusk_debris.block.not_blocks.ChestPhase
 import org.teamvoided.dusk_debris.block.not_blocks.DuskProperties
 import org.teamvoided.dusk_debris.util.block

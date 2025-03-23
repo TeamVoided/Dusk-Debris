@@ -5,8 +5,8 @@ import net.minecraft.entity.effect.StatusEffectType
 import net.minecraft.registry.Holder
 import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
-import org.teamvoided.dusk_debris.effect.MadnessEffect
 import org.teamvoided.dusk_debris.DuskDebris.id
+import org.teamvoided.dusk_debris.effect.MadnessEffect
 
 object DuskEffects {
     fun init() = Unit

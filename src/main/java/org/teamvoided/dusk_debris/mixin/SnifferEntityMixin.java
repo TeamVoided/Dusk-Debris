@@ -1,6 +1,9 @@
 package org.teamvoided.dusk_debris.mixin;
 
-import net.minecraft.entity.*;
+import net.minecraft.entity.EntityData;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.SpawnReason;
+import net.minecraft.entity.VariantProvider;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.passive.SnifferEntity;
 import net.minecraft.registry.Holder;

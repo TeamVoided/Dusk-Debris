@@ -1,18 +1,11 @@
 package org.teamvoided.dusk_debris.particle
 
-import com.mojang.blaze3d.vertex.VertexConsumer
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import net.minecraft.client.particle.*
-import net.minecraft.client.render.Camera
 import net.minecraft.client.world.ClientWorld
-import net.minecraft.util.math.MathHelper
-import net.minecraft.util.math.Vec3d
-import org.joml.Quaternionf
 import org.joml.Vector3f
 import java.awt.Color
-import kotlin.math.cos
-import kotlin.math.sin
 
 @Environment(EnvType.CLIENT)
 open class BonecallerParticle(
