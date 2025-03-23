@@ -61,5 +61,38 @@
         "stream": true
       }
     ]
+  },
+  "block.celestal_bell.use": {
+    "category": "block",
+    "sounds": [
+      {
+        "name": "dusks_and_dungeons:blocks/celestal_bell/used_1",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "dusks_and_dungeons:blocks/celestal_bell/used_2",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "dusks_and_dungeons:blocks/celestal_bell/used_1",
+        "attenuation_distance": 16,
+        "pitch": 0.98
+      },
+      {
+        "name": "dusks_and_dungeons:blocks/celestal_bell/used_2",
+        "attenuation_distance": 16,
+        "pitch": 0.98
+      },
+      {
+        "name": "dusks_and_dungeons:blocks/celestal_bell/used_1",
+        "attenuation_distance": 16,
+        "pitch": 0.96
+      },
+      {
+        "name": "dusks_and_dungeons:blocks/celestal_bell/used_2",
+        "attenuation_distance": 16,
+        "pitch": 0.96
+      }
+    ]
   }
 }
