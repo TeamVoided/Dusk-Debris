@@ -2,8 +2,11 @@ package org.teamvoided.dusk_debris.init
 
 import net.minecraft.block.entity.BlockEntity
 import net.minecraft.block.entity.BlockEntityType
+import net.minecraft.datafixer.TypeReferences
 import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
+import net.minecraft.util.Util
+import org.teamvoided.dusk_debris.DuskDebris.id
 import org.teamvoided.dusk_debris.block.entity.TreasureChestBlockEntity
 import org.teamvoided.dusk_debris.block.entity.DuskChestBlockEntity
 
@@ -30,9 +33,44 @@ object DuskBlockEntities {
             DuskBlocks.STONE_CHEST
         )
     )
+    
+    // DnD
+    val CELESTAL_BELL: BlockEntityType<CelestalBellBlockEntity> =
+        register("celestal_bell", BlockEntityType.Builder.create(::CelestalBellBlockEntity, DuskBlock.CELESTAL_BELL))
+
+    val CHEST_O_SOULS: BlockEntityType<ChestOSoulsBlockEntity> =
+        register("chest_o_souls", BlockEntityType.Builder.create(::ChestOSoulsBlockEntity, DuskBlock.CHEST_O_SOULS))
+
+    val QUARTER_BLOCK_PILE: BlockEntityType<QuarterBlockPileBlockEntity> = register(
+        "quarter_block_pile",
+        BlockEntityType.Builder.create(::QuarterBlockPileBlockEntity, DuskBlock.QUARTER_BLOCK_PILE)
+    )
+
+    val BUNNY_GRAVE: BlockEntityType<BunnyGraveBlockEntity> =
+        register("bunny_grave", BlockEntityType.Builder.create(::BunnyGraveBlockEntity, DuskBlock.BUNNY_GRAVE))
+
+    val HAUNTED_BLOCK: BlockEntityType<HauntedBlockEntity> = register(
+        "hauted_block", BlockEntityType.Builder.create(
+            ::HauntedBlockEntity,
+        )
+    )
+    val HAUNTED_GRAVESTONE_BLOCK: BlockEntityType<HauntedGravestoneBlockEntity> = register(
+        "haunted_gravestone_block", BlockEntityType.Builder.create(
+            ::HauntedGravestoneBlockEntity,
+            DuskBlock.HAUNTED_GRAVESTONE,
+            DuskBlock.SMALL_HAUNTED_GRAVESTONE,
+            DuskBlock.HAUNTED_DEEPSLATE_GRAVESTONE,
+            DuskBlock.SMALL_HAUNTED_DEEPSLATE_GRAVESTONE,
+            DuskBlock.HAUNTED_TUFF_GRAVESTONE,
+            DuskBlock.SMALL_HAUNTED_TUFF_GRAVESTONE,
+            DuskBlock.HAUNTED_BLACKSTONE_GRAVESTONE,
+            DuskBlock.SMALL_HAUNTED_BLACKSTONE_GRAVESTONE
+        )
+    )
 
 
     private fun <T : BlockEntity> register(id: String, builder: BlockEntityType.Builder<T>): BlockEntityType<T> {
-        return Registry.register(Registries.BLOCK_ENTITY_TYPE, id, builder.build(null))
+        val type = Util.getChoiceType(TypeReferences.BLOCK_ENTITY, id(id).toString())
+        return Registry.register(Registries.BLOCK_ENTITY_TYPE, id(id), builder.build(type))
     }
 }

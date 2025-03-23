@@ -1,6 +1,8 @@
 package org.teamvoided.dusk_debris.init
 
 import net.fabricmc.fabric.api.particle.v1.FabricParticleTypes
+import net.fabricmc.fabric.api.particle.v1.FabricParticleTypes.complex
+import net.fabricmc.fabric.api.particle.v1.FabricParticleTypes.simple
 import net.minecraft.particle.DefaultParticleType
 import net.minecraft.particle.ParticleType
 import net.minecraft.registry.Registries
@@ -11,58 +13,63 @@ import org.teamvoided.dusk_debris.particle.*
 
 object DuskParticles {
     val TOXIC_SMOKE_PARTICLE: ParticleType<NethershroomSporeParticleEffect> =
-        FabricParticleTypes.complex(NethershroomSporeParticleEffect.CODEC, NethershroomSporeParticleEffect.PACKET_CODEC)
-    val GUNPOWDER_EXPLOSION_SMOKE: ParticleType<GunpowderExplosionSmokeParticleEffect> = FabricParticleTypes.complex(
+        complex(NethershroomSporeParticleEffect.CODEC, NethershroomSporeParticleEffect.PACKET_CODEC)
+    val GUNPOWDER_EXPLOSION_SMOKE: ParticleType<GunpowderExplosionSmokeParticleEffect> = complex(
         GunpowderExplosionSmokeParticleEffect.CODEC,
         GunpowderExplosionSmokeParticleEffect.PACKET_CODEC
     )
     val GUNPOWDER_EXPLOSION_EMMITER: ParticleType<GunpowderExplosionEmitterParticleEffect> =
-        FabricParticleTypes.complex(
+        complex(
             GunpowderExplosionEmitterParticleEffect.CODEC,
             GunpowderExplosionEmitterParticleEffect.PACKET_CODEC
         )
-    val BLUNDERBOMB: DefaultParticleType = FabricParticleTypes.simple()
-    val FIREBOMB: DefaultParticleType = FabricParticleTypes.simple()
+    val BLUNDERBOMB: DefaultParticleType = simple()
+    val FIREBOMB: DefaultParticleType = simple()
     val BONECALLER: ParticleType<BonecallerParticleEffect> =
-        FabricParticleTypes.complex(BonecallerParticleEffect.CODEC, BonecallerParticleEffect.PACKET_CODEC)
-    val GEYSER: DefaultParticleType = FabricParticleTypes.simple()
+        complex(BonecallerParticleEffect.CODEC, BonecallerParticleEffect.PACKET_CODEC)
+    val GEYSER: DefaultParticleType = simple()
     val GODHOME: ParticleType<GodhomeParticleEffect> =
-        FabricParticleTypes.complex(GodhomeParticleEffect.CODEC, GodhomeParticleEffect.PACKET_CODEC)
-    val DRAINED_SOUL: DefaultParticleType = FabricParticleTypes.simple()
-    val COSMOS: DefaultParticleType = FabricParticleTypes.simple()
+        complex(GodhomeParticleEffect.CODEC, GodhomeParticleEffect.PACKET_CODEC)
+    val DRAINED_SOUL: DefaultParticleType = simple()
+    val COSMOS: DefaultParticleType = simple()
     val ENTITY_TEST: ParticleType<EntityTestParticleEffect> =
-        FabricParticleTypes.complex(EntityTestParticleEffect.CODEC, EntityTestParticleEffect.PACKET_CODEC)
+        complex(EntityTestParticleEffect.CODEC, EntityTestParticleEffect.PACKET_CODEC)
 
 
     val WIND: ParticleType<WindParticleEffect> =
-        FabricParticleTypes.complex(WindParticleEffect.CODEC, WindParticleEffect.PACKET_CODEC)
+        complex(WindParticleEffect.CODEC, WindParticleEffect.PACKET_CODEC)
 
-    val SPARK: DefaultParticleType = FabricParticleTypes.simple()
+    val SPARK: DefaultParticleType = simple()
 
-    val UNDERACID: DefaultParticleType = FabricParticleTypes.simple()
-    val ACID_BUBBLE_POP: DefaultParticleType = FabricParticleTypes.simple()
+    val UNDERACID: DefaultParticleType = simple()
+    val ACID_BUBBLE_POP: DefaultParticleType = simple()
 
     val STATIONARY_EMITTER: ParticleType<StationaryEmitterParticleEffect> =
-        FabricParticleTypes.complex(StationaryEmitterParticleEffect.CODEC, StationaryEmitterParticleEffect.PACKET_CODEC)
+        complex(StationaryEmitterParticleEffect.CODEC, StationaryEmitterParticleEffect.PACKET_CODEC)
 
     val FLASH: ParticleType<FlashParticleEffect> =
-        FabricParticleTypes.complex(FlashParticleEffect.CODEC, FlashParticleEffect.PACKET_CODEC)
+        complex(FlashParticleEffect.CODEC, FlashParticleEffect.PACKET_CODEC)
 
-    val SMALL_PURPLE_BUBBLE_CUBE: DefaultParticleType = FabricParticleTypes.simple()
-    val PURPLE_BIOME_BUBBLE: DefaultParticleType = FabricParticleTypes.simple()
-    val PURPLE_BUBBLE: DefaultParticleType = FabricParticleTypes.simple()
+    val SMALL_PURPLE_BUBBLE_CUBE: DefaultParticleType = simple()
+    val PURPLE_BIOME_BUBBLE: DefaultParticleType = simple()
+    val PURPLE_BUBBLE: DefaultParticleType = simple()
 
     val ASTRAS_FLYING_GOOP: ParticleType<GoopFlyingParticleEffect> =
-        FabricParticleTypes.complex(GoopFlyingParticleEffect.CODEC, GoopFlyingParticleEffect.PACKET_CODEC)
+        complex(GoopFlyingParticleEffect.CODEC, GoopFlyingParticleEffect.PACKET_CODEC)
     val ASTRAS_LANDED_GOOP: ParticleType<GoopLandedParticleEffect> =
-        FabricParticleTypes.complex(GoopLandedParticleEffect.CODEC, GoopLandedParticleEffect.PACKET_CODEC)
+        complex(GoopLandedParticleEffect.CODEC, GoopLandedParticleEffect.PACKET_CODEC)
 
     val SHRIEK_DIRECTIONAL: ParticleType<ShriekDirectionalParticleEffect> =
-        FabricParticleTypes.complex(ShriekDirectionalParticleEffect.CODEC, ShriekDirectionalParticleEffect.PACKET_CODEC)
+        complex(ShriekDirectionalParticleEffect.CODEC, ShriekDirectionalParticleEffect.PACKET_CODEC)
 
     val BETWEEN_POINTS: ParticleType<BetweenPointsParticleEffect> =
-        FabricParticleTypes.complex(BetweenPointsParticleEffect.CODEC, BetweenPointsParticleEffect.PACKET_CODEC)
+        complex(BetweenPointsParticleEffect.CODEC, BetweenPointsParticleEffect.PACKET_CODEC)
 
+    // DnD
+    val SPIDERLILY: DefaultParticleType = simple()
+    val MUSHROOM_LAUNCH: DefaultParticleType = simple()
+    val DUST_BUNNY: ParticleType<DustBunnyParticleEffect> = complex(DustBunnyParticleEffect.CODEC, DustBunnyParticleEffect.PACKET_CODEC)
+    val SPIRAL: ParticleType<SpiralParticleEffect> = complex(SpiralParticleEffect.CODEC, SpiralParticleEffect.PACKET_CODEC)
 
     fun init() {
         Registry.register(Registries.PARTICLE_TYPE, id("toxic_smoke_particle"), TOXIC_SMOKE_PARTICLE)
@@ -93,5 +100,14 @@ object DuskParticles {
         Registry.register(Registries.PARTICLE_TYPE, id("shriek_directional"), SHRIEK_DIRECTIONAL)
 
         Registry.register(Registries.PARTICLE_TYPE, id("between_points"), BETWEEN_POINTS)
+
+        // DnD
+        register("spiderlily", SPIDERLILY)
+        register("mushroom_launch", MUSHROOM_LAUNCH)
+        register("dust_bunny", DUST_BUNNY)
+        register("spiral", SPIRAL)
     }
+
+    fun register(id: String, particleType: ParticleType<*>) =
+        Registry.register(Registries.PARTICLE_TYPE, id(id), particleType)
 }

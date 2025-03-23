@@ -6,6 +6,7 @@ import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider
 import net.minecraft.block.Blocks
 import net.minecraft.data.client.ItemModelGenerator
 import net.minecraft.data.client.model.*
+import net.minecraft.data.client.model.BlockStateModelGenerator.TintType
 import net.minecraft.util.Identifier
 import org.teamvoided.dusk_debris.DuskDebris.id
 import org.teamvoided.dusk_debris.block.DuskBlockFamilies
@@ -197,6 +198,61 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
 //        gen.registerSingleton(DuskBlocks.SMOOTH_VOLCANIC_SANDSTONE) {
 //            TexturedModel.getCubeAll(Texture.getSubId(DuskBlocks.VOLCANIC_SANDSTONE, "_top"))
 //        }
+
+
+        // DnD
+        gen.registerGalleryRose(DuskBlocks.PAINTED_ROSE, TintType.NOT_TINTED)
+        gen.registerSpiderlilly(DuskBlocks.SPIDERLILY, TintType.NOT_TINTED)
+
+        gen.registerBigChain(DuskBlocks.BIG_CELESTAL_CHAIN)
+        val bottomModel = id("block/big_celestal_lantern_bottom")
+        gen.registerBigLantern(DuskBlocks.BIG_MOON_LANTERN, bottomModel)
+        gen.registerBigLantern(DuskBlocks.BIG_EARTH_LANTERN, bottomModel)
+        gen.registerBigLantern(DuskBlocks.BIG_COMET_LANTERN, bottomModel)
+        gen.registerBigLantern(DuskBlocks.BIG_SUN_LANTERN, bottomModel)
+        gen.registerBigLantern(DuskBlocks.BIG_STAR_LANTERN, bottomModel)
+        gen.registerBigLantern(DuskBlocks.BIG_NEBULAE_LANTERN, bottomModel)
+        gen.registerBigLantern(DuskBlocks.BIG_ECLIPSE_LANTERN, bottomModel)
+
+        gen.registerBell(DuskBlocks.CELESTAL_BELL)
+        gen.registerSingleton(
+            DuskBlocks.JOUNCESHROOM_BLOCK, TexturedModel.makeFactory(Texture::sideEnd, Models.CUBE_COLUMN)
+        )
+
+        gen.registerAmethyst(DuskBlocks.MOONCORE)
+        gen.registerTallCrystal(DuskBlocks.TALL_REDSTONE_CRYSTAL)
+        gen.registerBuiltin(ModelIds.getMinecraftNamespacedBlock("decorated_pot"), Blocks.TERRACOTTA)
+            .includeWithoutItem(DuskBlocks.POT_O_SCREAMS)
+        gen.registerBuiltin(ModelIds.getMinecraftNamespacedBlock("chest"), Blocks.OAK_PLANKS)
+            .includeWithoutItem(DuskBlocks.CHEST_O_SOULS)
+
+        gen.registerBunnyGrave(DuskBlocks.BUNNY_GRAVE, Blocks.SMOOTH_STONE, Blocks.STONE)
+
+
+        gen.registerFlowerPotPlant(
+            DuskBlocks.GALLERY_MAPLE_SAPLING, DuskBlocks.POTTED_GALLERY_MAPLE_SAPLING, TintType.NOT_TINTED
+        )
+        gen.registerLog(DuskBlocks.GALLERY_MAPLE_LOG)
+            .log(DuskBlocks.GALLERY_MAPLE_LOG)
+            .wood(DuskBlocks.GALLERY_MAPLE_WOOD)
+        gen.registerLog(DuskBlocks.STRIPPED_GALLERY_MAPLE_LOG)
+            .log(DuskBlocks.STRIPPED_GALLERY_MAPLE_LOG)
+            .wood(DuskBlocks.STRIPPED_GALLERY_MAPLE_WOOD)
+        gen.registerHangingSign(
+            DuskBlocks.STRIPPED_GALLERY_MAPLE_LOG,
+            DuskBlocks.GALLERY_MAPLE_HANGING_SIGN,
+            DuskBlocks.GALLERY_MAPLE_WALL_HANGING_SIGN
+        )
+        gen.registerSingleton(DuskBlocks.GALLERY_MAPLE_LEAVES, TexturedModel.LEAVES)
+
+        gen.genPsudoFamily(
+            DuskBlocks.GALLERY_MAPLE_WOOD_STAIRS,
+            DuskBlocks.GALLERY_MAPLE_WOOD_SLAB,
+            DuskBlocks.GALLERY_MAPLE_WOOD_WALL,
+            DuskBlocks.GALLERY_MAPLE_LOG,
+            DuskBlocks.GALLERY_MAPLE_WOOD
+        )
+
     }
 
     private fun BlockStateModelGenerator.fogCanyonModels() {

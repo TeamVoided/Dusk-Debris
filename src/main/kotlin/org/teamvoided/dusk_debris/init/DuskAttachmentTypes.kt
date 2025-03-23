@@ -8,6 +8,7 @@ import org.teamvoided.dusk_debris.DuskDebris
 import org.teamvoided.dusk_debris.data.gen.providers.variants.SnifferVariants
 import org.teamvoided.dusk_debris.entity.variant.SnifferVariant
 
+@Suppress("UnstableApiUsage")
 object DuskAttachmentTypes {
     fun init() {}
 
