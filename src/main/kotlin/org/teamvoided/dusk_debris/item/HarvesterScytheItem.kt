@@ -9,17 +9,17 @@ import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.attribute.EntityAttributeModifier
 import net.minecraft.entity.attribute.EntityAttributes
 import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.item.ItemStack
-import net.minecraft.item.RangedWeaponItem
-import net.minecraft.item.SwordItem
-import net.minecraft.item.ToolMaterial
+import net.minecraft.entity.projectile.ProjectileEntity
+import net.minecraft.item.*
 import net.minecraft.registry.tag.ItemTags
 import net.minecraft.stat.Stats
 import net.minecraft.util.Hand
 import net.minecraft.util.TypedActionResult
 import net.minecraft.util.math.BlockPos
+import net.minecraft.util.math.MathHelper
 import net.minecraft.world.World
 import org.teamvoided.dusk_debris.DuskDebris.id
+import org.teamvoided.dusk_debris.entity.projectile.FlyingPumpkinProjectile
 import java.util.function.Predicate
 
 class HarvesterScytheItem(toolMaterial: ToolMaterial, settings: Settings) : SwordItem(toolMaterial, settings) {
@@ -37,22 +37,22 @@ class HarvesterScytheItem(toolMaterial: ToolMaterial, settings: Settings) : Swor
             false
         else if (state.block is CropBlock)
             (state.block as CropBlock).isMature(state)
-/*        else if (!state.getOrEmpty(Properties.AGE_1).isEmpty)
-            state.get(Properties.AGE_1) >= Properties.AGE_1_MAX
-        else if (!state.getOrEmpty(Properties.AGE_2).isEmpty)
-            state.get(Properties.AGE_2) >= Properties.AGE_2_MAX
-        else if (!state.getOrEmpty(Properties.AGE_3).isEmpty)
-            state.get(Properties.AGE_3) >= Properties.AGE_3_MAX
-        else if (!state.getOrEmpty(Properties.AGE_4).isEmpty)
-            state.get(Properties.AGE_4) >= Properties.AGE_4_MAX
-        else if (!state.getOrEmpty(Properties.AGE_5).isEmpty)
-            state.get(Properties.AGE_5) >= Properties.AGE_5_MAX
-        else if (!state.getOrEmpty(Properties.AGE_7).isEmpty)
-            state.get(Properties.AGE_7) >= Properties.AGE_7_MAX
-        else if (!state.getOrEmpty(Properties.AGE_15).isEmpty)
-            state.get(Properties.AGE_15) >= Properties.AGE_15_MAX
-        else if (!state.getOrEmpty(Properties.AGE_25).isEmpty)
-            state.get(Properties.AGE_25) >= Properties.AGE_25_MAX*/
+        /*        else if (!state.getOrEmpty(Properties.AGE_1).isEmpty)
+                    state.get(Properties.AGE_1) >= Properties.AGE_1_MAX
+                else if (!state.getOrEmpty(Properties.AGE_2).isEmpty)
+                    state.get(Properties.AGE_2) >= Properties.AGE_2_MAX
+                else if (!state.getOrEmpty(Properties.AGE_3).isEmpty)
+                    state.get(Properties.AGE_3) >= Properties.AGE_3_MAX
+                else if (!state.getOrEmpty(Properties.AGE_4).isEmpty)
+                    state.get(Properties.AGE_4) >= Properties.AGE_4_MAX
+                else if (!state.getOrEmpty(Properties.AGE_5).isEmpty)
+                    state.get(Properties.AGE_5) >= Properties.AGE_5_MAX
+                else if (!state.getOrEmpty(Properties.AGE_7).isEmpty)
+                    state.get(Properties.AGE_7) >= Properties.AGE_7_MAX
+                else if (!state.getOrEmpty(Properties.AGE_15).isEmpty)
+                    state.get(Properties.AGE_15) >= Properties.AGE_15_MAX
+                else if (!state.getOrEmpty(Properties.AGE_25).isEmpty)
+                    state.get(Properties.AGE_25) >= Properties.AGE_25_MAX*/
         else
             true
     }
@@ -71,7 +71,7 @@ class HarvesterScytheItem(toolMaterial: ToolMaterial, settings: Settings) : Swor
             if (!user.isCreative) user.itemCooldownManager.set(this, 20)
             return TypedActionResult.success(itemStack, world.isClient())
         }
-        return  TypedActionResult.pass(itemStack)
+        return TypedActionResult.pass(itemStack)
     }
 
     fun getItemsFromInventory(stack: ItemStack, entity: LivingEntity): ItemStack {
@@ -94,9 +94,7 @@ class HarvesterScytheItem(toolMaterial: ToolMaterial, settings: Settings) : Swor
         } else return defaultAmmo()
     }
 
-    fun defaultAmmo(): ItemStack {
-        return ItemStack(DnDBlocks.SMALL_CARVED_PUMPKIN)
-    }
+    fun defaultAmmo(): ItemStack = Items.HEAVY_CORE.defaultStack //ItemStack(DnDBlocks.SMALL_CARVED_PUMPKIN)
 
     companion object {
         val AMMO: Predicate<ItemStack> =
@@ -117,5 +115,11 @@ class HarvesterScytheItem(toolMaterial: ToolMaterial, settings: Settings) : Swor
 
         // TODO  replace with voidlib
         fun Hand.toSlot() = if (this == Hand.MAIN_HAND) EquipmentSlot.MAINHAND else EquipmentSlot.OFFHAND
+        fun ProjectileEntity.setShootVelocity(pitch: Float, yaw: Float, roll: Float, speed: Float, modifierXYZ: Float) {
+            val f = -MathHelper.sin(yaw * (Math.PI.toFloat() / 180)) * MathHelper.cos(pitch * (Math.PI.toFloat() / 180))
+            val g = -MathHelper.sin((pitch + roll) * (Math.PI.toFloat() / 180))
+            val h = MathHelper.cos(yaw * (Math.PI.toFloat() / 180)) * MathHelper.cos(pitch * (Math.PI.toFloat() / 180))
+            this.setVelocity(f.toDouble(), g.toDouble(), h.toDouble(), speed, modifierXYZ)
+        }
     }
 }

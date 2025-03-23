@@ -50,5 +50,11 @@ object DuskParticlesClient {
             .register(DuskParticles.SHRIEK_DIRECTIONAL, ShriekDirectionalParticle::Factory)
 
         ParticleFactoryRegistry.getInstance().register(DuskParticles.BETWEEN_POINTS, BetweenPointsParticle.Factory())
+
+        // DnD
+         ParticleFactoryRegistry.getInstance().register(DuskParticles.SPIDERLILY, SpiderlilyPetalParticle::Factory)
+         ParticleFactoryRegistry.getInstance().register(DuskParticles.MUSHROOM_LAUNCH, MushroomLaunchParticle::Factory)
+         ParticleFactoryRegistry.getInstance().register(DuskParticles.DUST_BUNNY, DustBunnyParticle::Factory)
+         ParticleFactoryRegistry.getInstance().register(DuskParticles.SPIRAL, SpiralParticle::Factory)
     }
 }

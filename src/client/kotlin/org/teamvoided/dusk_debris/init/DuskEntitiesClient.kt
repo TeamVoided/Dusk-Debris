@@ -14,6 +14,12 @@ import org.teamvoided.dusk_debris.entity.tuff_golem.TuffGolemEntityRenderer
 import org.teamvoided.dusk_debris.entity.jellyfish.volaphyra.VolaphyraCoreEntityRenderer
 import org.teamvoided.dusk_debris.entity.jellyfish.volaphyra.VolaphyraEntityRenderer
 import org.teamvoided.dusk_debris.entity.lazer.LazerEntityRenderer
+import org.teamvoided.dusk_debris.entity.chill_charge.ChillChargeEntityRenderer
+import org.teamvoided.dusk_debris.entity.dice.DiceEntityRenderer
+import org.teamvoided.dusk_debris.entity.dust_bunny.DustBunnyEntityRenderer
+import org.teamvoided.dusk_debris.entity.flying_pumpkin.FlyingBlockItemEntityRenderer
+import org.teamvoided.dusk_debris.entity.piffling.PifflingPumpkinEntityRenderer
+i
 
 object DuskEntitiesClient {
     fun init() {
@@ -35,5 +41,12 @@ object DuskEntitiesClient {
         DuskEntityLists.THROWABLE_BOMB_ENTITIES.forEach {
             EntityRendererRegistry.register(it, ::FlyingItemEntityRenderer)
         }
+        // DnD
+        EntityRendererRegistry.register(DuskEntities.CHILL_CHARGE, ::ChillChargeEntityRenderer)
+        EntityRendererRegistry.register(DuskEntities.DIE, ::DiceEntityRenderer)
+//        EntityRendererRegistry.register(DuskEntities.BIRD_TEST, ::BirdEntityRenderer)
+        EntityRendererRegistry.register(DuskEntities.FLYING_PUMPKIN, ::FlyingBlockItemEntityRenderer)
+        EntityRendererRegistry.register(DuskEntities.DUST_BUNNY, ::DustBunnyEntityRenderer)
+        EntityRendererRegistry.register(DuskEntities.PIFFLING_PUMPKIN, ::PifflingPumpkinEntityRenderer)
     }
 }

@@ -13,6 +13,7 @@ import net.minecraft.util.TypedActionResult
 import net.minecraft.util.math.Direction
 import net.minecraft.util.math.Position
 import net.minecraft.world.World
+import org.teamvoided.dusk_debris.entity.DiceEntity
 
 class DiceItem(settings: Settings) : Item(settings), ProjectileItem {
     override fun use(world: World, user: PlayerEntity, hand: Hand): TypedActionResult<ItemStack> {

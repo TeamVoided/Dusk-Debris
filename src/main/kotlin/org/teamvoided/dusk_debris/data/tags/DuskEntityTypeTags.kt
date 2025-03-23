@@ -22,5 +22,8 @@ object DuskEntityTypeTags {
     val DONT_POP_FOG_BUBBLES = create("dont_pop_fog_bubbles")
     val NOT_DAMAGED_BY_FOG_EXPLOSIONS = create("not_damaged_by_fog_explosions")
 
+    // DnD
+    val CHILL_CHARGE_GOES_THROUGH = create("chill_charge_goes_through")
+
     fun create(id: String): TagKey<EntityType<*>> = TagKey.of(RegistryKeys.ENTITY_TYPE, id(id))
 }

@@ -17,6 +17,7 @@ class EntityTypeTagsProvider(output: FabricDataOutput, registriesFuture: Complet
     override fun configure(arg: HolderLookup.Provider) {
         duskTags()
         vanillaTags()
+        dnd()
         conventionTags()
     }
 
@@ -76,6 +77,17 @@ class EntityTypeTagsProvider(output: FabricDataOutput, registriesFuture: Complet
         getOrCreateTagBuilder(DuskEntityTypeTags.NOT_DAMAGED_BY_FOG_EXPLOSIONS)
             .forceAddTag(DuskEntityTypeTags.FOG_CANYON_ENTITIES)
 
+    }
+
+    fun dnd() {
+        getOrCreateTagBuilder(DuskEntityTypeTags.CHILL_CHARGE_GOES_THROUGH)
+            .add(DuskEntities.CHILL_CHARGE)
+            .add(EntityType.END_CRYSTAL)
+
+        getOrCreateTagBuilder(EntityTypeTags.IMPACT_PROJECTILES)
+            .add(DuskEntities.CHILL_CHARGE)
+        getOrCreateTagBuilder(EntityTypeTags.REDIRECTABLE_PROJECTILE)
+            .add(DuskEntities.CHILL_CHARGE)
     }
 
     private fun vanillaTags() {

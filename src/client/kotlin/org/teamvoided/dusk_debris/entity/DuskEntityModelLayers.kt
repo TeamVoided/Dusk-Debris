@@ -14,6 +14,12 @@ import org.teamvoided.dusk_debris.entity.skeleton.render.GloomEntityModel
 import org.teamvoided.dusk_debris.entity.skeleton.render.SkeletonWolfEntityModel.Companion.texturedModelData
 import org.teamvoided.dusk_debris.entity.tuff_golem.model.TuffGolemCloakModel
 import org.teamvoided.dusk_debris.entity.tuff_golem.model.TuffGolemEntityModel
+import org.teamvoided.dusk_debris.entity.bird.render.BirdEntityModel
+import org.teamvoided.dusk_debris.entity.block.CelestalBellBlockEntityRenderer
+import org.teamvoided.dusk_debris.entity.chill_charge.render.ChillChargeEntityModel
+import org.teamvoided.dusk_debris.entity.dice.render.DiceEntityModel
+import org.teamvoided.dusk_debris.entity.dust_bunny.render.DustBunnyEntityModel
+import org.teamvoided.dusk_debris.entity.piffling.model.PifflingPumpkinModel
 
 object DuskEntityModelLayers {
     val GLOOM: EntityModelLayer = registerMain("gloomed")
@@ -40,6 +46,14 @@ object DuskEntityModelLayers {
     val TREASURE_CHEST_RIGHT: EntityModelLayer = registerMain("treasure_chest_right")
 
 
+    val CHILL_CHARGE: EntityModelLayer = registerMain("chill_charge")
+    val BIRD: EntityModelLayer = registerMain("bird")
+    val DICE: EntityModelLayer = registerMain("dice")
+    val DUST_BUNNY: EntityModelLayer = registerMain("dust_bunny")
+    val PIFFLING_PUMPKIN: EntityModelLayer = registerMain("piffling_pumpkin")
+
+    val CELESTAL_BELL = registerMain("celestal_bell")
+
     fun init() {
         EntityModelLayerRegistry.registerModelLayer(GLOOM, GloomEntityModel::texturedModelData)
         EntityModelLayerRegistry.registerModelLayer(GLOOM_EYES, GloomEntityModel::texturedModelData)
@@ -64,6 +78,14 @@ object DuskEntityModelLayers {
         EntityModelLayerRegistry.registerModelLayer(TREASURE_CHEST, TreasureChestBlockEntityModel::singleTexturedModelData)
         EntityModelLayerRegistry.registerModelLayer(TREASURE_CHEST_LEFT, TreasureChestBlockEntityModel::leftDoubleTexturedModelData)
         EntityModelLayerRegistry.registerModelLayer(TREASURE_CHEST_RIGHT, TreasureChestBlockEntityModel::rightDoubleTexturedModelData)
+
+        // DnD
+        EntityModelLayerRegistry.registerModelLayer(BIRD, BirdEntityModel::texturedModelData)
+        EntityModelLayerRegistry.registerModelLayer(DICE, DiceEntityModel::texturedModelData)
+        EntityModelLayerRegistry.registerModelLayer(DUST_BUNNY, DustBunnyEntityModel::texturedModelData)
+        EntityModelLayerRegistry.registerModelLayer(PIFFLING_PUMPKIN, PifflingPumpkinModel::texturedModelData)
+        EntityModelLayerRegistry.registerModelLayer(CELESTAL_BELL, CelestalBellBlockEntityRenderer::getTexturedModelData)
+        EntityModelLayerRegistry.registerModelLayer(CHILL_CHARGE, ChillChargeEntityModel::texturedModelData)
     }
 
     private fun createInnerArmor(): TexturedModelData =

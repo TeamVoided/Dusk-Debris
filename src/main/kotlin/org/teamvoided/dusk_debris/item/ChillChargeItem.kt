@@ -16,6 +16,7 @@ import net.minecraft.util.math.Direction
 import net.minecraft.util.math.Position
 import net.minecraft.util.math.Vec3d
 import net.minecraft.world.World
+import org.teamvoided.dusk_debris.entity.ChillChargeEntity
 
 class ChillChargeItem(settings: Settings) : Item(settings), ProjectileItem {
     override fun use(world: World, user: PlayerEntity, hand: Hand): TypedActionResult<ItemStack> {
