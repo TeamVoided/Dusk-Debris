@@ -16,7 +16,7 @@ import net.minecraft.world.gen.feature.LiquidSettings
 import net.minecraft.world.gen.feature.StructureFeature
 import net.minecraft.world.gen.heightprovider.ConstantHeightProvider
 import net.minecraft.world.gen.heightprovider.HeightProvider
-import org.teamvoided.dusk_debris.init.worldgen.DuskStructureType
+import org.teamvoided.dusk_debris.init.worldgen.structure.DuskStructureType
 import org.teamvoided.dusk_debris.world.gen.structure.piece.PoolNoJigsawStructurePiece
 import java.util.*
 import kotlin.math.floor

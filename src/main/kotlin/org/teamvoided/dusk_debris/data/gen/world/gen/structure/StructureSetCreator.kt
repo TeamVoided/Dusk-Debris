@@ -13,12 +13,13 @@ object StructureSetCreator {
     fun bootstrap(c: BootstrapContext<StructureSet>) {
         val structures: HolderProvider<StructureFeature> = c.getRegistryLookup(RegistryKeys.STRUCTURE_FEATURE)
         val biomes: HolderProvider<Biome> = c.getRegistryLookup(RegistryKeys.BIOME)
+
         c.register(
-            DuskStructureSets.CAVE_FOSSILS,
-            DuskStructures.CAVE_FOSSIL,
-            2,
-            1,
-            10091212
+            DuskStructureSets.TEST,
+            DuskStructures.TEST,
+            6,
+            3,
+            1234567890
         )
         c.register(
             DuskStructureSets.ANCIENT_RUINS,

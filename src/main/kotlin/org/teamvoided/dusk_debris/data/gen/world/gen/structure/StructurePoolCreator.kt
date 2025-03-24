@@ -10,9 +10,12 @@ import net.minecraft.structure.pool.StructurePoolElement
 import net.minecraft.structure.pool.StructurePools
 import net.minecraft.structure.processor.StructureProcessorList
 import net.minecraft.structure.processor.StructureProcessorLists
+import net.minecraft.world.gen.feature.LiquidSettings
 import net.minecraft.world.gen.feature.PlacedFeature
 import org.teamvoided.dusk_debris.DuskDebris.MODID
 import org.teamvoided.dusk_debris.data.worldgen.structure.DuskStructurePools
+import org.teamvoided.dusk_debris.structure.pool.CavityPoolElement
+import java.util.*
 import java.util.function.Function
 
 object StructurePoolCreator {
@@ -47,7 +50,7 @@ object StructurePoolCreator {
             DuskStructurePools.TEST,
             poolEmpty,
             StructurePool.Projection.RIGID,
-            legacySingle("test", procEmpty)
+            cavity(procEmpty)
         )
     }
 
@@ -62,6 +65,21 @@ object StructurePoolCreator {
 
     private fun id(str: String) = "$MODID:$str"
     private fun mc(str: String) = "minecraft:$str"
+
+    private fun cavity(
+        processors: Holder<StructureProcessorList>,
+        weight: Int = 1
+    ): Pair<Function<StructurePool.Projection, out StructurePoolElement>, Int> =
+        Pair(
+            Function {
+                CavityPoolElement(
+                    processors,
+                    it,
+                    Optional.empty()//.of(LiquidSettings.IGNORE_WATERLOGGING)
+                )
+            },
+            weight
+        )
 
     private fun single(
         str: String,

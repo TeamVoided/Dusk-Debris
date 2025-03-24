@@ -1,4 +1,4 @@
-package org.teamvoided.dusk_debris.init.worldgen
+package org.teamvoided.dusk_debris.init.worldgen.structure
 
 import com.mojang.serialization.MapCodec
 import net.minecraft.registry.Registries

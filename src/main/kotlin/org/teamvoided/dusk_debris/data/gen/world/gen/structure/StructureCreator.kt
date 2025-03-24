@@ -12,6 +12,7 @@ import net.minecraft.world.biome.Biome
 import net.minecraft.world.gen.GenerationStep
 import net.minecraft.world.gen.YOffset
 import net.minecraft.world.gen.feature.DimensionPadding
+import net.minecraft.world.gen.feature.JigsawFeature
 import net.minecraft.world.gen.feature.StructureFeature
 import net.minecraft.world.gen.heightprovider.ConstantHeightProvider
 import net.minecraft.world.gen.heightprovider.HeightProvider
@@ -30,16 +31,12 @@ object StructureCreator {
         val pool: HolderProvider<StructurePool> = c.getRegistryLookup(RegistryKeys.STRUCTURE_POOL)
 
         c.register(
-            DuskStructures.CAVE_FOSSIL,
+            DuskStructures.TEST,
             DuskBiomeTags.TEST,
             DuskStructurePools.TEST,
-            UniformHeightProvider.create(
-                YOffset.aboveBottom(32),
-                YOffset.belowTop(2)
-            ),
-            YOffset.aboveBottom(31)
+            5
         )
-        c.register(
+        c.registerCave(
             DuskStructures.ANCIENT_STRUCTURES,
             BiomeTags.HAS_ANCIENT_CITY_STRUCTURE,
             StructurePools.createKey("ancient_city/structures"),
@@ -50,7 +47,7 @@ object StructureCreator {
         )
     }
 
-    private fun BootstrapContext<StructureFeature>.register(
+    private fun BootstrapContext<StructureFeature>.registerCave(
         key: RegistryKey<StructureFeature>,
         biomeTag: TagKey<Biome>,
         structurePool: RegistryKey<StructurePool>,
@@ -82,7 +79,7 @@ object StructureCreator {
         )
     }
 
-    private fun BootstrapContext<StructureFeature>.register(
+    private fun BootstrapContext<StructureFeature>.registerCave(
         key: RegistryKey<StructureFeature>,
         biomeTag: TagKey<Biome>,
         structurePool: RegistryKey<StructurePool>,
@@ -104,6 +101,33 @@ object StructureCreator {
                 pool.getHolderOrThrow(structurePool),
                 initialHeight,
                 ConstantHeightProvider.create(bottom)
+            )
+        )
+    }
+
+    private fun BootstrapContext<StructureFeature>.register(
+        key: RegistryKey<StructureFeature>,
+        biomeTag: TagKey<Biome>,
+        structurePool: RegistryKey<StructurePool>,
+        size: Int = 1,
+        initialHeight: HeightProvider=ConstantHeightProvider.create(YOffset.fixed(0)),
+    ) {
+        val biomes: HolderProvider<Biome> = this.getRegistryLookup(RegistryKeys.BIOME)
+        val pool: HolderProvider<StructurePool> = this.getRegistryLookup(RegistryKeys.STRUCTURE_POOL)
+
+        this.register(
+            key,
+            JigsawFeature(
+                StructureFeature.StructureSettings(
+                    biomes.getTagOrThrow(biomeTag),
+                    Map.of(),
+                    GenerationStep.Feature.UNDERGROUND_STRUCTURES,
+                    TerrainAdjustment.NONE
+                ),
+                pool.getHolderOrThrow(structurePool),
+                size,
+                initialHeight,
+                false
             )
         )
     }

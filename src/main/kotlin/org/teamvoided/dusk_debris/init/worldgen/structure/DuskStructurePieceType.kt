@@ -1,4 +1,4 @@
-package org.teamvoided.dusk_debris.init.worldgen
+package org.teamvoided.dusk_debris.init.worldgen.structure
 
 import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry

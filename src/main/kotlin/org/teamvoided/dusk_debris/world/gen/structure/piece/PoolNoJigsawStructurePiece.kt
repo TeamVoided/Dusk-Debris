@@ -22,7 +22,7 @@ import net.minecraft.world.gen.chunk.ChunkGenerator
 import net.minecraft.world.gen.feature.JigsawFeature
 import net.minecraft.world.gen.feature.LiquidSettings
 import org.slf4j.Logger
-import org.teamvoided.dusk_debris.init.worldgen.DuskStructurePieceType
+import org.teamvoided.dusk_debris.init.worldgen.structure.DuskStructurePieceType
 import java.util.*
 
 class PoolNoJigsawStructurePiece : StructurePiece {
