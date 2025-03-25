@@ -31,7 +31,7 @@ import kotlin.math.min
 // off every 'zix'.)
 //
 
-//converted to kotlin
+// converted to kotlin
 
 class FastNoise @JvmOverloads constructor(seed: Int = 1337) {
     enum class NoiseType {
