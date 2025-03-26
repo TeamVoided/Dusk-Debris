@@ -8,6 +8,8 @@ import org.teamvoided.dusk_debris.DuskDebris.id
 object DuskStructurePools {
     val NETHER_FOSSILS = create("nether_fossils")
     val TEST = create("test")
+    val TEST_UP = create("test_up")
+    val TEST_UP_FALL = create("test_up_fall")
 
     fun init() {}
 

@@ -17,6 +17,7 @@
     "SnifferEntityMixin",
     "SpreadableBlockMixin",
     "TrialSpawnerStateMixin",
+    "claw.EntityClawLogicMixin",
     "debugger.StateManagerMixin",
     "directional_sculk.blockstates.CalibratedSculkSensorBlockMixin",
     "directional_sculk.blockstates.SculkCatalystBlockEntityMixin",

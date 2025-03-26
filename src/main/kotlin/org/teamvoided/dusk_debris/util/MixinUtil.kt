@@ -5,6 +5,7 @@ import net.minecraft.entity.VariantProvider
 import net.minecraft.entity.passive.SnifferEntity
 import net.minecraft.registry.Holder
 import net.minecraft.util.math.Vec3d
+import org.teamvoided.dusk_debris.entity.helper.DuskClawStuff
 import org.teamvoided.dusk_debris.entity.helper.DuskVelocityWind
 import org.teamvoided.dusk_debris.entity.variant.SnifferVariant
 
@@ -17,3 +18,11 @@ var SnifferEntity.variant: Holder<SnifferVariant>
 var Entity.velocityWind: Vec3d
     get() = (this as DuskVelocityWind).getWind()
     set(wind) = (this as DuskVelocityWind).setWind(wind)
+
+var Entity.hangingDirection: Vec3d
+    get() = (this as DuskClawStuff).getHangingDirection()
+    set(direction) = (this as DuskClawStuff).setHangingDirection(direction)
+
+var Entity.isHanging: Boolean
+    get() = (this as DuskClawStuff).getHanging()
+    set(lie) = (this as DuskClawStuff).setHanging(lie)

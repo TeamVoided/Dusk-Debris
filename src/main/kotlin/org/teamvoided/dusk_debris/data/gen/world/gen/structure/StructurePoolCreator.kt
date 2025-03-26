@@ -10,7 +10,6 @@ import net.minecraft.structure.pool.StructurePoolElement
 import net.minecraft.structure.pool.StructurePools
 import net.minecraft.structure.processor.StructureProcessorList
 import net.minecraft.structure.processor.StructureProcessorLists
-import net.minecraft.world.gen.feature.LiquidSettings
 import net.minecraft.world.gen.feature.PlacedFeature
 import org.teamvoided.dusk_debris.DuskDebris.MODID
 import org.teamvoided.dusk_debris.data.worldgen.structure.DuskStructurePools
@@ -50,7 +49,27 @@ object StructurePoolCreator {
             DuskStructurePools.TEST,
             poolEmpty,
             StructurePool.Projection.RIGID,
-            cavity(procEmpty)
+            //cavity(procEmpty, 5),
+            single("crystal_mineshaft/shaft/corridor_i_1", procEmpty, 10),
+            single("crystal_mineshaft/shaft/corridor_l_1", procEmpty, 5),
+            single("crystal_mineshaft/shaft/corridor_t_1", procEmpty, 5),
+            single("crystal_mineshaft/shaft/corridor_x_1", procEmpty, 5)
+        )
+        val fallUp = c.register(
+            DuskStructurePools.TEST_UP_FALL,
+            poolEmpty,
+            StructurePool.Projection.RIGID,
+            single("crystal_mineshaft/shaft/vertical/roof_1", procEmpty),
+            single("crystal_mineshaft/shaft/vertical/blocked_1", procEmpty)
+        )
+        c.register(
+            DuskStructurePools.TEST_UP,
+            fallUp,
+            StructurePool.Projection.RIGID,
+            single("crystal_mineshaft/shaft/vertical/crossing_i_1", procEmpty, 10),
+            single("crystal_mineshaft/shaft/vertical/crossing_x_1", procEmpty, 5),
+            single("crystal_mineshaft/shaft/vertical/roof_1", procEmpty, 3),
+            single("crystal_mineshaft/shaft/vertical/blocked_1", procEmpty, 3)
         )
     }
 

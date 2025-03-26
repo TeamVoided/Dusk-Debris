@@ -7,6 +7,8 @@ import net.minecraft.loot.function.SetCountLootFunction
 import net.minecraft.loot.provider.number.ConstantLootNumberProvider
 import net.minecraft.loot.provider.number.UniformLootNumberProvider
 import net.minecraft.util.math.BlockPos
+import net.minecraft.util.math.Vec3d
+import net.minecraft.util.math.Vec3i
 import net.minecraft.world.StructureWorldAccess
 import java.util.function.BiConsumer
 
@@ -45,6 +47,8 @@ object Utils {
 
     fun BiConsumer<BlockPos, BlockState>.placeDebug(pos: BlockPos, block: Int) = this.accept(pos, getState(block))
 
+    fun Vec3i.vec3d(): Vec3d = Vec3d(this.x.toDouble(), this.y.toDouble(), this.z.toDouble())
+    fun Vec3d.vec3i(): Vec3i = Vec3i(this.x.toInt(), this.y.toInt(), this.z.toInt())
 
     fun getState(block: Int): BlockState {
         return when (block) {

@@ -34,7 +34,8 @@ object StructureCreator {
             DuskStructures.TEST,
             DuskBiomeTags.TEST,
             DuskStructurePools.TEST,
-            5
+            20,
+            UniformHeightProvider.create(YOffset.aboveBottom(30), YOffset.belowTop(180))
         )
         c.registerCave(
             DuskStructures.ANCIENT_STRUCTURES,
@@ -110,7 +111,7 @@ object StructureCreator {
         biomeTag: TagKey<Biome>,
         structurePool: RegistryKey<StructurePool>,
         size: Int = 1,
-        initialHeight: HeightProvider=ConstantHeightProvider.create(YOffset.fixed(0)),
+        initialHeight: HeightProvider = ConstantHeightProvider.create(YOffset.fixed(0)),
     ) {
         val biomes: HolderProvider<Biome> = this.getRegistryLookup(RegistryKeys.BIOME)
         val pool: HolderProvider<StructurePool> = this.getRegistryLookup(RegistryKeys.STRUCTURE_POOL)
