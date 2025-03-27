@@ -1,7 +1,12 @@
 package org.teamvoided.dusk_debris.entity.helper
 
+import net.minecraft.block.Blocks
 import net.minecraft.entity.Entity
 import net.minecraft.entity.LivingEntity
+import net.minecraft.particle.BlockStateParticleEffect
+import net.minecraft.particle.DustParticleEffect
+import net.minecraft.particle.ParticleTypes
+import net.minecraft.util.Color
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Box
 import net.minecraft.util.math.Direction
@@ -9,10 +14,11 @@ import net.minecraft.util.math.Vec3d
 import net.minecraft.util.shape.VoxelShape
 import net.minecraft.world.BlockCollisions
 import net.minecraft.world.CollisionView
+import net.minecraft.world.World
+import org.joml.Vector2d
 import org.teamvoided.dusk_debris.util.Utils.vec3d
 import org.teamvoided.dusk_debris.util.hangingDirection
 import org.teamvoided.dusk_debris.util.isHanging
-import java.util.function.BiFunction
 
 object ClawLogic {
     @JvmStatic
@@ -60,13 +66,36 @@ object ClawLogic {
         val world = entity.world
         if (world.collidesWithBlock(entity, boxSouth))
             dir = dir.add(Direction.SOUTH.vector.vec3d())
-        if (world.collidesWithBlock(entity, boxNorth))
+        else if (world.collidesWithBlock(entity, boxNorth))
             dir = dir.add(Direction.NORTH.vector.vec3d())
         if (world.collidesWithBlock(entity, boxEast))
             dir = dir.add(Direction.EAST.vector.vec3d())
-        if (world.collidesWithBlock(entity, boxWest))
+        else if (world.collidesWithBlock(entity, boxWest))
             dir = dir.add(Direction.WEST.vector.vec3d())
-        entity.hangingDirection = dir.normalize()
+        entity.hangingDirection = dir
+        entity.isHanging = dir != Vec3d.ZERO
+    }
+
+    @JvmStatic
+    fun particles(entity: LivingEntity) {
+        val world = entity.world
+        if (world.isClient && entity.isHanging) {
+            val box: Box = entity.bounds
+            val dir = entity.hangingDirection
+            val pos = Vector2d(
+                if (dir.x < 0) box.minX else if (dir.x > 0) box.maxX else 0.0,
+                if (dir.z < 0) box.minZ else if (dir.z > 0) box.maxZ else 0.0
+            ).add(entity.pos.x, entity.pos.z)
+            world.addParticle(
+                BlockStateParticleEffect(ParticleTypes.FALLING_DUST, Blocks.GRAVEL.defaultState),
+                pos.x,
+                entity.eyeY,
+                pos.y,
+                dir.x * 0.1,
+                -entity.random.nextDouble() * 0.04,
+                dir.z * 0.1
+            )
+        }
     }
 
     private fun CollisionView.collidesWithBlock(entity: Entity, box: Box): Boolean {

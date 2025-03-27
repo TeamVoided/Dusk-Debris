@@ -26,27 +26,23 @@ public abstract class EntityClawLogicMixin implements DuskClawStuff {
 
     @Redirect(method = "tickMovement", at = @At(value = "INVOKE", ordinal = 0, target = "Lnet/minecraft/entity/LivingEntity;hasStatusEffect(Lnet/minecraft/registry/Holder;)Z"))
     public boolean shouldResetFallDistanceAndWallCheck(LivingEntity entity, Holder<StatusEffect> effect) {
-        if (isHanging() || canHang()) {
-            if (!entity.isOnGround() && entity.getVelocity().y < 0) {
-                ClawLogic.checkIfOnWall(entity);
-            } else {
-                DuskDebris$onWallDirection = Vec3d.ZERO;
-            }
+        if (canHang() && !entity.isOnGround() && entity.getVelocity().y < 0) {
+            ClawLogic.checkIfOnWall(entity);
+            ClawLogic.particles(entity);
+            if (DuskDebris$onWall) return true;
+        } else {
+            DuskDebris$onWall = false;
+            DuskDebris$onWallDirection = Vec3d.ZERO;
         }
-        return entity.hasStatusEffect(effect) || isHanging();
+        return entity.hasStatusEffect(effect);
     }
 
 //    @Inject(method = "tickMovement", at = @At("HEAD"))
 //    public void tickClawLogics(CallbackInfo ci) {
 //        if (true){
-//        ClawLogic.INSTANCE.checkIfOnWall(instance);
+//          ClawLogic.INSTANCE.checkIfOnWall(instance);
+//      }
 //    }
-//    }
-
-    @Unique
-    public boolean isHanging() {
-        return DuskDebris$onWallDirection != Vec3d.ZERO;
-    }
 
     @Unique
     public boolean canHang() {
@@ -55,8 +51,8 @@ public abstract class EntityClawLogicMixin implements DuskClawStuff {
 
     @Unique
     public Vec3d DuskDebris$onWallDirection = Vec3d.ZERO;
-    //@Unique
-    //public Boolean DuskDebris$onWall = false;
+    @Unique
+    public boolean DuskDebris$onWall = false;
 
 
     @NotNull
@@ -69,14 +65,15 @@ public abstract class EntityClawLogicMixin implements DuskClawStuff {
     public void setHangingDirection(@NotNull Vec3d direction) {
         DuskDebris$onWallDirection = direction;
     }
-    //@NotNull
-    //@Override
-    //public boolean getHanging() {
-    //    return DuskDebris$onWall;
-    //}
 
-    //@Override
-    //public void setHanging(@NotNull Boolean hanging) {
-    //    DuskDebris$onWall = hanging;
-    //}
+    @NotNull
+    @Override
+    public boolean getHanging() {
+        return DuskDebris$onWall;
+    }
+
+    @Override
+    public void setHanging(@NotNull boolean hanging) {
+        DuskDebris$onWall = hanging;
+    }
 }
