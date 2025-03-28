@@ -1,4 +1,4 @@
-package org.teamvoided.dusk_debris.entity.skeleton
+package org.teamvoided.dusk_debris.entity.skeleton.wolf
 
 import net.minecraft.client.render.entity.EntityRendererFactory
 import net.minecraft.client.render.entity.MobEntityRenderer
@@ -7,7 +7,7 @@ import net.minecraft.util.Identifier
 import org.teamvoided.dusk_debris.DuskDebris
 import org.teamvoided.dusk_debris.entity.DuskEntityModelLayers
 import org.teamvoided.dusk_debris.entity.WitherSkeletonWolfEntity
-import org.teamvoided.dusk_debris.entity.skeleton.render.SkeletonWolfEntityModel
+import org.teamvoided.dusk_debris.entity.skeleton.wolf.render.SkeletonWolfEntityModel
 
 class WitherSkeletonWolfEntityRenderer(context: EntityRendererFactory.Context) :
     MobEntityRenderer<WitherSkeletonWolfEntity, SkeletonWolfEntityModel<WitherSkeletonWolfEntity>>(

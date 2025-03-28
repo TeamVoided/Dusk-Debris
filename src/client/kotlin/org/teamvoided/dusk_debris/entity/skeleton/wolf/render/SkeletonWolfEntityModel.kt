@@ -1,4 +1,4 @@
-package org.teamvoided.dusk_debris.entity.skeleton.render
+package org.teamvoided.dusk_debris.entity.skeleton.wolf.render
 
 import com.google.common.collect.ImmutableList
 import net.fabricmc.api.EnvType

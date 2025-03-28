@@ -1,4 +1,4 @@
-package org.teamvoided.dusk_debris.entity.skeleton.render
+package org.teamvoided.dusk_debris.entity.skeleton.gloom.model
 
 import net.minecraft.client.model.*
 import net.minecraft.client.render.entity.model.SkeletonEntityModel

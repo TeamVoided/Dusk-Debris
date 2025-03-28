@@ -19,8 +19,8 @@ import org.teamvoided.dusk_debris.entity.jellyfish.tiny.model.TinyEnemyJellyfish
 import org.teamvoided.dusk_debris.entity.jellyfish.volaphyra.model.VolaphyraCoreModel
 import org.teamvoided.dusk_debris.entity.jellyfish.volaphyra.model.VolaphyraMesogleaModel
 import org.teamvoided.dusk_debris.entity.piffling.model.PifflingPumpkinModel
-import org.teamvoided.dusk_debris.entity.skeleton.render.GloomEntityModel
-import org.teamvoided.dusk_debris.entity.skeleton.render.SkeletonWolfEntityModel.Companion.texturedModelData
+import org.teamvoided.dusk_debris.entity.skeleton.gloom.model.GloomEntityModel
+import org.teamvoided.dusk_debris.entity.skeleton.wolf.render.SkeletonWolfEntityModel.Companion.texturedModelData
 import org.teamvoided.dusk_debris.entity.tuff_golem.model.TuffGolemCloakModel
 import org.teamvoided.dusk_debris.entity.tuff_golem.model.TuffGolemEntityModel
 

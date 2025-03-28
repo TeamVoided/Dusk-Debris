@@ -14,10 +14,10 @@ import org.teamvoided.dusk_debris.entity.jellyfish.volaphyra.VolaphyraCoreEntity
 import org.teamvoided.dusk_debris.entity.jellyfish.volaphyra.VolaphyraEntityRenderer
 import org.teamvoided.dusk_debris.entity.lazer.LazerEntityRenderer
 import org.teamvoided.dusk_debris.entity.piffling.PifflingPumpkinEntityRenderer
-import org.teamvoided.dusk_debris.entity.skeleton.GloomEntityRenderer
-import org.teamvoided.dusk_debris.entity.skeleton.SkeletonWolfEntityRenderer
-import org.teamvoided.dusk_debris.entity.skeleton.WitherSkeletonHorseEntityRenderer
-import org.teamvoided.dusk_debris.entity.skeleton.WitherSkeletonWolfEntityRenderer
+import org.teamvoided.dusk_debris.entity.skeleton.gloom.GloomEntityRenderer
+import org.teamvoided.dusk_debris.entity.skeleton.wolf.SkeletonWolfEntityRenderer
+import org.teamvoided.dusk_debris.entity.skeleton.horse.WitherSkeletonHorseEntityRenderer
+import org.teamvoided.dusk_debris.entity.skeleton.wolf.WitherSkeletonWolfEntityRenderer
 import org.teamvoided.dusk_debris.entity.tuff_golem.TuffGolemEntityRenderer
 
 object DuskEntitiesClient {

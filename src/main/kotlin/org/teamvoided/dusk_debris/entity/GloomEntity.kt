@@ -8,6 +8,7 @@ import net.minecraft.entity.damage.DamageSource
 import net.minecraft.entity.data.DataTracker
 import net.minecraft.entity.data.TrackedData
 import net.minecraft.entity.data.TrackedDataHandlerRegistry
+import net.minecraft.entity.effect.StatusEffect
 import net.minecraft.entity.effect.StatusEffectInstance
 import net.minecraft.entity.effect.StatusEffects
 import net.minecraft.entity.mob.AbstractSkeletonEntity
@@ -19,6 +20,7 @@ import net.minecraft.entity.projectile.PersistentProjectileEntity
 import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
 import net.minecraft.nbt.NbtCompound
+import net.minecraft.registry.Holder
 import net.minecraft.sound.SoundEvent
 import net.minecraft.sound.SoundEvents
 import net.minecraft.util.math.BlockPos
@@ -29,10 +31,11 @@ import net.minecraft.world.World
 import org.teamvoided.dusk_debris.data.tags.DuskDamageTypeTags
 import org.teamvoided.dusk_debris.data.tags.DuskEntityTypeTags
 import org.teamvoided.dusk_debris.entity.ai.goal.EnterDarknessGoal
+import java.awt.Color
 
 class GloomEntity(entityType: EntityType<out GloomEntity>, world: World) :
     AbstractSkeletonEntity(entityType, world) {
-
+    var darkModeTransitionTime: Int = 0
 
     override fun initGoals() {
         goalSelector.add(3, AvoidSunlightGoal(this))
@@ -40,7 +43,7 @@ class GloomEntity(entityType: EntityType<out GloomEntity>, world: World) :
         goalSelector.add(
             3, FleeEntityGoal(
                 this, LivingEntity::class.java, 6.0f, 1.0, 1.2
-            ) { entity -> entity.type.isIn(DuskEntityTypeTags.DUSK_SKELETON_RETREATS) })
+            ) { it.type.isIn(DuskEntityTypeTags.DUSK_SKELETON_RETREATS) })
         goalSelector.add(5, WanderAroundFarGoal(this, 1.0))
         goalSelector.add(
             6, LookAtEntityGoal(
@@ -55,11 +58,8 @@ class GloomEntity(entityType: EntityType<out GloomEntity>, world: World) :
             )
         )
         targetSelector.add(
-            3, TargetGoal(
-                this, LivingEntity::class.java, true
-            ) { entity ->
-                (entity.type.isIn(DuskEntityTypeTags.DUSK_SKELETON_ATTACKS))
-            })
+            3,
+            TargetGoal(this, LivingEntity::class.java, true) { it.type.isIn(DuskEntityTypeTags.DUSK_SKELETON_ATTACKS) })
         targetSelector.add(
             3, TargetGoal(
                 this, TurtleEntity::class.java, 10, true, false, TurtleEntity.BABY_TURTLE_ON_LAND_FILTER
@@ -72,22 +72,24 @@ class GloomEntity(entityType: EntityType<out GloomEntity>, world: World) :
         builder
             .add(CONVERTING_TO_STRAY, false)
             .add(CONVERTING_TO_DARK_MODE, false)
+            .add(EYE_COLOR, eyeColorDefault)
+    }
+
+    override fun readCustomDataFromNbt(nbt: NbtCompound) {
+        super.readCustomDataFromNbt(nbt)
+        if (nbt.contains(STRAY_CONVERSION_TIME_KEY, 99) && nbt.getInt(STRAY_CONVERSION_TIME_KEY) > -1)
+            setConversionToStrayTime(nbt.getInt(STRAY_CONVERSION_TIME_KEY))
+        if (nbt.contains(MODE_CONVERSION_TIME_KEY, 99) && nbt.getInt(MODE_CONVERSION_TIME_KEY) > -1)
+            countdownToDarkMode = nbt.getInt(MODE_CONVERSION_TIME_KEY)
+        if (nbt.contains(EYE_COLOR_KEY))
+            this.eyeColor = nbt.getInt(EYE_COLOR_KEY)
     }
 
     override fun writeCustomDataToNbt(nbt: NbtCompound) {
         super.writeCustomDataToNbt(nbt)
         nbt.putInt(STRAY_CONVERSION_TIME_KEY, if (isConvertingToStray()) conversionToStrayTime else -1)
         nbt.putInt(MODE_CONVERSION_TIME_KEY, if (isLightMode()) countdownToDarkMode else -1)
-    }
-
-    override fun readCustomDataFromNbt(nbt: NbtCompound) {
-        super.readCustomDataFromNbt(nbt)
-        if (nbt.contains(STRAY_CONVERSION_TIME_KEY, 99) && nbt.getInt(STRAY_CONVERSION_TIME_KEY) > -1) {
-            setConversionToStrayTime(nbt.getInt(STRAY_CONVERSION_TIME_KEY))
-        }
-        if (nbt.contains(MODE_CONVERSION_TIME_KEY, 99) && nbt.getInt(MODE_CONVERSION_TIME_KEY) > -1) {
-            setConversionModeTime(nbt.getInt(MODE_CONVERSION_TIME_KEY))
-        }
+        nbt.putInt(EYE_COLOR_KEY, this.eyeColor)
     }
 
     override fun tick() {
@@ -115,7 +117,7 @@ class GloomEntity(entityType: EntityType<out GloomEntity>, world: World) :
                     } else {
                         this.addStatusEffect(StatusEffectInstance(StatusEffects.DARKNESS, 60), this)
                         setConvertingToDarkMode(false)
-                        setConversionModeTime(-1)
+                        countdownToDarkMode = -1
                     }
                 }
             } else if (countdownToDarkMode <= 240 || !isLightMode()) {
@@ -128,8 +130,15 @@ class GloomEntity(entityType: EntityType<out GloomEntity>, world: World) :
                     this.addStatusEffect(StatusEffectInstance(StatusEffects.SLOWNESS, 60, 255), this)
                 }
                 setConvertingToDarkMode(true)
-                setConversionModeTime(LIGHT_MODE_TIME)
+                countdownToDarkMode = LIGHT_MODE_TIME
 
+            }
+        } else if (world.isClient) {
+            if (isLightMode()) {
+                if (darkModeTransitionTime < 60)
+                    darkModeTransitionTime++
+            } else if (darkModeTransitionTime >= 0) {
+                darkModeTransitionTime--
             }
         }
         super.tick()
@@ -167,9 +176,10 @@ class GloomEntity(entityType: EntityType<out GloomEntity>, world: World) :
         dataTracker.set(CONVERTING_TO_DARK_MODE, converting)
     }
 
-    private fun setConversionModeTime(time: Int) {
-        countdownToDarkMode = time
-    }
+    var eyeColor: Int
+        get() = dataTracker.get(EYE_COLOR)
+        set(color) = dataTracker.set(EYE_COLOR, color)
+
 
     fun inDarkness(): Boolean {
         return world.getLightLevel(blockPos) < lightThreshold
@@ -230,7 +240,11 @@ class GloomEntity(entityType: EntityType<out GloomEntity>, world: World) :
         }
     }
 
-    override fun createArrowProjectile(itemStack: ItemStack, f: Float, itemStack2: ItemStack?): PersistentProjectileEntity {
+    override fun createArrowProjectile(
+        itemStack: ItemStack,
+        f: Float,
+        itemStack2: ItemStack?
+    ): PersistentProjectileEntity {
         val persistentProjectileEntity = super.createArrowProjectile(itemStack, f, itemStack2)
         if (persistentProjectileEntity is ArrowEntity) {
             persistentProjectileEntity.addEffect(StatusEffectInstance(statusEffect, 600))
@@ -240,7 +254,7 @@ class GloomEntity(entityType: EntityType<out GloomEntity>, world: World) :
 
     override fun initEquipment(random: RandomGenerator, difficulty: LocalDifficulty) {
         val weaponMaterial = random.nextFloat()
-        val weaponTypeAxe = random.nextInt(25) > 24
+        val weaponTypeAxe = random.nextInt(25) == 0
         if (weaponMaterial > 0.95) {
             if (weaponTypeAxe) {
                 this.equipStack(EquipmentSlot.MAINHAND, ItemStack(Items.IRON_AXE))
@@ -265,9 +279,8 @@ class GloomEntity(entityType: EntityType<out GloomEntity>, world: World) :
     }
 
     companion object {
-
-        private const val lightThreshold = 10
-        val statusEffect = StatusEffects.DARKNESS
+        private const val lightThreshold: Int = 10
+        val statusEffect: Holder<StatusEffect> = StatusEffects.DARKNESS
 
         private val CONVERTING_TO_STRAY: TrackedData<Boolean> =
             DataTracker.registerData(GloomEntity::class.java, TrackedDataHandlerRegistry.BOOLEAN)
@@ -285,10 +298,10 @@ class GloomEntity(entityType: EntityType<out GloomEntity>, world: World) :
 //        val STUNNED_MOVEMENT_PENALTY_MODIFIER =
 //            EntityAttributeModifier(stunned, -0.25, EntityAttributeModifier.Operation.ADD_VALUE)
 
-//        private val EYE_COLOR: TrackedData<Int> =
-//            DataTracker.registerData(GloomEntity::class.java, TrackedDataHandlerRegistry.INTEGER)
-//        val EYE_COLOR_KEY: String = "EyeColor"
-//        private var eyeColorDefault: Int = Color(217, 230, 244).rgb
+        private val EYE_COLOR: TrackedData<Int> =
+            DataTracker.registerData(GloomEntity::class.java, TrackedDataHandlerRegistry.INTEGER)
+        val EYE_COLOR_KEY: String = "EyeColor"
+        private var eyeColorDefault: Int = Color(217, 230, 244).rgb
 
 
         fun createAttributes(): DefaultAttributeContainer.Builder {

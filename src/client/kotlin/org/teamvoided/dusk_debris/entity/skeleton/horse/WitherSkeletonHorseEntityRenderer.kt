@@ -1,4 +1,4 @@
-package org.teamvoided.dusk_debris.entity.skeleton
+package org.teamvoided.dusk_debris.entity.skeleton.horse
 
 import net.minecraft.client.render.entity.EntityRendererFactory
 import net.minecraft.client.render.entity.MobEntityRenderer
