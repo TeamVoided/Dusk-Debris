@@ -18,5 +18,6 @@ fun VertexConsumer.uv0(u: Number, v: Number): VertexConsumer = this.uv0(u.toFloa
 
 
 val UP = Vec3d(0, 1, 0)
+
 fun Vec3d(num: Number) = Vec3d(num, num, num)
 fun Vec3d(x: Number, y: Number, z: Number) = Vec3d(x.toDouble(), y.toDouble(), z.toDouble())

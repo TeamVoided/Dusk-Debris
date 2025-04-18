@@ -1,0 +1,7 @@
+{
+  "parent": "dusk_debris:block/parent/pixel_accurate/sign_225",
+  "textures": {
+    "planks": "minecraft:block/mangrove_planks",
+    "wood": "minecraft:block/mangrove_log"
+  }
+}

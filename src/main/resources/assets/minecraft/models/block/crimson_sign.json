@@ -1,0 +1,7 @@
+{
+  "parent": "dusk_debris:block/parent/pixel_accurate/sign",
+  "textures": {
+    "planks": "minecraft:block/crimson_planks",
+    "wood": "minecraft:block/crimson_stem"
+  }
+}

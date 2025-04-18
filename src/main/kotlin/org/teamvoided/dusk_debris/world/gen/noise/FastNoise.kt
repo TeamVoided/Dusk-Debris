@@ -1,5 +1,6 @@
 package org.teamvoided.dusk_debris.world.gen.noise
 
+import net.minecraft.util.math.Vec3d
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
@@ -169,6 +170,10 @@ class FastNoise @JvmOverloads constructor(seed: Int = 1337) {
             amp *= m_gain
         }
         m_fractalBounding = 1 / ampFractal
+    }
+
+    fun GetNoise(vec3d: Vec3d): Float {
+        return GetNoise(vec3d.x.toFloat(), vec3d.y.toFloat(), vec3d.z.toFloat())
     }
 
     fun GetNoise(x: Float, y: Float, z: Float): Float {
@@ -394,7 +399,7 @@ class FastNoise @JvmOverloads constructor(seed: Int = 1337) {
             z *= m_lacunarity
 
             amp *= m_gain
-            sum -=( (1 - abs(SingleValue(++seed, x, y, z).toDouble())) * amp).toFloat()
+            sum -= ((1 - abs(SingleValue(++seed, x, y, z).toDouble())) * amp).toFloat()
         }
 
         return sum

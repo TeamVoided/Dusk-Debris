@@ -12,7 +12,9 @@
     "fluid_tag.CameraMixin",
     "fluid_tag.water.BubbleColumnUpParticleMixin",
     "fluid_tag.water.BubbleParticleMixin",
-    "fluid_tag.water.CurrentDownParticleMixin"
+    "fluid_tag.water.CurrentDownParticleMixin",
+    "pixel_accurate.SignBlockEntityRendererMixin",
+    "pixel_accurate.SignEditScreenMixin"
   ],
   "injectors": {
     "defaultRequire": 1

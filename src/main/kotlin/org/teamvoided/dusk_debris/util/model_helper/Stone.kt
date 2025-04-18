@@ -11,38 +11,38 @@ import org.teamvoided.dusk_debris.util.block
 import org.teamvoided.dusk_debris.util.model
 
 
-fun BlockStateModelGenerator.stoneChest(block: Block) {
-    this.blockStateCollector.accept(
-        VariantsBlockStateSupplier.create(block)
-            .coordinate(BlockStateModelGenerator.createNorthDefaultHorizontalRotationStates())
-            .coordinate(this.chestPhases(block))
-    )
-}
+//fun BlockStateModelGenerator.stoneChest(block: Block) {
+//    this.blockStateCollector.accept(
+//        VariantsBlockStateSupplier.create(block)
+//            .coordinate(BlockStateModelGenerator.createNorthDefaultHorizontalRotationStates())
+//            .coordinate(this.chestPhases(block))
+//    )
+//}
 
-fun BlockStateModelGenerator.chestPhases(block: Block): BlockStateVariantMap.TripleProperty<ChestType, ChestPhase, Boolean> {
-    val variants = BlockStateVariantMap.create(Properties.CHEST_TYPE, DuskProperties.CHEST_PHASE, DuskProperties.LID)
-
-    ChestType.entries.forEach { type ->
-        val typeS = if (type.ordinal == 0) "" else "_" + type.asString()
-        val lidModel = ModelIds.getBlockSubModelId(block, typeS + "_lid")
-        this.stoneChestModel(block, typeS, "_lid")
-        ChestPhase.entries.forEach { phase ->
-            val phaseS = if (phase.ordinal == 2) "_open" else ""
-
-//            println("t: ${type.ordinal}, p: ${phase.ordinal}")
-            val model: Identifier = if (phase == ChestPhase.CLOSING)
-                ModelIds.getBlockSubModelId(block, typeS + "_open")
-            else
-                this.stoneChestModel(block, typeS, phaseS)
-
-
-            variants
-                .register(type, phase, false, BlockStateVariant.create().put(VariantSettings.MODEL, model))
-                .register(type, phase, true, BlockStateVariant.create().put(VariantSettings.MODEL, lidModel))
-        }
-    }
-    return variants
-}
+//fun BlockStateModelGenerator.chestPhases(block: Block): BlockStateVariantMap.TripleProperty<ChestType, ChestPhase, Boolean> {
+//    val variants = BlockStateVariantMap.create(Properties.CHEST_TYPE, DuskProperties.CHEST_PHASE, DuskProperties.LID)
+//
+//    ChestType.entries.forEach { type ->
+//        val typeS = if (type.ordinal == 0) "" else "_" + type.asString()
+//        val lidModel = ModelIds.getBlockSubModelId(block, typeS + "_lid")
+//        this.stoneChestModel(block, typeS, "_lid")
+//        ChestPhase.entries.forEach { phase ->
+//            val phaseS = if (phase.ordinal == 2) "_open" else ""
+//
+////            println("t: ${type.ordinal}, p: ${phase.ordinal}")
+//            val model: Identifier = if (phase == ChestPhase.CLOSING)
+//                ModelIds.getBlockSubModelId(block, typeS + "_open")
+//            else
+//                this.stoneChestModel(block, typeS, phaseS)
+//
+//
+//            variants
+//                .register(type, phase, false, BlockStateVariant.create().put(VariantSettings.MODEL, model))
+//                .register(type, phase, true, BlockStateVariant.create().put(VariantSettings.MODEL, lidModel))
+//        }
+//    }
+//    return variants
+//}
 
 private fun BlockStateModelGenerator.stoneChestModel(
     block: Block,

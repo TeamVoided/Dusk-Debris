@@ -32,7 +32,7 @@ object DuskBlockEntities {
     val STONE_CHEST: BlockEntityType<DuskChestBlockEntity> = register(
         "stone_chest", BlockEntityType.Builder.create(
             ::DuskChestBlockEntity,
-            DuskBlocks.STONE_CHEST
+            //DuskBlocks.STONE_CHEST
         )
     )
     

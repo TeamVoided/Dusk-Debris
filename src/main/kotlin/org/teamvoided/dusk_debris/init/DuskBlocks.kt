@@ -51,7 +51,7 @@ object DuskBlocks {
 
     val STRONG_SCAFFOLDING =
         registerStrongScaffolding("strong_scaffolding", StrongScaffoldingBlock(copy(SCAFFOLDING))).cutout()
-    val STONE_CHEST = register("stone_chest", DuskDoubleChestBlock(copy(CHEST)) { DuskBlockEntities.STONE_CHEST })
+    //val STONE_CHEST = register("stone_chest", DuskDoubleChestBlock(copy(CHEST)) { DuskBlockEntities.STONE_CHEST })
 
     val ACID = registerNoItem("acid", FluidBlock(DuskFluids.ACID, copy(WATER).mapColor(MapColor.LIME)))
     val FOG_BUBBLE = registerNoItem(

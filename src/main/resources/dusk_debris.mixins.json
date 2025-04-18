@@ -38,7 +38,9 @@
     "fluid_tag.water.CoralParentBlockMixin",
     "fluid_tag.water.FarmlandBlockMixin",
     "fluid_tag.water.FishingBobberEntityMixin",
-    "fluid_tag.water.GlassBottleItemMixin"
+    "fluid_tag.water.GlassBottleItemMixin",
+    "pixel_accurate.CombinedSignBlockMixin",
+    "pixel_accurate.WallSignBlockMixin"
   ],
   "injectors": {
     "defaultRequire": 1

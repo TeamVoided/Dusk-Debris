@@ -24,7 +24,7 @@ import org.teamvoided.dusk_debris.util.model_helper.carpetStairs
 import java.util.*
 
 class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
-    val minecraft = false
+    private val minecraft = true
 
     override fun generateBlockStateModels(gen: BlockStateModelGenerator) {
         gen.sandstoneModels = mapOf(

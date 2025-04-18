@@ -1,0 +1,6 @@
+{
+  "parent": "dusk_debris:block/parent/pixel_accurate/wall_sign",
+  "textures": {
+    "planks": "dusk_debris:block/bamboo_sign_planks"
+  }
+}
