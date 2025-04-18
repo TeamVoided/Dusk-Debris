@@ -4,6 +4,7 @@ import net.minecraft.block.Block
 import net.minecraft.data.client.model.*
 import net.minecraft.state.property.Properties
 import net.minecraft.util.Identifier
+import org.teamvoided.dusk_debris.DuskDebris.mc
 import org.teamvoided.dusk_debris.util.block
 import org.teamvoided.dusk_debris.util.model
 
@@ -44,20 +45,16 @@ fun BlockStateModelGenerator.pixelAccurateSign(sign: Block, wallSign: Block, pla
 
 fun BlockStateModelGenerator.pixelAccurateSign(sign: Block, planks: Identifier, log: Identifier) {
     val texture: Texture = Texture()
-        .put(WOOD, log)
         .put(PLANKS, planks)
+        .put(WOOD, log)
     val default: Identifier =
-        block("parent/pixel_accurate/sign", WOOD, PLANKS)
-            .upload(sign.model(), texture, this.modelCollector)
+        block(mc("block/parent/sign_0"), PLANKS, WOOD).upload(sign.model("_0"), texture, this.modelCollector)
     val rotate225: Identifier =
-        block("parent/pixel_accurate/sign_225", WOOD, PLANKS)
-            .upload(sign.model("_1"), texture, this.modelCollector)
+        block(mc("block/parent/sign_1"), PLANKS, WOOD).upload(sign.model("_1"), texture, this.modelCollector)
     val rotate45: Identifier =
-        block("parent/pixel_accurate/sign_45", WOOD, PLANKS)
-            .upload(sign.model("_2"), texture, this.modelCollector)
+        block(mc("block/parent/sign_2"), PLANKS, WOOD).upload(sign.model("_2"), texture, this.modelCollector)
     val rotate675: Identifier =
-        block("parent/pixel_accurate/sign_675", WOOD, PLANKS)
-            .upload(sign.model("_3"), texture, this.modelCollector)
+        block(mc("block/parent/sign_3"), PLANKS, WOOD).upload(sign.model("_3"), texture, this.modelCollector)
 
     this.blockStateCollector.accept(
         VariantsBlockStateSupplier.create(sign)
@@ -68,7 +65,7 @@ fun BlockStateModelGenerator.pixelAccurateSign(sign: Block, planks: Identifier, 
 fun BlockStateModelGenerator.pixelAccurateWallSign(wallSign: Block, planks: Identifier) {
     val texture: Texture = Texture()
         .put(PLANKS, planks)
-    block("parent/pixel_accurate/wall_sign", PLANKS).upload(wallSign, texture, this.modelCollector)
+    block(mc("block/parent/wall_sign"), PLANKS).upload(wallSign, texture, this.modelCollector)
     this.registerNorthDefaultHorizontalRotation(wallSign)
 }
 

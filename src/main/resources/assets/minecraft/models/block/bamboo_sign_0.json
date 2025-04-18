@@ -1,5 +1,5 @@
 {
-  "parent": "dusk_debris:block/parent/pixel_accurate/sign",
+  "parent": "minecraft:block/parent/sign_0",
   "textures": {
     "planks": "dusk_debris:block/bamboo_sign_planks",
     "wood": "dusk_debris:block/bamboo_sign_log"

@@ -9,6 +9,7 @@ import net.minecraft.data.client.model.*
 import net.minecraft.data.client.model.BlockStateModelGenerator.TintType
 import net.minecraft.util.Identifier
 import org.teamvoided.dusk_debris.DuskDebris.id
+import org.teamvoided.dusk_debris.DuskDebris.mc
 import org.teamvoided.dusk_debris.block.DuskBlockFamilies
 import org.teamvoided.dusk_debris.block.DuskBlockLists
 import org.teamvoided.dusk_debris.data.gen.providers.models.MinecraftModelProvider.generateAlternativeMinecraftModels
@@ -52,9 +53,10 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
         }
         gen.generateWoodModels()
         gen.generateStoneModels()
+        gen.fogCanyonModels()
 
         DuskItemLists.SPAWN_EGGS_ITEM_LIST.forEach {
-            gen.registerParentedItemModel(it, Identifier.ofDefault("item/template_spawn_egg"))
+            gen.registerParentedItemModel(it, mc("item/template_spawn_egg"))
         }
         DuskBlockLists.RIBBON_BLOCKS_LIST.forEach {
             gen.registerRibbon(it)
@@ -68,7 +70,6 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
 
         gen.carpetStairs(DuskBlocks.RED_CARPET_STAIRS, Blocks.RED_WOOL)
 
-        gen.fogCanyonModels()
 
         gen.registerItemModel(DuskItems.MACE_BLAZE)
 

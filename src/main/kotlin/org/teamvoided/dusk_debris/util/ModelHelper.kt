@@ -627,20 +627,14 @@ fun BlockStateModelGenerator.registerParentedItemModel(block: Block) =
     this.registerParentedItemModel(block, block.model())
 
 //    fun BlockStateModelGenerator.parentedModel(block: Block, parent: Identifier): Identifier = this.parentedModel(block, block, parent)
-fun block(parent: String, vararg requiredTextures: TextureKey): Model {
-    return Model(
-        Optional.of(
-            id("block/$parent")
-        ), Optional.empty(), *requiredTextures
-    )
-}
+fun block(parent: Identifier, vararg requiredTextures: TextureKey): Model=
+    Model(Optional.of(parent), Optional.empty(), *requiredTextures)
+
+fun block(parent: String, vararg requiredTextures: TextureKey): Model =
+    Model(Optional.of(id("block/$parent")), Optional.empty(), *requiredTextures)
 
 fun block(parent: String, variant: String, vararg requiredTextures: TextureKey): Model {
-    return Model(
-        Optional.of(
-            id("block/$parent")
-        ), Optional.of(variant), *requiredTextures
-    )
+    return Model(Optional.of(id("block/$parent")), Optional.of(variant), *requiredTextures)
 }
 
 fun BlockStateModelGenerator.parentedModel(

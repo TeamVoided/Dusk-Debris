@@ -1,5 +1,5 @@
 {
-  "parent": "dusk_debris:block/parent/pixel_accurate/wall_sign",
+  "parent": "minecraft:block/parent/wall_sign",
   "textures": {
     "planks": "minecraft:block/cherry_planks"
   }

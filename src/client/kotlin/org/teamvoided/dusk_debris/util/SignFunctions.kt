@@ -5,6 +5,8 @@ import net.minecraft.block.sign.WallSignBlock
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.render.OverlayTexture
+import net.minecraft.state.property.Properties
+import net.minecraft.util.math.Direction
 
 object SignFunctions {
 //    @JvmStatic
@@ -24,13 +26,13 @@ object SignFunctions {
     fun renderSignModelBackground(graphics: GuiGraphics, state: BlockState) {
         val scale = 90f
         if (state.block is WallSignBlock) {
-            graphics.matrices.translate(-scale / 2, scale * 0.485f, 1f)
+            graphics.matrices.translate(-scale / 2, scale * 0.484375f, 1f) // 7.75/16
         } else {
-            graphics.matrices.translate(-scale / 2, scale * 0.725f, 1f)
+            graphics.matrices.translate(-scale / 2, scale * 0.734375f, 1f) // 11.75/16
         }
         graphics.matrices.scale(scale, -scale, 1f)
         MinecraftClient.getInstance().blockRenderManager.renderBlockAsEntity(
-            state.block.defaultState,
+            state.block.defaultState.withIfExists(Properties.HORIZONTAL_FACING, Direction.SOUTH),
             graphics.matrices,
             graphics.vertexConsumers,
             15728880,

@@ -1,7 +1,7 @@
 {
   "variants": {
     "rotation=0": {
-      "model": "minecraft:block/crimson_sign",
+      "model": "minecraft:block/crimson_sign_0",
       "y": 180
     },
     "rotation=1": {
@@ -15,7 +15,7 @@
       "model": "minecraft:block/crimson_sign_3"
     },
     "rotation=12": {
-      "model": "minecraft:block/crimson_sign",
+      "model": "minecraft:block/crimson_sign_0",
       "y": 90
     },
     "rotation=13": {
@@ -39,7 +39,7 @@
       "y": 180
     },
     "rotation=4": {
-      "model": "minecraft:block/crimson_sign",
+      "model": "minecraft:block/crimson_sign_0",
       "y": 270
     },
     "rotation=5": {
@@ -55,7 +55,7 @@
       "y": 270
     },
     "rotation=8": {
-      "model": "minecraft:block/crimson_sign"
+      "model": "minecraft:block/crimson_sign_0"
     },
     "rotation=9": {
       "model": "minecraft:block/crimson_sign_1"

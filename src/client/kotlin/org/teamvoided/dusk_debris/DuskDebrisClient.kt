@@ -15,9 +15,6 @@ import org.teamvoided.dusk_debris.resource.WaterColormapResourceSupplier
 
 @Suppress("unused")
 object DuskDebrisClient {
-    @JvmStatic
-    val SIGN_RENDER_OFFSET = Vec3d(0.0, 0.33333, 0.1)
-
     fun init() {
         log.info("Hello from Client")
 
