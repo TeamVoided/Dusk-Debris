@@ -46,7 +46,7 @@ public abstract class EntityClawLogicMixin implements DuskClawStuff {
 
     @Unique
     public boolean canHang() {
-        return true;
+        return false;
     }
 
     @Unique
