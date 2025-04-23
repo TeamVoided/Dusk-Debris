@@ -2,6 +2,7 @@ package org.teamvoided.dusk_debris.data.gen.tags
 
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider
+import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags
 import net.minecraft.item.Items
 import net.minecraft.registry.HolderLookup
 import net.minecraft.registry.tag.ItemTags
@@ -36,6 +37,12 @@ class ItemTagsProvider(
         getOrCreateTagBuilder(DuskItemTags.IGNITES_GUNPOWDER)
             .add(Items.FLINT_AND_STEEL)
             .add(Items.FIRE_CHARGE)
+
+        getOrCreateTagBuilder(DuskItemTags.LEAVES_DONT_POISON)
+            .forceAddTag(ItemTags.SWORDS)
+            .forceAddTag(ItemTags.AXES)
+            .add(Items.SHEARS)
+
 //        getOrCreateTagBuilder(DuskItemTags.CRAB_FOOD)
 //            .addOptionalTag(ConventionalItemTags.RAW_FISHES_FOODS)
 //            .add(Items.ROTTEN_FLESH)

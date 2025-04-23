@@ -36,7 +36,7 @@ class SequoiaTreeFeature(codec: Codec<DefaultFeatureConfig>) : Feature<DefaultFe
         val world = context.world
         val config = context.config
 
-        val width = random.nextInt(5) + 1
+        val width = 6//random.nextInt(5) + 1
         val height = width * 10 + (random.nextInt(width * 4) - width * 2)
 
         if (origin.y + height > world.topY) return false
@@ -122,9 +122,9 @@ class SequoiaTreeFeature(codec: Codec<DefaultFeatureConfig>) : Feature<DefaultFe
         }
 
         setTrunkBlocks(config, world, random, logPositions)
-//        setLeavesBlocks(config, world, random, origin, height, width)
-        branch(config, world, random, origin.add(-1, 0, -1), width, height)
-//                this.setBlockState(world, mutable, logBlock.getBlockState(random, pos))
+        //setLeavesBlocks(config, world, random, origin, height, width)
+        //branch(config, world, random, origin.add(-1, 0, -1), width, height)
+        //this.setBlockState(world, mutable, logBlock.getBlockState(random, pos))
         return true
     }
 

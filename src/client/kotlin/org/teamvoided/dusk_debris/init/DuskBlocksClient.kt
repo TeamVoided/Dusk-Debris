@@ -8,7 +8,7 @@ import net.minecraft.client.render.RenderLayer
 import org.teamvoided.dusk_debris.block.GunpowderBlock
 
 object DuskBlocksClient {
-    fun init(){
+    fun init() {
         ColorProviderRegistry.BLOCK.register(
             { _, world, pos, _ ->
                 if (world != null && pos != null) BiomeColors.getFoliageColor(world, pos)
@@ -23,10 +23,7 @@ object DuskBlocksClient {
 
         DuskBlocks.CUTOUT_BLOCKS.forEach { BlockRenderLayerMap.INSTANCE.putBlock(it, RenderLayer.getCutout()) }
         DuskBlocks.TRANSLUCENT_BLOCKS.forEach {
-            BlockRenderLayerMap.INSTANCE.putBlock(
-                it,
-                RenderLayer.getTranslucent()
-            )
+            BlockRenderLayerMap.INSTANCE.putBlock(it, RenderLayer.getTranslucent())
         }
     }
 }

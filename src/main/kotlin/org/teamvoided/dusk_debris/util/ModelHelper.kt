@@ -526,10 +526,8 @@ fun BlockStateModelGenerator.makeRibbonModel(block: Block, variant: Int): Identi
 }
 
 fun BlockStateModelGenerator.registerGeyser(block: Block) {
-    this.registerItemModel(block.asItem())
     val texture = Texture()
         .put(TextureKey.SIDE, Texture.getSubId(block, "_side"))
-
     val modelActive: Identifier = Models.CUBE_BOTTOM_TOP.upload(
         block.model("_active"),
         texture

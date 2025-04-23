@@ -19,6 +19,8 @@ object DuskItemTags {
     val HARVESTER_SCYTHE_AMMO = create("harvester_scythe_ammo")
     val REPAIR_HARVESTER_SCYTHE = create("repair_harvester_scythe")
 
+    val LEAVES_DONT_POISON = create("leaves_dont_poison")
+
     fun create(id: String): TagKey<Item> {
         val regTag = TagKey.of(RegistryKeys.ITEM, id(id))
         ITEM_TAGS.add(regTag)

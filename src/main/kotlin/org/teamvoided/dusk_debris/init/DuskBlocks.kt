@@ -690,6 +690,8 @@ object DuskBlocks {
                 .pistonBehavior(PistonBehavior.DESTROY)
         )
     )
+    val POISON_BIRCH_LEAVES = register("poison_birch_leaves", PoisonLeavesBlock(copy(BIRCH_LEAVES))).cutout()
+
 
     val VOLCANIC_SAND = register(
         "volcanic_sand",

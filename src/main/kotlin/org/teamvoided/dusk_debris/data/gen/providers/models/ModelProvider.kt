@@ -7,7 +7,6 @@ import net.minecraft.block.Blocks
 import net.minecraft.data.client.ItemModelGenerator
 import net.minecraft.data.client.model.*
 import net.minecraft.data.client.model.BlockStateModelGenerator.TintType
-import net.minecraft.util.Identifier
 import org.teamvoided.dusk_debris.DuskDebris.id
 import org.teamvoided.dusk_debris.DuskDebris.mc
 import org.teamvoided.dusk_debris.block.DuskBlockFamilies
@@ -25,7 +24,7 @@ import org.teamvoided.dusk_debris.util.model_helper.carpetStairs
 import java.util.*
 
 class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
-    private val minecraft = true
+    private val minecraft = false
 
     override fun generateBlockStateModels(gen: BlockStateModelGenerator) {
         gen.sandstoneModels = mapOf(
@@ -143,31 +142,7 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
 
         gen.registerSimpleState(DuskBlocks.BOG_MUD)
         gen.registerItemModel(DuskItems.BOG_MUD_BUCKET)
-        gen.registerSingleton(DuskBlocks.CYPRESS_LEAVES, TexturedModel.LEAVES)
-        gen.registerLog(DuskBlocks.CYPRESS_LOG)
-            .log(DuskBlocks.CYPRESS_LOG)
-            .wood(DuskBlocks.CYPRESS_WOOD)
-        gen.registerLog(DuskBlocks.STRIPPED_CYPRESS_LOG)
-            .log(DuskBlocks.STRIPPED_CYPRESS_LOG)
-            .wood(DuskBlocks.STRIPPED_CYPRESS_WOOD)
-        gen.registerHangingSign(
-            DuskBlocks.STRIPPED_CYPRESS_LOG,
-            DuskBlocks.CYPRESS_HANGING_SIGN,
-            DuskBlocks.CYPRESS_WALL_HANGING_SIGN
-        )
 
-        gen.registerSingleton(DuskBlocks.SEQUOIA_LEAVES, TexturedModel.LEAVES)
-        gen.registerLog(DuskBlocks.SEQUOIA_LOG)
-            .log(DuskBlocks.SEQUOIA_LOG)
-            .wood(DuskBlocks.SEQUOIA_WOOD)
-        gen.registerLog(DuskBlocks.STRIPPED_SEQUOIA_LOG)
-            .log(DuskBlocks.STRIPPED_SEQUOIA_LOG)
-            .wood(DuskBlocks.STRIPPED_SEQUOIA_WOOD)
-        gen.registerHangingSign(
-            DuskBlocks.STRIPPED_SEQUOIA_LOG,
-            DuskBlocks.SEQUOIA_HANGING_SIGN,
-            DuskBlocks.SEQUOIA_WALL_HANGING_SIGN
-        )
 
         gen.registerSimpleCubeAll(DuskBlocks.CRYSTAL_BLOCK)
         gen.registerAxisRotated(
@@ -185,17 +160,6 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
         gen.registerGeyser(DuskBlocks.ROARING_GEYSER)
         gen.registerRotatable(DuskBlocks.VOLCANIC_SAND)
         gen.registerDustable(DuskBlocks.SUSPICIOUS_VOLCANIC_SAND)
-        gen.registerLog(DuskBlocks.CHARRED_LOG)
-            .log(DuskBlocks.CHARRED_LOG)
-            .wood(DuskBlocks.CHARRED_WOOD)
-        gen.registerLog(DuskBlocks.STRIPPED_CHARRED_LOG)
-            .log(DuskBlocks.STRIPPED_CHARRED_LOG)
-            .wood(DuskBlocks.STRIPPED_CHARRED_WOOD)
-        gen.registerHangingSign(
-            DuskBlocks.STRIPPED_CHARRED_LOG,
-            DuskBlocks.CHARRED_HANGING_SIGN,
-            DuskBlocks.CHARRED_WALL_HANGING_SIGN
-        )
 //        gen.registerSingleton(DuskBlocks.SMOOTH_VOLCANIC_SANDSTONE) {
 //            TexturedModel.getCubeAll(Texture.getSubId(DuskBlocks.VOLCANIC_SANDSTONE, "_top"))
 //        }
@@ -229,22 +193,6 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
 
         gen.registerBunnyGrave(DuskBlocks.BUNNY_GRAVE, Blocks.SMOOTH_STONE, Blocks.STONE)
 
-
-        gen.registerFlowerPotPlant(
-            DuskBlocks.GALLERY_MAPLE_SAPLING, DuskBlocks.POTTED_GALLERY_MAPLE_SAPLING, TintType.NOT_TINTED
-        )
-        gen.registerLog(DuskBlocks.GALLERY_MAPLE_LOG)
-            .log(DuskBlocks.GALLERY_MAPLE_LOG)
-            .wood(DuskBlocks.GALLERY_MAPLE_WOOD)
-        gen.registerLog(DuskBlocks.STRIPPED_GALLERY_MAPLE_LOG)
-            .log(DuskBlocks.STRIPPED_GALLERY_MAPLE_LOG)
-            .wood(DuskBlocks.STRIPPED_GALLERY_MAPLE_WOOD)
-        gen.registerHangingSign(
-            DuskBlocks.STRIPPED_GALLERY_MAPLE_LOG,
-            DuskBlocks.GALLERY_MAPLE_HANGING_SIGN,
-            DuskBlocks.GALLERY_MAPLE_WALL_HANGING_SIGN
-        )
-        gen.registerSingleton(DuskBlocks.GALLERY_MAPLE_LEAVES, TexturedModel.LEAVES)
     }
 
     private fun BlockStateModelGenerator.fogCanyonModels() {
