@@ -31,6 +31,10 @@ object DuskConfiguredFeatures {
 
     val BOREAL_VALLEY_VEGETATION = create("boreal_valley/boreal_valley_vegetation")
     val SEQUOIA_TREE = create("boreal_valley/sequoia_tree")
+    val ROCK_SPIRE = create("spire/stone")
+    val LARGE_ROCK_SPIRE = create("spire/large/stone")
+    val GRASS_SPIRE = create("spire/grass")
+    val LARGE_GRASS_SPIRE = create("spire/large/grass")
 
 
 

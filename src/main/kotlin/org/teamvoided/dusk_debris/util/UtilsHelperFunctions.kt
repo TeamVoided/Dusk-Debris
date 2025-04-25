@@ -79,13 +79,9 @@ fun ServerWorld.sendToPlayerIfNearby(
     }
 }
 
-fun DoublePerlinNoiseSampler.sample(blockPos: BlockPos): Double {
-    return this.sample(
-        blockPos.x.toDouble(),
-        blockPos.y.toDouble(),
-        blockPos.z.toDouble()
-    )
-}
+fun DoublePerlinNoiseSampler.sample(blockPos: BlockPos): Double = this.sample(blockPos.toVec3d())
+
+fun DoublePerlinNoiseSampler.sample(vec3d: Vec3d): Double = this.sample(vec3d.x, vec3d.y, vec3d.z)
 
 fun createCuboidShape(minXZ: Double, minY: Double, maxXZ: Double, maxY: Double): VoxelShape {
     return Block.createCuboidShape(minXZ, minY, minXZ, maxXZ, maxY, maxXZ)

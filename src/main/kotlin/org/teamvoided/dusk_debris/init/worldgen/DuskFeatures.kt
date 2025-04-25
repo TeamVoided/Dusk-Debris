@@ -8,6 +8,10 @@ import net.minecraft.world.gen.feature.FeatureConfig
 import org.teamvoided.dusk_debris.DuskDebris.id
 import org.teamvoided.dusk_debris.world.gen.configured_feature.*
 import org.teamvoided.dusk_debris.world.gen.configured_feature.config.*
+import org.teamvoided.dusk_debris.world.gen.configured_feature.config.rock_spires.RockFormationFeatureConfig
+import org.teamvoided.dusk_debris.world.gen.configured_feature.config.rock_spires.SurfaceFormationFeatureConfig
+import org.teamvoided.dusk_debris.world.gen.configured_feature.rock_spires.RockFormationFeature
+import org.teamvoided.dusk_debris.world.gen.configured_feature.rock_spires.SurfaceFormationFeature
 
 object DuskFeatures {
 
@@ -21,6 +25,9 @@ object DuskFeatures {
     val RANDOM_NOISE_SELECTOR = register("random_noise_selector", RandomNoiseFeature(NoiseFeatureConfig.CODEC))
 
     val SEQUOIA_TREE = register("sequoia_tree", SequoiaTreeFeature(DefaultFeatureConfig.CODEC))
+
+    val ROCK_SPIRE = register("rock_spire", RockFormationFeature(RockFormationFeatureConfig.CODEC))
+    val SURFACE_SPIRE = register("surface_spire", SurfaceFormationFeature(SurfaceFormationFeatureConfig.CODEC))
 
     val NOISE_SURFACE = register("noise_surface", NoiseSurfaceFeature(NoiseSurfaceFeatureConfig.CODEC))
 

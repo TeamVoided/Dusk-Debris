@@ -18,6 +18,7 @@ import net.minecraft.world.gen.feature.util.PlacedFeatureUtil
 import net.minecraft.world.gen.root.AboveRootPlacement
 import net.minecraft.world.gen.stateprovider.BlockStateProvider
 import net.minecraft.world.gen.stateprovider.NoiseBlockStateProvider
+import net.minecraft.world.gen.stateprovider.SimpleBlockStateProvider
 import net.minecraft.world.gen.treedecorator.LeavesVineTreeDecorator
 import net.minecraft.world.gen.treedecorator.TreeDecorator
 import net.minecraft.world.gen.trunk.StraightTrunkPlacer
@@ -30,6 +31,8 @@ import org.teamvoided.dusk_debris.world.gen.configured_feature.ThresholdPlacedFe
 import org.teamvoided.dusk_debris.world.gen.configured_feature.config.GlassSpikeFeatureConfig
 import org.teamvoided.dusk_debris.world.gen.configured_feature.config.NoiseFeatureConfig
 import org.teamvoided.dusk_debris.world.gen.configured_feature.config.TorusFeatureConfig
+import org.teamvoided.dusk_debris.world.gen.configured_feature.config.rock_spires.RockFormationFeatureConfig
+import org.teamvoided.dusk_debris.world.gen.configured_feature.config.rock_spires.SurfaceFormationFeatureConfig
 import org.teamvoided.dusk_debris.world.gen.foliage.CypressFoliagePlacer
 import org.teamvoided.dusk_debris.world.gen.root.CypressRootPlacer
 import org.teamvoided.dusk_debris.world.gen.root.config.CypressRootConfig
@@ -204,7 +207,47 @@ object ConfiguredFeatureCreator {
             DuskFeatures.SEQUOIA_TREE,
             DefaultFeatureConfig()
         )
+        c.registerConfiguredFeature(
+            DuskConfiguredFeatures.ROCK_SPIRE,
+            DuskFeatures.ROCK_SPIRE,
+            spire
+        )
+        c.registerConfiguredFeature(
+            DuskConfiguredFeatures.LARGE_ROCK_SPIRE,
+            DuskFeatures.ROCK_SPIRE,
+            spire_large
+        )
+        c.registerConfiguredFeature(
+            DuskConfiguredFeatures.GRASS_SPIRE,
+            DuskFeatures.SURFACE_SPIRE,
+            SurfaceFormationFeatureConfig(
+                SimpleBlockStateProvider.of(Blocks.GRASS_BLOCK),
+                SimpleBlockStateProvider.of(Blocks.DIRT),
+                spire
+            )
+        )
+        c.registerConfiguredFeature(
+            DuskConfiguredFeatures.LARGE_GRASS_SPIRE,
+            DuskFeatures.SURFACE_SPIRE,
+            SurfaceFormationFeatureConfig(
+                SimpleBlockStateProvider.of(Blocks.GRASS_BLOCK),
+                SimpleBlockStateProvider.of(Blocks.DIRT),
+                spire_large
+            )
+        )
     }
+
+    private val spire = RockFormationFeatureConfig(
+        UniformIntProvider.create(7, 16),
+        UniformIntProvider.create(16, 80),
+        UniformFloatProvider.create(1f, 3f)
+    )
+
+    private val spire_large = RockFormationFeatureConfig(
+        UniformIntProvider.create(17, 24),
+        UniformIntProvider.create(48, 120),
+        UniformFloatProvider.create(1f, 3f)
+    )
 
     fun BootstrapContext<ConfiguredFeature<*, *>>.emptyPlaceInLine(registryKey: RegistryKey<ConfiguredFeature<*, *>>): Holder<PlacedFeature> {
         return PlacedFeatureUtil.placedInline(
