@@ -1,4 +1,4 @@
-package org.teamvoided.dusk_debris.data.gen.providers
+package org.teamvoided.dusk_debris.data.gen.providers.english_translation
 
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricLanguageProvider
@@ -8,8 +8,6 @@ import net.minecraft.item.Item
 import net.minecraft.registry.HolderLookup
 import net.minecraft.registry.Registries
 import net.minecraft.util.Identifier
-import org.teamvoided.dusk_debris.data.gen.providers.english_translation.DamageTypeTranslations
-import org.teamvoided.dusk_debris.data.gen.providers.english_translation.PaintingTranslations
 import org.teamvoided.dusk_debris.data.tags.DuskFluidTags
 import org.teamvoided.dusk_debris.data.tags.DuskItemTags
 import org.teamvoided.dusk_debris.init.DuskEntities
@@ -35,8 +33,9 @@ class EnglishTranslationProvider(o: FabricDataOutput, r: CompletableFuture<Holde
         DamageTypeTranslations.translations(gen)
         PaintingTranslations.translations(gen)
 
-        getKey(DuskTabs.DUSK_TAB)?.let { gen.add(it, "Dusk Items") }
+        //getKey(DuskTabs.DUSK_TAB)?.let { gen.add(it, "Dusk Items") }
         getKey(DuskTabs.EVERYTHING)?.let { gen.add(it, "Dusk Items") }
+        getKey(DuskTabs.SPELLS)?.let { gen.add(it, "Dusk Spells") }
     }
 
     private fun genLang(identifier: Identifier): String =

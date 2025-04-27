@@ -18,6 +18,7 @@ import org.teamvoided.dusk_debris.entity.jellyfish.tiny.model.TinyEnemyJellyfish
 import org.teamvoided.dusk_debris.entity.jellyfish.tiny.model.TinyEnemyJellyfishModel
 import org.teamvoided.dusk_debris.entity.jellyfish.volaphyra.model.VolaphyraCoreModel
 import org.teamvoided.dusk_debris.entity.jellyfish.volaphyra.model.VolaphyraMesogleaModel
+import org.teamvoided.dusk_debris.entity.magic.vengeful_spirit.VengefulSpiritModel
 import org.teamvoided.dusk_debris.entity.piffling.model.PifflingPumpkinModel
 import org.teamvoided.dusk_debris.entity.skeleton.gloom.model.GloomEntityModel
 import org.teamvoided.dusk_debris.entity.skeleton.wolf.render.SkeletonWolfEntityModel.Companion.texturedModelData
@@ -43,6 +44,8 @@ object DuskEntityModelLayers {
 
     val TINY_ENEMY_JELLYFISH: EntityModelLayer = registerMain("tiny_enemy_jellyfish")
     val TINY_ENEMY_JELLYFISH_MESOGLEA: EntityModelLayer = register("tiny_enemy_jellyfish", "mesoglea")
+
+    val VENGEFUL_SPIRIT: EntityModelLayer = registerMain("vengeful_spirit")
 
     val TREASURE_CHEST: EntityModelLayer = registerMain("treasure_chest")
     val TREASURE_CHEST_LEFT: EntityModelLayer = registerMain("treasure_chest_left")
@@ -77,6 +80,7 @@ object DuskEntityModelLayers {
         EntityModelLayerRegistry.registerModelLayer(TINY_ENEMY_JELLYFISH, TinyEnemyJellyfishCoreModel::texturedModelData)
         EntityModelLayerRegistry.registerModelLayer(TINY_ENEMY_JELLYFISH_MESOGLEA, TinyEnemyJellyfishModel::texturedModelData)
 
+        EntityModelLayerRegistry.registerModelLayer(VENGEFUL_SPIRIT, VengefulSpiritModel::texturedModelData)
 
         EntityModelLayerRegistry.registerModelLayer(TREASURE_CHEST, TreasureChestBlockEntityModel::singleTexturedModelData)
         EntityModelLayerRegistry.registerModelLayer(TREASURE_CHEST_LEFT, TreasureChestBlockEntityModel::leftDoubleTexturedModelData)

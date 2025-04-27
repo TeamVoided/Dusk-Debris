@@ -74,6 +74,15 @@ object DuskBiomeModifications {
             BiomeSelectors.foundInOverworld()
                 .and(tagNo(ConventionalBiomeTags.IS_DEEP_OCEAN))
         )
+
+        //addFeature(
+        //    "add_large_rock_spire",
+        //    GenerationStep.Feature.LOCAL_MODIFICATIONS,
+        //    DuskPlacedFeatures.LARGE_ROCK_SPIRE,
+        //    BiomeSelectors.foundInOverworld()
+        //        .and(tagNo(ConventionalBiomeTags.IS_RIVER))
+        //)
+
     }
 
     private fun addFeature(

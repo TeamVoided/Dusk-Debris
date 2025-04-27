@@ -200,7 +200,7 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
         this.bubbleBlossomBlock(DuskBlocks.PURPLE_BUBBLE_BLOSSOM)
     }
 
-    private val single = listOf(DuskItems.DIE_ITEM, DuskItems.CHILL_CHARGE)
+    private val single = listOf(DuskItems.DEBUG_SPELL_ITEM, DuskItems.DIE_ITEM, DuskItems.CHILL_CHARGE)
     override fun generateItemModels(gen: ItemModelGenerator) {
         single.forEach { gen.register(it, Models.SINGLE_LAYER_ITEM) }
         gen.register(DuskItems.FREEZE_ROD, Models.HANDHELD_ROD)

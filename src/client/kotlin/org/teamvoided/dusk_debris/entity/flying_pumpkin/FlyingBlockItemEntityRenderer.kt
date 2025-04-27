@@ -34,8 +34,7 @@ class FlyingBlockItemEntityRenderer<T>(
         vertexConsumers: VertexConsumerProvider,
         light: Int
     ) {
-        if (entity.age >= 2 ||
-            !(dispatcher.camera.focusedEntity.squaredDistanceTo(entity) < distance)) {
+        if (entity.age >= 2 || !(dispatcher.camera.focusedEntity.squaredDistanceTo(entity) < distance)) {
             matrices.push()
             matrices.scale(this.scale, this.scale, this.scale)
             matrices.translate(0f, 0.25f, 0f)
@@ -90,7 +89,7 @@ class FlyingBlockItemEntityRenderer<T>(
         private val xRotatorMult = 0.3f
         private val yRotatorMult = 0.3f
         private val zRotatorMult = 0.1f
-        private val distance = MathHelper.square(3.5f).toDouble()
+        private val distance = MathHelper.square(3.5)
         const val OFFSET = 0.5f
     }
 }

@@ -28,6 +28,11 @@ object DuskPlacedFeatures {
     val TORUS = create("torus")
     val OVERWORLD_TORUS = create("overworld_torus")
 
+    val ROCK_SPIRE = create("spire/rocky")
+    val LARGE_ROCK_SPIRE = create("spire/large/rocky")
+    val GRASS_SPIRE = create("spire/grass")
+    val LARGE_GRASS_SPIRE = create("spire/large/grass")
+
     val BOREAL_VALLEY_VEGETATION = create("boreal_valley/boreal_valley_vegetation")
 
     private fun create(id: String): RegistryKey<PlacedFeature> =

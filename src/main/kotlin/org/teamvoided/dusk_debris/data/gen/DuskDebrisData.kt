@@ -7,7 +7,7 @@ import net.minecraft.registry.RegistrySetBuilder
 import org.teamvoided.dusk_debris.DuskDebris.log
 import org.teamvoided.dusk_debris.data.gen.providers.DamageTypeProvider
 import org.teamvoided.dusk_debris.data.gen.providers.EnchantmentsProvider
-import org.teamvoided.dusk_debris.data.gen.providers.EnglishTranslationProvider
+import org.teamvoided.dusk_debris.data.gen.providers.english_translation.EnglishTranslationProvider
 import org.teamvoided.dusk_debris.data.gen.providers.FogModifiers
 import org.teamvoided.dusk_debris.data.gen.providers.loot_table.EntityLootTableProvider
 import org.teamvoided.dusk_debris.data.gen.providers.models.ModelProvider

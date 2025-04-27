@@ -2,7 +2,9 @@ package org.teamvoided.dusk_debris.world.gen.configured_feature.config.rock_spir
 
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
+import net.minecraft.block.Block
 import net.minecraft.block.Blocks
+import net.minecraft.registry.tag.TagKey
 import net.minecraft.util.math.float_provider.ConstantFloatProvider
 import net.minecraft.util.math.float_provider.FloatProvider
 import net.minecraft.util.math.int_provider.IntProvider
@@ -13,17 +15,27 @@ class SurfaceFormationFeatureConfig(
     val topState: BlockStateProvider,
     val underState: BlockStateProvider,
     rockState: BlockStateProvider,
+    replaceable: TagKey<Block>,
     sizeY: IntProvider,
     sizeXZ: IntProvider,
     exponent: FloatProvider = ConstantFloatProvider.create(2f)
-) : RockFormationFeatureConfig(rockState, sizeY, sizeXZ, exponent) {
+) : RockFormationFeatureConfig(rockState, replaceable, sizeY, sizeXZ, exponent) {
     constructor(
         topState: BlockStateProvider,
         underState: BlockStateProvider,
+        replaceable: TagKey<Block>,
         sizeY: IntProvider,
         sizeXZ: IntProvider,
         exponent: FloatProvider = ConstantFloatProvider.create(2f)
-    ) : this(topState, underState, SimpleBlockStateProvider.of(Blocks.STONE.defaultState), sizeY, sizeXZ, exponent)
+    ) : this(
+        topState,
+        underState,
+        SimpleBlockStateProvider.of(Blocks.STONE.defaultState),
+        replaceable,
+        sizeY,
+        sizeXZ,
+        exponent
+    )
 
     constructor(
         topState: BlockStateProvider,
@@ -33,6 +45,7 @@ class SurfaceFormationFeatureConfig(
         topState,
         underState,
         config.rockState,
+        config.replaceable,
         config.sizeY,
         config.sizeXZ,
         config.exponent

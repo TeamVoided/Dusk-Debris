@@ -123,6 +123,16 @@ class BlockTagsProvider(output: FabricDataOutput, registriesFuture: CompletableF
             .add(Blocks.SOUL_SOIL)
 
             .add(Blocks.END_STONE)
+
+        getOrCreateTagBuilder(DuskBlockTags.GROUND_AND_REPLACEABLE)
+            .forceAddTag(BlockTags.REPLACEABLE)
+            .forceAddTag(BlockTags.DIRT)
+            .forceAddTag(BlockTags.SAND)
+            .forceAddTag(BlockTags.SNOW)
+            .add(Blocks.GRAVEL)
+            .add(Blocks.SANDSTONE)
+            .add(Blocks.RED_SANDSTONE)
+            .add(Blocks.PACKED_ICE)
     }
 
     private fun vanillaTags() {

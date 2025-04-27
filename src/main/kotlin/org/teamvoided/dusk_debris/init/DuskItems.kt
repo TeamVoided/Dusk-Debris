@@ -48,6 +48,7 @@ object DuskItems {
             Item.Settings().maxCount(1).component(DataComponentTypes.BUCKET_ENTITY_DATA, NbtComponent.DEFAULT)
         )
     )
+    val DEBUG_SPELL_ITEM = register("debug_spell_item", DebugSpellItem(Item.Settings().maxCount(1)))
 
     val MACE_BLAZE = register(
         "mace_blaze",

@@ -15,7 +15,7 @@ import org.teamvoided.dusk_debris.world.gen.configured_feature.config.rock_spire
 import org.teamvoided.dusk_debris.world.gen.noise.FastNoise
 import kotlin.math.*
 
-open class RockFormationFeature<T: RockFormationFeatureConfig>(codec: Codec<T>) :
+open class RockFormationFeature<T : RockFormationFeatureConfig>(codec: Codec<T>) :
     Feature<T>(codec) {
     override fun place(context: FeatureContext<T>): Boolean {
         val random = context.random
@@ -23,6 +23,7 @@ open class RockFormationFeature<T: RockFormationFeatureConfig>(codec: Codec<T>) 
         val origin = context.origin
         val config = context.config
 
+        val replaceable = config.replaceable
         val widthx: Int = config.sizeXZ[random]
         val widthz: Int = config.sizeXZ[random]
         val height: Int = config.sizeY[random]
@@ -46,14 +47,14 @@ open class RockFormationFeature<T: RockFormationFeatureConfig>(codec: Codec<T>) 
                     val offset = BlockPos(loopX, -loopY, loopZ)
                     val pos = origin.add(offset)
                     val worldState = world.getBlockState(pos)
-                    if (worldState.isIn(BlockTags.REPLACEABLE) && !worldState.isOf(Blocks.CAVE_AIR)) {
+                    if (worldState.isIn(replaceable) && !worldState.isOf(Blocks.CAVE_AIR)) {
                         val vec3d = offset.ofCenter()
                         val x = abs(vec3d.x / widthx).pow(exponent)
                         val z = abs(vec3d.z / widthz).pow(exponent)
                         val y = abs(vec3d.y / (height * if (offset.y < 0) .5 else 1.0)).pow(exponent)
                         val the = -loopY / height.toDouble()
                         val noise =
-                            noiseShaper.GetNoise((pos.ofCenter().multiply(1.0, 0.2, 1.0))) * 0.5 * (1 - the * the)
+                        noiseShaper.GetNoise((pos.ofCenter().multiply(1.0, 0.2, 1.0))) * 0.5 * (1 - the * the)
                         val distance = x + y + z
                         if (distance + noise < 1) {
                             val together = getBlock(world, pos, config, random, distance, yDepth, noiseDecorator)

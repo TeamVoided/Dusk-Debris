@@ -14,13 +14,13 @@ object StructureSetCreator {
         val structures: HolderProvider<StructureFeature> = c.getRegistryLookup(RegistryKeys.STRUCTURE_FEATURE)
         val biomes: HolderProvider<Biome> = c.getRegistryLookup(RegistryKeys.BIOME)
 
-        c.register(
-            DuskStructureSets.TEST,
-            DuskStructures.TEST,
-            6,
-            3,
-            1234567890
-        )
+        //c.register(
+        //    DuskStructureSets.TEST,
+        //    DuskStructures.TEST,
+        //    6,
+        //    3,
+        //    1234567890
+        //)
         c.register(
             DuskStructureSets.ANCIENT_RUINS,
             DuskStructures.ANCIENT_STRUCTURES,

@@ -8,6 +8,7 @@ import net.minecraft.registry.RegistryKey
 import net.minecraft.registry.RegistryKeys
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
+import net.minecraft.util.math.int_provider.ConstantIntProvider
 import net.minecraft.world.gen.YOffset
 import net.minecraft.world.gen.blockpredicate.BlockPredicate
 import net.minecraft.world.gen.decorator.*
@@ -79,6 +80,15 @@ object PlacedFeatureCreator {
             DuskConfiguredFeatures.OVERWORLD_TORUS,
             RarityFilterPlacementModifier.create(100),
             InSquarePlacementModifier.getInstance(),
+            PlacedFeatureUtil.OCEAN_FLOOR_WG_HEIGHTMAP,
+            BiomePlacementModifier.getInstance()
+        )
+
+        c.register(
+            DuskPlacedFeatures.LARGE_ROCK_SPIRE,
+            DuskConfiguredFeatures.LARGE_ROCK_SPIRE,
+            RarityFilterPlacementModifier.create(100),
+            RandomOffsetPlacementModifier.horizontal(ConstantIntProvider.create(8)),
             PlacedFeatureUtil.OCEAN_FLOOR_WG_HEIGHTMAP,
             BiomePlacementModifier.getInstance()
         )

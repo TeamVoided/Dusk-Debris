@@ -15,6 +15,7 @@ import net.minecraft.util.math.Vec3d
 import org.teamvoided.dusk_debris.DuskDebris.id
 import org.teamvoided.dusk_debris.entity.*
 import org.teamvoided.dusk_debris.entity.projectile.FlyingPumpkinProjectile
+import org.teamvoided.dusk_debris.entity.projectile.VengefulSpiritEntity
 import org.teamvoided.dusk_debris.entity.throwable_bomb.BlunderbombEntity
 import org.teamvoided.dusk_debris.entity.throwable_bomb.BonecallerEntity
 import org.teamvoided.dusk_debris.entity.throwable_bomb.FirebombEntity
@@ -132,6 +133,15 @@ object DuskEntities {
             .setEyeHeight(0.25f)
             .passengerAttachments(0.5f)
             .maxTrackingRange(8)
+    )
+    val VENGEFUL_SPIRIT = register(
+        "vengeful_spirit", EntityType.Builder.create(::VengefulSpiritEntity, SpawnGroup.MISC)
+            .setDimensions(1f, 1f)
+            .setEyeHeight(0.5f)
+            .passengerAttachments(1f)
+            .maxTrackingRange(4)
+            .trackingTickInterval(20)
+            .makeFireImmune()
     )
 
     /// DnD Entities

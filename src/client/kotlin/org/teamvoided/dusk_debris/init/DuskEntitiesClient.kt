@@ -13,6 +13,7 @@ import org.teamvoided.dusk_debris.entity.jellyfish.tiny.TinyEnemyJellyfishEntity
 import org.teamvoided.dusk_debris.entity.jellyfish.volaphyra.VolaphyraCoreEntityRenderer
 import org.teamvoided.dusk_debris.entity.jellyfish.volaphyra.VolaphyraEntityRenderer
 import org.teamvoided.dusk_debris.entity.lazer.LazerEntityRenderer
+import org.teamvoided.dusk_debris.entity.magic.vengeful_spirit.VengefulSpiritRenderer
 import org.teamvoided.dusk_debris.entity.piffling.PifflingPumpkinEntityRenderer
 import org.teamvoided.dusk_debris.entity.skeleton.gloom.GloomEntityRenderer
 import org.teamvoided.dusk_debris.entity.skeleton.wolf.SkeletonWolfEntityRenderer
@@ -36,10 +37,12 @@ object DuskEntitiesClient {
         EntityRendererRegistry.register(DuskEntities.VOLAPHYRA_CORE, ::VolaphyraCoreEntityRenderer)
         EntityRendererRegistry.register(DuskEntities.TINY_ENEMY_JELLYFISH, ::TinyEnemyJellyfishEntityRenderer)
 
+        EntityRendererRegistry.register(DuskEntities.VENGEFUL_SPIRIT, ::VengefulSpiritRenderer)
 
         DuskEntityLists.THROWABLE_BOMB_ENTITIES.forEach {
             EntityRendererRegistry.register(it, ::FlyingItemEntityRenderer)
         }
+
         // DnD
         EntityRendererRegistry.register(DuskEntities.CHILL_CHARGE, ::ChillChargeEntityRenderer)
         EntityRendererRegistry.register(DuskEntities.DIE, ::DiceEntityRenderer)

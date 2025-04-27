@@ -23,6 +23,7 @@ import net.minecraft.world.gen.treedecorator.LeavesVineTreeDecorator
 import net.minecraft.world.gen.treedecorator.TreeDecorator
 import net.minecraft.world.gen.trunk.StraightTrunkPlacer
 import org.teamvoided.dusk_debris.data.gen.world.gen.configured_feature_creators.NetherConfiguredFeatureCreators.netherConfiguredFeatureCreators
+import org.teamvoided.dusk_debris.data.tags.DuskBlockTags
 import org.teamvoided.dusk_debris.data.worldgen.DuskConfiguredFeatures
 import org.teamvoided.dusk_debris.data.worldgen.DuskPlacedFeatures
 import org.teamvoided.dusk_debris.init.DuskBlocks
@@ -238,14 +239,16 @@ object ConfiguredFeatureCreator {
     }
 
     private val spire = RockFormationFeatureConfig(
-        UniformIntProvider.create(7, 16),
+        DuskBlockTags.GROUND_AND_REPLACEABLE,
         UniformIntProvider.create(16, 80),
+        UniformIntProvider.create(7, 16),
         UniformFloatProvider.create(1f, 3f)
     )
 
     private val spire_large = RockFormationFeatureConfig(
-        UniformIntProvider.create(17, 24),
+        DuskBlockTags.GROUND_AND_REPLACEABLE,
         UniformIntProvider.create(48, 120),
+        UniformIntProvider.create(17, 24),
         UniformFloatProvider.create(1f, 3f)
     )
 
