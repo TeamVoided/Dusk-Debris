@@ -15,7 +15,7 @@ import net.minecraft.util.math.Vec3d
 import org.teamvoided.dusk_debris.DuskDebris.id
 import org.teamvoided.dusk_debris.entity.*
 import org.teamvoided.dusk_debris.entity.projectile.FlyingPumpkinProjectile
-import org.teamvoided.dusk_debris.entity.projectile.VengefulSpiritEntity
+import org.teamvoided.dusk_debris.entity.spell.VengefulSpiritEntity
 import org.teamvoided.dusk_debris.entity.throwable_bomb.BlunderbombEntity
 import org.teamvoided.dusk_debris.entity.throwable_bomb.BonecallerEntity
 import org.teamvoided.dusk_debris.entity.throwable_bomb.FirebombEntity

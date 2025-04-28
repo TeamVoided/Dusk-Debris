@@ -7,8 +7,6 @@ import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.item.ProjectileItem
 import net.minecraft.item.ProjectileItem.DispenserConfig
-import net.minecraft.sound.SoundCategory
-import net.minecraft.sound.SoundEvents
 import net.minecraft.stat.Stats
 import net.minecraft.util.Hand
 import net.minecraft.util.TypedActionResult
@@ -16,14 +14,13 @@ import net.minecraft.util.math.Direction
 import net.minecraft.util.math.Position
 import net.minecraft.util.math.Vec3d
 import net.minecraft.world.World
-import org.teamvoided.dusk_debris.entity.ChillChargeEntity
-import org.teamvoided.dusk_debris.entity.projectile.VengefulSpiritEntity
+import org.teamvoided.dusk_debris.entity.spell.VengefulSpiritEntity
 
 class DebugSpellItem(settings: Settings) : Item(settings), ProjectileItem {
     override fun use(world: World, user: PlayerEntity, hand: Hand): TypedActionResult<ItemStack> {
         if (!world.isClient()) {
             val entity =
-                VengefulSpiritEntity(world, user.pos.getX(), user.eyePos.getY(), user.pos.getZ(), user.velocity)
+                VengefulSpiritEntity(world, user.pos.x, user.pos.y + user.height / 2, user.pos.z, user.velocity)
             entity.owner = user
             entity.setProperties(user, user.pitch, user.yaw, 0.0f, 1.5f, 1.0f)
             world.spawnEntity(entity)

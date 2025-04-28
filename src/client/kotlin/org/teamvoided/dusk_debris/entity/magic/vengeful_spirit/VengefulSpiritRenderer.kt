@@ -11,7 +11,7 @@ import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.MathHelper
 import org.teamvoided.dusk_debris.DuskDebris
 import org.teamvoided.dusk_debris.entity.DuskEntityModelLayers
-import org.teamvoided.dusk_debris.entity.projectile.VengefulSpiritEntity
+import org.teamvoided.dusk_debris.entity.spell.VengefulSpiritEntity
 import org.teamvoided.dusk_debris.util.Utils
 
 

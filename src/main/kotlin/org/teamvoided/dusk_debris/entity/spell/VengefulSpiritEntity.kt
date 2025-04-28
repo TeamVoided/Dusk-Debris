@@ -1,4 +1,4 @@
-package org.teamvoided.dusk_debris.entity.projectile
+package org.teamvoided.dusk_debris.entity.spell
 
 import net.minecraft.enchantment.EnchantmentHelper
 import net.minecraft.entity.EntityDimensions
@@ -13,7 +13,6 @@ import net.minecraft.entity.projectile.ExplosiveProjectileEntity
 import net.minecraft.entity.projectile.ProjectileUtil
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.particle.ParticleEffect
-import net.minecraft.particle.ParticleTypes
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.hit.BlockHitResult
 import net.minecraft.util.hit.EntityHitResult
@@ -21,8 +20,6 @@ import net.minecraft.util.hit.HitResult
 import net.minecraft.util.math.MathHelper
 import net.minecraft.util.math.Vec3d
 import net.minecraft.world.World
-import org.teamvoided.dusk_debris.entity.DiceEntity
-import org.teamvoided.dusk_debris.entity.LightningCloudEntity
 import org.teamvoided.dusk_debris.init.DuskEntities
 import org.teamvoided.dusk_debris.init.DuskParticles
 
@@ -35,7 +32,12 @@ class VengefulSpiritEntity : ExplosiveProjectileEntity {
     constructor(world: World, x: Double, y: Double, z: Double, velocity: Vec3d) :
             super(DuskEntities.VENGEFUL_SPIRIT, x, y, z, velocity, world)
 
-    private var despawnDistance: Float = 100f
+    private var despawnDistance: Int
+
+    init {
+        despawnDistance = DEFAULT_DESPAWN_DISTANCE
+        accelerationPower = 0.1
+    }
 
 
     override fun initDataTracker(builder: DataTracker.Builder) {
@@ -58,15 +60,20 @@ class VengefulSpiritEntity : ExplosiveProjectileEntity {
         ProjectileUtil.rotateTowardsMovement(this, 1f)
         super.tick()
         if (distanceTraveled > despawnDistance) {
-            if (this.world.isClient)
-                particlesOnHit()
-            else
+            world.sendEntityStatus(this, 60.toByte())
+            if (!this.world.isClient)
                 this.discard()
         } else if (world.isClient) {
+            val pos = Vec3d(
+                (random.nextDouble() - 0.5),
+                (random.nextDouble() - 0.5),
+                (random.nextDouble() - 0.5)
+            ).normalize().multiply(this.size.toDouble()).add(0.0,this.standingEyeHeight.toDouble(),0.0)
+            val velocity = velocity.multiply(-0.1)
             world.addParticle(
                 getParticle(),
                 this.x, this.eyeY, this.z,
-                0.0, 0.0, 0.0
+                velocity.x, velocity.y, velocity.z
             )
         }
     }
@@ -75,8 +82,9 @@ class VengefulSpiritEntity : ExplosiveProjectileEntity {
         super.onCollision(hitResult)
         if (!world.isClient) {
             if (noClip) {
-                despawnDistance = 25f
+                despawnDistance = NO_CLIPPED_DESPAWN_DISTANCE
             } else {
+                world.sendEntityStatus(this, 60.toByte())
                 this.discard()
             }
         }
@@ -84,7 +92,6 @@ class VengefulSpiritEntity : ExplosiveProjectileEntity {
 
     override fun onEntityHit(entityHitResult: EntityHitResult) {
         super.onEntityHit(entityHitResult)
-        particlesOnHit()
         if (world is ServerWorld) {
             val entity = entityHitResult.entity
             if (entity != null) {
@@ -103,7 +110,6 @@ class VengefulSpiritEntity : ExplosiveProjectileEntity {
 
     override fun onBlockHit(blockHitResult: BlockHitResult) {
         super.onBlockHit(blockHitResult)
-        particlesOnHit()
         if (!this.world.isClient) {
             //if ((owner !is MobEntity || this.world.gameRules.getBooleanValue(GameRules.DO_MOB_GRIEFING))) {
             //    val blockPos = blockHitResult.blockPos.offset(blockHitResult.side)
@@ -114,24 +120,27 @@ class VengefulSpiritEntity : ExplosiveProjectileEntity {
         }
     }
 
-    private fun particlesOnHit() {
+    fun addExplosionParticles() {
         if (world.isClient)
             repeat(30) {
                 val velocity = Vec3d(
                     (random.nextDouble() - 0.5),
                     (random.nextDouble() - 0.5),
                     (random.nextDouble() - 0.5)
-                ).normalize()
+                ).normalize().multiply(0.2)
                 world.addParticle(
                     getParticle(),
-                    this.x,
-                    this.eyeY,
-                    this.z,
-                    velocity.x,
-                    velocity.y,
-                    velocity.z,
+                    this.x, this.eyeY, this.z,
+                    velocity.x, velocity.y, velocity.z,
                 )
             }
+    }
+
+    override fun handleStatus(status: Byte) {
+        if (status.toInt() == 60)
+            addExplosionParticles()
+        else
+            super.handleStatus(status)
     }
 
     var size: Float
@@ -172,5 +181,8 @@ class VengefulSpiritEntity : ExplosiveProjectileEntity {
         private const val SIZE_DEFAULT = 0.5f
         private val SIZE_BOUNDS = (0.1f to 30f)
         private const val SIZE_KEY = "size"
+
+        private const val DEFAULT_DESPAWN_DISTANCE = 100
+        private const val NO_CLIPPED_DESPAWN_DISTANCE = 25
     }
 }

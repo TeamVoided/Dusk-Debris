@@ -28,7 +28,6 @@ class VengefulSpiritModel(val root: ModelPart) : SinglePartEntityModel<Entity>()
         this.bone.scaleX = 2 * entity.width
         this.bone.scaleY = 2 * entity.height
         this.bone.scaleZ = 2 * entity.width
-        sendMessageIngame(bone.pivotY.toString())
     }
 
     override fun method_2828(

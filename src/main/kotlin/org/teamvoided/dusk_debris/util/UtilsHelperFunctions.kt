@@ -10,10 +10,7 @@ import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.state.property.BooleanProperty
 import net.minecraft.state.property.Properties
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Box
-import net.minecraft.util.math.Direction
-import net.minecraft.util.math.Vec3d
+import net.minecraft.util.math.*
 import net.minecraft.util.math.noise.DoublePerlinNoiseSampler
 import net.minecraft.util.shape.VoxelShape
 import net.minecraft.util.shape.VoxelShapes
@@ -113,7 +110,7 @@ fun Vec3d.toBlockPos(): BlockPos {
     return BlockPos(floor(this.x).toInt(), floor(this.y).toInt(), floor(this.z).toInt())
 }
 
-fun BlockPos.toVec3d(): Vec3d {
+fun Vec3i.toVec3d(): Vec3d {
     return Vec3d(this.x.toDouble(), this.y.toDouble(), this.z.toDouble())
 }
 
