@@ -20,8 +20,7 @@ class TorusFeatureConfig(
     val pitch: FloatProvider,
     val roll: FloatProvider,
     val noiseMultiplier: FloatProvider,
-) :
-    FeatureConfig {
+) : FeatureConfig {
     companion object {
         val CODEC: Codec<TorusFeatureConfig> =
             RecordCodecBuilder.create { instance: RecordCodecBuilder.Instance<TorusFeatureConfig> ->
@@ -47,13 +46,13 @@ class TorusFeatureConfig(
                         .fieldOf("ring_height")
                         .orElse(UniformIntProvider.create(2, 6))
                         .forGetter { config: TorusFeatureConfig -> config.ringHeight },
-                    FloatProvider.createValidatedCodec(0f,1f)
+                    FloatProvider.createValidatedCodec(0f, 1f)
                         .fieldOf("pitch")
                         .forGetter { config: TorusFeatureConfig -> config.pitch },
-                    FloatProvider.createValidatedCodec(0f,1f)
+                    FloatProvider.createValidatedCodec(0f, 1f)
                         .fieldOf("roll")
                         .forGetter { config: TorusFeatureConfig -> config.roll },
-                    FloatProvider.createValidatedCodec(0f,10f)
+                    FloatProvider.createValidatedCodec(0f, 10f)
                         .fieldOf("noise_multiplier")
                         .forGetter { config: TorusFeatureConfig -> config.noiseMultiplier }
                 ).apply(instance, ::TorusFeatureConfig)

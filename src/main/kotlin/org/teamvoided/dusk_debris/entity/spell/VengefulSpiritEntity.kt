@@ -72,7 +72,7 @@ class VengefulSpiritEntity : ExplosiveProjectileEntity {
             val velocity = velocity.multiply(-0.1)
             world.addParticle(
                 getParticle(),
-                this.x, this.eyeY, this.z,
+                pos.x, pos.y, pos.z,
                 velocity.x, velocity.y, velocity.z
             )
         }

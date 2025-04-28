@@ -40,7 +40,8 @@
     "fluid_tag.water.FishingBobberEntityMixin",
     "fluid_tag.water.GlassBottleItemMixin",
     "pixel_accurate.CombinedSignBlockMixin",
-    "pixel_accurate.WallSignBlockMixin"
+    "pixel_accurate.WallSignBlockMixin",
+    "spell.PlayerEntitySpellMixin"
   ],
   "injectors": {
     "defaultRequire": 1
