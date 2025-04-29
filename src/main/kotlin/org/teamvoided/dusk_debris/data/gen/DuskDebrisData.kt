@@ -9,6 +9,7 @@ import org.teamvoided.dusk_debris.data.gen.providers.DamageTypeProvider
 import org.teamvoided.dusk_debris.data.gen.providers.EnchantmentsProvider
 import org.teamvoided.dusk_debris.data.gen.providers.english_translation.EnglishTranslationProvider
 import org.teamvoided.dusk_debris.data.gen.providers.FogModifiers
+import org.teamvoided.dusk_debris.data.gen.providers.Spells
 import org.teamvoided.dusk_debris.data.gen.providers.loot_table.EntityLootTableProvider
 import org.teamvoided.dusk_debris.data.gen.providers.models.ModelProvider
 import org.teamvoided.dusk_debris.data.gen.providers.variants.PaintingVariants
@@ -64,6 +65,7 @@ class DuskDebrisData : DataGeneratorEntrypoint {
         gen.add(RegistryKeys.PAINTING_VARIANT, PaintingVariants::bootstrap)
         gen.add(DuskRegistryKeys.SNIFFER_VARIANT, SnifferVariants::bootstrap)
         gen.add(DuskRegistryKeys.FOG_MODIFIER, FogModifiers::bootstrap)
+        gen.add(DuskRegistryKeys.SPELL, Spells::bootstrap)
         println("End build registry")
     }
 }

@@ -32,5 +32,6 @@ class DynamicRegistryProvider(o: FabricDataOutput, r: CompletableFuture<HolderLo
         e.addAll(reg.getLookupOrThrow(RegistryKeys.PAINTING_VARIANT))
         e.addAll(reg.getLookupOrThrow(DuskRegistryKeys.SNIFFER_VARIANT))
         e.addAll(reg.getLookupOrThrow(DuskRegistryKeys.FOG_MODIFIER))
+        e.addAll(reg.getLookupOrThrow(DuskRegistryKeys.SPELL))
     }
 }

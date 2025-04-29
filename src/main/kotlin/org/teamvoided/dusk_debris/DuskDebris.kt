@@ -40,7 +40,7 @@ object DuskDebris {
         DuskRegistryKeys.init()
         DuskRegistries.init()
 
-        DuskSpells.init()
+        DuskSpellTypes.init()
 
         DuskCommands.init()
 

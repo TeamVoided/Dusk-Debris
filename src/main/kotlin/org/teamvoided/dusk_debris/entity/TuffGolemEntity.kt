@@ -32,7 +32,6 @@ import org.teamvoided.dusk_debris.entity.ai.goal.ShowOffGoal
 import org.teamvoided.dusk_debris.entity.ai.goal.TuffGolemHome
 import java.util.*
 
-
 class TuffGolemEntity(entityType: EntityType<out TuffGolemEntity>, world: World) : GolemEntity(entityType, world) {
     var stateTicks: Int = 0
     val statueAnimationState: AnimationState = AnimationState()
