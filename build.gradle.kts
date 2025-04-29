@@ -21,7 +21,7 @@ val curse_id: String? by project
 
 repositories {
     maven("https://teamvoided.org/releases")
-    //maven("https://teamvoided.org/snapshots")
+    maven("https://teamvoided.org/snapshots")
     maven("https://maven.terraformersmc.com/") { name = "Terraformers" }
     maven("https://api.modrinth.com/maven")
     mavenCentral()
@@ -45,7 +45,7 @@ dependencies {
     modImplementation(fileTree("libs"))
     modImplementation(libs.modmenu)
     modImplementation(libs.reef)
-    //modImplementation(libs.creative.works)
+    modImplementation(libs.creative.works)
 
     //modImplementation("software.bernie.geckolib:geckolib-fabric-1.20.6:${geckolib_version}")
 }
