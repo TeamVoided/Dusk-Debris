@@ -3,7 +3,7 @@ package org.teamvoided.dusk_debris.data.variants
 import net.minecraft.registry.RegistryKey
 import org.teamvoided.dusk_debris.DuskDebris.id
 import org.teamvoided.dusk_debris.entity.variant.SnifferVariant
-import org.teamvoided.dusk_debris.init.DuskRegistries
+import org.teamvoided.dusk_debris.init.DuskRegistryKeys
 
 object DuskSnifferVariants {
     val DEFAULT = create("default")
@@ -23,5 +23,5 @@ object DuskSnifferVariants {
     val FROZEN = create("frozen")                    //snowy? (biome tint)
     val DEEP_DARK = create("deep_dark")              //deep dark
 
-    fun create(path: String): RegistryKey<SnifferVariant> = RegistryKey.of(DuskRegistries.SNIFFER_VARIANT, id(path))
+    fun create(path: String): RegistryKey<SnifferVariant> = RegistryKey.of(DuskRegistryKeys.SNIFFER_VARIANT, id(path))
 }

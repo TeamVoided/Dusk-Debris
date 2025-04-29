@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.teamvoided.dusk_debris.data.gen.providers.variants.SnifferVariants;
 import org.teamvoided.dusk_debris.entity.variant.SnifferVariant;
 import org.teamvoided.dusk_debris.init.DuskAttachmentTypes;
-import org.teamvoided.dusk_debris.init.DuskRegistries;
+import org.teamvoided.dusk_debris.init.DuskRegistryKeys;
 
 @Debug(export = true)
 @Mixin(SnifferEntity.class)
@@ -40,7 +40,7 @@ public abstract class SnifferEntityMixin extends MobEntity implements VariantPro
     @Override
     public Holder<SnifferVariant> getVariant() {
         var id = this.getAttachedOrElse(DuskAttachmentTypes.SNIFFER_VARIANT, SnifferVariants.DEFAULT);
-        return this.getWorld().getRegistryManager().getLookupOrThrow(DuskRegistries.SNIFFER_VARIANT).getHolderOrThrow(id);
+        return this.getWorld().getRegistryManager().getLookupOrThrow(DuskRegistryKeys.SNIFFER_VARIANT).getHolderOrThrow(id);
     }
 
     @Override

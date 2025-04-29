@@ -10,7 +10,7 @@ import org.teamvoided.dusk_debris.DuskDebris.id
 import org.teamvoided.dusk_debris.data.tags.DuskBiomeTags
 import org.teamvoided.dusk_debris.data.variants.DuskSnifferVariants
 import org.teamvoided.dusk_debris.entity.variant.SnifferVariant
-import org.teamvoided.dusk_debris.init.DuskRegistries.SNIFFER_VARIANT
+import org.teamvoided.dusk_debris.init.DuskRegistryKeys.SNIFFER_VARIANT
 import java.util.*
 
 object SnifferVariants {

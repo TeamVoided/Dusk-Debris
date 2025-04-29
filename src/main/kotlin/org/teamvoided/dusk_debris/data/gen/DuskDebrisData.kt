@@ -19,7 +19,7 @@ import org.teamvoided.dusk_debris.data.gen.world.gen.biome.BiomeCreator
 import org.teamvoided.dusk_debris.data.gen.world.gen.structure.StructureCreator
 import org.teamvoided.dusk_debris.data.gen.world.gen.structure.StructurePoolCreator
 import org.teamvoided.dusk_debris.data.gen.world.gen.structure.StructureSetCreator
-import org.teamvoided.dusk_debris.init.DuskRegistries
+import org.teamvoided.dusk_debris.init.DuskRegistryKeys
 
 @Suppress("unused")
 class DuskDebrisData : DataGeneratorEntrypoint {
@@ -62,8 +62,8 @@ class DuskDebrisData : DataGeneratorEntrypoint {
         gen.add(RegistryKeys.ENCHANTMENT, EnchantmentsProvider::bootstrap)
 
         gen.add(RegistryKeys.PAINTING_VARIANT, PaintingVariants::bootstrap)
-        gen.add(DuskRegistries.SNIFFER_VARIANT, SnifferVariants::bootstrap)
-        gen.add(DuskRegistries.FOG_MODIFIER, FogModifiers::bootstrap)
+        gen.add(DuskRegistryKeys.SNIFFER_VARIANT, SnifferVariants::bootstrap)
+        gen.add(DuskRegistryKeys.FOG_MODIFIER, FogModifiers::bootstrap)
         println("End build registry")
     }
 }

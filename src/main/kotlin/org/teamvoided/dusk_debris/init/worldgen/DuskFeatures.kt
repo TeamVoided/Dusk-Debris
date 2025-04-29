@@ -33,6 +33,6 @@ object DuskFeatures {
 
     fun init() {}
 
-    private fun <C : FeatureConfig?, F : Feature<C>> register(name: String, feature: F): F =
+    private fun <C : FeatureConfig, F : Feature<C>> register(name: String, feature: F): F =
         Registry.register(Registries.FEATURE, id(name), feature)
 }

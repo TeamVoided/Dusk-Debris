@@ -18,7 +18,7 @@ object DuskCommands {
                 val world = cx.source.world
                 val player = cx.source.player ?: return@executes 0
                 var offset = 0.0
-                world.registryManager.get(DuskRegistries.SNIFFER_VARIANT).holders().forEach {
+                world.registryManager.get(DuskRegistryKeys.SNIFFER_VARIANT).holders().forEach {
                     val pos = player.pos.add(offset, 0.0, 0.0)
 
                     val sniffer = SnifferEntity(EntityType.SNIFFER, world)

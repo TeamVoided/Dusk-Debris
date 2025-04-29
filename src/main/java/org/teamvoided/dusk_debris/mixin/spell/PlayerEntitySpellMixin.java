@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.teamvoided.dusk_debris.entity.helper.DuskSpellStuff;
-import org.teamvoided.dusk_debris.spell.AbstractSpell;
+import org.teamvoided.dusk_debris.spell.Spell;
 
 @Mixin(PlayerEntity.class)
 abstract public class PlayerEntitySpellMixin extends LivingEntity implements DuskSpellStuff {
@@ -25,24 +25,24 @@ abstract public class PlayerEntitySpellMixin extends LivingEntity implements Dus
         if (getSpell() != null) {
             var spell = getSpell();
             spell.castTick(this);
-            if (getSpellTicksLeft() >= spell.getCoolup()) {
+            if (getSpellTicksLeft() <= 0) {
                 spell.onCastEnd(this);
                 setSpellTicksLeft(0);
                 setSpell(null);
             } else {
-                setSpellTicksLeft(getSpellTicksLeft() + 1);
+                setSpellTicksLeft(getSpellTicksLeft() - 1);
             }
         }
     }
 
     @Override
-    public void setSpell(@Nullable AbstractSpell spell) {
+    public void setSpell(@Nullable Spell spell) {
         DuskDebris$spell = spell;
     }
 
     @Nullable
     @Override
-    public AbstractSpell getSpell() {
+    public Spell getSpell() {
         return DuskDebris$spell;
     }
 
@@ -61,5 +61,5 @@ abstract public class PlayerEntitySpellMixin extends LivingEntity implements Dus
 
     @Unique
     @Nullable
-    public AbstractSpell DuskDebris$spell = null;
+    public Spell DuskDebris$spell = null;
 }

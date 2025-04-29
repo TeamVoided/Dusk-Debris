@@ -37,7 +37,10 @@ object DuskDebris {
         DuskTabs.init()
 
         DuskAttachmentTypes.init()
+        DuskRegistryKeys.init()
         DuskRegistries.init()
+
+        DuskSpells.init()
 
         DuskCommands.init()
 

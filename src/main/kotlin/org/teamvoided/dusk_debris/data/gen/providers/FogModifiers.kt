@@ -7,7 +7,7 @@ import net.minecraft.world.biome.Biome
 import org.teamvoided.dusk_debris.DuskDebris
 import org.teamvoided.dusk_debris.data.DuskFogModifiers
 import org.teamvoided.dusk_debris.data.tags.DuskBiomeTags
-import org.teamvoided.dusk_debris.init.DuskRegistries.FOG_MODIFIER
+import org.teamvoided.dusk_debris.init.DuskRegistryKeys.FOG_MODIFIER
 import org.teamvoided.dusk_debris.world.FogModifier
 import java.util.*
 

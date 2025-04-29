@@ -18,7 +18,7 @@ object DuskAttachmentTypes {
         AttachmentRegistry.create(DuskDebris.id("sniffer_variant")) { builder: AttachmentRegistry.Builder<RegistryKey<SnifferVariant>> ->
             builder
                 .initializer { SnifferVariants.DEFAULT }
-                .persistent(RegistryKey.codec(DuskRegistries.SNIFFER_VARIANT))
-                .syncWith(RegistryKey.packetCodec(DuskRegistries.SNIFFER_VARIANT), AttachmentSyncPredicate.all())
+                .persistent(RegistryKey.codec(DuskRegistryKeys.SNIFFER_VARIANT))
+                .syncWith(RegistryKey.packetCodec(DuskRegistryKeys.SNIFFER_VARIANT), AttachmentSyncPredicate.all())
         }
 }
