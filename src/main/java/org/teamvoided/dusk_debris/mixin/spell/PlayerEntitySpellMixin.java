@@ -3,6 +3,7 @@ package org.teamvoided.dusk_debris.mixin.spell;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.text.Text;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
@@ -22,22 +23,25 @@ abstract public class PlayerEntitySpellMixin extends LivingEntity implements Dus
 
     @Inject(method = "tickMovement", at = @At("HEAD"))
     public void spellTick(CallbackInfo ci) {
+        if (this.getWorld().isClient) return;
         if (getSpell() != null) {
             var spell = getSpell();
-            spell.getSpellType().castTick(this);
+            spell.castTick(this);
             if (getSpellTicksLeft() <= 0) {
-                spell.getSpellType().onCastEnd(this);
+                spell.onCastEnd(this);
                 setSpellTicksLeft(0);
                 setSpell(null);
             } else {
                 setSpellTicksLeft(getSpellTicksLeft() - 1);
             }
         }
+        ((PlayerEntity) (Object) this).sendMessage(Text.literal("ticks left: " + this.getSpellTicksLeft()), true);
     }
 
     @Override
     public void setSpell(@Nullable Spell<?, ?> spell) {
         DuskDebris$spell = spell;
+        if (spell != null) spell.onCast(this);
     }
 
     @Nullable

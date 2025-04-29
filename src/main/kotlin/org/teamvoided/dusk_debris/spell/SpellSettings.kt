@@ -4,7 +4,7 @@ import java.util.stream.Stream
 
 
 interface SpellSettings {
-    val decoratedFeatures: Stream<Spell<*, *>> get() = Stream.empty()
+    val spellSettings: Stream<Spell<*, *>> get() = Stream.empty()
 
     companion object {
         object DefaultSpellSettings : SpellSettings

@@ -5,12 +5,6 @@ import net.minecraft.client.model.*
 import net.minecraft.client.render.entity.model.SinglePartEntityModel
 import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.entity.Entity
-import net.minecraft.util.math.Axis
-import net.minecraft.util.math.MathHelper
-import org.joml.Vector3f
-import org.teamvoided.dusk_debris.util.Utils
-import org.teamvoided.dusk_debris.util.scale
-import org.teamvoided.dusk_debris.util.sendMessageIngame
 
 class VengefulSpiritModel(val root: ModelPart) : SinglePartEntityModel<Entity>() {
     val bone = root.getChild("bone")

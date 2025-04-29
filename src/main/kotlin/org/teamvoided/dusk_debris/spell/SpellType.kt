@@ -13,23 +13,23 @@ import org.teamvoided.dusk_debris.init.DuskRegistries
 
 abstract class SpellType<SS : SpellSettings>(configCodec: Codec<SS>) {
     private val codec: MapCodec<Spell<SS, SpellType<SS>>> = configCodec.fieldOf("settings")
-        .xmap({ Spell(this, it) }, { it.config })
+        .xmap({ Spell(this, it) }, { it.settings })
 
     fun getCodec() = codec
 
     fun id() = DuskRegistries.SPELL_TYPE.getId(this)!!
 
-    open fun castRequirements(castor: LivingEntity): Boolean = true
+    open fun castRequirements(castor: LivingEntity, settings: SS): Boolean = true
 
-    open fun onCast(castor: LivingEntity) {}
+    open fun onCast(castor: LivingEntity, settings: SS) {}
 
-    open fun castTick(castor: LivingEntity) {}
+    open fun castTick(castor: LivingEntity, settings: SS) {}
 
-    open fun onCastEnd(castor: LivingEntity) {}
+    open fun onCastEnd(castor: LivingEntity, settings: SS) {}
 
-    abstract fun actualSpell(castor: LivingEntity)
+    abstract fun actualSpell(castor: LivingEntity, settings: SS)
 
-    open fun nonEntityBehavior(world: World, random: RandomGenerator, pos: Vec3d, rotation: Vec3d) {
+    open fun nonEntityBehavior(world: World, random: RandomGenerator, pos: Vec3d, rotation: Vec3d, settings: SS) {
         if (world.isClient) {
             repeat(10) {
                 val particlePos = Vec3d(
