@@ -24,9 +24,9 @@ abstract public class PlayerEntitySpellMixin extends LivingEntity implements Dus
     public void spellTick(CallbackInfo ci) {
         if (getSpell() != null) {
             var spell = getSpell();
-            spell.castTick(this);
+            spell.getSpellType().castTick(this);
             if (getSpellTicksLeft() <= 0) {
-                spell.onCastEnd(this);
+                spell.getSpellType().onCastEnd(this);
                 setSpellTicksLeft(0);
                 setSpell(null);
             } else {
@@ -36,13 +36,13 @@ abstract public class PlayerEntitySpellMixin extends LivingEntity implements Dus
     }
 
     @Override
-    public void setSpell(@Nullable Spell spell) {
+    public void setSpell(@Nullable Spell<?, ?> spell) {
         DuskDebris$spell = spell;
     }
 
     @Nullable
     @Override
-    public Spell getSpell() {
+    public Spell<?, ?> getSpell() {
         return DuskDebris$spell;
     }
 
@@ -61,5 +61,6 @@ abstract public class PlayerEntitySpellMixin extends LivingEntity implements Dus
 
     @Unique
     @Nullable
-    public Spell DuskDebris$spell = null;
+    public Spell<?, ?> DuskDebris$spell = null;
+
 }

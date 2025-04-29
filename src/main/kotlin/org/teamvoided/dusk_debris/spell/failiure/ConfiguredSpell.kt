@@ -7,7 +7,7 @@
 //import net.minecraft.util.random.RandomGenerator
 //import net.minecraft.world.StructureWorldAccess
 //import net.minecraft.world.gen.chunk.ChunkGenerator
-//import org.teamvoided.dusk_debris.spell.codec.SpellConfig
+//import org.teamvoided.dusk_debris.spell.SpellConfig
 //import org.teamvoided.dusk_debris.init.DuskRegistries
 //import java.util.stream.Stream
 //

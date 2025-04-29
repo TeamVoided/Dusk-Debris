@@ -1,21 +1,18 @@
 package org.teamvoided.dusk_debris.spell
 
 import com.mojang.serialization.Codec
-import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.attribute.EntityAttributeModifier
 import net.minecraft.entity.attribute.EntityAttributes
 import net.minecraft.util.math.Vec3d
 import org.teamvoided.dusk_debris.entity.spell.VengefulSpiritEntity
-import org.teamvoided.dusk_debris.spell.config.VengefulSpiritConfig
-import org.teamvoided.dusk_debris.world.gen.configured_carver.config.GeodeCarverConfig
 
-class VengefulSpiritSpell(codec: Codec<VengefulSpiritConfig>) : Spell<VengefulSpiritConfig> {
+class VengefulSpiritSpell(codec: Codec<GenericSpellSettings>) : SpellType<GenericSpellSettings>(codec) {
 
     override fun onCast(castor: LivingEntity) {
         val entityAttributeSpeedInstance = castor.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED)
-        entityAttributeSpeedInstance!!.removeModifier(Spell.SPELL_CASTING_MODIFIER_ID)
+        entityAttributeSpeedInstance!!.removeModifier(SpellType.SPELL_CASTING_MODIFIER_ID)
         entityAttributeSpeedInstance.addTemporaryModifier(SPELL_CASTING_PENALTY_MODIFIER)
         castor.velocity = Vec3d.ZERO
         castor.velocityDirty = true
@@ -24,7 +21,7 @@ class VengefulSpiritSpell(codec: Codec<VengefulSpiritConfig>) : Spell<VengefulSp
 
     override fun onCastEnd(castor: LivingEntity) {
         castor.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED)!!
-            .removeModifier(Spell.SPELL_CASTING_MODIFIER_ID)
+            .removeModifier(SpellType.SPELL_CASTING_MODIFIER_ID)
     }
 
     override fun actualSpell(castor: LivingEntity) {
@@ -45,6 +42,6 @@ class VengefulSpiritSpell(codec: Codec<VengefulSpiritConfig>) : Spell<VengefulSp
 
     companion object {
         private val SPELL_CASTING_PENALTY_MODIFIER =
-            EntityAttributeModifier(Spell.SPELL_CASTING_MODIFIER_ID, -0.25, EntityAttributeModifier.Operation.ADD_VALUE)
+            EntityAttributeModifier(SpellType.SPELL_CASTING_MODIFIER_ID, -0.25, EntityAttributeModifier.Operation.ADD_VALUE)
     }
 }

@@ -8,7 +8,7 @@
 //import net.minecraft.world.gen.feature.FeatureConfig
 //import org.teamvoided.dusk_debris.DuskDebris
 //import org.teamvoided.dusk_debris.init.DuskRegistries
-//import org.teamvoided.dusk_debris.spell.codec.SpellConfig
+//import org.teamvoided.dusk_debris.spell.SpellConfig
 //import org.teamvoided.dusk_debris.spell.codec.VengefulSpiritSpellCodec
 //
 //open class Spell<SC : SpellConfig>(codec: Codec<SC>) {
