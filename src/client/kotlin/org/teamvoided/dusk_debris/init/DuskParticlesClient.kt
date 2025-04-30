@@ -24,6 +24,7 @@ object DuskParticlesClient {
         ParticleFactoryRegistry.getInstance().register(DuskParticles.GEYSER, GeyserParticle::Factory)
         ParticleFactoryRegistry.getInstance().register(DuskParticles.GODHOME, GodhomeParticle::Factory)
         ParticleFactoryRegistry.getInstance().register(DuskParticles.DRAINED_SOUL, DrainedSoulParticle::SmallFactory)
+        ParticleFactoryRegistry.getInstance().register(DuskParticles.SPELL, SpellParticle::Factory)
         ParticleFactoryRegistry.getInstance().register(DuskParticles.CUBE, CubeParticle::Factory)
 
         ParticleFactoryRegistry.getInstance().register(DuskParticles.COSMOS, CosmosParticle::Factory)

@@ -60,23 +60,24 @@ class VengefulSpiritEntity : ExplosiveProjectileEntity {
     override fun tick() {
         ProjectileUtil.rotateTowardsMovement(this, 1f)
         super.tick()
-        println(distanceTraveled)
         if (distanceTraveled > despawnDistance) {
             world.sendEntityStatus(this, 60.toByte())
             if (!this.world.isClient)
                 this.discard()
         } else if (world.isClient) {
-            val pos = Vec3d(
-                (random.nextDouble() - 0.5),
-                (random.nextDouble() - 0.5),
-                (random.nextDouble() - 0.5)
-            ).normalize().multiply(this.size.toDouble()).add(this.x, this.standingEyeHeight.toDouble(), this.z)
-            val velocity = velocity.multiply(-0.1)
-            world.addParticle(
-                getParticle(),
-                pos.x, pos.y, pos.z,
-                velocity.x, velocity.y, velocity.z
-            )
+            repeat(random.nextInt(3) + 1) {
+                val pos = Vec3d(
+                    (random.nextDouble() - 0.5),
+                    (random.nextDouble() - 0.5),
+                    (random.nextDouble() - 0.5)
+                ).normalize().multiply(this.size * 1.25).add(this.x, this.eyeY, this.z)
+                val velocity = velocity.multiply(-0.1)
+                world.addParticle(
+                    getParticle(),
+                    pos.x, pos.y, pos.z,
+                    velocity.x, velocity.y, velocity.z
+                )
+            }
         }
 
         val x = this.x - this.prevX
@@ -128,19 +129,23 @@ class VengefulSpiritEntity : ExplosiveProjectileEntity {
     }
 
     fun addExplosionParticles() {
-        if (world.isClient)
+        val radius = 0.3
+        if (world.isClient) {
             repeat(30) {
-                val velocity = Vec3d(
+                val rand = Vec3d(
                     (random.nextDouble() - 0.5),
                     (random.nextDouble() - 0.5),
                     (random.nextDouble() - 0.5)
-                ).normalize().multiply(0.2)
+                ).normalize()
+                val pos = rand.multiply(this.size * 1.25).add(this.x, this.eyeY, this.z)
+                val velocity = rand.multiply(radius)
                 world.addParticle(
                     getParticle(),
-                    this.x, this.eyeY, this.z,
+                    pos.x, pos.y, pos.z,
                     velocity.x, velocity.y, velocity.z,
                 )
             }
+        }
     }
 
     override fun handleStatus(status: Byte) {
@@ -161,7 +166,7 @@ class VengefulSpiritEntity : ExplosiveProjectileEntity {
         }
 
 
-    fun getParticle(): ParticleEffect = DuskParticles.DRAINED_SOUL
+    fun getParticle(): ParticleEffect = DuskParticles.SPELL
 
     override fun isBurning(): Boolean = false
     override fun getParticleType(): ParticleEffect? = null

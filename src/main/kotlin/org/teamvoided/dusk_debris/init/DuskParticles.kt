@@ -29,6 +29,7 @@ object DuskParticles {
     val GODHOME: ParticleType<GodhomeParticleEffect> =
         complex(GodhomeParticleEffect.CODEC, GodhomeParticleEffect.PACKET_CODEC)
     val DRAINED_SOUL: DefaultParticleType = simple()
+    val SPELL: DefaultParticleType = simple()
     val CUBE: DefaultParticleType = simple()
 
 
@@ -84,6 +85,7 @@ object DuskParticles {
         register("geyser", GEYSER)
         register("godhome", GODHOME)
         register("drained_soul", DRAINED_SOUL)
+        register("spell", SPELL)
         register("cube", CUBE)
 
         register("cosmos", COSMOS)
