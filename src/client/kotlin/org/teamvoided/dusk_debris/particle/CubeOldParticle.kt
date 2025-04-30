@@ -12,7 +12,7 @@ import org.joml.Quaternionf
 import org.joml.Vector3f
 import org.teamvoided.dusk_debris.util.*
 
-abstract class CubeParticle(
+abstract class CubeOldParticle(
     world: ClientWorld, x: Double, y: Double, z: Double,
     velocityX: Double, velocityY: Double, velocityZ: Double
 ) : SpriteBillboardParticle(world, x, y, z, velocityX, velocityY, velocityZ) {

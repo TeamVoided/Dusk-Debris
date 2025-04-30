@@ -7,6 +7,7 @@ import org.teamvoided.dusk_debris.particle.emmiter.BetweenPointsParticle
 import org.teamvoided.dusk_debris.particle.emmiter.BlunderbombParticle
 import org.teamvoided.dusk_debris.particle.emmiter.FirebombParticle
 import org.teamvoided.dusk_debris.particle.emmiter.GunpowderExplosionEmitterParticle
+import org.teamvoided.dusk_debris.particle.stupid_particles.CubeParticle
 import org.teamvoided.dusk_debris.particle.vanilla.AdditionalWaterSuspendParticle
 
 object DuskParticlesClient {
@@ -23,6 +24,8 @@ object DuskParticlesClient {
         ParticleFactoryRegistry.getInstance().register(DuskParticles.GEYSER, GeyserParticle::Factory)
         ParticleFactoryRegistry.getInstance().register(DuskParticles.GODHOME, GodhomeParticle::Factory)
         ParticleFactoryRegistry.getInstance().register(DuskParticles.DRAINED_SOUL, DrainedSoulParticle::SmallFactory)
+        ParticleFactoryRegistry.getInstance().register(DuskParticles.CUBE, CubeParticle::Factory)
+
         ParticleFactoryRegistry.getInstance().register(DuskParticles.COSMOS, CosmosParticle::Factory)
         ParticleFactoryRegistry.getInstance().register(DuskParticles.ENTITY_TEST, EntityTestParticle::Factory)
 

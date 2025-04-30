@@ -17,11 +17,10 @@ object DuskParticles {
         GunpowderExplosionSmokeParticleEffect.CODEC,
         GunpowderExplosionSmokeParticleEffect.PACKET_CODEC
     )
-    val GUNPOWDER_EXPLOSION_EMMITER: ParticleType<GunpowderExplosionEmitterParticleEffect> =
-        complex(
-            GunpowderExplosionEmitterParticleEffect.CODEC,
-            GunpowderExplosionEmitterParticleEffect.PACKET_CODEC
-        )
+    val GUNPOWDER_EXPLOSION_EMMITER: ParticleType<GunpowderExplosionEmitterParticleEffect> = complex(
+        GunpowderExplosionEmitterParticleEffect.CODEC,
+        GunpowderExplosionEmitterParticleEffect.PACKET_CODEC
+    )
     val BLUNDERBOMB: DefaultParticleType = simple()
     val FIREBOMB: DefaultParticleType = simple()
     val BONECALLER: ParticleType<BonecallerParticleEffect> =
@@ -30,6 +29,9 @@ object DuskParticles {
     val GODHOME: ParticleType<GodhomeParticleEffect> =
         complex(GodhomeParticleEffect.CODEC, GodhomeParticleEffect.PACKET_CODEC)
     val DRAINED_SOUL: DefaultParticleType = simple()
+    val CUBE: DefaultParticleType = simple()
+
+
     val COSMOS: DefaultParticleType = simple()
     val ENTITY_TEST: ParticleType<EntityTestParticleEffect> =
         complex(EntityTestParticleEffect.CODEC, EntityTestParticleEffect.PACKET_CODEC)
@@ -67,38 +69,42 @@ object DuskParticles {
     // DnD
     val SPIDERLILY: DefaultParticleType = simple()
     val MUSHROOM_LAUNCH: DefaultParticleType = simple()
-    val DUST_BUNNY: ParticleType<DustBunnyParticleEffect> = complex(DustBunnyParticleEffect.CODEC, DustBunnyParticleEffect.PACKET_CODEC)
-    val SPIRAL: ParticleType<SpiralParticleEffect> = complex(SpiralParticleEffect.CODEC, SpiralParticleEffect.PACKET_CODEC)
+    val DUST_BUNNY: ParticleType<DustBunnyParticleEffect> =
+        complex(DustBunnyParticleEffect.CODEC, DustBunnyParticleEffect.PACKET_CODEC)
+    val SPIRAL: ParticleType<SpiralParticleEffect> =
+        complex(SpiralParticleEffect.CODEC, SpiralParticleEffect.PACKET_CODEC)
 
     fun init() {
-        Registry.register(Registries.PARTICLE_TYPE, id("toxic_smoke_particle"), TOXIC_SMOKE_PARTICLE)
-        Registry.register(Registries.PARTICLE_TYPE, id("gunpowder_explosion_smoke"), GUNPOWDER_EXPLOSION_SMOKE)
-        Registry.register(Registries.PARTICLE_TYPE, id("gunpowder_explosion_emitter"), GUNPOWDER_EXPLOSION_EMMITER)
-        Registry.register(Registries.PARTICLE_TYPE, id("blunderbomb"), BLUNDERBOMB)
-        Registry.register(Registries.PARTICLE_TYPE, id("firebomb"), FIREBOMB)
-        Registry.register(Registries.PARTICLE_TYPE, id("bonecaller"), BONECALLER)
-        Registry.register(Registries.PARTICLE_TYPE, id("geyser"), GEYSER)
-        Registry.register(Registries.PARTICLE_TYPE, id("godhome"), GODHOME)
-        Registry.register(Registries.PARTICLE_TYPE, id("drained_soul"), DRAINED_SOUL)
-        Registry.register(Registries.PARTICLE_TYPE, id("cosmos"), COSMOS)
-        Registry.register(Registries.PARTICLE_TYPE, id("entity_test"), ENTITY_TEST)
+        register("toxic_smoke_particle", TOXIC_SMOKE_PARTICLE)
+        register("gunpowder_explosion_smoke", GUNPOWDER_EXPLOSION_SMOKE)
+        register("gunpowder_explosion_emitter", GUNPOWDER_EXPLOSION_EMMITER)
+        register("blunderbomb", BLUNDERBOMB)
+        register("firebomb", FIREBOMB)
+        register("bonecaller", BONECALLER)
+        register("geyser", GEYSER)
+        register("godhome", GODHOME)
+        register("drained_soul", DRAINED_SOUL)
+        register("cube", CUBE)
 
-        Registry.register(Registries.PARTICLE_TYPE, id("wind"), WIND)
+        register("cosmos", COSMOS)
+        register("entity_test", ENTITY_TEST)
 
-        Registry.register(Registries.PARTICLE_TYPE, id("spark"), SPARK)
-        Registry.register(Registries.PARTICLE_TYPE, id("underacid"), UNDERACID)
-        Registry.register(Registries.PARTICLE_TYPE, id("acid_bubble_pop"), ACID_BUBBLE_POP)
+        register("wind", WIND)
 
-        Registry.register(Registries.PARTICLE_TYPE, id("small_purple_bubble_cube"), SMALL_PURPLE_BUBBLE_CUBE)
-        Registry.register(Registries.PARTICLE_TYPE, id("purple_biome_bubble"), PURPLE_BIOME_BUBBLE)
-        Registry.register(Registries.PARTICLE_TYPE, id("purple_bubble"), PURPLE_BUBBLE)
+        register("spark", SPARK)
+        register("underacid", UNDERACID)
+        register("acid_bubble_pop", ACID_BUBBLE_POP)
 
-        Registry.register(Registries.PARTICLE_TYPE, id("goop_flying"), ASTRAS_FLYING_GOOP)
-        Registry.register(Registries.PARTICLE_TYPE, id("goop_landed"), ASTRAS_LANDED_GOOP)
+        register("small_purple_bubble_cube", SMALL_PURPLE_BUBBLE_CUBE)
+        register("purple_biome_bubble", PURPLE_BIOME_BUBBLE)
+        register("purple_bubble", PURPLE_BUBBLE)
 
-        Registry.register(Registries.PARTICLE_TYPE, id("shriek_directional"), SHRIEK_DIRECTIONAL)
+        register("goop_flying", ASTRAS_FLYING_GOOP)
+        register("goop_landed", ASTRAS_LANDED_GOOP)
 
-        Registry.register(Registries.PARTICLE_TYPE, id("between_points"), BETWEEN_POINTS)
+        register("shriek_directional", SHRIEK_DIRECTIONAL)
+
+        register("between_points", BETWEEN_POINTS)
 
         // DnD
         register("spiderlily", SPIDERLILY)

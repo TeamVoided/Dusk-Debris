@@ -20,7 +20,7 @@ class BubbleCubeParticle(
     velocityX: Double,
     velocityY: Double,
     velocityZ: Double
-) : CubeParticle(world, x, y, z, velocityX, velocityY, velocityZ) {
+) : CubeOldParticle(world, x, y, z, velocityX, velocityY, velocityZ) {
     val rotOffset: Float
     val radius: Float
     val speed: Float

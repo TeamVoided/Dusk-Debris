@@ -4,14 +4,13 @@ import net.minecraft.entity.Entity
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.VariantProvider
 import net.minecraft.entity.passive.SnifferEntity
-import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.registry.Holder
 import net.minecraft.util.math.Vec3d
 import org.teamvoided.dusk_debris.entity.helper.DuskClawStuff
 import org.teamvoided.dusk_debris.entity.helper.DuskSpellStuff
 import org.teamvoided.dusk_debris.entity.helper.DuskVelocityWind
+import org.teamvoided.dusk_debris.entity.helper.SpellController
 import org.teamvoided.dusk_debris.entity.variant.SnifferVariant
-import org.teamvoided.dusk_debris.spell.Spell
 
 var SnifferEntity.variant: Holder<SnifferVariant>
     get() = (this as VariantProvider<Holder<SnifferVariant>>).getVariant()
@@ -31,10 +30,5 @@ var Entity.isHanging: Boolean
     get() = (this as DuskClawStuff).getHanging()
     set(lie) = (this as DuskClawStuff).setHanging(lie)
 
-var LivingEntity.spell: Spell<*, *>?
-    get() = (this as DuskSpellStuff).getSpell()
-    set(spell) = (this as DuskSpellStuff).setSpell(spell)
-
-var LivingEntity.spellTicksLeft: Int
-    get() = (this as DuskSpellStuff).getSpellTicksLeft()
-    set(ticks) = (this as DuskSpellStuff).setSpellTicksLeft(ticks)
+val LivingEntity.spellController: SpellController
+    get() = (this as DuskSpellStuff).getSpellController()

@@ -13,8 +13,7 @@ import net.minecraft.server.command.CommandManager.literal
 import net.minecraft.server.command.ServerCommandSource
 import net.minecraft.text.Text
 import org.teamvoided.dusk_debris.spell.Spell
-import org.teamvoided.dusk_debris.util.spell
-import org.teamvoided.dusk_debris.util.spellTicksLeft
+import org.teamvoided.dusk_debris.util.spellController
 import org.teamvoided.dusk_debris.util.toBlockPos
 import org.teamvoided.dusk_debris.util.variant
 
@@ -45,7 +44,7 @@ object DuskCommands {
 
     fun spell(cx: CommandContext<ServerCommandSource>, registryEntry: Holder.Reference<Spell<*, *>>): Int {
         val player = cx.source.player ?: return 0
-        player.spell = registryEntry.value()
+        player.spellController.setSpell(player, registryEntry)
         player.sendMessage(Text.literal("applied spell " + registryEntry.key.toString()), false)
         return 1
     }

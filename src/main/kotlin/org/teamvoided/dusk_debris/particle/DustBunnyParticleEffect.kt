@@ -23,7 +23,9 @@ class DustBunnyParticleEffect(val color1: Color, val color2: Color) : ParticleEf
             ).apply(inst, ::DustBunnyParticleEffect)
         }
         val PACKET_CODEC = PacketCodec.tuple(
-            PacketCodecs.INT, { it.color1.rgb }, PacketCodecs.INT, { it.color2.rgb }, ::DustBunnyParticleEffect
+            PacketCodecs.INT, { it.color1.rgb },
+            PacketCodecs.INT, { it.color2.rgb },
+            ::DustBunnyParticleEffect
         )
     }
 }

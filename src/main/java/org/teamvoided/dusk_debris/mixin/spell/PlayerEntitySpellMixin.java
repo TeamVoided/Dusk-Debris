@@ -5,6 +5,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -12,6 +13,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.teamvoided.dusk_debris.entity.helper.DuskSpellStuff;
+import org.teamvoided.dusk_debris.entity.helper.SpellController;
 import org.teamvoided.dusk_debris.spell.Spell;
 
 @Mixin(PlayerEntity.class)
@@ -21,50 +23,19 @@ abstract public class PlayerEntitySpellMixin extends LivingEntity implements Dus
         super(entityType, world);
     }
 
+    @Unique
+    public SpellController spellController = new SpellController();
+
+
     @Inject(method = "tickMovement", at = @At("HEAD"))
     public void spellTick(CallbackInfo ci) {
         if (this.getWorld().isClient) return;
-        if (getSpell() != null) {
-            var spell = getSpell();
-            spell.castTick(this);
-            if (getSpellTicksLeft() <= 0) {
-                spell.onCastEnd(this);
-                setSpellTicksLeft(0);
-                setSpell(null);
-            } else {
-                setSpellTicksLeft(getSpellTicksLeft() - 1);
-            }
-        }
-        ((PlayerEntity) (Object) this).sendMessage(Text.literal("ticks left: " + this.getSpellTicksLeft()), true);
+        spellController.tick(this);
     }
 
+    @NotNull
     @Override
-    public void setSpell(@Nullable Spell<?, ?> spell) {
-        DuskDebris$spell = spell;
-        if (spell != null) spell.onCast(this);
+    public SpellController getSpellController() {
+        return spellController;
     }
-
-    @Nullable
-    @Override
-    public Spell<?, ?> getSpell() {
-        return DuskDebris$spell;
-    }
-
-    @Override
-    public int getSpellTicksLeft() {
-        return DuskDebris$spellTicksLeft;
-    }
-
-    @Override
-    public void setSpellTicksLeft(int spellTicksLeft) {
-        DuskDebris$spellTicksLeft = spellTicksLeft;
-    }
-
-    @Unique
-    public int DuskDebris$spellTicksLeft = 0;
-
-    @Unique
-    @Nullable
-    public Spell<?, ?> DuskDebris$spell = null;
-
 }

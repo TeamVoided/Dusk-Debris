@@ -22,6 +22,7 @@ import net.minecraft.util.math.Vec3d
 import net.minecraft.world.World
 import org.teamvoided.dusk_debris.init.DuskEntities
 import org.teamvoided.dusk_debris.init.DuskParticles
+import kotlin.math.sqrt
 
 class VengefulSpiritEntity : ExplosiveProjectileEntity {
     constructor(entityType: EntityType<out ExplosiveProjectileEntity>, world: World) : super(entityType, world)
@@ -59,6 +60,7 @@ class VengefulSpiritEntity : ExplosiveProjectileEntity {
     override fun tick() {
         ProjectileUtil.rotateTowardsMovement(this, 1f)
         super.tick()
+        println(distanceTraveled)
         if (distanceTraveled > despawnDistance) {
             world.sendEntityStatus(this, 60.toByte())
             if (!this.world.isClient)
@@ -68,7 +70,7 @@ class VengefulSpiritEntity : ExplosiveProjectileEntity {
                 (random.nextDouble() - 0.5),
                 (random.nextDouble() - 0.5),
                 (random.nextDouble() - 0.5)
-            ).normalize().multiply(this.size.toDouble()).add(0.0,this.standingEyeHeight.toDouble(),0.0)
+            ).normalize().multiply(this.size.toDouble()).add(this.x, this.standingEyeHeight.toDouble(), this.z)
             val velocity = velocity.multiply(-0.1)
             world.addParticle(
                 getParticle(),
@@ -76,6 +78,11 @@ class VengefulSpiritEntity : ExplosiveProjectileEntity {
                 velocity.x, velocity.y, velocity.z
             )
         }
+
+        val x = this.x - this.prevX
+        val y = this.y - this.prevY
+        val z = this.z - this.prevZ
+        this.distanceTraveled += sqrt(x * x + y * y + z * z).toFloat()
     }
 
     override fun onCollision(hitResult: HitResult) {

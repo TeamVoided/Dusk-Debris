@@ -49,9 +49,6 @@ abstract class SpellType<SS : SpellSettings>(configCodec: Codec<SS>) {
 
     companion object {
         //val PACKET_CODEC = PacketCodecs.fromCodec(DuskRegistries.Spell.codec)
-
-        val SPELL_CASTING_MODIFIER_ID: Identifier = DuskDebris.id("spell_casting")
-
 //        val MAP_CODEC: MapCodec<Spell> = RecordCodecBuilder.mapCodec { instance ->
 //            instance.group(
 //                Codec.INT

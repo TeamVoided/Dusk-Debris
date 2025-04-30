@@ -1,8 +1,9 @@
-package org.teamvoided.dusk_debris.spell
+package org.teamvoided.dusk_debris.spell.settings
 
 import com.mojang.serialization.Codec
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
+import org.teamvoided.dusk_debris.spell.SpellSettings
 
 data class GenericSpellSettings(val priority: Int = 20, val cooldown: Int = 8) : SpellSettings {
     companion object{
