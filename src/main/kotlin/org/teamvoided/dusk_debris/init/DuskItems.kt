@@ -17,6 +17,7 @@ import net.minecraft.registry.Registry
 import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvents
 import net.minecraft.util.Hand
+import net.minecraft.util.Rarity
 import net.minecraft.util.TypedActionResult
 import net.minecraft.util.math.BlockPointer
 import net.minecraft.world.World
@@ -48,7 +49,7 @@ object DuskItems {
             Item.Settings().maxCount(1).component(DataComponentTypes.BUCKET_ENTITY_DATA, NbtComponent.DEFAULT)
         )
     )
-    val DEBUG_SPELL_ITEM = register("debug_spell_item", DebugSpellItem(Item.Settings().maxCount(1)))
+    val DEBUG_SPELL_ITEM = register("debug_spell_item", DebugSpellItem(Item.Settings().maxCount(1).rarity(Rarity.EPIC)))
 
     val MACE_BLAZE = register(
         "mace_blaze",

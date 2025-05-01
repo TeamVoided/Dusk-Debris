@@ -1,8 +1,18 @@
 package org.teamvoided.dusk_debris.spell
 
 import com.mojang.serialization.Codec
+import net.minecraft.enchantment.Enchantment
 import net.minecraft.entity.LivingEntity
+import net.minecraft.network.codec.PacketCodecs
+import net.minecraft.registry.Holder
 import net.minecraft.registry.RegistryCodecs
+import net.minecraft.registry.RegistryFixedCodec
+import net.minecraft.registry.tag.EnchantmentTags
+import net.minecraft.text.CommonTexts
+import net.minecraft.text.Style
+import net.minecraft.text.Text
+import net.minecraft.text.Texts
+import net.minecraft.util.Formatting
 import net.minecraft.util.dynamic.RegistryElementCodec
 import net.minecraft.util.math.Vec3d
 import net.minecraft.util.random.RandomGenerator
@@ -22,6 +32,9 @@ class Spell<SS : SpellSettings, S : SpellType<SS>>(val spellType: S, val setting
     companion object {
         val CODEC: Codec<Spell<out SpellSettings, out SpellType<out SpellSettings>>> =
             DuskRegistries.SPELL_TYPE.codec.dispatch({ it.spellType }, { it.getCodec() })
+
+        val ENTRY_CODEC = RegistryFixedCodec.create(DuskRegistryKeys.SPELL)
+        val ENTRY_PACKET_CODEC = PacketCodecs.holder(DuskRegistryKeys.SPELL)
 
         val REGISTRY_CODEC = RegistryElementCodec.of(DuskRegistryKeys.SPELL, CODEC)
         val LIST_CODEC = RegistryCodecs.homogeneousList(DuskRegistryKeys.SPELL, CODEC)

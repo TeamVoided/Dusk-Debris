@@ -45,41 +45,5 @@ class GloomEntityRenderer(context: EntityRendererFactory.Context) : SkeletonEnti
     companion object {
         private val TEXTURE: Identifier = id("textures/entity/skeleton/gloomed.png")
         private val OVERLAY_TEXTURE: Identifier = id("textures/entity/skeleton/gloomed_overlay.png")
-
-        @JvmStatic
-        fun gloomTranslucency(
-            gloomEntity: GloomEntity,
-            vertexConsumer: VertexConsumerProvider,
-            renderLayer: RenderLayer,
-            tickDelta: Float
-        ): VertexConsumer? {
-            sendMessageIngame("it is working")
-            return vertexConsumer.getBuffer(renderLayer)
-
-
-//            val transitionTime: Int = gloomEntity.darkModeTransitionTime
-//            if (transitionTime >= 60) {
-//                return vertexConsumer.getBuffer(
-//                    RenderLayer.getBeaconBeam(
-//                        TEXTURE,
-//                        true
-//                    )
-//                ).color(ColorUtil.Argb32.of(256, -1))
-//            } else if (transitionTime >= 0) {
-//                val tock = if (gloomEntity.isLightMode()) {
-//                    tickDelta
-//                } else {
-//                    -tickDelta
-//                }
-//                val ratio = (((transitionTime + tock) / 60) * 256).toInt()
-//                return vertexConsumer.getBuffer(
-//                    RenderLayer.getBeaconBeam(
-//                        TEXTURE,
-//                        true
-//                    )
-//                ).color(ColorUtil.Argb32.of(ratio, -1))
-//            }
-//            return null
-        }
     }
 }

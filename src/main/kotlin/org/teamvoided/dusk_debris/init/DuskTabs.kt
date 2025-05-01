@@ -2,12 +2,13 @@ package org.teamvoided.dusk_debris.init
 
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents
-import net.minecraft.enchantment.Enchantment
+import net.minecraft.component.DataComponentMap
 import net.minecraft.item.*
 import net.minecraft.registry.*
 import net.minecraft.text.Text
 import org.teamvoided.dusk_debris.DuskDebris.id
-import java.util.function.Consumer
+import org.teamvoided.dusk_debris.component.SpellComponent
+import org.teamvoided.dusk_debris.spell.Spell
 import kotlin.jvm.optionals.getOrNull
 
 
@@ -92,12 +93,29 @@ object DuskTabs {
     )
     val SPELLS: ItemGroup = register("dusk_spells",
         FabricItemGroup.builder()
-            .icon {ItemStack(DuskItems.DEBUG_SPELL_ITEM)}
+            .icon { ItemStack(DuskItems.DEBUG_SPELL_ITEM) }
             .name(Text.translatable("itemGroup.dusk_debris.dusk_spells"))
             .entries { params, entries ->
-                entries.addItem(DuskItems.DEBUG_SPELL_ITEM)
+                params.holders().getLookup(DuskRegistryKeys.SPELL).ifPresent { registryLookup ->
+                    generateSpellEntries(entries, registryLookup)
+                }
             }
             .build())
+
+    private fun generateSpellEntries(
+        collector: ItemGroup.ItemStackCollector,
+        lookup: HolderLookup<Spell<*, *>>
+    ) {
+        lookup.holders().map { forSpell(it) }.forEach { stack: ItemStack ->
+            collector.addStack(stack, ItemGroup.Visibility.PARENT_AND_SEARCH_TABS)
+        }
+    }
+
+    private fun forSpell(info: Holder.Reference<Spell<*, *>>): ItemStack {
+        val itemStack = ItemStack(DuskItems.DEBUG_SPELL_ITEM)
+        itemStack.set(DuskComponents.SPELL, SpellComponent(info))
+        return itemStack
+    }
 
     fun init() {
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.BUILDING_BLOCKS)

@@ -5,6 +5,7 @@ import net.minecraft.client.particle.*
 import net.minecraft.client.world.ClientWorld
 import net.minecraft.particle.DefaultParticleType
 import org.teamvoided.dusk_debris.util.Utils
+import java.awt.Color
 
 class SpellParticle(
     world: ClientWorld,
@@ -14,12 +15,12 @@ class SpellParticle(
     private var angleRate: Float
 
     init {
-        prevAngle = random.nextFloat()
-        angle = prevAngle
-        angleRate = (random.nextFloat() - 0.5f) * Utils.rotate30
+        val color = Color(0xF9EEF1)
+        this.colorRed = color.red / 255f
+        this.colorGreen = color.green / 255f
+        this.colorBlue = color.blue / 255f
+
         gravityStrength = random.nextFloat() + 0.5f
-        val age = 25
-        maxAge = age + (random.nextFloat() * (age / 2f)).toInt()
         velocityMultiplier = 0.9f
         velocityX = xVel
         velocityY = yVel
@@ -27,6 +28,11 @@ class SpellParticle(
         x = xPos
         y = yPos
         z = zPos
+
+        prevAngle = random.nextFloat()
+        angle = prevAngle
+        angleRate = (random.nextFloat() - 0.5f) * Utils.rotate30
+        maxAge = MIN_AGE + (random.nextFloat() * MIN_AGE).toInt()
     }
 
     override fun tick() {
@@ -50,20 +56,26 @@ class SpellParticle(
     }
 
     override fun getSize(tickDelta: Float): Float {
-        val age = this.age + tickDelta
-        val scaleProgress = if (age - (maxAge - 20) >= 0) {
-            val square = ((-age + maxAge) / 20f) - 1f
-            Math.max(-(square * square) + 1, 0f)
-        } else if (age <= 5) {
-            val square = (age / 5) - 1
-            -(square * square) + 1
+        val age: Float = this.age + tickDelta
+        val scaleProgress = if (age - (maxAge - THRESHOLD) >= 0) {
+            val square = ((-age + maxAge + 1f) / (THRESHOLD + 1)) - 1f
+            -(square * square) + 1f
+        } else if (age <= START) {
+            val square = (age / START) - 1
+            -(square * square) + 1f
         } else 1f
         return scaleProgress * scale
     }
 
     override fun getType(): ParticleTextureSheet = ParticleTextureSheet.PARTICLE_SHEET_TRANSLUCENT
 
-    public override fun getBrightness(tint: Float): Int = 240
+    public override fun getBrightness(tickDelta: Float): Int = 240
+
+    companion object {
+        const val THRESHOLD: Int = 20
+        const val START: Int = 5
+        const val MIN_AGE: Int = THRESHOLD + START
+    }
 
     class Factory(private val spriteProvider: SpriteProvider) : ParticleFactory<DefaultParticleType> {
         override fun createParticle(

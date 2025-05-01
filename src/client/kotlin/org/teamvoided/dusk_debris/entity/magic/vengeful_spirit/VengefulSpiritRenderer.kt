@@ -28,7 +28,7 @@ class VengefulSpiritRenderer(context: EntityRendererFactory.Context) : EntityRen
         vertexConsumers: VertexConsumerProvider,
         light: Int
     ) {
-        if (entity.age >= 2 || !(dispatcher.camera.focusedEntity.squaredDistanceTo(entity) < distance)) {
+        if (entity.age >= 4 || dispatcher.camera.focusedEntity.squaredDistanceTo(entity) > entity.size * entity.size) {
             val vertexConsumer = vertexConsumers.getBuffer(RenderLayer.getEntityCutoutNoCull(TEXTURE))
             val yawStuff =
                 MathHelper.wrapDegrees(MathHelper.lerpDegrees(tickDelta, entity.prevYaw, entity.yaw)) * Utils.DEG_TO_RAD
@@ -51,7 +51,6 @@ class VengefulSpiritRenderer(context: EntityRendererFactory.Context) : EntityRen
     }
 
     override fun getBlockLight(entity: VengefulSpiritEntity, pos: BlockPos): Int = 15
-    override fun getSkyLight(entity: VengefulSpiritEntity, pos: BlockPos): Int = 15
 
     companion object {
         private val distance = MathHelper.square(3.5)

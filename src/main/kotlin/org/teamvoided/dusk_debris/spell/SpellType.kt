@@ -3,13 +3,20 @@ package org.teamvoided.dusk_debris.spell
 import com.mojang.serialization.Codec
 import com.mojang.serialization.MapCodec
 import net.minecraft.entity.LivingEntity
-import net.minecraft.util.Identifier
+import net.minecraft.registry.Holder
+import net.minecraft.registry.Registries
+import net.minecraft.text.MutableText
+import net.minecraft.text.Style
+import net.minecraft.text.Text
+import net.minecraft.text.Texts
+import net.minecraft.util.Formatting
+import net.minecraft.util.Util
 import net.minecraft.util.math.Vec3d
 import net.minecraft.util.random.RandomGenerator
 import net.minecraft.world.World
-import org.teamvoided.dusk_debris.DuskDebris
 import org.teamvoided.dusk_debris.init.DuskParticles
 import org.teamvoided.dusk_debris.init.DuskRegistries
+import org.teamvoided.dusk_debris.spell.settings.GenericSpellSettings
 
 abstract class SpellType<SS : SpellSettings>(configCodec: Codec<SS>) {
     private val codec: MapCodec<Spell<SS, SpellType<SS>>> = configCodec.fieldOf("settings")
@@ -48,6 +55,12 @@ abstract class SpellType<SS : SpellSettings>(configCodec: Codec<SS>) {
     }
 
     companion object {
+        fun getFullName(spell: Holder<Spell<*, *>>): Text {
+            val mutableText: MutableText = (spell.value().settings as GenericSpellSettings).description.copy()
+            Texts.setStyleIfAbsent(mutableText, Style.EMPTY.withColor(Formatting.WHITE))
+            return mutableText
+        }
+
         //val PACKET_CODEC = PacketCodecs.fromCodec(DuskRegistries.Spell.codec)
 //        val MAP_CODEC: MapCodec<Spell> = RecordCodecBuilder.mapCodec { instance ->
 //            instance.group(

@@ -8,12 +8,15 @@ import net.minecraft.item.Item
 import net.minecraft.registry.HolderLookup
 import net.minecraft.registry.Registries
 import net.minecraft.util.Identifier
+import org.teamvoided.dusk_debris.data.DuskSpells
 import org.teamvoided.dusk_debris.data.tags.DuskFluidTags
 import org.teamvoided.dusk_debris.data.tags.DuskItemTags
 import org.teamvoided.dusk_debris.init.DuskEntities
 import org.teamvoided.dusk_debris.init.DuskItems
+import org.teamvoided.dusk_debris.init.DuskRegistries
 import org.teamvoided.dusk_debris.init.DuskTabs
 import org.teamvoided.dusk_debris.init.DuskTabs.getKey
+import org.teamvoided.dusk_debris.spell.Spell
 import java.util.concurrent.CompletableFuture
 
 @Suppress("MemberVisibilityCanBePrivate")
@@ -27,6 +30,7 @@ class EnglishTranslationProvider(o: FabricDataOutput, r: CompletableFuture<Holde
         DuskItemTags.ITEM_TAGS.forEach { gen.add(it.translationKey, genLang(it.id)) }
         DuskFluidTags.FLUID_TAGS.forEach { gen.add(it.translationKey, genLang(it.id)) }
 
+        DuskSpells.SPELLS.forEach { gen.add(DuskSpells.spellTranslation(it).string, genLang(it.value)) }
 
         gen.add("container.treasure_chest", "Treasure Chest")
 

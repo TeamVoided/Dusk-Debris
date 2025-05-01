@@ -39,16 +39,16 @@ class DesolateDiveSpell(codec: Codec<GenericSpellSettings>) : SpellType<GenericS
         if (castor.spellController.spellTicksLeft < 9) {
             if (castor.spellController.spellTicksLeft == 8)
                 actualSpell(castor, settings)
-        } else if (castor.spellController.spellTicksLeft <= settings.cooldown - 9) {
+        } else if (castor.spellController.spellTicksLeft <= settings.cooldown - 4) {
             castor.resetFallDistance()
             addGravity(castor)
-            castor.velocity = castor.velocity.multiply(0.0, 2.0, 0.0)
+            castor.velocity = castor.velocity.multiply(0.0, 4.0, 0.0)
             castor.velocityDirty = true
             tryCheckDiveBlockActions(castor)
             if (castor.isOnGround)
                 actualSpell(castor, settings)
         } else {
-            castor.velocity = castor.velocity.multiply(0.1)
+            castor.velocity = castor.velocity.multiply(0.0)
             castor.velocityDirty = true
         }
     }

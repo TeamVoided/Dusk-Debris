@@ -25,7 +25,6 @@ object DuskDebris {
         DuskBlocks.init()
         DuskFluids.init()
         DuskBlockFamilies.init()
-
         DuskBlockEntities.init()
         DuskEffects.init()
         DuskEntities.init()
@@ -43,7 +42,7 @@ object DuskDebris {
         DuskSpellTypes.init()
 
         DuskCommands.init()
-
+        DuskComponents.init()
 
         InitializeFabricEvents()
     }

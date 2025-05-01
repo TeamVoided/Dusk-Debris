@@ -131,7 +131,7 @@ class VengefulSpiritEntity : ExplosiveProjectileEntity {
     fun addExplosionParticles() {
         val radius = 0.3
         if (world.isClient) {
-            repeat(30) {
+            repeat(60) {
                 val rand = Vec3d(
                     (random.nextDouble() - 0.5),
                     (random.nextDouble() - 0.5),
@@ -149,10 +149,8 @@ class VengefulSpiritEntity : ExplosiveProjectileEntity {
     }
 
     override fun handleStatus(status: Byte) {
-        if (status.toInt() == 60)
-            addExplosionParticles()
-        else
-            super.handleStatus(status)
+        if (status.toInt() == 60) addExplosionParticles()
+        else super.handleStatus(status)
     }
 
     var size: Float
@@ -164,7 +162,6 @@ class VengefulSpiritEntity : ExplosiveProjectileEntity {
             this.setPosition(this.x, this.y - (new - old), this.z)
             getDataTracker().set(SIZE, new)
         }
-
 
     fun getParticle(): ParticleEffect = DuskParticles.SPELL
 
@@ -187,14 +184,13 @@ class VengefulSpiritEntity : ExplosiveProjectileEntity {
     }
 
     companion object {
-        private val SIZE: TrackedData<Float> = DataTracker.registerData(
-            VengefulSpiritEntity::class.java, TrackedDataHandlerRegistry.FLOAT
-        )
+        private val SIZE: TrackedData<Float> =
+            DataTracker.registerData(VengefulSpiritEntity::class.java, TrackedDataHandlerRegistry.FLOAT)
         private const val SIZE_DEFAULT = 0.5f
         private val SIZE_BOUNDS = (0.1f to 30f)
         private const val SIZE_KEY = "size"
 
-        private const val DEFAULT_DESPAWN_DISTANCE = 100
-        private const val NO_CLIPPED_DESPAWN_DISTANCE = 25
+        private const val DEFAULT_DESPAWN_DISTANCE = 200
+        private const val NO_CLIPPED_DESPAWN_DISTANCE = 100
     }
 }
