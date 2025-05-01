@@ -7,6 +7,7 @@ import net.minecraft.client.particle.*
 import net.minecraft.client.render.Camera
 import net.minecraft.client.world.ClientWorld
 import net.minecraft.util.math.MathHelper
+import org.teamvoided.dusk_debris.particle.color.FlashParticleEffect
 import org.teamvoided.dusk_debris.util.Utils
 import java.awt.Color
 

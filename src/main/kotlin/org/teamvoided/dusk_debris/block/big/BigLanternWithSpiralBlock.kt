@@ -4,7 +4,7 @@ import net.minecraft.block.BlockState
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.random.RandomGenerator
 import net.minecraft.world.World
-import org.teamvoided.dusk_debris.particle.SpiralParticleEffect
+import org.teamvoided.dusk_debris.particle.color.SpiralParticleEffect
 
 class BigLanternWithSpiralBlock(private val color1: Int, private val color2: Int, settings: Settings) :
     BigLanternBlock(settings) {

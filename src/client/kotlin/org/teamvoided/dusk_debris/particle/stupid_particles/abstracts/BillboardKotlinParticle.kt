@@ -1,6 +1,7 @@
 package org.teamvoided.dusk_debris.particle.stupid_particles.abstracts
 
 import com.mojang.blaze3d.vertex.VertexConsumer
+import net.minecraft.client.particle.BillboardParticle
 import net.minecraft.client.particle.Particle
 import net.minecraft.client.render.Camera
 import net.minecraft.client.world.ClientWorld
@@ -23,14 +24,13 @@ abstract class BillboardKotlinParticle : Particle {
         this.scale = 1f
     }
 
-    /*
-    val facingCameraMode: FacingCameraMode
-        get() = FacingCameraMode.ALL_AXIS
-    */
+
+    open val facingCameraMode: BillboardParticle.FacingCameraMode = BillboardParticle.FacingCameraMode.ALL_AXIS
+
 
     override fun buildGeometry(vertexConsumer: VertexConsumer, camera: Camera, tickDelta: Float) {
         val quaternionf = Quaternionf()
-        //facingCameraMode.setRotation(quaternionf, camera, tickDelta)
+        facingCameraMode.setRotation(quaternionf, camera, tickDelta)
         if (this.angle != 0.0f) {
             quaternionf.rotateZ(MathHelper.lerp(tickDelta, this.prevAngle, this.angle))
         }
@@ -104,18 +104,5 @@ abstract class BillboardKotlinParticle : Particle {
     protected abstract val minV: Float
     protected abstract val maxV: Float
 
-    /*interface FacingCameraMode {
-        fun setRotation(quaternionf: Quaternionf, camera: Camera, f: Float)
-
-        companion object {
-            val ALL_AXIS: FacingCameraMode =
-                FacingCameraMode { rotation: Quaternionf, camera: Camera, tickDelta: Float ->
-                    rotation.set(camera.rotation)
-                }
-            val Y_AND_W: FacingCameraMode =
-                FacingCameraMode { rotation: Quaternionf, camera: Camera, tickDelta: Float ->
-                    rotation[0.0f, camera.rotation.y, 0.0f] = camera.rotation.w
-                }
-        }
-    }*/
+    val NONE: BillboardParticle.FacingCameraMode = BillboardParticle.FacingCameraMode { _, _, _ -> }
 }

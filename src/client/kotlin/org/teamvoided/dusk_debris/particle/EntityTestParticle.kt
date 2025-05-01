@@ -6,6 +6,7 @@ import net.minecraft.client.particle.*
 import net.minecraft.client.world.ClientWorld
 import net.minecraft.entity.Entity
 import net.minecraft.util.math.Vec3d
+import org.teamvoided.dusk_debris.particle.entity.EntityTestParticleEffect
 import org.teamvoided.dusk_debris.util.Utils.rotate360
 import kotlin.math.cos
 import kotlin.math.sin

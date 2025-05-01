@@ -16,7 +16,7 @@ import org.teamvoided.dusk_debris.data.tags.DuskEntityTypeTags
 import org.teamvoided.dusk_debris.init.DuskBlocks
 import org.teamvoided.dusk_debris.init.DuskEntities
 import org.teamvoided.dusk_debris.init.DuskParticles
-import org.teamvoided.dusk_debris.particle.FlashParticleEffect
+import org.teamvoided.dusk_debris.particle.color.FlashParticleEffect
 import org.teamvoided.dusk_debris.world.explosion.SpecialExplosionBehavior
 import kotlin.math.cos
 import kotlin.math.sin

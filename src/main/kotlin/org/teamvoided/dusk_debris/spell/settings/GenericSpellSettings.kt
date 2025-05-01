@@ -36,6 +36,6 @@ data class GenericSpellSettings(val description: Text, val priority: Int = 20, v
         //    PacketCodec.tuple(
         //        TextCodecs.UNLIMITED_TEXT_PACKET_CODEC, { it.description },
         //        ::GenericSpellSettings
-        //    )
+        //)
     }
 }

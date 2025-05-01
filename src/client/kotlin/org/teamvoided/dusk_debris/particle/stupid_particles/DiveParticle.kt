@@ -1,51 +1,37 @@
 package org.teamvoided.dusk_debris.particle.stupid_particles
 
 import com.mojang.blaze3d.vertex.VertexConsumer
-import net.minecraft.client.model.Dilation
-import net.minecraft.client.model.ModelCuboidData
-import net.minecraft.client.model.ModelPartBuilder
-import net.minecraft.client.particle.BillboardParticle
-import net.minecraft.client.particle.Particle
-import net.minecraft.client.render.Camera
+import net.minecraft.client.particle.*
 import net.minecraft.client.world.ClientWorld
-import net.minecraft.util.math.MathHelper
+import net.minecraft.entity.Entity
 import org.joml.Quaternionf
-import org.joml.Vector3f
+import org.teamvoided.dusk_debris.particle.entity.EntityTestParticleEffect
+import org.teamvoided.dusk_debris.particle.stupid_particles.abstracts.SpriteBillboardKotlinParticle
 
-abstract class DiveParticle : Particle {
-    protected var scale: Float
-
-    protected constructor(world: ClientWorld, x: Double, y: Double, z: Double) : super(world, x, y, z) {
-        this.scale = 1f
+class DiveParticle(world: ClientWorld, x: Double, y: Double, z: Double, val entity: Entity?) :
+    SpriteBillboardKotlinParticle(world, x, y, z, 0.0, 0.0, 0.0) {
+    init {
+        maxAge = 4
     }
 
-    protected constructor(
-        world: ClientWorld,
-        x: Double, y: Double, z: Double,
-        xVel: Double, yVel: Double, zVel: Double
-    ) : super(world, x, y, z, xVel, yVel, zVel) {
-        this.scale = 1f
-    }
-
-
-    override fun buildGeometry(vertexConsumer: VertexConsumer, camera: Camera, tickDelta: Float) {
-        val quaternionf = Quaternionf()
-        if (this.angle != 0.0f) {
-            quaternionf.rotateZ(MathHelper.lerp(tickDelta, this.prevAngle, this.angle))
+    override fun tick() {
+        if (entity == null) {
+            markDead()
+            return
         }
-
-        this.drawPlaneLerping(vertexConsumer, camera, quaternionf, tickDelta)
+        prevPosX = entity.prevX
+        prevPosY = entity.prevY
+        prevPosZ = entity.prevZ
+        if (age++ >= maxAge) {
+            markDead()
+        } else {
+            x = entity.x //* 0.05
+            y = entity.y //* 0.05
+            z = entity.z //* 0.05
+        }
     }
 
-    fun drawPlaneLerping(vertexConsumer: VertexConsumer, camera: Camera, quaternionf: Quaternionf, tickDelta: Float) {
-        val vec3d = camera.pos
-        val x = (MathHelper.lerp(tickDelta.toDouble(), this.prevPosX, this.x) - vec3d.getX()).toFloat()
-        val y = (MathHelper.lerp(tickDelta.toDouble(), this.prevPosY, this.y) - vec3d.getY()).toFloat()
-        val z = (MathHelper.lerp(tickDelta.toDouble(), this.prevPosZ, this.z) - vec3d.getZ()).toFloat()
-        this.drawPlane(vertexConsumer, quaternionf, x, y, z, tickDelta)
-    }
-
-    fun drawPlane(
+    override fun drawPlane(
         vertexConsumer: VertexConsumer,
         quaternionf: Quaternionf,
         x: Float,
@@ -59,42 +45,36 @@ abstract class DiveParticle : Particle {
         val minV = this.minV
         val maxV = this.maxV
         val brightness = this.getBrightness(tickDelta)
-        this.corner(vertexConsumer, quaternionf, x, y, z,  1f, -1f, size, maxU, maxV, brightness)
-        this.corner(vertexConsumer, quaternionf, x, y, z,  1f,  1f, size, maxU, minV, brightness)
-        this.corner(vertexConsumer, quaternionf, x, y, z, -1f,  1f, size, minU, minV, brightness)
+        this.corner(vertexConsumer, quaternionf, x, y, z, 1f, -1f, size, maxU, maxV, brightness)
+        this.corner(vertexConsumer, quaternionf, x, y, z, 1f, 1f, size, maxU, minV, brightness)
+        this.corner(vertexConsumer, quaternionf, x, y, z, -1f, 1f, size, minU, minV, brightness)
         this.corner(vertexConsumer, quaternionf, x, y, z, -1f, -1f, size, minU, maxV, brightness)
     }
 
-    fun corner(
-        vertexConsumer: VertexConsumer,
-        quaternionf: Quaternionf,
-        x: Float,
-        y: Float,
-        z: Float,
-        textureVer: Float,
-        textureHor: Float,
-        size: Float,
-        u: Float,
-        v: Float,
-        brightness: Int
-    ) {
-        val vector3f = Vector3f(textureVer, textureHor, 0.0f).rotate(quaternionf).mul(size).add(x, y, z)
-        vertexConsumer
-            .xyz(vector3f.x(), vector3f.y(), vector3f.z())
-            .uv0(u, v)
-            .color(this.colorRed, this.colorGreen, this.colorBlue, this.colorAlpha)
-            .uv2(brightness)
+    override val facingCameraMode = NONE
+
+    override fun getType(): ParticleTextureSheet = ParticleTextureSheet.PARTICLE_SHEET_TRANSLUCENT
+
+    public override fun getBrightness(tickDelta: Float): Int = 240
+
+    class Factory(private val spriteProvider: SpriteProvider) : ParticleFactory<EntityTestParticleEffect> {
+        override fun createParticle(
+            type: EntityTestParticleEffect,
+            world: ClientWorld,
+            posX: Double,
+            posY: Double,
+            posZ: Double,
+            velX: Double,
+            velY: Double,
+            velZ: Double,
+        ): Particle {
+            val entity = type.entity
+            val target = if (entity != null) {
+                world.getEntityById(entity)
+            } else null
+            val particle = DiveParticle(world, posX, posY, posZ, target)
+            particle.setSprite(spriteProvider)
+            return particle
+        }
     }
-
-    fun getSize(tickDelta: Float): Float =this.scale
-
-    override fun scale(scale: Float): Particle {
-        this.scale *= scale
-        return super.scale(scale)
-    }
-
-    protected abstract val minU: Float
-    protected abstract val maxU: Float
-    protected abstract val minV: Float
-    protected abstract val maxV: Float
 }

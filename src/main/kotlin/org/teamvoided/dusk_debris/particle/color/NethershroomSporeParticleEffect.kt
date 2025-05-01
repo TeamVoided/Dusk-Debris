@@ -1,4 +1,4 @@
-package org.teamvoided.dusk_debris.particle
+package org.teamvoided.dusk_debris.particle.color
 
 import com.mojang.serialization.Codec
 import com.mojang.serialization.MapCodec
@@ -11,31 +11,27 @@ import net.minecraft.particle.ParticleType
 import org.teamvoided.dusk_debris.init.DuskParticles
 import java.awt.Color
 
-class FlashParticleEffect(
-    val color: Color,
-    val maxAge: Int = 4
+class NethershroomSporeParticleEffect(
+    val color: Color
 ) : ParticleEffect {
     constructor(
-        color: Int,
-        maxAge: Int = 4
-    ) : this(Color(color), maxAge)
+        color: Int
+    ) : this(Color(color))
 
-    override fun getType(): ParticleType<FlashParticleEffect> =
-        DuskParticles.FLASH
+    override fun getType(): ParticleType<NethershroomSporeParticleEffect> =
+        DuskParticles.TOXIC_SMOKE_PARTICLE
 
     companion object {
-        val CODEC: MapCodec<FlashParticleEffect> =
+        val CODEC: MapCodec<NethershroomSporeParticleEffect> =
             RecordCodecBuilder.mapCodec { instance ->
                 instance.group(
-                    Codec.INT.fieldOf("color").forGetter { it.color.rgb },
-                    Codec.INT.fieldOf("max_age").forGetter { it.maxAge }
-                ).apply(instance, ::FlashParticleEffect)
+                    Codec.INT.fieldOf("color").forGetter { it.color.rgb }
+                ).apply(instance, ::NethershroomSporeParticleEffect)
             }
-        val PACKET_CODEC: PacketCodec<RegistryByteBuf, FlashParticleEffect> =
+        val PACKET_CODEC: PacketCodec<RegistryByteBuf, NethershroomSporeParticleEffect> =
             PacketCodec.tuple(
                 PacketCodecs.INT, { it.color.rgb },
-                PacketCodecs.INT, { it.maxAge },
-                ::FlashParticleEffect
+                ::NethershroomSporeParticleEffect
             )
     }
 }

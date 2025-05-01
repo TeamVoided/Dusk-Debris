@@ -5,6 +5,7 @@ import net.fabricmc.api.Environment
 import net.minecraft.client.particle.*
 import net.minecraft.client.world.ClientWorld
 import org.joml.Vector3f
+import org.teamvoided.dusk_debris.particle.color.BonecallerParticleEffect
 import java.awt.Color
 
 @Environment(EnvType.CLIENT)

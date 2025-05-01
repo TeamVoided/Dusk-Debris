@@ -13,7 +13,7 @@ import org.teamvoided.dusk_debris.block.CoinPileBlock
 import org.teamvoided.dusk_debris.block.RibbonBlock
 import org.teamvoided.dusk_debris.block.not_blocks.DuskProperties
 import org.teamvoided.dusk_debris.init.DuskBlocks
-import org.teamvoided.dusk_debris.particle.NethershroomSporeParticleEffect
+import org.teamvoided.dusk_debris.particle.color.NethershroomSporeParticleEffect
 import java.util.function.ToIntFunction
 
 

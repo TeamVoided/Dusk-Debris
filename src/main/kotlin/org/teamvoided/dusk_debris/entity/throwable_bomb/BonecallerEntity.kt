@@ -21,7 +21,7 @@ import net.minecraft.world.World
 import org.teamvoided.dusk_debris.init.DuskBlocks
 import org.teamvoided.dusk_debris.init.DuskEntities
 import org.teamvoided.dusk_debris.init.DuskItems
-import org.teamvoided.dusk_debris.particle.BonecallerParticleEffect
+import org.teamvoided.dusk_debris.particle.color.BonecallerParticleEffect
 import java.awt.Color
 
 open class BonecallerEntity : AbstractThrwowableBombEntity {

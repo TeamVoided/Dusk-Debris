@@ -8,6 +8,9 @@ import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
 import org.teamvoided.dusk_debris.DuskDebris.id
 import org.teamvoided.dusk_debris.particle.*
+import org.teamvoided.dusk_debris.particle.color.*
+import org.teamvoided.dusk_debris.particle.entity.DivingParticleEffect
+import org.teamvoided.dusk_debris.particle.entity.EntityTestParticleEffect
 
 
 object DuskParticles {
@@ -30,6 +33,8 @@ object DuskParticles {
         complex(GodhomeParticleEffect.CODEC, GodhomeParticleEffect.PACKET_CODEC)
     val DRAINED_SOUL: DefaultParticleType = simple()
     val SPELL: DefaultParticleType = simple()
+    val SPELL_DIVE: ParticleType<DivingParticleEffect> =
+        complex(DivingParticleEffect.CODEC, DivingParticleEffect.PACKET_CODEC)
     val CUBE: DefaultParticleType = simple()
 
 
@@ -86,6 +91,7 @@ object DuskParticles {
         register("godhome", GODHOME)
         register("drained_soul", DRAINED_SOUL)
         register("spell", SPELL)
+        register("spell_dive", SPELL_DIVE)
         register("cube", CUBE)
 
         register("cosmos", COSMOS)

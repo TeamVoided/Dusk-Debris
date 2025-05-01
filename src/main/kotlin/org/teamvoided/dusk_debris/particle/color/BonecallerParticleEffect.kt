@@ -1,4 +1,4 @@
-package org.teamvoided.dusk_debris.particle
+package org.teamvoided.dusk_debris.particle.color
 
 import com.mojang.serialization.Codec
 import com.mojang.serialization.MapCodec

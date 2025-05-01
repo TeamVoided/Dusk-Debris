@@ -4,6 +4,7 @@ import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import net.minecraft.client.particle.*
 import net.minecraft.client.world.ClientWorld
+import org.teamvoided.dusk_debris.particle.color.GunpowderExplosionSmokeParticleEffect
 import java.awt.Color
 
 @Environment(EnvType.CLIENT)

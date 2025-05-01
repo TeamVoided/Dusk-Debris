@@ -1,4 +1,4 @@
-package org.teamvoided.dusk_debris.particle
+package org.teamvoided.dusk_debris.particle.color
 
 import com.mojang.serialization.Codec
 import com.mojang.serialization.MapCodec
@@ -11,27 +11,27 @@ import net.minecraft.particle.ParticleType
 import org.teamvoided.dusk_debris.init.DuskParticles
 import java.awt.Color
 
-class GunpowderExplosionSmokeParticleEffect(
-    val color: Color
+class GodhomeParticleEffect(
+    val color: Color = Color(0xFFFFFF)
 ) : ParticleEffect {
     constructor(
         color: Int
     ) : this(Color(color))
 
-    override fun getType(): ParticleType<GunpowderExplosionSmokeParticleEffect> =
-        DuskParticles.GUNPOWDER_EXPLOSION_SMOKE
+    override fun getType(): ParticleType<GodhomeParticleEffect> =
+        DuskParticles.GODHOME
 
     companion object {
-        val CODEC: MapCodec<GunpowderExplosionSmokeParticleEffect> =
+        val CODEC: MapCodec<GodhomeParticleEffect> =
             RecordCodecBuilder.mapCodec { instance ->
                 instance.group(
                     Codec.INT.fieldOf("color").forGetter { it.color.rgb }
-                ).apply(instance, ::GunpowderExplosionSmokeParticleEffect)
+                ).apply(instance, ::GodhomeParticleEffect)
             }
-        val PACKET_CODEC: PacketCodec<RegistryByteBuf, GunpowderExplosionSmokeParticleEffect> =
+        val PACKET_CODEC: PacketCodec<RegistryByteBuf, GodhomeParticleEffect> =
             PacketCodec.tuple(
                 PacketCodecs.INT, { it.color.rgb },
-                ::GunpowderExplosionSmokeParticleEffect
+                ::GodhomeParticleEffect
             )
     }
 }

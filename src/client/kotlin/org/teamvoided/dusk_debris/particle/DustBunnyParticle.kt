@@ -8,6 +8,7 @@ import net.minecraft.client.world.ClientWorld
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.MathHelper.lerp
 import org.joml.Vector3f
+import org.teamvoided.dusk_debris.particle.color.DustBunnyParticleEffect
 import java.awt.Color
 
 class DustBunnyParticle(

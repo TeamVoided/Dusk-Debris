@@ -9,7 +9,7 @@ import net.minecraft.world.World
 import org.teamvoided.dusk_debris.entity.throwable_bomb.NethershroomThrowableEntity
 import org.teamvoided.dusk_debris.init.DuskBlocks
 import org.teamvoided.dusk_debris.init.DuskEntities
-import org.teamvoided.dusk_debris.particle.NethershroomSporeParticleEffect
+import org.teamvoided.dusk_debris.particle.color.NethershroomSporeParticleEffect
 
 class SmokebombEntity : NethershroomThrowableEntity {
     constructor(entityType: EntityType<out SmokebombEntity>, world: World) : super(entityType, world)

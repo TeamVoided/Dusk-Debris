@@ -8,8 +8,8 @@ import net.minecraft.client.particle.ParticleFactory
 import net.minecraft.client.world.ClientWorld
 import net.minecraft.util.math.MathHelper
 import net.minecraft.util.math.Vec3d
-import org.teamvoided.dusk_debris.particle.GunpowderExplosionEmitterParticleEffect
-import org.teamvoided.dusk_debris.particle.GunpowderExplosionSmokeParticleEffect
+import org.teamvoided.dusk_debris.particle.color.GunpowderExplosionEmitterParticleEffect
+import org.teamvoided.dusk_debris.particle.color.GunpowderExplosionSmokeParticleEffect
 import java.awt.Color
 
 @Environment(EnvType.CLIENT)

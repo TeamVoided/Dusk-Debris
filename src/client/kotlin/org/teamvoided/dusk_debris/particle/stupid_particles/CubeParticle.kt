@@ -10,13 +10,11 @@ import net.minecraft.client.particle.SpriteProvider
 import net.minecraft.client.world.ClientWorld
 import net.minecraft.particle.DefaultParticleType
 import net.minecraft.util.math.Direction
-import net.minecraft.util.math.MathHelper
 import org.joml.Quaternionf
 import org.joml.Vector4f
-import org.teamvoided.dusk_debris.particle.DuskBubbleParticle
 import org.teamvoided.dusk_debris.particle.stupid_particles.abstracts.SpriteBillboardKotlinParticle
+import org.teamvoided.dusk_debris.particle.stupid_particles.model_test.CubeUnwrapped
 import kotlin.math.abs
-import kotlin.math.max
 
 class CubeParticle(
     world: ClientWorld,

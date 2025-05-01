@@ -24,7 +24,7 @@ import org.teamvoided.dusk_debris.block.not_blocks.DuskProperties
 import org.teamvoided.dusk_debris.block.not_blocks.GodhomeBronzePhase
 import org.teamvoided.dusk_debris.data.tags.DuskEntityTypeTags
 import org.teamvoided.dusk_debris.module.DuskGameRules
-import org.teamvoided.dusk_debris.particle.GodhomeParticleEffect
+import org.teamvoided.dusk_debris.particle.color.GodhomeParticleEffect
 import org.teamvoided.dusk_debris.util.Utils.rotate90
 import org.teamvoided.dusk_debris.util.addParticle
 import org.teamvoided.dusk_debris.util.spawnParticles

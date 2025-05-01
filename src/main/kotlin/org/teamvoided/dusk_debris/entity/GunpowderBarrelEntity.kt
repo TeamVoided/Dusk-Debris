@@ -19,7 +19,7 @@ import org.teamvoided.dusk_debris.data.tags.DuskEntityTypeTags
 import org.teamvoided.dusk_debris.init.DuskBlocks
 import org.teamvoided.dusk_debris.init.DuskEntities
 import org.teamvoided.dusk_debris.init.DuskSoundEvents
-import org.teamvoided.dusk_debris.particle.GunpowderExplosionEmitterParticleEffect
+import org.teamvoided.dusk_debris.particle.color.GunpowderExplosionEmitterParticleEffect
 import org.teamvoided.dusk_debris.world.explosion.SpecialExplosionBehavior
 import kotlin.math.cos
 import kotlin.math.sin
