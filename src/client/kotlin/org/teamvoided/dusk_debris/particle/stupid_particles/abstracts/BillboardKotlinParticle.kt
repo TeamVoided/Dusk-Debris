@@ -25,33 +25,35 @@ abstract class BillboardKotlinParticle : Particle {
     }
 
 
+    init {   }
+
     open val facingCameraMode: BillboardParticle.FacingCameraMode = BillboardParticle.FacingCameraMode.ALL_AXIS
 
 
     override fun buildGeometry(vertexConsumer: VertexConsumer, camera: Camera, tickDelta: Float) {
         val quaternionf = Quaternionf()
         facingCameraMode.setRotation(quaternionf, camera, tickDelta)
-        if (this.angle != 0.0f) {
+        if (this.angle != 0f) {
             quaternionf.rotateZ(MathHelper.lerp(tickDelta, this.prevAngle, this.angle))
         }
 
-        this.drawPlaneLerping(vertexConsumer, camera, quaternionf, tickDelta)
+        this.lerpPosition(vertexConsumer, camera, quaternionf, tickDelta)
     }
 
-    open fun drawPlaneLerping(
+    open fun lerpPosition(
         vertexConsumer: VertexConsumer,
         camera: Camera,
         quaternionf: Quaternionf,
         tickDelta: Float
     ) {
         val vec3d = camera.pos
-        val x = (MathHelper.lerp(tickDelta.toDouble(), this.prevPosX, this.x) - vec3d.getX()).toFloat()
-        val y = (MathHelper.lerp(tickDelta.toDouble(), this.prevPosY, this.y) - vec3d.getY()).toFloat()
-        val z = (MathHelper.lerp(tickDelta.toDouble(), this.prevPosZ, this.z) - vec3d.getZ()).toFloat()
-        this.drawPlane(vertexConsumer, quaternionf, x, y, z, tickDelta)
+        val x = (MathHelper.lerp(tickDelta.toDouble(), this.prevPosX, this.x) - vec3d.x).toFloat()
+        val y = (MathHelper.lerp(tickDelta.toDouble(), this.prevPosY, this.y) - vec3d.y).toFloat()
+        val z = (MathHelper.lerp(tickDelta.toDouble(), this.prevPosZ, this.z) - vec3d.z).toFloat()
+        this.drawParticle(vertexConsumer, quaternionf, x, y, z, tickDelta)
     }
 
-    open fun drawPlane(
+    open fun drawParticle(
         vertexConsumer: VertexConsumer,
         quaternionf: Quaternionf,
         x: Float,
@@ -60,14 +62,14 @@ abstract class BillboardKotlinParticle : Particle {
         tickDelta: Float
     ) {
         val size = this.getSize(tickDelta)
-        val minU = this.minU
-        val maxU = this.maxU
-        val minV = this.minV
-        val maxV = this.maxV
+        val minU = this.minU()
+        val maxU = this.maxU()
+        val minV = this.minV()
+        val maxV = this.maxV()
         val brightness = this.getBrightness(tickDelta)
-        this.corner(vertexConsumer, quaternionf, x, y, z, 1f, -1f, size, maxU, maxV, brightness)
-        this.corner(vertexConsumer, quaternionf, x, y, z, 1f, 1f, size, maxU, minV, brightness)
-        this.corner(vertexConsumer, quaternionf, x, y, z, -1f, 1f, size, minU, minV, brightness)
+        this.corner(vertexConsumer, quaternionf, x, y, z,  1f, -1f, size, maxU, maxV, brightness)
+        this.corner(vertexConsumer, quaternionf, x, y, z,  1f,  1f, size, maxU, minV, brightness)
+        this.corner(vertexConsumer, quaternionf, x, y, z, -1f,  1f, size, minU, minV, brightness)
         this.corner(vertexConsumer, quaternionf, x, y, z, -1f, -1f, size, minU, maxV, brightness)
     }
 
@@ -77,16 +79,16 @@ abstract class BillboardKotlinParticle : Particle {
         x: Float,
         y: Float,
         z: Float,
-        textureVer: Float,
-        textureHor: Float,
+        textureCordHor: Float,
+        textureCordVer: Float,
         size: Float,
         u: Float,
         v: Float,
         brightness: Int
     ) {
-        val vector3f = Vector3f(textureVer, textureHor, 0.0f).rotate(quaternionf).mul(size).add(x, y, z)
+        val vector3f = Vector3f(textureCordHor, textureCordVer, 0f).rotate(quaternionf).mul(size).add(x, y, z)
         vertexConsumer
-            .xyz(vector3f.x(), vector3f.y(), vector3f.z())
+            .xyz(vector3f.x, vector3f.y, vector3f.z)
             .uv0(u, v)
             .color(this.colorRed, this.colorGreen, this.colorBlue, this.colorAlpha)
             .uv2(brightness)
@@ -99,10 +101,8 @@ abstract class BillboardKotlinParticle : Particle {
         return super.scale(scale)
     }
 
-    protected abstract val minU: Float
-    protected abstract val maxU: Float
-    protected abstract val minV: Float
-    protected abstract val maxV: Float
-
-    val NONE: BillboardParticle.FacingCameraMode = BillboardParticle.FacingCameraMode { _, _, _ -> }
+    protected abstract fun minU(): Float
+    protected abstract fun maxU(): Float
+    protected abstract fun minV(): Float
+    protected abstract fun maxV(): Float
 }

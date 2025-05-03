@@ -7,6 +7,7 @@ import net.minecraft.entity.Entity
 import org.joml.Quaternionf
 import org.teamvoided.dusk_debris.particle.entity.EntityTestParticleEffect
 import org.teamvoided.dusk_debris.particle.stupid_particles.abstracts.SpriteBillboardKotlinParticle
+import org.teamvoided.dusk_debris.util.NONE
 
 class DiveParticle(world: ClientWorld, x: Double, y: Double, z: Double, val entity: Entity?) :
     SpriteBillboardKotlinParticle(world, x, y, z, 0.0, 0.0, 0.0) {
@@ -31,7 +32,7 @@ class DiveParticle(world: ClientWorld, x: Double, y: Double, z: Double, val enti
         }
     }
 
-    override fun drawPlane(
+    override fun drawParticle(
         vertexConsumer: VertexConsumer,
         quaternionf: Quaternionf,
         x: Float,
@@ -40,10 +41,10 @@ class DiveParticle(world: ClientWorld, x: Double, y: Double, z: Double, val enti
         tickDelta: Float
     ) {
         val size = this.getSize(tickDelta)
-        val minU = this.minU
-        val maxU = this.maxU
-        val minV = this.minV
-        val maxV = this.maxV
+        val minU = this.minU()
+        val maxU = this.maxU()
+        val minV = this.minV()
+        val maxV = this.maxV()
         val brightness = this.getBrightness(tickDelta)
         this.corner(vertexConsumer, quaternionf, x, y, z, 1f, -1f, size, maxU, maxV, brightness)
         this.corner(vertexConsumer, quaternionf, x, y, z, 1f, 1f, size, maxU, minV, brightness)

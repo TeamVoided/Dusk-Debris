@@ -19,23 +19,25 @@ abstract class SpriteBillboardKotlinParticle : BillboardKotlinParticle {
         zVel: Double
     ) : super(world, x, y, z, xVel, yVel, zVel)
 
+    init {}
+
     protected fun setSprite(sprite: Sprite) {
         this.sprite = sprite
     }
 
-    override val minU: Float = sprite!!.minU
+    override fun minU(): Float = sprite?.minU ?: error("null sprite provided")
 
-    override val maxU: Float = sprite!!.maxU
+    override fun maxU(): Float = sprite?.maxU ?: error("null sprite provided")
 
-    override val minV: Float = sprite!!.minV
+    override fun minV(): Float = sprite?.minV ?: error("null sprite provided")
 
-    override val maxV: Float = sprite!!.maxV
+    override fun maxV(): Float = sprite?.maxV ?: error("null sprite provided")
 
-    fun setSprite(spriteProvider: SpriteProvider) {
+    open fun setSprite(spriteProvider: SpriteProvider) {
         this.setSprite(spriteProvider.getRandom(this.random))
     }
 
-    fun setSpriteForAge(spriteProvider: SpriteProvider) {
+    open fun setSpriteForAge(spriteProvider: SpriteProvider) {
         if (!this.dead) {
             this.setSprite(spriteProvider.getSprite(this.age, this.maxAge))
         }

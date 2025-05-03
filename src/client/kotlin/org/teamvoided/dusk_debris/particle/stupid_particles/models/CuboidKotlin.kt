@@ -1,4 +1,4 @@
-package org.teamvoided.dusk_debris.particle.stupid_particles.model_test
+package org.teamvoided.dusk_debris.particle.stupid_particles.models
 
 import com.mojang.blaze3d.vertex.VertexConsumer
 import net.minecraft.client.model.ModelPart
@@ -8,9 +8,11 @@ import org.joml.Quaternionf
 import org.joml.Vector3f
 import org.joml.Vector4f
 
-class CubeUnwrapped(
-    textureWidth: Int,
-    textureHeight: Int,
+class CuboidKotlin(
+    val minU: Float,
+    val maxU: Float,
+    val minV: Float,
+    val maxV: Float,
     private val minX: Float,    //offset from source
     private val minY: Float,    //offset from source
     private val minZ: Float,    //offset from source
@@ -21,26 +23,26 @@ class CubeUnwrapped(
     dilationY: Float,           //dilation
     dilationZ: Float,           //dilation
     mirror: Boolean,
-    squishU: Float,
-    squishV: Float,
     directions: Set<Direction>
 ) {
     constructor(
-        textureWidth: Int,
-        textureHeight: Int,
+        minU: Float,
+        maxU: Float,
+        minV: Float,
+        maxV: Float,
         sizeX: Float,
         sizeY: Float,
         sizeZ: Float,
         mirror: Boolean,
-        squishU: Float,
-        squishV: Float,
         directions: Set<Direction>
     ) : this(
-        textureWidth,
-        textureHeight,
-        -sizeX / 2,
-        -sizeY / 2,
-        -sizeZ / 2,
+        minU,
+        maxU,
+        minV,
+        maxV,
+        -sizeX / 2f,
+        -sizeY / 2f,
+        -sizeZ / 2f,
         sizeX,
         sizeY,
         sizeZ,
@@ -48,8 +50,6 @@ class CubeUnwrapped(
         0f,
         0f,
         mirror,
-        squishU,
-        squishV,
         directions
     )
 
@@ -79,33 +79,31 @@ class CubeUnwrapped(
             minX = temp
         }
 
-        val vxyz = ModelPart.Vertex(minX, minY, minZ, 0f, 0f)
-        val vXyz = ModelPart.Vertex(maxX, minY, minZ, 0f, 8f)
-        val vXYz = ModelPart.Vertex(maxX, maxY, minZ, 8f, 8f)
-        val vxYz = ModelPart.Vertex(minX, maxY, minZ, 8f, 0f)
-        val vxyZ = ModelPart.Vertex(minX, minY, maxZ, 0f, 0f)
-        val vXyZ = ModelPart.Vertex(maxX, minY, maxZ, 0f, 8f)
-        val vXYZ = ModelPart.Vertex(maxX, maxY, maxZ, 8f, 8f)
-        val vxYZ = ModelPart.Vertex(minX, maxY, maxZ, 8f, 0f)
-        val width = textureWidth.toFloat()
-        val widthZ = textureWidth.toFloat() + sizeZ
-        val widthZX = textureWidth.toFloat() + sizeZ + sizeX
-        val widthZXX = textureWidth.toFloat() + sizeZ + sizeX + sizeX
-        val widthZXZ = textureWidth.toFloat() + sizeZ + sizeX + sizeZ
-        val widthZXZX = textureWidth.toFloat() + sizeZ + sizeX + sizeZ + sizeX
-        val height = textureHeight.toFloat()
-        val heightZ = textureHeight.toFloat() + sizeZ
-        val heightZY = textureHeight.toFloat() + sizeZ + sizeY
+        val vxyz = ModelPart.Vertex(minX, minY, minZ, 1f, -1f)
+        val vXyz = ModelPart.Vertex(maxX, minY, minZ, -1f, 1f)
+        val vXYz = ModelPart.Vertex(maxX, maxY, minZ, 1f, 1f)
+        val vxYz = ModelPart.Vertex(minX, maxY, minZ, 1f, -1f)
+        val vxyZ = ModelPart.Vertex(minX, minY, maxZ, -1f, -1f)
+        val vXyZ = ModelPart.Vertex(maxX, minY, maxZ, -1f, 1f)
+        val vXYZ = ModelPart.Vertex(maxX, maxY, maxZ, 1f, 1f)
+        val vxYZ = ModelPart.Vertex(minX, maxY, maxZ, 1f, -1f)
+        //val width =     (textureWidth.toFloat())
+        //val widthZ =    (textureWidth.toFloat() + sizeZ)
+        //val widthZX =   (textureWidth.toFloat() + sizeZ + sizeX)
+        //val widthZXX =  (textureWidth.toFloat() + sizeZ + sizeX + sizeX)
+        //val widthZXZ =  (textureWidth.toFloat() + sizeZ + sizeX + sizeZ)
+        //val widthZXZX = (textureWidth.toFloat() + sizeZ + sizeX + sizeZ + sizeX)
+        //val height =    (textureHeight.toFloat()) / 16f
+        //val heightZ =   (textureHeight.toFloat() + sizeZ) / 16f
+        //val heightZY =  (textureHeight.toFloat() + sizeZ + sizeY) / 16f
         var side = 0
         if (directions.contains(Direction.DOWN)) {
             sides[side++] = Quad(
                 arrayOf(vXyZ, vxyZ, vxyz, vXyz),
-                widthZ,
-                height,
-                widthZX,
-                heightZ,
-                squishU,
-                squishV,
+                minU,//widthZ,
+                maxU,//height,
+                minV,//widthZX,
+                maxV,//heightZ,
                 mirror,
                 Direction.DOWN
             )
@@ -114,12 +112,10 @@ class CubeUnwrapped(
         if (directions.contains(Direction.UP)) {
             sides[side++] = Quad(
                 arrayOf(vXYz, vxYz, vxYZ, vXYZ),
-                widthZX,
-                heightZ,
-                widthZXX,
-                height,
-                squishU,
-                squishV,
+                minU,//widthZX,
+                maxU,//heightZ,
+                minV,//widthZXX,
+                maxV,//height,
                 mirror,
                 Direction.UP
             )
@@ -128,12 +124,10 @@ class CubeUnwrapped(
         if (directions.contains(Direction.WEST)) {
             sides[side++] = Quad(
                 arrayOf(vxyz, vxyZ, vxYZ, vxYz),
-                width,
-                heightZ,
-                widthZ,
-                heightZY,
-                squishU,
-                squishV,
+                minU,// width,
+                maxU,// heightZ,
+                minV,// widthZ,
+                maxV,// heightZY,
                 mirror,
                 Direction.WEST
             )
@@ -142,12 +136,10 @@ class CubeUnwrapped(
         if (directions.contains(Direction.NORTH)) {
             sides[side++] = Quad(
                 arrayOf(vXyz, vxyz, vxYz, vXYz),
-                widthZ,
-                heightZ,
-                widthZX,
-                heightZY,
-                squishU,
-                squishV,
+                minU, //widthZ,
+                maxU, //heightZ,
+                minV, //widthZX,
+                maxV, //heightZY,
                 mirror,
                 Direction.NORTH
             )
@@ -156,12 +148,10 @@ class CubeUnwrapped(
         if (directions.contains(Direction.EAST)) {
             sides[side++] = Quad(
                 arrayOf(vXyZ, vXyz, vXYz, vXYZ),
-                widthZX,
-                heightZ,
-                widthZXZ,
-                heightZY,
-                squishU,
-                squishV,
+                minU, //widthZX,
+                maxU, //heightZ,
+                minV, //widthZXZ,
+                maxV, //heightZY,
                 mirror,
                 Direction.EAST
             )
@@ -170,12 +160,10 @@ class CubeUnwrapped(
         if (directions.contains(Direction.SOUTH)) {
             sides[side] = Quad(
                 arrayOf(vxyZ, vXyZ, vXYZ, vxYZ),
-                widthZXZ,
-                heightZ,
-                widthZXZX,
-                heightZY,
-                squishU,
-                squishV,
+                minU, //widthZXZ,
+                maxU, //heightZ,
+                minV, //widthZXZX,
+                maxV, //heightZY,
                 mirror,
                 Direction.SOUTH
             )
@@ -223,16 +211,22 @@ class CubeUnwrapped(
         particleSize: Float
     ) {
         this.sides.forEach { quad ->
-            quad!!.vertices.forEach { vertex ->
+            quad?.vertices?.forEach { vertex ->
+                val vector3f = Vector3f(vertex.u, vertex.v, 0f)
+                    .rotate(quaternionf)
+                    .mul(10f)
+                    .add(x, y, z)
+
                 val vX = vertex.pos.x() / 16f
                 val vY = vertex.pos.y() / 16f
                 val vZ = vertex.pos.z() / 16f
-                val xyz = Vector3f(vertex.u, vertex.v, 0.0f)
+                val xyz = Vector3f(vertex.u, vertex.v, 0f)
                     .rotate(quaternionf)
                     .mul(particleSize)
-                    .add(x, y, z).add(vX, vY, vZ)
+                    .add(x, y, z)
+                    .add(vX, vY, vZ)
                 vertexConsumer
-                    .xyz(xyz.x, xyz.y, xyz.z)
+                    .xyz(vector3f.x, vector3f.y, vector3f.z)
                     .uv0(vertex.u, vertex.v)
                     .color(color.x, color.y, color.z, color.w)
                     .uv2(brightness)
@@ -248,20 +242,16 @@ class CubeUnwrapped(
         v1: Float,
         u2: Float,
         v2: Float,
-        squishU: Float,
-        squishV: Float,
         mirror: Boolean,
         direction: Direction
     ) {
         val direction: Vector3f
 
         init {
-            val f = 0f // / squishU
-            val g = 0f // / squishV
-            vertices[0] = vertices[0].remap(u2 / squishU - f, v1 / squishV + g)
-            vertices[1] = vertices[1].remap(u1 / squishU + f, v1 / squishV + g)
-            vertices[2] = vertices[2].remap(u1 / squishU + f, v2 / squishV - g)
-            vertices[3] = vertices[3].remap(u2 / squishU - f, v2 / squishV - g)
+            vertices[0] = vertices[0].remap(u2, v1)
+            vertices[1] = vertices[1].remap(u1, v1)
+            vertices[2] = vertices[2].remap(u1, v2)
+            vertices[3] = vertices[3].remap(u2, v2)
             if (mirror) {
                 val i = vertices.size
 
