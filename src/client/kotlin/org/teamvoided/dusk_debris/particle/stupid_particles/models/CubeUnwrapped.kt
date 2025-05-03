@@ -3,6 +3,7 @@ package org.teamvoided.dusk_debris.particle.stupid_particles.models
 import net.minecraft.util.math.Direction
 import org.apache.commons.lang3.math.IEEE754rUtils.max
 import org.teamvoided.dusk_debris.util.sendMessageIngame
+import kotlin.math.abs
 
 class CubeUnwrapped(
     minU: Float,
@@ -34,9 +35,9 @@ class CubeUnwrapped(
         val sizeU = maxU - minU
         val sizeV = maxV - minV
 
-        x = sizeX
-        y = sizeY
-        z = sizeZ
+        x = abs(sizeX)
+        y = abs(sizeY)
+        z = abs(sizeZ)
         val axisU = (z + x + z + x)
         val axisV = (z + y)
         x /= axisU

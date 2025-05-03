@@ -27,12 +27,12 @@ abstract class BillboardKotlinParticle : Particle {
 
     init {   }
 
-    open val facingCameraMode: BillboardParticle.FacingCameraMode = BillboardParticle.FacingCameraMode.ALL_AXIS
+    open val particleRotation: BillboardParticle.FacingCameraMode = BillboardParticle.FacingCameraMode.ALL_AXIS
 
 
     override fun buildGeometry(vertexConsumer: VertexConsumer, camera: Camera, tickDelta: Float) {
         val quaternionf = Quaternionf()
-        facingCameraMode.setRotation(quaternionf, camera, tickDelta)
+        particleRotation.setRotation(quaternionf, camera, tickDelta)
         if (this.angle != 0f) {
             quaternionf.rotateZ(MathHelper.lerp(tickDelta, this.prevAngle, this.angle))
         }
@@ -46,10 +46,10 @@ abstract class BillboardKotlinParticle : Particle {
         quaternionf: Quaternionf,
         tickDelta: Float
     ) {
-        val vec3d = camera.pos
-        val x = (MathHelper.lerp(tickDelta.toDouble(), this.prevPosX, this.x) - vec3d.x).toFloat()
-        val y = (MathHelper.lerp(tickDelta.toDouble(), this.prevPosY, this.y) - vec3d.y).toFloat()
-        val z = (MathHelper.lerp(tickDelta.toDouble(), this.prevPosZ, this.z) - vec3d.z).toFloat()
+        val camera = camera.pos
+        val x = (MathHelper.lerp(tickDelta.toDouble(), this.prevPosX, this.x) - camera.x).toFloat()
+        val y = (MathHelper.lerp(tickDelta.toDouble(), this.prevPosY, this.y) - camera.y).toFloat()
+        val z = (MathHelper.lerp(tickDelta.toDouble(), this.prevPosZ, this.z) - camera.z).toFloat()
         this.drawParticle(vertexConsumer, quaternionf, x, y, z, tickDelta)
     }
 

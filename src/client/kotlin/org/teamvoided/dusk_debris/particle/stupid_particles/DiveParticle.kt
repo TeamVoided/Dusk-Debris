@@ -52,7 +52,7 @@ class DiveParticle(world: ClientWorld, x: Double, y: Double, z: Double, val enti
         this.corner(vertexConsumer, quaternionf, x, y, z, -1f, -1f, size, minU, maxV, brightness)
     }
 
-    override val facingCameraMode = NONE
+    override val particleRotation = NONE
 
     override fun getType(): ParticleTextureSheet = ParticleTextureSheet.PARTICLE_SHEET_TRANSLUCENT
 

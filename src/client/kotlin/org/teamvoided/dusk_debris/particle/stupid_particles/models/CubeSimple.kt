@@ -103,7 +103,7 @@ open class CubeSimple(
         }
     }
 
-    class UV(val minU: Float, val maxU: Float, val minV: Float, val maxV: Float) {
+    data class UV(val minU: Float, val maxU: Float, val minV: Float, val maxV: Float) {
         fun u(minU: Float, maxU: Float): UV = UV(minU, maxU, minV, maxV)
         fun v(minV: Float, maxV: Float): UV = UV(minU, maxU, minV, maxV)
     }
@@ -131,7 +131,7 @@ open class CubeSimple(
     ) {
         this.sides.forEach { quad ->
             quad?.vertices?.forEach { vertex ->
-                val vector3f = vertex.pos
+                val vector3f = Vector3f(vertex.pos)
                     .rotate(quaternionf)
                     .mul(size)
                     .add(x, y, z)
