@@ -10,11 +10,12 @@ class CubeUnwrapped(
     maxU: Float,
     minV: Float,
     maxV: Float,
-    sizeX: Float,
-    sizeY: Float,
-    sizeZ: Float,
+    sizeX: Float = 1f,
+    sizeY: Float = 1f,
+    sizeZ: Float = 1f,
     directions: Set<Direction> = Direction.entries.toSet()
 ) : CubeSimple(minU, maxU, minV, maxV, sizeX, sizeY, sizeZ, directions) {
+
     init {
         var side = 0
 

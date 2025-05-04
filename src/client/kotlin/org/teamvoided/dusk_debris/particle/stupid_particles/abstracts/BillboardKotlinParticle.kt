@@ -24,9 +24,6 @@ abstract class BillboardKotlinParticle : Particle {
         this.scale = 1f
     }
 
-
-    init {   }
-
     open val particleRotation: BillboardParticle.FacingCameraMode = BillboardParticle.FacingCameraMode.ALL_AXIS
 
 

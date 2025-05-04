@@ -15,7 +15,6 @@ import org.joml.Vector4f
 import org.teamvoided.dusk_debris.particle.stupid_particles.abstracts.SpriteBillboardKotlinParticle
 import org.teamvoided.dusk_debris.particle.stupid_particles.models.CubeSimple
 import org.teamvoided.dusk_debris.particle.stupid_particles.models.CubeUnwrapped
-import org.teamvoided.dusk_debris.util.NONE
 import org.teamvoided.dusk_debris.util.Utils
 
 open class CubeParticle(
@@ -28,9 +27,9 @@ open class CubeParticle(
     zVel: Double
 ) : SpriteBillboardKotlinParticle(world, x, y, z, xVel, yVel, zVel) {
     private var cubeShape: CubeSimple? = null
-    private var prevRot: Vec3d
-    private var rotation: Vec3d
-    private var rotSpeed: Vec3d
+    private var prevRot: Vec3d = Vec3d.ZERO
+    private var rotation: Vec3d = Vec3d.ZERO
+    private var rotSpeed: Vec3d = Vec3d.ZERO
 
     init {
         this.maxAge = 100
@@ -66,7 +65,7 @@ open class CubeParticle(
         }
     }
 
-    fun getRotation(tickDelta: Float): Vector3f {
+    private fun getRotation(tickDelta: Float): Vector3f {
         val x = MathHelper.lerp(tickDelta.toDouble(), prevRot.x, rotation.x).toFloat()
         val y = MathHelper.lerp(tickDelta.toDouble(), prevRot.y, rotation.y).toFloat()
         val z = MathHelper.lerp(tickDelta.toDouble(), prevRot.z, rotation.z).toFloat()
@@ -102,15 +101,7 @@ open class CubeParticle(
     }
 
     open fun createShape() {
-        this.cubeShape = CubeUnwrapped(
-            this.minU(),
-            this.maxU(),
-            this.minV(),
-            this.maxV(),
-            1f,
-            1f,
-            1f,
-        )
+        this.cubeShape = CubeUnwrapped(this.minU(), this.maxU(), this.minV(), this.maxV())
     }
 
     override val particleRotation = BillboardParticle.FacingCameraMode { rotation: Quaternionf, _, tickDelta: Float ->

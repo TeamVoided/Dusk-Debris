@@ -3,6 +3,7 @@ package org.teamvoided.dusk_debris.particle.color
 import com.mojang.serialization.Codec
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
+import net.fabricmc.fabric.api.particle.v1.FabricParticleTypes
 import net.minecraft.network.RegistryByteBuf
 import net.minecraft.network.codec.PacketCodec
 import net.minecraft.network.codec.PacketCodecs
@@ -37,6 +38,7 @@ class GunpowderExplosionEmitterParticleEffect(
                 PacketCodecs.INT, { it.color.rgb },
                 ::GunpowderExplosionEmitterParticleEffect
             )
+        val REGISTER = FabricParticleTypes.complex(CODEC, PACKET_CODEC)
     }
 }
 

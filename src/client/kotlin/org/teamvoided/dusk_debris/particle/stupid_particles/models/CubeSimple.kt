@@ -2,11 +2,9 @@ package org.teamvoided.dusk_debris.particle.stupid_particles.models
 
 import com.mojang.blaze3d.vertex.VertexConsumer
 import net.minecraft.util.math.Direction
-import net.minecraft.util.math.Vec3i
 import org.joml.Quaternionf
 import org.joml.Vector3f
 import org.joml.Vector4f
-import org.teamvoided.dusk_debris.util.Utils.vec3d
 
 open class CubeSimple(
     minU: Float,
@@ -18,6 +16,15 @@ open class CubeSimple(
     sizeZ: Float,
     directions: Set<Direction> = Direction.entries.toSet()
 ) {
+    constructor(
+        minU: Float,
+        maxU: Float,
+        minV: Float,
+        maxV: Float,
+        size: Float,
+        directions: Set<Direction> = Direction.entries.toSet()
+    ) : this(minU, maxU, minV, maxV, size, size, size, directions)
+
     val sides: Array<Quad?> = arrayOfNulls(directions.size)
 
     init {

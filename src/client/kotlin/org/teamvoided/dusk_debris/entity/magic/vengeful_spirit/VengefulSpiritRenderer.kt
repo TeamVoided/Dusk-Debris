@@ -32,14 +32,13 @@ class VengefulSpiritRenderer(context: EntityRendererFactory.Context) : EntityRen
             val vertexConsumer = vertexConsumers.getBuffer(RenderLayer.getEntityCutoutNoCull(TEXTURE))
             val yawStuff =
                 MathHelper.wrapDegrees(MathHelper.lerpDegrees(tickDelta, entity.prevYaw, entity.yaw)) * Utils.DEG_TO_RAD
-            val pitchStuff =
-                MathHelper.wrapDegrees(
-                    MathHelper.lerpDegrees(
-                        tickDelta,
-                        entity.prevPitch,
-                        entity.pitch
-                    )
-                ) * Utils.DEG_TO_RAD
+            val pitchStuff = MathHelper.wrapDegrees(
+                MathHelper.lerpDegrees(
+                    tickDelta,
+                    entity.prevPitch,
+                    entity.pitch
+                )
+            ) * Utils.DEG_TO_RAD
             model.setAngles(entity, 0f, 0f, entity.age + tickDelta, yawStuff, pitchStuff)
             model.method_60879(matrices, vertexConsumer, light, OverlayTexture.DEFAULT_UV)
             super.render(entity, yaw, tickDelta, matrices, vertexConsumers, light)
@@ -53,7 +52,6 @@ class VengefulSpiritRenderer(context: EntityRendererFactory.Context) : EntityRen
     override fun getBlockLight(entity: VengefulSpiritEntity, pos: BlockPos): Int = 15
 
     companion object {
-        private val distance = MathHelper.square(3.5)
         private val TEXTURE: Identifier = DuskDebris.id("textures/entity/vengeful_spirit/vengeful_spirit.png")
     }
 }
