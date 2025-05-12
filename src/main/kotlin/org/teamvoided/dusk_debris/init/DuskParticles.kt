@@ -10,6 +10,7 @@ import org.teamvoided.dusk_debris.DuskDebris.id
 import org.teamvoided.dusk_debris.particle.*
 import org.teamvoided.dusk_debris.particle.color.*
 import org.teamvoided.dusk_debris.particle.entity.DivingParticleEffect
+import org.teamvoided.dusk_debris.particle.entity.EinsteinParticleEffect
 import org.teamvoided.dusk_debris.particle.entity.EntityTestParticleEffect
 
 
@@ -42,6 +43,7 @@ object DuskParticles {
 
     val COSMOS = simple()
     val ENTITY_TEST = complex(EntityTestParticleEffect.CODEC, EntityTestParticleEffect.PACKET_CODEC)
+    val EINSTEIN_ORBIT = complex(EinsteinParticleEffect.CODEC, EinsteinParticleEffect.PACKET_CODEC)
 
     val FLASH = complex(FlashParticleEffect.CODEC, FlashParticleEffect.PACKET_CODEC)
 
@@ -83,6 +85,7 @@ object DuskParticles {
 
         register("cosmos", COSMOS)
         register("entity_test", ENTITY_TEST)
+        register("einstein_orbit", EINSTEIN_ORBIT)
 
         register("goop_flying", ASTRAS_FLYING_GOOP)
         register("goop_landed", ASTRAS_LANDED_GOOP)
