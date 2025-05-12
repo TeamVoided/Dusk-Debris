@@ -141,11 +141,7 @@ class CoinPileBlock(settings: Settings) : Block(settings), Waterloggable {
     }
 
     companion object {
-        val CODEC: MapCodec<CoinPileBlock> = createCodec { settings: Settings ->
-            CoinPileBlock(
-                settings
-            )
-        }
+        val CODEC: MapCodec<CoinPileBlock> = createCodec(::CoinPileBlock)
         const val MAX_LAYERS: Int = 8
         const val IMPASSABLE_HEIGHT: Int = 5
         val LAYERS: IntProperty = Properties.LAYERS

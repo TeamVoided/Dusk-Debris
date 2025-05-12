@@ -16,7 +16,7 @@ import net.minecraft.world.gen.feature.ConfiguredFeature
 import net.minecraft.world.gen.feature.PlacedFeature
 import net.minecraft.world.gen.feature.PlacementModifier
 import net.minecraft.world.gen.feature.util.PlacedFeatureUtil
-import org.teamvoided.dusk_debris.data.gen.world.gen.placed_feature_creators.NetherPlacedFeatureCreators.netherPlacedFeatureCreators
+import org.teamvoided.dusk_debris.data.gen.world.gen.placed_feature.NetherPlacedFeatureCreators.netherPlacedFeatureCreators
 import org.teamvoided.dusk_debris.data.worldgen.DuskConfiguredFeatures
 import org.teamvoided.dusk_debris.data.worldgen.DuskPlacedFeatures
 

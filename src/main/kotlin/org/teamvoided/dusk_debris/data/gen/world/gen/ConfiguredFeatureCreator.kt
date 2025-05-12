@@ -22,7 +22,7 @@ import net.minecraft.world.gen.stateprovider.SimpleBlockStateProvider
 import net.minecraft.world.gen.treedecorator.LeavesVineTreeDecorator
 import net.minecraft.world.gen.treedecorator.TreeDecorator
 import net.minecraft.world.gen.trunk.StraightTrunkPlacer
-import org.teamvoided.dusk_debris.data.gen.world.gen.configured_feature_creators.NetherConfiguredFeatureCreators.netherConfiguredFeatureCreators
+import org.teamvoided.dusk_debris.data.gen.world.gen.configured_feature.NetherConfiguredFeatureCreators.netherConfiguredFeatureCreators
 import org.teamvoided.dusk_debris.data.tags.DuskBlockTags
 import org.teamvoided.dusk_debris.data.worldgen.DuskConfiguredFeatures
 import org.teamvoided.dusk_debris.data.worldgen.DuskPlacedFeatures

@@ -3,6 +3,7 @@ package org.teamvoided.dusk_debris.world.gen.terrain_parameters.nether
 import net.minecraft.util.function.ToFloatFunction
 import net.minecraft.util.math.Spline
 import org.teamvoided.dusk_debris.util.world_helper.add
+import org.teamvoided.dusk_debris.util.world_helper.calculateSlope
 import org.teamvoided.dusk_debris.world.gen.terrain_parameters.NetherTerrainParametersCreator.nFloor
 import kotlin.math.ceil
 
@@ -178,14 +179,5 @@ object OffsetFloor {
             .add(-0.05f, negative)
             .add(0.05f, positive)
         return spline.build()
-    }
-
-
-    fun calculateSlope(value1: Float, value2: Float, point1: Float, point2: Float): Float {
-        return (value2 - value1) / (point2 - point1)
-    }
-
-    fun calculateSlope(pair1: Pair<Float, Float>, pair2: Pair<Float, Float>): Float {
-        return (pair2.second - pair1.second) / (pair2.first - pair1.first)
     }
 }

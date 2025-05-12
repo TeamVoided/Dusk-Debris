@@ -7,8 +7,9 @@ import org.teamvoided.dusk_debris.DuskDebris.id
 
 object DuskDimension {
     val NETHER = create("nether")
+    val OVERWORLD = create("overworld")
 
-    fun create(id: String): RegistryKey<DimensionOptions> =
+    private fun create(id: String): RegistryKey<DimensionOptions> =
         RegistryKey.of(RegistryKeys.DIMENSION, id(id))
 
 }

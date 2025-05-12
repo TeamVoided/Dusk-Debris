@@ -1,4 +1,4 @@
-package org.teamvoided.dusk_debris.data.gen.world.gen.placed_feature_creators
+package org.teamvoided.dusk_debris.data.gen.world.gen.placed_feature
 
 import net.minecraft.registry.BootstrapContext
 import net.minecraft.registry.HolderProvider

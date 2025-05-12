@@ -8,15 +8,19 @@ import org.teamvoided.dusk_debris.DuskDebris.id
 object DuskNoiseParametersKeys {
     val EXAMPLE = create("example")
 
-    //    val LAVA_TUBE = create("lava_tube")
-    val LAVA_LEVEL = create("lava_level")
+    val CONTINENTAL_WEIRDNESS = create("parameters/continental_weirdness")
 
-    val TEMPERATURE_NETHER = create("parameters/temperature")
-    val VEGETATION_NETHER = create("parameters/humidity")
-    val CONTINENTALNESS_NETHER = create("parameters/continentalness")
-    val EROSION_NETHER = create("parameters/erosion")
-    val DROP_CEILING = create("drop_ceiling")
-    val RIDGE_NETHER = create("parameters/ridge")
+
+
+    //val LAVA_TUBE = create("lava_tube")
+    val LAVA_LEVEL = create("nether/lava_level")
+
+    val TEMPERATURE_NETHER = create("nether/parameters/temperature")
+    val VEGETATION_NETHER = create("nether/parameters/humidity")
+    val CONTINENTALNESS_NETHER = create("nether/parameters/continentalness")
+    val EROSION_NETHER = create("nether/parameters/erosion")
+    val DROP_CEILING = create("nether/drop_ceiling")
+    val RIDGE_NETHER = create("nether/parameters/ridge")
 
     /*
     val TEMPERATURE_LARGE_NETHER = create("parameters/large_biomes/temperature")
@@ -26,6 +30,7 @@ object DuskNoiseParametersKeys {
     val DROP_CEILING_LARGE = create("large_biomes/drop_ceiling")
      */
 
-    fun create(id: String): RegistryKey<DoublePerlinNoiseSampler.NoiseParameters> =
+
+    private  fun create(id: String): RegistryKey<DoublePerlinNoiseSampler.NoiseParameters> =
         RegistryKey.of(RegistryKeys.NOISE_PARAMETERS, id(id))
 }

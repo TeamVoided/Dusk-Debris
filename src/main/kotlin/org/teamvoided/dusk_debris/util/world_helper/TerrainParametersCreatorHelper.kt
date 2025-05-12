@@ -3,10 +3,19 @@ package org.teamvoided.dusk_debris.util.world_helper
 import net.minecraft.util.function.ToFloatFunction
 import net.minecraft.util.math.Spline
 
+/* - - math - -*/
+fun calculateSlope(value1: Float, value2: Float, point1: Float, point2: Float): Float {
+    return (value2 - value1) / (point2 - point1)
+}
+
+fun calculateSlope(pair1: Pair<Float, Float>, pair2: Pair<Float, Float>): Float {
+    return (pair2.second - pair1.second) / (pair2.first - pair1.first)
+}
+
 
 /* - - Vannilla mapped - -*/
-fun <C, I : ToFloatFunction<C>> Spline.Builder<C, I>.add(location: Float, f: Float): Spline.Builder<C, I> =
-    this.method_41294(location, f)
+fun <C, I : ToFloatFunction<C>> Spline.Builder<C, I>.add(location: Float, derivative: Float): Spline.Builder<C, I> =
+    this.method_41294(location, derivative)
 
 //fun <C, I : ToFloatFunction<C>> Spline.Builder<C, I>.add(
 //    location: Float,

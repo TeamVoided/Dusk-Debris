@@ -7,8 +7,8 @@ import org.teamvoided.dusk_debris.DuskDebris.id
 
 object DuskNoiseSettings {
     val NETHER = create("nether")
+    val OVERWORLD = create("overworld")
 
-    fun create(id: String): RegistryKey<ChunkGeneratorSettings> =
+    private   fun create(id: String): RegistryKey<ChunkGeneratorSettings> =
         RegistryKey.of(RegistryKeys.CHUNK_GENERATOR_SETTINGS, id(id))
-
 }

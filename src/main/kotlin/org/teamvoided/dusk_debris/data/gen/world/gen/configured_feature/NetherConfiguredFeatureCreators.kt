@@ -1,4 +1,4 @@
-package org.teamvoided.dusk_debris.data.gen.world.gen.configured_feature_creators
+package org.teamvoided.dusk_debris.data.gen.world.gen.configured_feature
 
 import net.minecraft.block.BlockState
 import net.minecraft.block.Blocks

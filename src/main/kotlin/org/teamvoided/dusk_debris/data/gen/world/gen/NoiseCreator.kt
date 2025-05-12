@@ -3,14 +3,25 @@ package org.teamvoided.dusk_debris.data.gen.world.gen
 import net.minecraft.registry.BootstrapContext
 import net.minecraft.registry.RegistryKey
 import net.minecraft.util.math.noise.DoublePerlinNoiseSampler.NoiseParameters
+import org.teamvoided.dusk_debris.data.gen.world.gen.NoiseCreator.register
+import org.teamvoided.dusk_debris.data.gen.world.gen.NoiseCreator.registerNetherBiomeNoises
 import org.teamvoided.dusk_debris.data.worldgen.DuskNoiseParametersKeys
 
 object NoiseCreator {
     fun bootstrap(c: BootstrapContext<NoiseParameters>) {
-//        register(c, DuskNoiseParametersKeys.LAVA_TUBE, -8, 1.0, -2.0, 1.0, 0.0, 0.0, 0.0)
-        c.register(DuskNoiseParametersKeys.LAVA_LEVEL, -10, 1.0)
-        c.register(DuskNoiseParametersKeys.EXAMPLE, -5, 1.0)
-        c.registerNetherBiomeNoises(
+        c.overworld()
+        c.nether()
+    }
+
+    private fun BootstrapContext<NoiseParameters>.overworld() {
+        this.register(DuskNoiseParametersKeys.CONTINENTAL_WEIRDNESS, -8, 1.0, -2.0, 1.0, 0.0, 0.0, 0.0)
+    }
+
+    private fun BootstrapContext<NoiseParameters>.nether() {
+        //register(c, DuskNoiseParametersKeys.LAVA_TUBE, -8, 1.0, -2.0, 1.0, 0.0, 0.0, 0.0)
+        this.register(DuskNoiseParametersKeys.LAVA_LEVEL, -10, 1.0)
+        this.register(DuskNoiseParametersKeys.EXAMPLE, -5, 1.0)
+        this.registerNetherBiomeNoises(
             0,
             DuskNoiseParametersKeys.TEMPERATURE_NETHER,
             DuskNoiseParametersKeys.VEGETATION_NETHER,
@@ -18,17 +29,17 @@ object NoiseCreator {
             DuskNoiseParametersKeys.EROSION_NETHER,
             DuskNoiseParametersKeys.DROP_CEILING
         )
-//        registerNetherBiomeNoises(
-//            c,
-//            -2,
-//            DuskNoiseParametersKeys.TEMPERATURE_LARGE_NETHER,
-//            DuskNoiseParametersKeys.VEGETATION_LARGE_NETHER,
-//            DuskNoiseParametersKeys.CONTINENTALNESS_LARGE_NETHER,
-//            DuskNoiseParametersKeys.EROSION_LARGE_NETHER,
-//            DuskNoiseParametersKeys.DROP_CEILING_LARGE
-//        )
-        c.register(DuskNoiseParametersKeys.RIDGE_NETHER, -7, 1.0, 2.0, 1.0, 0.0, 0.0, 0.0)
+        //this.registerNetherBiomeNoises(
+        //    -2,
+        //    DuskNoiseParametersKeys.TEMPERATURE_LARGE_NETHER,
+        //    DuskNoiseParametersKeys.VEGETATION_LARGE_NETHER,
+        //    DuskNoiseParametersKeys.CONTINENTALNESS_LARGE_NETHER,
+        //    DuskNoiseParametersKeys.EROSION_LARGE_NETHER,
+        //    DuskNoiseParametersKeys.DROP_CEILING_LARGE
+        //)
+        this.register(DuskNoiseParametersKeys.RIDGE_NETHER, -7, 1.0, 2.0, 1.0, 0.0, 0.0, 0.0)
     }
+
 
     private fun BootstrapContext<NoiseParameters>.registerNetherBiomeNoises(
         octaveOffset: Int,
