@@ -23,9 +23,9 @@ abstract class AbstractCubeParticle(
     zVel: Double
 ) : SpriteBillboardKotlinParticle(world, x, y, z, xVel, yVel, zVel) {
     private var cubeShape: CubeSimple? = null
-    private var prevRot: Vec3d = Vec3d.ZERO
-    private var rotation: Vec3d = Vec3d.ZERO
-    private var rotSpeed: Vec3d = Vec3d.ZERO
+    var prevRot: Vec3d = Vec3d.ZERO
+    var rotation: Vec3d = Vec3d.ZERO
+    var rotSpeed: Vec3d = Vec3d.ZERO
 
 
     override fun drawParticle(

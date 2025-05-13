@@ -9,11 +9,13 @@ import net.minecraft.world.gen.DensityFunction
 import net.minecraft.world.gen.DensityFunction.NoiseHolder
 import net.minecraft.world.gen.DensityFunctions.*
 import org.teamvoided.dusk_debris.data.gen.world.gen.density_function.NetherDensityFunctionCreator.theNetherCreator
+import org.teamvoided.dusk_debris.data.gen.world.gen.density_function.OverworldDensityFunctionCreator.overworldCreator
 import org.teamvoided.dusk_debris.world.gen.density_functions.SingleDensityFunctionInput
 
 object DensityFunctionCreator {
 
     fun bootstrap(c: BootstrapContext<DensityFunction>) {
+        c.overworldCreator()
         c.theNetherCreator()
     }
 

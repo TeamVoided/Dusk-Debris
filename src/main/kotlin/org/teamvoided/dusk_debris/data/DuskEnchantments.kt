@@ -36,7 +36,7 @@ object DuskEnchantments {
     val IMPALING = create("minecraft/enchantment/impaling")
 //    val WIND_BURST = create("minecraft/enchantment/wind_burst")
 
-    fun create(id: String): RegistryKey<Enchantment> {
+    private fun create(id: String): RegistryKey<Enchantment> {
         val enchantment = RegistryKey.of(RegistryKeys.ENCHANTMENT, DuskDebris.id(id))
         ENCHANTMENTS.add(enchantment)
         return enchantment

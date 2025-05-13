@@ -13,6 +13,6 @@ object DuskFogModifiers {
 
     val BOREAL_VALLEY = create("boreal_valley")
 
-    fun create(path: String): RegistryKey<FogModifier> =
+    private fun create(path: String): RegistryKey<FogModifier> =
         RegistryKey.of(DuskRegistryKeys.FOG_MODIFIER, DuskDebris.id(path))
 }

@@ -8,6 +8,7 @@ import org.teamvoided.dusk_debris.particle.emmiter.BlunderbombParticle
 import org.teamvoided.dusk_debris.particle.emmiter.FirebombParticle
 import org.teamvoided.dusk_debris.particle.emmiter.GunpowderExplosionEmitterParticle
 import org.teamvoided.dusk_debris.particle.stupid_particles.CubeParticle
+import org.teamvoided.dusk_debris.particle.stupid_particles.EinsteinOrbitParticle
 import org.teamvoided.dusk_debris.particle.vanilla.AdditionalWaterSuspendParticle
 
 object DuskParticlesClient {
@@ -29,6 +30,7 @@ object DuskParticlesClient {
 
         ParticleFactoryRegistry.getInstance().register(DuskParticles.COSMOS, CosmosParticle::Factory)
         ParticleFactoryRegistry.getInstance().register(DuskParticles.ENTITY_TEST, EntityTestParticle::Factory)
+        ParticleFactoryRegistry.getInstance().register(DuskParticles.EINSTEIN_ORBIT, EinsteinOrbitParticle::Factory)
 
         ParticleFactoryRegistry.getInstance().register(DuskParticles.WIND, WindParticle::Factory)
 
@@ -56,9 +58,9 @@ object DuskParticlesClient {
         ParticleFactoryRegistry.getInstance().register(DuskParticles.BETWEEN_POINTS, BetweenPointsParticle.Factory())
 
         // DnD
-         ParticleFactoryRegistry.getInstance().register(DuskParticles.SPIDERLILY, SpiderlilyPetalParticle::Factory)
-         ParticleFactoryRegistry.getInstance().register(DuskParticles.MUSHROOM_LAUNCH, MushroomLaunchParticle::Factory)
-         ParticleFactoryRegistry.getInstance().register(DuskParticles.DUST_BUNNY, DustBunnyParticle::Factory)
-         ParticleFactoryRegistry.getInstance().register(DuskParticles.SPIRAL, SpiralParticle::Factory)
+        ParticleFactoryRegistry.getInstance().register(DuskParticles.SPIDERLILY, SpiderlilyPetalParticle::Factory)
+        ParticleFactoryRegistry.getInstance().register(DuskParticles.MUSHROOM_LAUNCH, MushroomLaunchParticle::Factory)
+        ParticleFactoryRegistry.getInstance().register(DuskParticles.DUST_BUNNY, DustBunnyParticle::Factory)
+        ParticleFactoryRegistry.getInstance().register(DuskParticles.SPIRAL, SpiralParticle::Factory)
     }
 }

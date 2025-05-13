@@ -14,8 +14,8 @@ fun calculateSlope(pair1: Pair<Float, Float>, pair2: Pair<Float, Float>): Float 
 
 
 /* - - Vannilla mapped - -*/
-fun <C, I : ToFloatFunction<C>> Spline.Builder<C, I>.add(location: Float, derivative: Float): Spline.Builder<C, I> =
-    this.method_41294(location, derivative)
+fun <C, I : ToFloatFunction<C>> Spline.Builder<C, I>.add(location: Float, value: Float): Spline.Builder<C, I> =
+    this.method_41294(location, value)
 
 //fun <C, I : ToFloatFunction<C>> Spline.Builder<C, I>.add(
 //    location: Float,

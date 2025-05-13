@@ -10,20 +10,20 @@ import net.minecraft.world.gen.YOffset
 import net.minecraft.world.gen.chunk.ChunkGeneratorSettings
 import net.minecraft.world.gen.chunk.GenerationShapeConfig
 import net.minecraft.world.gen.noise.NoiseParametersKeys
-import net.minecraft.world.gen.noise.NoiseRouterData
 import net.minecraft.world.gen.surfacebuilder.SurfaceRules.*
 import net.minecraft.world.gen.surfacebuilder.VanillaSurfaceRules
 import org.teamvoided.dusk_debris.data.gen.world.gen.density_function.NetherDensityFunctionCreator.createNether
-import org.teamvoided.dusk_debris.data.gen.world.gen.density_function.OverworldDensityFunctionCreator
+import org.teamvoided.dusk_debris.data.gen.world.gen.density_function.OverworldDensityFunctionCreator.overworld
 import org.teamvoided.dusk_debris.data.worldgen.DuskBiomes
 import org.teamvoided.dusk_debris.data.worldgen.DuskNoiseSettings
+import org.teamvoided.dusk_debris.world.gen.terrain_parameters.overworld.Offset
 
 object NoiseSettingsGenerator {
     //ChunkGeneratorSettings
 
     fun bootstrap(c: BootstrapContext<ChunkGeneratorSettings>) {
-        c.register(DuskNoiseSettings.OVERWORLD, c.)
-        c.register(DuskNoiseSettings.NETHER, c.createNetherSettings(false, false))
+        c.register(DuskNoiseSettings.OVERWORLD, c.createOverworldSettings())
+        c.register(DuskNoiseSettings.NETHER, c.createNetherSettings())
 //        c.register(DuskNoiseSettings.NETHER_LARGE_BIOME, createNetherSettings(c, false, true))
 //        c.register(DuskNoiseSettings.NETHER_AMPLIFIED, createNetherSettings(c, true, false))
 
@@ -35,23 +35,18 @@ object NoiseSettingsGenerator {
     }
 
 
-    private fun BootstrapContext<*>.createOverworldSettings(
-        amplified: Boolean,
-        largeBiomes: Boolean
+    private fun BootstrapContext<ChunkGeneratorSettings>.createOverworldSettings(
+        amplified: Boolean = false,
+        largeBiomes: Boolean = false
     ): ChunkGeneratorSettings {
         return ChunkGeneratorSettings(
             GenerationShapeConfig.create(-64, 384, 1, 2),
             Blocks.STONE.defaultState,
             Blocks.WATER.defaultState,
-            OverworldDensityFunctionCreator.overworld(
-                this.getRegistryLookup(RegistryKeys.DENSITY_FUNCTION),
-                this.getRegistryLookup(RegistryKeys.NOISE_PARAMETERS),
-                largeBiomes,
-                amplified
-            ),
+            this.overworld(largeBiomes, amplified),
             VanillaSurfaceRules.getOverworldRules(),
             OverworldBiomeParameters().spawnSuitabilityNoises,
-            63,
+            Offset.SEA_LEVEL,
             false,
             true,
             true,
@@ -61,8 +56,8 @@ object NoiseSettingsGenerator {
 
 
     private fun BootstrapContext<*>.createNetherSettings(
-        amplified: Boolean,
-        largeBiomes: Boolean
+        amplified: Boolean = false,
+        largeBiomes: Boolean = false
     ): ChunkGeneratorSettings {
         return ChunkGeneratorSettings(
             GenerationShapeConfig.create(0, 256, 1, 2),

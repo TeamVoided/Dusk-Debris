@@ -8,14 +8,20 @@ import org.teamvoided.dusk_debris.DuskDebris.id
 object DuskDensityFunctions {
     val EXAMPLE = create("example")
 
-    val CONTINENTALNESS = create("parameters/continentalness")
+    val TEMPERATURE = create("parameters/temperature")
+    val HUMIDITY = create("parameters/humidity")
+    val RIDGES_DEBUG = create("parameters/ridges")
+    val RIDGES_FOLD_DEBUG = create("parameters/ridges_folded")
+    val EROSION_DEBUG = create("parameters/debug/erosion")
+    val CONTINENT_DEBUG = create("parameters/debug/continentalness")
+    val CONTINENT_WIERD = create("parameters/continentalness_wierd")
     val RIDGES_WEIRD = create("parameters/ridges_weird")
     val DEPTH = create("parameters/depth")
-    val SLOPED_CHEESE = create("sloped_cheese")
-    val OFFSET = create("offset")
-    val JAGGEDNESS = create("jaggedness")
-    val FACTOR = create("factor")
-    val JAGGED_PARAMETER = create("jagged_parameter")
+    val SLOPED_CHEESE = create("shapers/sloped_cheese")
+    val OFFSET = create("shapers/offset")
+    val JAGGEDNESS = create("shapers/jaggedness")
+    val FACTOR = create("shapers/factor")
+    val OVERWORLD_IDWJ = create("initial_density_without_jaggedness")
     val OVERWORLD_FINAL_DENSITY = create("final_density")
 
 

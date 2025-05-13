@@ -3,7 +3,6 @@ package org.teamvoided.dusk_debris.world.gen.terrain_parameters
 import net.minecraft.util.function.ToFloatFunction
 import net.minecraft.util.math.Spline
 import org.teamvoided.dusk_debris.util.world_helper.add
-import org.teamvoided.dusk_debris.world.gen.terrain_parameters.nether.OffsetFloor
 import org.teamvoided.dusk_debris.world.gen.terrain_parameters.overworld.Offset
 
 object OverworldTerrainParametersCreator {
@@ -21,37 +20,39 @@ object OverworldTerrainParametersCreator {
     private var JAGGEDNESS_AMPLIFIED: ToFloatFunction<Float> =
         ToFloatFunction.createUnlimited { it * 2.0f }
 
+    val CONT: List<Float> = listOf(-1.1f, -1.02f, -0.7f, -0.3f, -0.1f, 0.1f, 0.11f, 0.2f, 0.4f, 1f)
+    val EROS: List<Float> = listOf(-0.85f, -0.7f, -0.4f, -0.35f, -0.1f, 0.2f, 0.4f, 0.55f, 0.7f)
+
     fun <C, I : ToFloatFunction<C>> offsetSpline(
         continents: I,
         erosion: I,
-        ridgesFolded: I,
         ridges: I,
+        ridgesFolded: I,
         amplified: Boolean = false
     ): Spline<C, I> {
         val amplifiedTransformer = if (amplified) OFFSET_AMPLIFIED else NO_TRANSFORM
 
         val island = Offset.mushroomIsland(erosion, ridgesFolded, amplifiedTransformer)
-        val deepOcean = -0.45f
-        val ocean = -0.12f
+        val deepOcean = -60 / 256f
+        val ocean = -30 / 256f
         val shoreline = 0f
-        val outland = 0.1f
-        val midland = 0.25f
-        val inland = 0.5f
+        val shoreline2 = 0f
+        val outland = 20 / 256f
+        val midland = 60 / 256f
+        val inland = 100 / 256f
 
-
-        //OFFSET CONTINENTALNESS
-        return Spline.builder(continents, amplifiedTransformer)
-            .add(-1.1f, island) //mushroom island
-            .add(-1.02f, deepOcean) //deep ocean
-            .add(-0.7f, deepOcean) //deep ocean
-            .add(-0.3f, ocean) //ocean
-            .add(-0.1f, ocean) //shoreline ocean connection
-            .add(0.1f, shoreline) //shoreline
-            .add(0.11f, shoreline) //shoreline outland connection, usually just the same as shoreline
-            .add(0.2f, outland) //outland
-            .add(0.4f, midland) //midland
-            .add(1f, inland) //inland
-            .build()
+        val offset = Spline.builder(continents, amplifiedTransformer)
+        offset.add(CONT[0], island)
+        offset.add(CONT[1], deepOcean)
+        offset.add(CONT[2], deepOcean)
+        offset.add(CONT[3], ocean)
+        offset.add(CONT[4], ocean)      //shoreline ocean connection
+        offset.add(CONT[5], shoreline)
+        offset.add(CONT[6], shoreline2) //shoreline outland connection, usually just the same as shoreline, or cliffs
+        offset.add(CONT[7], outland)
+        offset.add(CONT[8], midland)
+        offset.add(CONT[9], inland)
+        return offset.build()
     }
 
     //method_42054
@@ -68,7 +69,8 @@ object OverworldTerrainParametersCreator {
         val jaggedRidgesFolded = Spline.builder(ridgesFolded, amplifiedTransformer)
             .add(-0.8f, 6f)
             .add(-0.7f, jaggedErosion.build())
-        return jaggedRidgesFolded.build()
+
+        return jaggedErosion.build()
     }
 
     fun <C, I : ToFloatFunction<C>> jaggednessSpline(
@@ -76,25 +78,11 @@ object OverworldTerrainParametersCreator {
         erosion: I,
         ridges: I,
         ridgesFolded: I,
-        jaggedness: I,
         amplified: Boolean
     ): Spline<C, I> {
         val amplifiedTransformer = if (amplified) JAGGEDNESS_AMPLIFIED else NO_TRANSFORM
-        val spline = Spline.builder(jaggedness, amplifiedTransformer)
+        val spline = Spline.builder(erosion, amplifiedTransformer)
             .add(-1f, 0f)
-        return spline.build()
-    }
-
-    private fun <C, I : ToFloatFunction<C>> offset(
-        howFarInland: Float,
-        erosion: I,
-        ridges: I,
-        ridgesFolded: I,
-        amplifier: ToFloatFunction<Float>
-    ): Spline<C, I> {
-        val spline = Spline.builder(erosion, amplifier)
-            .add(-0.85f, 0f)
-            .add(0.7f, 0f)
         return spline.build()
     }
 }

@@ -239,14 +239,14 @@ class ShiftBlock(settings: Settings) : Block(settings) {
         val ORIENTATION: EnumProperty<JigsawOrientation> = Properties.ORIENTATION
         val PHASE: EnumProperty<GodhomeBronzePhase> = DuskProperties.GODHOME_BRONZE_PHASE
 
-        val travelDistance = 40
-        val range = 15.0
+        private val travelDistance = 40
+        private val range = 15.0
         val rangeBox = Box(
             -range, -range, -range,
             range, range, range
         )
 
-        fun godhomeStrongParticles(world: World, pos: BlockPos, repeat: Int = 5) {
+        private fun godhomeStrongParticles(world: World, pos: BlockPos, repeat: Int = 5) {
             val rand = world.random
             repeat(repeat) {
                 val randInRadius = MathHelper.sqrt(rand.nextFloat()) * range
