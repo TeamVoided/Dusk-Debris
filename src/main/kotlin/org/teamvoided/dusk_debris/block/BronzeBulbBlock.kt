@@ -32,7 +32,7 @@ open class BronzeBulbBlock(settings: Settings?) : Block(settings) {
     }
 
     override fun randomDisplayTick(state: BlockState, world: World, pos: BlockPos, random: RandomGenerator) {
-        if (state.get(PHASE) == GodhomeBronzePhase.RADIANT) ShiftBlock.godhomeStrongParticles(world, pos, 1)
+        //if (state.get(PHASE) == GodhomeBronzePhase.RADIANT) ShiftBlock.godhomeStrongParticles(world, pos, 1)
     }
 
     override fun neighborUpdate(

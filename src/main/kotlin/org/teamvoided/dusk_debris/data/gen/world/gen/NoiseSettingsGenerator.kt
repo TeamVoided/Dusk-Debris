@@ -55,7 +55,7 @@ object NoiseSettingsGenerator {
     }
 
 
-    private fun BootstrapContext<*>.createNetherSettings(
+    private fun BootstrapContext<ChunkGeneratorSettings>.createNetherSettings(
         amplified: Boolean = false,
         largeBiomes: Boolean = false
     ): ChunkGeneratorSettings {

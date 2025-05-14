@@ -10,10 +10,6 @@ object DuskDensityFunctions {
 
     val TEMPERATURE = create("parameters/temperature")
     val HUMIDITY = create("parameters/humidity")
-    val RIDGES_DEBUG = create("parameters/ridges")
-    val RIDGES_FOLD_DEBUG = create("parameters/ridges_folded")
-    val EROSION_DEBUG = create("parameters/debug/erosion")
-    val CONTINENT_DEBUG = create("parameters/debug/continentalness")
     val CONTINENT_WIERD = create("parameters/continentalness_wierd")
     val RIDGES_WEIRD = create("parameters/ridges_weird")
     val DEPTH = create("parameters/depth")

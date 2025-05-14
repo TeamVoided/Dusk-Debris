@@ -54,6 +54,8 @@ class DuskDebrisData : DataGeneratorEntrypoint {
         gen.add(RegistryKeys.NOISE_PARAMETERS, NoiseCreator::bootstrap)
         gen.add(RegistryKeys.DENSITY_FUNCTION, DensityFunctionCreator::bootstrap)
         gen.add(RegistryKeys.CHUNK_GENERATOR_SETTINGS, NoiseSettingsGenerator::bootstrap)
+        gen.add(RegistryKeys.DIMENSION, DimensionCreator::bootstrap)
+
 
         gen.add(RegistryKeys.STRUCTURE_POOL, StructurePoolCreator::bootstrap)
         gen.add(RegistryKeys.STRUCTURE_FEATURE, StructureCreator::bootstrap)

@@ -8,6 +8,7 @@ import net.minecraft.world.dimension.DimensionOptions
 import net.minecraft.world.dimension.DimensionType
 import net.minecraft.world.gen.chunk.ChunkGeneratorSettings
 import net.minecraft.world.gen.chunk.NoiseChunkGenerator
+import org.teamvoided.dusk_debris.data.gen.world.gen.dimension.OverworldDebugCreator
 import org.teamvoided.dusk_debris.data.gen.world.gen.dimension.OverworldDimensionCreator
 import org.teamvoided.dusk_debris.data.worldgen.DuskDimension
 import org.teamvoided.dusk_debris.data.worldgen.DuskDimensionType
@@ -22,7 +23,8 @@ object DimensionCreator {
             DuskDimension.OVERWORLD,
             DuskDimensionType.OVERWORLD,
             DuskNoiseSettings.OVERWORLD,
-            OverworldDimensionCreator.noiseBiomeSource { biome.getHolderOrThrow(it) }
+            //OverworldDimensionCreator.noiseBiomeSource { biome.getHolderOrThrow(it) }
+            OverworldDebugCreator.addBiomesTo { biome.getHolderOrThrow(it) }
         )
     }
 

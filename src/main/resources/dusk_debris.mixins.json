@@ -9,6 +9,7 @@
     "BlockWithEntityAccessor",
     "ChunkNoiseSamplerMixin",
     "EntityWindLogicMixin",
+    "FabricDynamicRegistryMixin",
     "FreezeTopLayerFeatureMixin",
     "MangroveRootsBlockMixin",
     "PaintingEntityMixin",

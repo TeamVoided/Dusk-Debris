@@ -4,6 +4,7 @@ import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricDynamicRegistryProvider
 import net.minecraft.registry.HolderLookup
 import net.minecraft.registry.RegistryKeys
+import org.teamvoided.dusk_debris.data.worldgen.DuskDensityFunctions
 import org.teamvoided.dusk_debris.init.DuskRegistryKeys
 import java.util.concurrent.CompletableFuture
 
@@ -21,6 +22,7 @@ class DynamicRegistryProvider(o: FabricDataOutput, r: CompletableFuture<HolderLo
         e.addAll(reg.getLookupOrThrow(RegistryKeys.NOISE_PARAMETERS))
         e.addAll(reg.getLookupOrThrow(RegistryKeys.DENSITY_FUNCTION))
         e.addAll(reg.getLookupOrThrow(RegistryKeys.CHUNK_GENERATOR_SETTINGS))
+        e.addAll(reg.getLookupOrThrow(RegistryKeys.DIMENSION))
 
         e.addAll(reg.getLookupOrThrow(RegistryKeys.STRUCTURE_POOL))
         e.addAll(reg.getLookupOrThrow(RegistryKeys.STRUCTURE_FEATURE))

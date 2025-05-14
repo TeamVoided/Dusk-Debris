@@ -1,23 +1,9 @@
 package org.teamvoided.dusk_debris.data.gen.world.gen.dimension
 
-import com.mojang.datafixers.util.Pair
-import net.minecraft.registry.RegistryKey
-import net.minecraft.world.biome.Biome
-import net.minecraft.world.biome.Biomes
-import net.minecraft.world.biome.source.util.MultiNoiseUtil.*
-import org.teamvoided.dusk_debris.data.gen.world.gen.DimensionCreator
-import org.teamvoided.dusk_debris.data.gen.world.gen.dimension.OverworldDimensionCreator.ocean
-import org.teamvoided.dusk_debris.util.world_helper.mult
-import org.teamvoided.dusk_debris.util.world_helper.range
-import org.teamvoided.dusk_debris.world.gen.terrain_parameters.OverworldTerrainParametersCreator.CONT
+import org.teamvoided.dusk_debris.util.world_helper.*
 import java.util.function.Function
 
 object OverworldDimensionCreator {
-
-    val fullRange = range(-1, 1)
-    val negativeRange = range(-1, 0f)
-    val positiveRange = range(0f, 1)
-    val zeroRange = range(0f)
 
     // - - - depth - - - //
     val dTop = zeroRange
@@ -29,8 +15,8 @@ object OverworldDimensionCreator {
     // - - - continentalness - - - //
     val cMushIsle = range(-1.5f, -1.05f)
     val cDeepOcean = range(-1.05f, -0.45f)
-    val cOcean = range(-0.45f, -0.05f)
-    val cBeach = range(-0.1f, 0.1f)
+    val cOcean = range(-0.45f, -0.11f)
+    val cBeach = range(-0.1f)
     val cOutland = range(0.1f, 0.2f)
     val cMidland = range(0.2f, 0.4f)
     val cInland = range(0.4f, 1)
@@ -67,72 +53,4 @@ object OverworldDimensionCreator {
     val wPeakN = wPeakP.mult(-1f)
     val wShatter = range(1, 2)
     val wHills = range(-2, -1)
-
-    fun <T> noiseBiomeSource(it: Function<RegistryKey<Biome>, T>): ParameterRangeList<T> {
-        val list: MutableList<Pair<NoiseHypercube, T>> = mutableListOf()
-        list += it.ocean(dTop)
-        return ParameterRangeList(list)
-    }
-
-    private fun <T> Function<RegistryKey<Biome>, T>.ocean(depth: ParameterRange): List<Pair<NoiseHypercube, T>> {
-        return biomeSource(
-            this.createNH(
-                Biomes.MUSHROOM_FIELDS,
-                fullRange,
-                fullRange,
-                cMushIsle,
-                fullRange,
-                depth,
-                fullRange,
-            ),
-            this.createNH(
-                Biomes.DEEP_OCEAN,
-                fullRange,
-                fullRange,
-                cDeepOcean,
-                fullRange,
-                depth,
-                fullRange,
-            ),
-            this.createNH(
-                Biomes.OCEAN,
-                fullRange,
-                fullRange,
-                cOcean,
-                fullRange,
-                depth,
-                fullRange,
-            )
-        )
-    }
-
-
-    fun <T> Function<RegistryKey<Biome>, T>.createNH(
-        biome: RegistryKey<Biome>,
-        temperature: ParameterRange,
-        humidity: ParameterRange,
-        continentalness: ParameterRange,
-        erosion: ParameterRange,
-        depth: ParameterRange,
-        weirdness: ParameterRange,
-    ): kotlin.Pair<T, NoiseHypercube> {
-        return this.apply(biome) to NoiseHypercube(
-            temperature,
-            humidity,
-            continentalness,
-            erosion,
-            depth,
-            weirdness,
-            0L
-        )
-    }
-
-    fun <T> biomeSource(vararg biomes: kotlin.Pair<T, NoiseHypercube>): List<Pair<NoiseHypercube, T>> {
-        val list: List<Pair<NoiseHypercube, T>> = listOf()
-        biomes.forEach {
-            list.addLast(Pair.of(it.second, it.first))
-        }
-        return list
-    }
-
 }

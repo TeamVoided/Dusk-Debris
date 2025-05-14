@@ -14,7 +14,7 @@ class DebugAxis(
     val axis: Direction.Axis,
     val period: Double
 ) : DensityFunction {
-    constructor(axis: Direction.Axis, period: Int) : this(axis, period.toDouble())
+    constructor(axis: Direction.Axis, period: Number) : this(axis, period.toDouble())
 
     override fun compute(c: DensityFunction.FunctionContext): Double {
         val axis = when (axis) {

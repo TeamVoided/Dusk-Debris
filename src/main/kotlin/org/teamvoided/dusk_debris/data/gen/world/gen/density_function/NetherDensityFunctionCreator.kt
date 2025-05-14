@@ -8,6 +8,7 @@ import net.minecraft.util.math.Direction
 import net.minecraft.world.biome.source.util.VanillaTerrainParametersCreator
 import net.minecraft.world.gen.DensityFunction
 import net.minecraft.world.gen.DensityFunctions
+import net.minecraft.world.gen.chunk.ChunkGeneratorSettings
 import net.minecraft.world.gen.noise.NoiseParametersKeys
 import net.minecraft.world.gen.noise.NoiseRouter
 import net.minecraft.world.gen.noise.NoiseRouterData

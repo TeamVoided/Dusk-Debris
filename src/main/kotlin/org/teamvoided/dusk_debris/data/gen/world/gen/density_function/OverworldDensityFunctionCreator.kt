@@ -21,13 +21,11 @@ import org.teamvoided.dusk_debris.world.gen.terrain_parameters.OverworldTerrainP
 import voidlib.devin.world.gen.*
 
 object OverworldDensityFunctionCreator {
-    private val debugged: Pair<String, String> = ("erosion" to "continentalness")
     private val debug = true
-    private val debugSize = 100
+    private val debugSize = 300
 
     fun BootstrapContext<DensityFunction>.overworldCreator() {
         this.parameters()
-        if (debug) this.parametersDebug()
         this.shapers()
     }
 
@@ -39,22 +37,25 @@ object OverworldDensityFunctionCreator {
         this.register(DuskDensityFunctions.HUMIDITY, noi2D(NoiseParametersKeys.VEGETATION))
         this.register(
             DuskDensityFunctions.CONTINENT_WIERD,
-            cacheOnce(
-                add(
-                    this.dense(NoiseRouterData.CONTINENTS_OVERWORLD),
-                    rangeChoice(
-                        this.dense(NoiseRouterData.CONTINENTS_OVERWORLD),
-                        0.0,
-                        2.0,
-                        multiply(
-                            0.5,
-                            this.noi2D(DuskNoiseParametersKeys.CONTINENTAL_WEIRDNESS)
-
-                        ).cube(),
-                        DensityFunctions.constant(0.0)
-                    )
-                )
+            add(
+                0,
+                this.dense(NoiseRouterData.CONTINENTS_OVERWORLD)
             )
+            //cacheOnce(
+            //    add(
+            //        this.dense(NoiseRouterData.CONTINENTS_OVERWORLD),
+            //        rangeChoice(
+            //            this.dense(NoiseRouterData.CONTINENTS_OVERWORLD),
+            //            0.0,
+            //            2.0,
+            //            multiply(
+            //                0.5,
+            //                this.noi2D(DuskNoiseParametersKeys.CONTINENTAL_WEIRDNESS)
+            //            ).cube(),
+            //            DensityFunctions.constant(0.0)
+            //        )
+            //    )
+            //)
         )
 
         //  |-(|1.5x-1|-1)+1|-1
@@ -84,43 +85,12 @@ object OverworldDensityFunctionCreator {
         )
     }
 
-    fun BootstrapContext<DensityFunction>.parametersDebug() {
-        this.register(
-            DuskDensityFunctions.EROSION_DEBUG,
-            debugger("erosion", OverworldTerrainParametersCreator.EROS)
-        )
-        this.register(
-            DuskDensityFunctions.CONTINENT_DEBUG,
-            debugger("continentalness", OverworldTerrainParametersCreator.CONT)
-        )
-        this.register(
-            DuskDensityFunctions.RIDGES_DEBUG,
-            DebugAxis(Axis.X, debugSize)
-        )
-        this.register(
-            DuskDensityFunctions.RIDGES_FOLD_DEBUG,
-            DebugAxis(Axis.X, debugSize / 2)
-        )
-    }
-
-    private fun debugger(string: String, list: List<Float>, const: Double = 0.0): DensityFunction {
-        return if (debugged.first == string) {
-            debuggerCheckerboard(Axis.X, list)
-        } else if (debugged.second == string) {
-            debuggerCheckerboard(Axis.Z, list)
-        } else DensityFunctions.constant(const)
-    }
-
-    private fun debuggerCheckerboard(axis: Axis, list: List<Float>): DebugCheckerboard {
-        return DebugCheckerboard(axis, debugSize, list)
-    }
-
 
     private fun BootstrapContext<DensityFunction>.shapers() {
-        val continents = this.wrap(DuskDensityFunctions.CONTINENT_DEBUG, DuskDensityFunctions.CONTINENT_WIERD)
-        val erosion = this.wrap(DuskDensityFunctions.EROSION_DEBUG, NoiseRouterData.EROSION_OVERWORLD)
-        val ridges = this.wrap(DuskDensityFunctions.RIDGES_DEBUG, NoiseRouterData.RIDGES_OVERWORLD)
-        val ridgesFolded = this.wrap(DuskDensityFunctions.RIDGES_FOLD_DEBUG, NoiseRouterData.RIDGES_FOLDED_OVERWORLD)
+        val continents = this.wrap(DuskDensityFunctions.CONTINENT_WIERD)
+        val erosion = this.wrap(NoiseRouterData.EROSION_OVERWORLD)
+        val ridges = this.wrap(NoiseRouterData.RIDGES_OVERWORLD)
+        val ridgesFolded = this.wrap(NoiseRouterData.RIDGES_FOLDED_OVERWORLD)
 
         this.register(
             DuskDensityFunctions.DEPTH,
@@ -140,7 +110,6 @@ object OverworldDensityFunctionCreator {
                         OverworldTerrainParametersCreator.offsetSpline(
                             continents,
                             erosion,
-                            ridges,
                             ridgesFolded,
                             false
                         )
@@ -152,16 +121,13 @@ object OverworldDensityFunctionCreator {
         this.register(
             DuskDensityFunctions.JAGGEDNESS,
             NoiseRouterData.splineWithBlending(
-                add(
-                    0,
-                    copySpline(
-                        OverworldTerrainParametersCreator.jaggednessSpline(
-                            continents,
-                            erosion,
-                            ridges,
-                            ridgesFolded,
-                            false
-                        )
+                copySpline(
+                    OverworldTerrainParametersCreator.jaggednessSpline(
+                        continents,
+                        erosion,
+                        ridges,
+                        ridgesFolded,
+                        false
                     )
                 ),
                 getBlendOffset()
@@ -248,11 +214,8 @@ object OverworldDensityFunctionCreator {
         )
     }
 
-    private fun BootstrapContext<DensityFunction>.wrap(
-        debugDF: RegistryKey<DensityFunction>,
-        regularDF: RegistryKey<DensityFunction>
-    ): DensityFunctions.Spline.FunctionWrapper =
-        DensityFunctions.Spline.FunctionWrapper(this.denseHold(if (debug) debugDF else regularDF))
+    private fun BootstrapContext<DensityFunction>.wrap(df: RegistryKey<DensityFunction>): DensityFunctions.Spline.FunctionWrapper =
+        DensityFunctions.Spline.FunctionWrapper(this.denseHold(df))
 
 
     private fun BootstrapContext<DensityFunction>.noi2D(noise: RegistryKey<DoublePerlinNoiseSampler.NoiseParameters>): DensityFunction =
@@ -265,16 +228,16 @@ object OverworldDensityFunctionCreator {
 
     fun BootstrapContext<ChunkGeneratorSettings>.overworld(largeBiome: Boolean, amplified: Boolean): NoiseRouter {
         return NoiseRouter(
-            DensityFunctions.constant(0.0),
-            DensityFunctions.constant(0.0),
-            DensityFunctions.constant(0.0),
-            DensityFunctions.constant(0.0),
+            DensityFunctions.constant(1.0),
+            DensityFunctions.constant(1.0),
+            DensityFunctions.constant(1.0),
+            DensityFunctions.constant(1.0),
             this.dense(DuskDensityFunctions.TEMPERATURE),
             this.dense(DuskDensityFunctions.HUMIDITY),
-            this.dense(if (debug) DuskDensityFunctions.CONTINENT_DEBUG else DuskDensityFunctions.CONTINENT_WIERD),
-            this.dense(if (debug) DuskDensityFunctions.EROSION_DEBUG else NoiseRouterData.EROSION_OVERWORLD),
+            this.dense(DuskDensityFunctions.CONTINENT_WIERD),
+            this.dense(NoiseRouterData.EROSION_OVERWORLD),
             DensityFunctions.constant(0.0),
-            this.dense(if (debug) DuskDensityFunctions.RIDGES_DEBUG else DuskDensityFunctions.RIDGES_WEIRD),
+            this.dense(DuskDensityFunctions.RIDGES_WEIRD),
             this.dense(DuskDensityFunctions.OVERWORLD_IDWJ),
             this.dense(DuskDensityFunctions.OVERWORLD_FINAL_DENSITY),
             DensityFunctions.constant(0.0),
