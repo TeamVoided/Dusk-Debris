@@ -17,10 +17,11 @@ import net.minecraft.util.function.ToFloatFunction
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Spline
 import org.teamvoided.dusk_debris.spell.Spell
+import org.teamvoided.dusk_debris.util.Utils
 import org.teamvoided.dusk_debris.util.spellController
 import org.teamvoided.dusk_debris.util.toBlockPos
 import org.teamvoided.dusk_debris.util.variant
-import org.teamvoided.dusk_debris.world.gen.terrain_parameters.OverworldTerrainParametersCreator
+import org.teamvoided.dusk_debris.world.gen.terrain_parameters.OverworldTerrainCreator
 
 object DuskCommands {
     fun init() = CommandRegistrationCallback.EVENT.register { dispatcher, ctx, _ ->
@@ -46,43 +47,57 @@ object DuskCommands {
             .build()
         spell.addChild(spellType)
 
-        val spline = literal("spline").executes { spline<Float, ToFloatFunction<Float>>(it) }.build()
+        val spline = literal("spline").executes { spline(it) }.build()
         dispatcher.root.addChild(spline)
     }
 
-    fun <C, I : ToFloatFunction<C>> spline(cx: CommandContext<ServerCommandSource>): Int {
+    fun spline(cx: CommandContext<ServerCommandSource>): Int {
         val world = cx.source.world
-        val size = 50
-        val height = 10
-        for (x in -size..size) {
-            val xSample = x / size.toFloat()
-            val xAlt = x > size / 2 || -x > size / 2
-            for (z in -size..size) {
-                val zSample = z / size.toFloat()
-                val zAlt = z > size / 2 || -z > size / 2
-                for (y in -height..height) {
-                    val ySample = y / height.toFloat()
+        //if (!DuskDebris.isDev()) {
+        //    world.players.forEach { it.sendMessage(Text.literal("do not run the spline command"), false) }
+        //    return 1
+        //}
+        val xSize = 100
+        val zSize = 100
+        val xRange = xSize * (3 / 4f)
+        val zRange = zSize * (3 / 4f)
+        val height = world.dimension.minY..(world.dimension.height - world.dimension.minY)
+        for (x in -xSize..xSize) {
+            val xSample = x / xRange
+            val xAlt = x > xRange || -x > xRange
+            for (z in -zSize..zSize) {
+                val zSample = z / zRange //-3 * (((z / zRange).absoluteValue - (2f / 3f)).absoluteValue - (1f / 3f))
+                val zAlt = z > zRange || -z > zRange
 
-                    val cont = xSample - ySample
-                    val eros = zSample - ySample
-                    val riFl = 1f
+                val cont = xSample
+                val eros = 0f
+                val ridg = 0f
+                val riFl = zSample
+                val data = OverworldTerrainCreator.TerrainParametersData(
+                    ToFloatFunction.createUnlimited { cont },
+                    ToFloatFunction.createUnlimited { eros },
+                    ToFloatFunction.createUnlimited { ridg },
+                    ToFloatFunction.createUnlimited { riFl }
+                )
+                val spline: Spline<Float, ToFloatFunction<Float>> = OverworldTerrainCreator.offsetSpline(data, false)
+                if (spline !is Spline.Multipoint<Float, ToFloatFunction<Float>>) return 1
+                val the = spline.apply(0f)
 
-                    val continent = ToFloatFunction.createUnlimited { cont } as I
-                    val erosion = ToFloatFunction.createUnlimited { eros } as I
-                    val ridgesFold = ToFloatFunction.createUnlimited { riFl } as I
-                    val spline: Spline<C, I> = OverworldTerrainParametersCreator.offsetSpline(
-                        continent,
-                        erosion,
-                        ridgesFold,
-                    )
-                    if (spline is Spline.Multipoint<C, I>) {
-                        val the = spline.coordinate().apply(0f as C)
-                        val block = if (xAlt || zAlt) Blocks.DEEPSLATE else Blocks.STONE
-                        if (the >= 0f) world.setBlockState(BlockPos(x, y, z), block.defaultState)
-                    } else return 1
+                for (y in height) {
+                    val ySample = (y - 128f) / 128f
+                    val sampled = (the - ySample) - 0.5
+
+                    val block2 =
+                        if (sampled <= 0)
+                            if (!(xAlt || zAlt) && y < 63) Blocks.BLUE_STAINED_GLASS.defaultState
+                            else Blocks.AIR.defaultState
+                        else if (xAlt || zAlt) Utils.getStateGlass((sampled * 16 + 1).toInt())
+                        else Utils.getStateConcrete((sampled * 16 + 1).toInt())
+                    world.setBlockState(BlockPos(x, y, z), block2)
                 }
             }
         }
+        world.players.forEach { it.sendMessage(Text.literal("spline placed"), false) }
 
         return 1
     }

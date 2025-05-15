@@ -2,7 +2,6 @@ package org.teamvoided.dusk_debris.data.gen.world.gen.density_function
 
 import net.minecraft.registry.BootstrapContext
 import net.minecraft.registry.RegistryKey
-import net.minecraft.util.math.Direction.Axis
 import net.minecraft.util.math.noise.DoublePerlinNoiseSampler
 import net.minecraft.world.gen.DensityFunction
 import net.minecraft.world.gen.DensityFunctions
@@ -14,10 +13,7 @@ import org.teamvoided.dusk_debris.data.gen.world.gen.DensityFunctionCreator.dens
 import org.teamvoided.dusk_debris.data.gen.world.gen.DensityFunctionCreator.denseHold
 import org.teamvoided.dusk_debris.data.gen.world.gen.DensityFunctionCreator.noiseHold
 import org.teamvoided.dusk_debris.data.worldgen.DuskDensityFunctions
-import org.teamvoided.dusk_debris.data.worldgen.DuskNoiseParametersKeys
-import org.teamvoided.dusk_debris.world.gen.density_functions.DebugAxis
-import org.teamvoided.dusk_debris.world.gen.density_functions.DebugCheckerboard
-import org.teamvoided.dusk_debris.world.gen.terrain_parameters.OverworldTerrainParametersCreator
+import org.teamvoided.dusk_debris.world.gen.terrain_parameters.OverworldTerrainCreator
 import voidlib.devin.world.gen.*
 
 object OverworldDensityFunctionCreator {
@@ -26,7 +22,21 @@ object OverworldDensityFunctionCreator {
 
     fun BootstrapContext<DensityFunction>.overworldCreator() {
         this.parameters()
-        this.shapers()
+        this.shapers(
+            DuskDensityFunctions.CONTINENT_WIERD,
+            NoiseRouterData.EROSION_OVERWORLD,
+            NoiseRouterData.RIDGES_OVERWORLD,
+            NoiseRouterData.RIDGES_FOLDED_OVERWORLD,
+            DuskDensityFunctions.DEPTH,
+            DuskDensityFunctions.OFFSET,
+            DuskDensityFunctions.JAGGEDNESS,
+            DuskDensityFunctions.FACTOR,
+            DuskDensityFunctions.SLOPED_CHEESE,
+            DuskDensityFunctions.OVERWORLD_IDWJ,
+            DuskDensityFunctions.OVERWORLD_FINAL_DENSITY,
+            false,
+            false
+        )
     }
 
 
@@ -86,107 +96,77 @@ object OverworldDensityFunctionCreator {
     }
 
 
-    private fun BootstrapContext<DensityFunction>.shapers() {
-        val continents = this.wrap(DuskDensityFunctions.CONTINENT_WIERD)
-        val erosion = this.wrap(NoiseRouterData.EROSION_OVERWORLD)
-        val ridges = this.wrap(NoiseRouterData.RIDGES_OVERWORLD)
-        val ridgesFolded = this.wrap(NoiseRouterData.RIDGES_FOLDED_OVERWORLD)
+    private fun BootstrapContext<DensityFunction>.shapers(
+        continents: RegistryKey<DensityFunction>,
+        erosion: RegistryKey<DensityFunction>,
+        ridges: RegistryKey<DensityFunction>,
+        ridgesFolded: RegistryKey<DensityFunction>,
+        depth: RegistryKey<DensityFunction>,
+        offset: RegistryKey<DensityFunction>,
+        jaggedness: RegistryKey<DensityFunction>,
+        factor: RegistryKey<DensityFunction>,
+        cheese: RegistryKey<DensityFunction>,
+        idwj: RegistryKey<DensityFunction>,
+        finalDensity: RegistryKey<DensityFunction>,
+        amplified: Boolean,
+        largeBiome: Boolean
+    ) {
+
+        val data = OverworldTerrainCreator.TerrainParametersData(
+            this.wrap(continents),
+            this.wrap(erosion),
+            this.wrap(ridges),
+            this.wrap(ridgesFolded)
+        )
+        val dataSimple = data.simple()
 
         this.register(
-            DuskDensityFunctions.DEPTH,
+            depth,
             cacheOnce(
                 add(
                     clampedGradientY(-64, 320, 1.5, -1.5),
-                    this.dense(DuskDensityFunctions.OFFSET)
+                    this.dense(offset)
                 )
             )
         )
         this.register(
-            DuskDensityFunctions.OFFSET,
+            offset,
             NoiseRouterData.splineWithBlending(
-                add(
-                    -0.5,
-                    copySpline(
-                        OverworldTerrainParametersCreator.offsetSpline(
-                            continents,
-                            erosion,
-                            ridgesFolded,
-                            false
-                        )
-                    )
-                ),
+                add(-0.5, copySpline(OverworldTerrainCreator.offsetSpline(data, amplified))),
                 getBlendOffset()
             )
         )
         this.register(
-            DuskDensityFunctions.JAGGEDNESS,
+            jaggedness,
             NoiseRouterData.splineWithBlending(
-                copySpline(
-                    OverworldTerrainParametersCreator.jaggednessSpline(
-                        continents,
-                        erosion,
-                        ridges,
-                        ridgesFolded,
-                        false
-                    )
-                ),
+                copySpline(OverworldTerrainCreator.jaggednessSpline(dataSimple, amplified)),
                 getBlendOffset()
             )
         )
         this.register(
-            DuskDensityFunctions.FACTOR,
+            factor,
             NoiseRouterData.splineWithBlending(
-                add(
-                    10,
-                    copySpline(
-                        OverworldTerrainParametersCreator.factorSpline(
-                            continents,
-                            erosion,
-                            ridges,
-                            ridgesFolded,
-                            false
-                        )
-                    )
-                ),
+                add(10, copySpline(OverworldTerrainCreator.factorSpline(dataSimple, amplified))),
                 getBlendOffset()
             )
         )
 
         val jaggednessFunction = noise(this.noiseHold(NoiseParametersKeys.JAGGED), 1500.0, 0.0)
-        val jagged = multiply(this.dense(DuskDensityFunctions.JAGGEDNESS), jaggednessFunction.halfNegative())
-        val depthAndJaggedness = NoiseRouterData.noiseGradientDensity(
-            this.dense(DuskDensityFunctions.FACTOR),
-            add(
-                this.dense(DuskDensityFunctions.DEPTH),
-                jagged
-            )
-        )
+        val jagged = multiply(this.dense(jaggedness), jaggednessFunction.halfNegative())
+        val depthAndJaggedness =
+            NoiseRouterData.noiseGradientDensity(this.dense(factor), add(this.dense(depth), jagged))
         this.register(
-            DuskDensityFunctions.SLOPED_CHEESE,
+            cheese,
             depthAndJaggedness
         )
-        val idwj = NoiseRouterData.noiseGradientDensity(
-            cache2D(this.dense(DuskDensityFunctions.FACTOR)),
-            this.dense(DuskDensityFunctions.DEPTH)
+        val withoutJagged = NoiseRouterData.noiseGradientDensity(cache2D(this.dense(factor)), this.dense(depth))
+        this.register(
+            idwj,
+            surfaceSlide(amplified, add(-0.703125, withoutJagged).clamp(-64.0, 64.0))
         )
         this.register(
-            DuskDensityFunctions.OVERWORLD_IDWJ,
-            surfaceSlide(
-                false,
-                add(-0.703125, idwj).clamp(-64.0, 64.0)
-            )
-        )
-        this.register(
-            DuskDensityFunctions.OVERWORLD_FINAL_DENSITY,
-            interpolated(
-                blendDensity(
-                    this.createFinalDensity(
-                        false,
-                        false,
-                        DuskDensityFunctions.SLOPED_CHEESE
-                    )
-                )
-            ).squeeze()
+            finalDensity,
+            interpolated(blendDensity(this.createFinalDensity(amplified, largeBiome, cheese))).squeeze()
         )
     }
 
@@ -207,10 +187,10 @@ object OverworldDensityFunctionCreator {
             384,
             if (amplified) 16 else 80,
             if (amplified) 0 else 64,
-            -0.078125,
+            -5.0 / 64.0,
             0,
             24,
-            if (amplified) 0.4 else 0.1171875
+            if (amplified) 0.4 else (15.0 / 128.0)
         )
     }
 

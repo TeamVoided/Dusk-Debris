@@ -42,15 +42,15 @@ object Utils {
         ConstantLootNumberProvider.create(x.toFloat())
 
     fun StructureWorldAccess.placeDebug(pos: BlockPos, block: Int) =
-        this.setBlockState(pos, getState(block), Block.NOTIFY_ALL)
+        this.setBlockState(pos, getStateGlass(block), Block.NOTIFY_ALL)
 
 
-    fun BiConsumer<BlockPos, BlockState>.placeDebug(pos: BlockPos, block: Int) = this.accept(pos, getState(block))
+    fun BiConsumer<BlockPos, BlockState>.placeDebug(pos: BlockPos, block: Int) = this.accept(pos, getStateGlass(block))
 
     fun Vec3i.vec3d(): Vec3d = Vec3d(this.x.toDouble(), this.y.toDouble(), this.z.toDouble())
     fun Vec3d.vec3i(): Vec3i = Vec3i(this.x.toInt(), this.y.toInt(), this.z.toInt())
 
-    fun getState(block: Int): BlockState {
+    fun getStateGlass(block: Int): BlockState {
         return when (block) {
             0 -> Blocks.GLASS
             1 -> Blocks.WHITE_STAINED_GLASS
@@ -70,6 +70,29 @@ object Utils {
             15 -> Blocks.MAGENTA_STAINED_GLASS
             16 -> Blocks.PINK_STAINED_GLASS
             else -> Blocks.TINTED_GLASS
+        }.defaultState
+    }
+
+    fun getStateConcrete(block: Int): BlockState {
+        return when (block) {
+            0 -> Blocks.STONE
+            1 -> Blocks.WHITE_CONCRETE
+            2 -> Blocks.LIGHT_GRAY_CONCRETE
+            3 -> Blocks.GRAY_CONCRETE
+            4 -> Blocks.BLACK_CONCRETE
+            5 -> Blocks.BROWN_CONCRETE
+            6 -> Blocks.RED_CONCRETE
+            7 -> Blocks.ORANGE_CONCRETE
+            8 -> Blocks.YELLOW_CONCRETE
+            9 -> Blocks.LIME_CONCRETE
+            10 -> Blocks.GREEN_CONCRETE
+            11 -> Blocks.CYAN_CONCRETE
+            12 -> Blocks.LIGHT_BLUE_CONCRETE
+            13 -> Blocks.BLUE_CONCRETE
+            14 -> Blocks.PURPLE_CONCRETE
+            15 -> Blocks.MAGENTA_CONCRETE
+            16 -> Blocks.PINK_CONCRETE
+            else -> Blocks.DEEPSLATE
         }.defaultState
     }
 }

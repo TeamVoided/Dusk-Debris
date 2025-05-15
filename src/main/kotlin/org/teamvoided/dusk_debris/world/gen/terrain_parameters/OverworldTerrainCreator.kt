@@ -5,7 +5,7 @@ import net.minecraft.util.math.Spline
 import org.teamvoided.dusk_debris.util.world_helper.add
 import org.teamvoided.dusk_debris.world.gen.terrain_parameters.overworld.Offset
 
-object OverworldTerrainParametersCreator {
+object OverworldTerrainCreator {
     private var NO_TRANSFORM: ToFloatFunction<Float> = ToFloatFunction.IDENTITY
 
     //if above sea level, terrain height gets multiplied by 2, otherwise, return the same
@@ -25,29 +25,28 @@ object OverworldTerrainParametersCreator {
 
 
     fun <C, I : ToFloatFunction<C>> offsetSpline(
-        continents: I,
-        erosion: I,
-        ridgesFolded: I,
-        amplified: Boolean = false
+        data: TerrainParametersData<C, I>,
+        amplified: Boolean
     ): Spline<C, I> {
-        val amplifier = if (amplified) OFFSET_AMPLIFIED else NO_TRANSFORM
+        data.amplifier = if (amplified) OFFSET_AMPLIFIED else NO_TRANSFORM
 
-        val island = Offset.mushroomIsland(erosion, ridgesFolded, amplifier)
-        val deepestOcean = Offset.ocean(2f, erosion, ridgesFolded, amplifier)
-        val deepOcean = Offset.ocean(1.5f, erosion, ridgesFolded, amplifier)
-        val ocean = Offset.ocean(1f, erosion, ridgesFolded, amplifier)
-        val oceanShallow = Offset.ocean(0.8f, erosion, ridgesFolded, amplifier)
-        val shoreline = Offset.offsetBeach(erosion, ridgesFolded, amplifier)
-        val coast = Offset.offsetCont(0f, erosion, ridgesFolded, amplifier)
-        val outland = Offset.offsetCont(1 / 3f, erosion, ridgesFolded, amplifier)
-        val midland = Offset.offsetCont(2 / 3f, erosion, ridgesFolded, amplifier)
-        val inland = Offset.offsetCont(1f, erosion, ridgesFolded, amplifier)
+        val island = Offset.mushroomIsland(data)
+        val deepestOcean = Offset.ocean(2f, data)
+        val deepOcean = Offset.ocean(1.5f, data)
+        val ocean = Offset.ocean(1f, data)
+        val oceanShallow = Offset.ocean(0.8f, data)
+        val shoreline = Offset.offsetBeach(data)
+        val coast = Offset.offsetCont(0f, data)
+        val outland = Offset.offsetCont(0.4f, data)
+        val midland = Offset.offsetCont(0.6f, data)
+        val inland = Offset.offsetCont(1f, data)
 
-        val offset = Spline.builder(continents, amplifier)
-        offset.add(-0.5f, coast)
-        offset.add(-0.2f, outland)
-        offset.add(0.2f, midland)
-        offset.add(0.5f, inland)
+        val offset = Spline.builder(data.continents, data.amplifier)
+        offset.add(-1f, coast)
+        offset.add(-0.25f, outland)
+        offset.add(0.25f, midland)
+        offset.add(1f, inland)
+
         //offset.add(CONT[0], island)
         //offset.add(CONT[1], deepestOcean)
         //offset.add(CONT[2], deepOcean)
@@ -61,19 +60,14 @@ object OverworldTerrainParametersCreator {
         return offset.build()
     }
 
-    //data class denseFuncs<C, I : ToFloatFunction<C>>(val canyon: I) {}
-
     fun <C, I : ToFloatFunction<C>> factorSpline(
-        continents: I,
-        erosion: I,
-        ridges: I,
-        ridgesFolded: I,
+        data: TerrainParametersDataSimple<C, I>,
         amplified: Boolean
     ): Spline<C, I> {
-        val amplifiedTransformer = if (amplified) FACTOR_AMPLIFIED else NO_TRANSFORM
-        val factorErosion = Spline.builder(erosion, amplifiedTransformer)
+        data.amplifier = if (amplified) FACTOR_AMPLIFIED else NO_TRANSFORM
+        val factorErosion = Spline.builder(data.erosion, data.amplifier)
             .add(0f, 10f)
-        val factorRidgesFolded = Spline.builder(ridgesFolded, amplifiedTransformer)
+        val factorRidgesFolded = Spline.builder(data.ridgesFolded, data.amplifier)
             .add(-0.8f, 6f)
             .add(-0.7f, factorErosion.build())
 
@@ -81,15 +75,34 @@ object OverworldTerrainParametersCreator {
     }
 
     fun <C, I : ToFloatFunction<C>> jaggednessSpline(
-        continents: I,
-        erosion: I,
-        ridges: I,
-        ridgesFolded: I,
+        data: TerrainParametersDataSimple<C, I>,
         amplified: Boolean
     ): Spline<C, I> {
-        val amplifiedTransformer = if (amplified) JAGGEDNESS_AMPLIFIED else NO_TRANSFORM
-        val spline = Spline.builder(erosion, amplifiedTransformer)
+        data.amplifier = if (amplified) JAGGEDNESS_AMPLIFIED else NO_TRANSFORM
+        val spline = Spline.builder(data.erosion, data.amplifier)
             .add(-1f, 0f)
         return spline.build()
     }
+
+    data class TerrainParametersData<C, I : ToFloatFunction<C>>(
+        val continents: I,
+        val erosion: I,
+        val ridges: I,
+        val ridgesFolded: I,
+        //val canyon: I,
+        var amplifier: ToFloatFunction<Float> = NO_TRANSFORM
+    ) {
+        fun simple(): TerrainParametersDataSimple<C, I> =
+            TerrainParametersDataSimple(continents, erosion, ridges, ridgesFolded, amplifier)
+    }
+
+    data class TerrainParametersDataSimple<C, I : ToFloatFunction<C>>(
+        val continents: I,
+        val erosion: I,
+        val ridges: I,
+        val ridgesFolded: I,
+        var amplifier: ToFloatFunction<Float> = NO_TRANSFORM
+    )
+
+    //private data class Values(val contNumb: Float, val ) {}
 }

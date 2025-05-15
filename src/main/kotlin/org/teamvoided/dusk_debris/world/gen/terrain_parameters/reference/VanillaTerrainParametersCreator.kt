@@ -353,7 +353,7 @@ object VanillaTerrainParametersCreator {
         } else {
             n = calculateSlope(i, k, -1.0f, 1.0f)
             if (bl) {
-                builder.method_41294(-1.0f, max(0.2, i.toDouble()).toFloat())
+                builder.method_41294(-1.0f, max(0.2f, i))
                 builder.add(0.0f, MathHelper.lerp(0.5f, i, k), n)
             } else {
                 builder.add(-1.0f, i, n)
@@ -371,7 +371,7 @@ object VanillaTerrainParametersCreator {
         val j = 0.46082947f
         val k = 1.0f - (1.0f - g) * 0.5f
         val l = 0.5f * (1.0f - g)
-        val m = (f + 1.17f) * 0.46082947f
+        val m = (f + i) * j
         val n = m * k - l
         return if (f < h) max(n.toDouble(), -0.2222).toFloat() else max(n.toDouble(), 0.0).toFloat()
     }

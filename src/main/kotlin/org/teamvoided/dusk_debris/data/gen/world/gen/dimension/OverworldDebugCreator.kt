@@ -8,7 +8,7 @@ import net.minecraft.world.biome.Biomes
 import net.minecraft.world.biome.source.util.MultiNoiseUtil.*
 import org.teamvoided.dusk_debris.util.world_helper.NoiseHyper3
 import org.teamvoided.dusk_debris.util.world_helper.range
-import org.teamvoided.dusk_debris.world.gen.terrain_parameters.OverworldTerrainParametersCreator
+import org.teamvoided.dusk_debris.world.gen.terrain_parameters.OverworldTerrainCreator
 import java.util.function.Consumer
 import java.util.function.Function
 
@@ -56,7 +56,7 @@ class OverworldDebugCreator {
                 this.fullRange,
                 0f
             )
-            OverworldTerrainParametersCreator.EROS.forEach {
+            OverworldTerrainCreator.EROS.forEach {
                 eros.biome(if (eros.biome == Biomes.DESERT) Biomes.BADLANDS else Biomes.DESERT).erosion(it)
                 biomeEntryConsumer.accept(eros.create())
             }
@@ -72,7 +72,7 @@ class OverworldDebugCreator {
                 this.fullRange,
                 0f
             )
-            OverworldTerrainParametersCreator.CONT.forEach {
+            OverworldTerrainCreator.CONT.forEach {
                 cont.biome(if (cont.biome == Biomes.SNOWY_TAIGA) Biomes.STONY_SHORE else Biomes.SNOWY_TAIGA)
                     .continentalness(it)
                 biomeEntryConsumer.accept(cont.create())
