@@ -10,6 +10,7 @@ object DuskNoiseParametersKeys {
 
     val CONTINENTAL_WEIRDNESS = create("parameters/continental_weirdness")
 
+    val GRAND_CANYON = create("plateau/grand_canyon")
 
 
     //val LAVA_TUBE = create("lava_tube")

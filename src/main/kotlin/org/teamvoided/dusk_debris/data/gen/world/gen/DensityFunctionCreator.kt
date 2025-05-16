@@ -15,10 +15,8 @@ import org.teamvoided.dusk_debris.world.gen.density_functions.SingleDensityFunct
 object DensityFunctionCreator {
 
     fun bootstrap(c: BootstrapContext<DensityFunction>) {
-        println("density start")
         c.overworldCreator()
         c.theNetherCreator()
-        println("density end")
     }
 //    NoiseRouterData.class
 

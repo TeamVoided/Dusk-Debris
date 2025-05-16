@@ -11,8 +11,10 @@ import net.minecraft.world.gen.noise.NoiseRouter
 import net.minecraft.world.gen.noise.NoiseRouterData
 import org.teamvoided.dusk_debris.data.gen.world.gen.DensityFunctionCreator.dense
 import org.teamvoided.dusk_debris.data.gen.world.gen.DensityFunctionCreator.denseHold
+import org.teamvoided.dusk_debris.data.gen.world.gen.DensityFunctionCreator.noise
 import org.teamvoided.dusk_debris.data.gen.world.gen.DensityFunctionCreator.noiseHold
 import org.teamvoided.dusk_debris.data.worldgen.DuskDensityFunctions
+import org.teamvoided.dusk_debris.data.worldgen.DuskNoiseParametersKeys
 import org.teamvoided.dusk_debris.world.gen.terrain_parameters.OverworldTerrainCreator
 import voidlib.devin.world.gen.*
 
@@ -25,8 +27,6 @@ object OverworldDensityFunctionCreator {
         this.shapers(
             DuskDensityFunctions.CONTINENT_WIERD,
             NoiseRouterData.EROSION_OVERWORLD,
-            NoiseRouterData.RIDGES_OVERWORLD,
-            NoiseRouterData.RIDGES_FOLDED_OVERWORLD,
             DuskDensityFunctions.DEPTH,
             DuskDensityFunctions.OFFSET,
             DuskDensityFunctions.JAGGEDNESS,
@@ -93,14 +93,50 @@ object OverworldDensityFunctionCreator {
                 )
             )
         )
+
+        this.register(
+            DuskDensityFunctions.PLATEAU_TYPE,
+            const(-1)
+        )
+
+        val grandCanyonBias = 1
+        val grandCanyonShifter = min(
+            1,
+            add(
+                multiply(
+                    0.5,
+                    add(
+                        1,
+                        this.dense(NoiseRouterData.RIDGES_FOLDED_OVERWORLD)
+                    )
+                ),
+                multiply(
+                    4,
+                    this.noi2D(DuskNoiseParametersKeys.GRAND_CANYON).square()
+                )
+            )
+        )
+        this.register(
+            DuskDensityFunctions.GRAND_CANYON_RIDGES_FOLDED,
+            cacheOnce(
+                add(
+                    -grandCanyonBias,
+                    multiply(
+                        grandCanyonShifter,
+                        add(
+                            grandCanyonBias,
+                            this.dense(NoiseRouterData.RIDGES_FOLDED_OVERWORLD)
+                        )
+                    )
+                )
+            )
+        )
     }
 
 
     private fun BootstrapContext<DensityFunction>.shapers(
         continents: RegistryKey<DensityFunction>,
         erosion: RegistryKey<DensityFunction>,
-        ridges: RegistryKey<DensityFunction>,
-        ridgesFolded: RegistryKey<DensityFunction>,
         depth: RegistryKey<DensityFunction>,
         offset: RegistryKey<DensityFunction>,
         jaggedness: RegistryKey<DensityFunction>,
@@ -111,12 +147,12 @@ object OverworldDensityFunctionCreator {
         amplified: Boolean,
         largeBiome: Boolean
     ) {
-
         val data = OverworldTerrainCreator.TerrainParametersData(
             this.wrap(continents),
             this.wrap(erosion),
-            this.wrap(ridges),
-            this.wrap(ridgesFolded)
+            this.wrap(NoiseRouterData.RIDGES_OVERWORLD),
+            this.wrap(NoiseRouterData.RIDGES_FOLDED_OVERWORLD),
+            this.wrap(DuskDensityFunctions.GRAND_CANYON_RIDGES_FOLDED)
         )
         val dataSimple = data.simple()
 
@@ -162,7 +198,7 @@ object OverworldDensityFunctionCreator {
         val withoutJagged = NoiseRouterData.noiseGradientDensity(cache2D(this.dense(factor)), this.dense(depth))
         this.register(
             idwj,
-            surfaceSlide(amplified, add(-0.703125, withoutJagged).clamp(-64.0, 64.0))
+            surfaceSlide(amplified, add(-45.0 / 64.0, withoutJagged).clamp(-64.0, 64.0))
         )
         this.register(
             finalDensity,
@@ -198,11 +234,14 @@ object OverworldDensityFunctionCreator {
         DensityFunctions.Spline.FunctionWrapper(this.denseHold(df))
 
 
-    private fun BootstrapContext<DensityFunction>.noi2D(noise: RegistryKey<DoublePerlinNoiseSampler.NoiseParameters>): DensityFunction =
+    private fun BootstrapContext<DensityFunction>.noi2D(
+        noise: RegistryKey<DoublePerlinNoiseSampler.NoiseParameters>,
+        scaleXZ: Double = 0.25
+    ): DensityFunction =
         shiftedNoise2d(
             this.dense(NoiseRouterData.SHIFT_X),
             this.dense(NoiseRouterData.SHIFT_Z),
-            0.25,
+            scaleXZ,
             this.noiseHold(noise)
         )
 

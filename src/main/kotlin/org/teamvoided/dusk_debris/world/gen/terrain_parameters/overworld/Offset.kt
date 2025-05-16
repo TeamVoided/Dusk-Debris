@@ -10,8 +10,8 @@ import kotlin.math.max
 
 object Offset {
     const val SEA_LEVEL = 63
-    private fun elev(inputY: Int): Float = (inputY - SEA_LEVEL) / 128f
-    private fun addSL(inputY: Int): Float = inputY / 128f
+    private fun elev(inputY: Number): Float = (inputY.toFloat() - SEA_LEVEL) / 128f
+    private fun addSL(inputY: Number): Float = inputY.toFloat() / 128f
 
     fun <C, I : ToFloatFunction<C>> offsetBeach(data: OverworldTerrainCreator.TerrainParametersData<C, I>): Spline<C, I> {
         val spline = Spline.builder(data.ridgesFolded, data.amplifier)
@@ -20,35 +20,39 @@ object Offset {
         return spline.build()
     }
 
-    fun <C, I : ToFloatFunction<C>> offsetCont(
+    fun <C, I : ToFloatFunction<C>> offsetEros(
         contNumber: Float, //increase this number the further inland you go, from 0 to 1 (outland to inland)
         data: OverworldTerrainCreator.TerrainParametersData<C, I>,
     ): Spline<C, I> {
         val spline = Spline.builder(data.erosion, data.amplifier)
-            .add(0f, createCanyon(contNumber, data))
+            .add(-1f, createMountain(108, 256, true, data))
+            .add(-0.6f, createMountain(50, 256, false, data))
+            .add(-0.55f, createCanyon(contNumber, data))
+            .add(-0.35f, createCanyon(contNumber, data))
         return spline.build()
     }
 
+    /**CANYON TYPES
+     * Canyon: default, just a plateau
+     * Eroded: plateau but the start is halfway inland (no change on riverbank, create a slope)
+     * Layered: two plateaus, one that starts at the Eroded point, and one half as high at the Default point
+     **/
     private fun <C, I : ToFloatFunction<C>> createCanyon(
         contNumber: Float,
         data: OverworldTerrainCreator.TerrainParametersData<C, I>
     ): Spline<C, I> {
-        val carve = if (contNumber > 0.5f) -0.7f else 0.6f
-        val carve2 = ((1 - contNumber) / 2 + 0.5f)
+        val carve = if (contNumber > 0.5f) 1f else 0f
 
-        val riverbed = -1f to (elev(48) * carve2)
-        val riverbank = -0.8f to 0f
-        val plateau1 = carve - 0.001f to elev(100)
-        val plateau2 = carve to plateau1.second
-        val final = 1f to elev((100 + contNumber * 5).toInt())
+        val riverbed = -1f to (elev(30 + carve * 8))
+        val plateau1 = -0.7f to elev(80 + carve * 20)
+        val plateau2 = -0.3f to elev(108 + carve * 20)
+        val final = 1f to elev(120 + carve * 20)
 
-        val cliffBaseSlope = calculateSlope(riverbank, plateau2)
         val plateauSlope = calculateSlope(plateau2, final)
 
-        val spline = Spline.builder(data.ridgesFolded, data.amplifier)
-            .add(riverbed, 0.1f)
-            .add(riverbank, cliffBaseSlope)
-            .add(plateau1, cliffBaseSlope)
+        val spline = Spline.builder(data.grandCanyonRF, data.amplifier)
+            .add(riverbed)
+            //.add(riverbank)
             .add(plateau2, 0f)
             .add(final, plateauSlope)
         return spline.build()
