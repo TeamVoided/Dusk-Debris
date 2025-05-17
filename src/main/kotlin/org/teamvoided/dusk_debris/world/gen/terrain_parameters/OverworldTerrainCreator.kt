@@ -4,6 +4,7 @@ import net.minecraft.util.function.ToFloatFunction
 import net.minecraft.util.math.Spline
 import org.teamvoided.dusk_debris.util.world_helper.add
 import org.teamvoided.dusk_debris.world.gen.terrain_parameters.overworld.Offset
+import org.teamvoided.dusk_debris.world.gen.terrain_parameters.overworld.offset.Plateaus
 
 object OverworldTerrainCreator {
     private var NO_TRANSFORM: ToFloatFunction<Float> = ToFloatFunction.IDENTITY
@@ -17,41 +18,79 @@ object OverworldTerrainCreator {
     private var JAGGEDNESS_AMPLIFIED: ToFloatFunction<Float> =
         ToFloatFunction.createUnlimited { it * 2.0f }
 
-    val CONT: List<Float> = listOf(-1.1f, -1.02f, -0.7f, -0.3f, -0.11f, -0.1f, 0.1f, 0.11f, 0.2f, 0.4f, 1f)
-    val EROS: List<Float> = listOf(-0.85f, -0.7f, -0.4f, -0.35f, -0.1f, 0.2f, 0.4f, 0.55f, 0.7f)
-
-
-
-    /** CONTINENTALNESS VALUES
-     *
-     * types
-     * - Mushroom Island, mushroom island spline
-     * - Deepest ocean, deepest point of all oceans
-     * - Deep ocean, shallowest point of deep ocean biomes
-     * - Ocean, deepest point of ocean biomes
-     * - Coast 1, shallowest part of ocean
-     * - Coast 2, cliffs over ocean or same as Coast 1
-     * - Shoreline 1, beachtop or smaller outland
-     * - Shoreline 2, cliffs in beach or same as Shoreline 1
-     * - Outland, slightly shorter terrain
-     * - Midland, baseline terrain
-     * - Inland, tallest points
-     **/
+    val EROS: List<Float> = listOf(-0.85f, -0.7f, -0.4f, -0.35f, -0.2f, -0.1f, 0.2f, 0.4f, 0.55f, 0.7f)
 
     /** VANILLA CONTINENTALNESS VALUES
      *
      * types, repeat names are not mistakes, the game just copies those splines
-     * - Mushroom Island, flat mushroom island
-     * - Deep Ocean, flat deep ocean
-     * - Deep Ocean, flat deep ocean
-     * - Ocean, flat ocean
-     * - Ocean, flat ocean
-     * - Shoreline, flat (for a different reason) shore
-     * - Shoreline, flat (for a different reason) shore
-     * - Outland, predominantly flat terrain, save a few mountains at low erosion
-     * - Midland, mountains loose rivers and create valleys, windswept hills and plateaus start here
-     * - Inland, steeper lower erosion terrain
+     * - -1.1 - Mushroom Island, flat mushroom island
+     * - -1.02 - Deep Ocean, flat deep ocean
+     * - -0.51 - Deep Ocean, flat deep ocean
+     * - -0.44 - Ocean, flat ocean
+     * - -0.18 - Ocean, flat ocean
+     * - -0.16 - Shoreline, flat (for a different reason) shore
+     * - -0.15 - Shoreline, flat (for a different reason) shore
+     * - -0.1 - Outland, predominantly flat terrain, save a few mountains at low erosion
+     * - 0.25 - Midland, mountains loose rivers and create valleys, windswept hills and plateaus start here
+     * - 1 - Inland, steeper lower erosion terrain
+     *
+     * CONTINENTALNESS VALUES
+     *
+     * types
+     * - -1.1 - Mushroom Island, mushroom island spline
+     * - -1.02 - Deepest ocean, deepest point of all oceans
+     * - -0.7 - Deep ocean, shallowest point of deep ocean biomes
+     * - -0.3 - Ocean, deepest point of ocean biomes
+     * - -0.11 - Coast 1, shallowest part of ocean
+     * - -0.1 - Coast 2, cliffs over ocean or same as Coast 1
+     * - 0.1 - Shoreline 1, beachtop or smaller outland
+     * - 0.11 - Shoreline 2, cliffs in beach or same as Shoreline 1
+     * - 0.2 - Outland, slightly shorter terrain
+     * - 0.4 - Midland, baseline terrain
+     * - 1 - Inland, tallest points
      **/
+    enum class Cont(val f: Float) {
+        MushroomIsland(-1.1f),
+        DeepestOcean(-1.02f),
+        DeepOcean(-0.7f),
+        Ocean(-0.3f),
+        Coast1(-0.11f),
+        Coast2(-0.1f),
+        Shoreline1(0.1f),
+        Shoreline2(0.11f),
+        Outland(0.2f),
+        Midland(0.4f),
+        Inland(1f);
+    }
+
+    /** VANILLA EROSION VALUES
+     *
+     * types, repeat names are not mistakes, the game just copies those splines
+     * - -0.85 Tall Mountains
+     * - -0.7 Mountains
+     * - -0.4 Mountains Inland
+     * - -0.35 Plateaus Inland
+     * - -0.1 Valley inland
+     * - 0.2 Flats
+     * - 0.4 Flats, no defined outland
+     * - 0.45 Windswept Hills Inland, no defined outland
+     * - 0.55 Windswept Hills Inland, no defined outland
+     * - 0.58 Flats, no defined outland
+     * - 0.7 Swamps
+     **/
+
+    enum class Eros(val f: Float) {
+        TallMountain(-0.85f),
+        Mountain(-0.7f),
+        MountainInland(-0.4f),
+        Plateau1(-0.35f),
+        Plateau2(-0.2f),
+        Valley(-0.1f),
+        FlatsHigh(0.2f),
+        FlatsMed(0.4f),
+        FlatsLow(0.55f),
+        Swamp(0.7f);
+    }
 
     fun <C, I : ToFloatFunction<C>> offsetSpline(
         data: TerrainParametersData<C, I>,
@@ -72,23 +111,19 @@ object OverworldTerrainCreator {
         val inland = Offset.offsetEros(1f, data)
 
 
-
-
         val offset = Spline.builder(data.continents, data.amplifier)
-        offset.add(-1f, outland)
-        offset.add(0.25f, midland)
-        offset.add(1f, inland)
 
-        //offset.add(CONT[0], island)
-        //offset.add(CONT[1], deepestOcean)
-        //offset.add(CONT[2], deepOcean)
-        //offset.add(CONT[3], ocean)
-        //offset.add(CONT[4], oceanShallow)
-        //offset.add(CONT[5], shoreline)
-        //offset.add(CONT[6], coast)
-        //offset.add(CONT[7], outland)
-        //offset.add(CONT[8], midland)
-        //offset.add(CONT[9], inland)
+        offset.add(Cont.MushroomIsland.f, island)
+        offset.add(Cont.DeepestOcean.f, deepestOcean)
+        offset.add(Cont.DeepOcean.f, deepOcean)
+        offset.add(Cont.Ocean.f, ocean)
+        offset.add(Cont.Coast1.f, coast1)
+        offset.add(Cont.Coast2.f, coast2)
+        offset.add(Cont.Shoreline1.f, shoreline1)
+        offset.add(Cont.Shoreline2.f, shoreline2)
+        offset.add(Cont.Outland.f, outland)
+        offset.add(Cont.Midland.f, midland)
+        offset.add(Cont.Inland.f, inland)
         return offset.build()
     }
 
@@ -116,11 +151,40 @@ object OverworldTerrainCreator {
         return spline.build()
     }
 
+    fun <C, I : ToFloatFunction<C>> undergroundRiverCondition(y: I, data: TerrainParametersData<C, I>): Spline<C, I> {
+        val elevation = Spline.builder(y)
+            .add(54f, 0f)
+            .add(55f, 1f)
+            .add(75f, 1f)
+            .add(76f, 0f)
+            .build()
+        val ridgesF = Spline.builder(data.ridgesFolded)
+            .add(-0.75f, elevation)
+            .add(-0.7f, 0f)
+            .build()
+        val plateauType = Spline.builder(data.plateauType)
+            .add(Plateaus.PlatType.Plateau.max, 0f)
+            .add(Plateaus.PlatType.Cave.min, ridgesF)
+            .build()
+        val erosion = Spline.builder(data.erosion)
+            .add(Eros.MountainInland.f, 0f)
+            .add(Eros.Plateau1.f, plateauType)
+            .add(Eros.Plateau2.f, plateauType)
+            .add(Eros.Valley.f, 0f)
+            .build()
+        val continents = Spline.builder(data.continents)
+            .add(Cont.Coast2.f, 0f)
+            .add(Cont.Shoreline1.f, erosion)
+            .build()
+        return continents
+    }
+
     data class TerrainParametersData<C, I : ToFloatFunction<C>>(
         val continents: I,
         val erosion: I,
         val ridges: I,
         val ridgesFolded: I,
+        val plateauType: I,
         val grandCanyonRF: I,
         var amplifier: ToFloatFunction<Float> = NO_TRANSFORM
     ) {
@@ -135,6 +199,4 @@ object OverworldTerrainCreator {
         val ridgesFolded: I,
         var amplifier: ToFloatFunction<Float> = NO_TRANSFORM
     )
-
-    //private data class Values(val contNumb: Float, val ) {}
 }

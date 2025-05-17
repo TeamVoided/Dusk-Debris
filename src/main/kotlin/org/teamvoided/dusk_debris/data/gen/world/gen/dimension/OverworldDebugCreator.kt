@@ -56,8 +56,8 @@ class OverworldDebugCreator {
                 this.fullRange,
                 0f
             )
-            OverworldTerrainCreator.EROS.forEach {
-                eros.biome(if (eros.biome == Biomes.DESERT) Biomes.BADLANDS else Biomes.DESERT).erosion(it)
+            OverworldTerrainCreator.Eros.entries.forEach {
+                eros.biome(if (eros.biome == Biomes.DESERT) Biomes.BADLANDS else Biomes.DESERT).erosion(it.f)
                 biomeEntryConsumer.accept(eros.create())
             }
         }
@@ -72,9 +72,9 @@ class OverworldDebugCreator {
                 this.fullRange,
                 0f
             )
-            OverworldTerrainCreator.CONT.forEach {
+            OverworldTerrainCreator.Cont.entries.forEach {
                 cont.biome(if (cont.biome == Biomes.SNOWY_TAIGA) Biomes.STONY_SHORE else Biomes.SNOWY_TAIGA)
-                    .continentalness(it)
+                    .continentalness(it.f)
                 biomeEntryConsumer.accept(cont.create())
             }
         }

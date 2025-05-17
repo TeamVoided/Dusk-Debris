@@ -45,7 +45,7 @@ object VanillaTerrainParametersCreator {
     ): Spline<C, I> {
 //toFloatFunction4
         val amplifiedTransformer = if (amplified) OFFSET_AMPLIFIED else NO_TRANSFORM
-        val seashoreSpline = createContinentalOffsetSpline(
+        val seashoreSpline = createErosionOffsetSpline(
             erosion,
             ridgesFolded,
             -0.15f,
@@ -58,7 +58,7 @@ object VanillaTerrainParametersCreator {
             false,
             amplifiedTransformer
         )
-        val outlandSpline = createContinentalOffsetSpline(
+        val outlandSpline = createErosionOffsetSpline(
             erosion,
             ridgesFolded,
             -0.1f,
@@ -71,7 +71,7 @@ object VanillaTerrainParametersCreator {
             false,
             amplifiedTransformer
         )
-        val midlandSpline = createContinentalOffsetSpline(
+        val midlandSpline = createErosionOffsetSpline(
             erosion,
             ridgesFolded,
             -0.1f,
@@ -84,7 +84,7 @@ object VanillaTerrainParametersCreator {
             true,
             amplifiedTransformer
         )
-        val inlandSpline = createContinentalOffsetSpline(
+        val inlandSpline = createErosionOffsetSpline(
             erosion,
             ridgesFolded,
             -0.05f,
@@ -386,7 +386,7 @@ object VanillaTerrainParametersCreator {
     }
 
     //method_42051
-    fun <C, I : ToFloatFunction<C>> createContinentalOffsetSpline(
+    fun <C, I : ToFloatFunction<C>> createErosionOffsetSpline(
         erosion: I,
         ridgesFolded: I,
         continentalness: Float,

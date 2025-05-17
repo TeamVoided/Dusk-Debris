@@ -68,9 +68,10 @@ fun noise(noise: Holder<NoiseParameters>, verticalScale: Number) = noise(noise, 
 
 fun rangeChoice(
     input: DensityFunction,
-    minInclusive: Double, maxInclusive: Double,
+    minInclusive: Number, maxInclusive: Number,
     whenInRange: DensityFunction, whenOutOfRange: DensityFunction,
-): DensityFunction = DensityFunctions.rangeChoice(input, minInclusive, maxInclusive, whenInRange, whenOutOfRange)
+): DensityFunction =
+    DensityFunctions.rangeChoice(input, minInclusive.toDouble(), maxInclusive.toDouble(), whenInRange, whenOutOfRange)
 
 fun shiftX(noise: Holder<NoiseParameters>): DensityFunction = DensityFunctions.shiftX(noise)
 fun shiftZ(noise: Holder<NoiseParameters>): DensityFunction = DensityFunctions.shiftZ(noise)

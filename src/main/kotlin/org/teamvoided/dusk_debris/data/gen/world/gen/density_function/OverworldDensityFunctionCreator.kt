@@ -11,7 +11,6 @@ import net.minecraft.world.gen.noise.NoiseRouter
 import net.minecraft.world.gen.noise.NoiseRouterData
 import org.teamvoided.dusk_debris.data.gen.world.gen.DensityFunctionCreator.dense
 import org.teamvoided.dusk_debris.data.gen.world.gen.DensityFunctionCreator.denseHold
-import org.teamvoided.dusk_debris.data.gen.world.gen.DensityFunctionCreator.noise
 import org.teamvoided.dusk_debris.data.gen.world.gen.DensityFunctionCreator.noiseHold
 import org.teamvoided.dusk_debris.data.worldgen.DuskDensityFunctions
 import org.teamvoided.dusk_debris.data.worldgen.DuskNoiseParametersKeys
@@ -24,6 +23,7 @@ object OverworldDensityFunctionCreator {
 
     fun BootstrapContext<DensityFunction>.overworldCreator() {
         this.parameters()
+        this.shapers()
         this.shapers(
             DuskDensityFunctions.CONTINENT_WIERD,
             NoiseRouterData.EROSION_OVERWORLD,
@@ -35,7 +35,10 @@ object OverworldDensityFunctionCreator {
             DuskDensityFunctions.OVERWORLD_IDWJ,
             DuskDensityFunctions.OVERWORLD_FINAL_DENSITY,
             false,
-            false
+            false,
+            DuskDensityFunctions.UR_CONDITION,
+            DuskDensityFunctions.UR_DENSITY,
+            DuskDensityFunctions.AQU_FLOODEDNESS
         )
     }
 
@@ -99,7 +102,7 @@ object OverworldDensityFunctionCreator {
             const(-1)
         )
 
-        val grandCanyonBias = 1
+        val grandCanyonBias = 0.825f
         val grandCanyonShifter = min(
             1,
             add(
@@ -111,7 +114,7 @@ object OverworldDensityFunctionCreator {
                     )
                 ),
                 multiply(
-                    4,
+                    2,
                     this.noi2D(DuskNoiseParametersKeys.GRAND_CANYON).square()
                 )
             )
@@ -119,13 +122,16 @@ object OverworldDensityFunctionCreator {
         this.register(
             DuskDensityFunctions.GRAND_CANYON_RIDGES_FOLDED,
             cacheOnce(
-                add(
-                    -grandCanyonBias,
-                    multiply(
-                        grandCanyonShifter,
-                        add(
-                            grandCanyonBias,
-                            this.dense(NoiseRouterData.RIDGES_FOLDED_OVERWORLD)
+                min(
+                    this.dense(NoiseRouterData.RIDGES_FOLDED_OVERWORLD),
+                    add(
+                        -grandCanyonBias,
+                        multiply(
+                            grandCanyonShifter,
+                            add(
+                                grandCanyonBias,
+                                this.dense(NoiseRouterData.RIDGES_FOLDED_OVERWORLD)
+                            )
                         )
                     )
                 )
@@ -133,6 +139,21 @@ object OverworldDensityFunctionCreator {
         )
     }
 
+
+    private fun BootstrapContext<DensityFunction>.shapers() {
+        this.register(
+            DuskDensityFunctions.AQU_BARRIER,
+            noise(this.noiseHold(NoiseParametersKeys.AQUIFER_BARRIER), 0.5)
+        )
+        this.register(
+            DuskDensityFunctions.AQU_FLUID_SPREAD,
+            noise(this.noiseHold(NoiseParametersKeys.AQUIFER_FLUID_LEVEL_SPREAD), 0.7142857142857143)
+        )
+        this.register(
+            DuskDensityFunctions.AQU_LAVA,
+            noise(this.noiseHold(NoiseParametersKeys.AQUIFER_LAVA))
+        )
+    }
 
     private fun BootstrapContext<DensityFunction>.shapers(
         continents: RegistryKey<DensityFunction>,
@@ -145,16 +166,41 @@ object OverworldDensityFunctionCreator {
         idwj: RegistryKey<DensityFunction>,
         finalDensity: RegistryKey<DensityFunction>,
         amplified: Boolean,
-        largeBiome: Boolean
+        largeBiome: Boolean,
+        urCondition: RegistryKey<DensityFunction>,
+        urDensity: RegistryKey<DensityFunction>,
+        aquiferFloodedness: RegistryKey<DensityFunction>,
     ) {
         val data = OverworldTerrainCreator.TerrainParametersData(
             this.wrap(continents),
             this.wrap(erosion),
             this.wrap(NoiseRouterData.RIDGES_OVERWORLD),
             this.wrap(NoiseRouterData.RIDGES_FOLDED_OVERWORLD),
+            this.wrap(DuskDensityFunctions.PLATEAU_TYPE),
             this.wrap(DuskDensityFunctions.GRAND_CANYON_RIDGES_FOLDED)
         )
         val dataSimple = data.simple()
+
+        this.register(
+            urCondition,
+            copySpline(OverworldTerrainCreator.undergroundRiverCondition(this.wrap(NoiseRouterData.Y), data))
+        )
+        this.register(
+            urDensity,
+            rangeChoice(
+                this.dense(urCondition),
+                0.5f,
+                1.1f,
+                add(
+                    -0.003,
+                    add(
+                        clampedGradientY(-10, 138, -1, 1).square(),
+                        interpolated(this.dense(NoiseRouterData.RIDGES_OVERWORLD)).square()
+                    )
+                ),
+                const(1000000)
+            )
+        )
 
         this.register(
             depth,
@@ -204,6 +250,19 @@ object OverworldDensityFunctionCreator {
             finalDensity,
             interpolated(blendDensity(this.createFinalDensity(amplified, largeBiome, cheese))).squeeze()
         )
+
+
+        this.register(
+            aquiferFloodedness,
+            rangeChoice(
+                this.dense(urCondition),
+                0.5f,
+                1.1f,
+                const(1),
+                noise(this.noiseHold(NoiseParametersKeys.AQUIFER_FLUID_LEVEL_FLOODEDNESS), 0.67)
+            )
+        )
+
     }
 
 
@@ -247,15 +306,15 @@ object OverworldDensityFunctionCreator {
 
     fun BootstrapContext<ChunkGeneratorSettings>.overworld(largeBiome: Boolean, amplified: Boolean): NoiseRouter {
         return NoiseRouter(
-            DensityFunctions.constant(1.0),
-            DensityFunctions.constant(1.0),
-            DensityFunctions.constant(1.0),
-            DensityFunctions.constant(1.0),
+            this.dense(DuskDensityFunctions.AQU_BARRIER),
+            this.dense(DuskDensityFunctions.AQU_FLOODEDNESS),
+            this.dense(DuskDensityFunctions.AQU_FLUID_SPREAD),
+            this.dense(DuskDensityFunctions.AQU_LAVA),
             this.dense(DuskDensityFunctions.TEMPERATURE),
             this.dense(DuskDensityFunctions.HUMIDITY),
             this.dense(DuskDensityFunctions.CONTINENT_WIERD),
             this.dense(NoiseRouterData.EROSION_OVERWORLD),
-            DensityFunctions.constant(0.0),
+            this.dense(DuskDensityFunctions.DEPTH),
             this.dense(DuskDensityFunctions.RIDGES_WEIRD),
             this.dense(DuskDensityFunctions.OVERWORLD_IDWJ),
             this.dense(DuskDensityFunctions.OVERWORLD_FINAL_DENSITY),

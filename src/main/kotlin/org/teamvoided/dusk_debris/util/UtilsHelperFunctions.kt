@@ -145,3 +145,4 @@ fun Direction.asProperty(): BooleanProperty {
         Direction.EAST -> Properties.EAST
     }
 }
+

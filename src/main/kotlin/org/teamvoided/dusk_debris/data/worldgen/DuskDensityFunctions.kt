@@ -20,18 +20,20 @@ object DuskDensityFunctions {
     val OVERWORLD_IDWJ = create("initial_density_without_jaggedness")
     val OVERWORLD_FINAL_DENSITY = create("final_density")
 
+
     val GRAND_CANYON_RIDGES_FOLDED = create("plateau/grand_canyon_ridges_folded")
     val PLATEAU_TYPE = create("plateau/type")
 
+    /** idea used from [Jacobsjo message](https://discord.com/channels/738975290583285762/770775163942993930/948013415748751432)**/
+    val UR_CONDITION = create("underground_rivers/picker")
+    val UR_DENSITY = create("underground_rivers/density")
 
-    /** PLATEAU TYPE NOTES
-     *
-     * types
-     * - cave river?, -1 -0.55
-     * - plateau, -0.2 0.2
-     * - canyon, 0.2 0.55
-     * - grand canyon, 0.55 1
-     **/
+
+    val AQU_BARRIER = create("aquifer/barrier")
+    val AQU_FLOODEDNESS = create("aquifer/floodedness")
+    val AQU_FLOODEDNESS_LB = create("aquifer/floodedness")
+    val AQU_FLUID_SPREAD = create("aquifer/fluid_spread")
+    val AQU_LAVA = create("aquifer/lava")
 
 
     val NETHER_PILLARS = nether("nether_pillars")
