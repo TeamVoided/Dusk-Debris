@@ -2,6 +2,7 @@ package org.teamvoided.dusk_debris.data.gen.world.gen.density_function
 
 import net.minecraft.registry.BootstrapContext
 import net.minecraft.registry.RegistryKey
+import net.minecraft.util.math.Spline
 import net.minecraft.util.math.noise.DoublePerlinNoiseSampler
 import net.minecraft.world.gen.DensityFunction
 import net.minecraft.world.gen.DensityFunctions
@@ -14,6 +15,7 @@ import org.teamvoided.dusk_debris.data.gen.world.gen.DensityFunctionCreator.dens
 import org.teamvoided.dusk_debris.data.gen.world.gen.DensityFunctionCreator.noiseHold
 import org.teamvoided.dusk_debris.data.worldgen.DuskDensityFunctions
 import org.teamvoided.dusk_debris.data.worldgen.DuskNoiseParametersKeys
+import org.teamvoided.dusk_debris.util.world_helper.add
 import org.teamvoided.dusk_debris.world.gen.terrain_parameters.OverworldTerrainCreator
 import voidlib.devin.world.gen.*
 
@@ -38,7 +40,8 @@ object OverworldDensityFunctionCreator {
             false,
             DuskDensityFunctions.UR_CONDITION,
             DuskDensityFunctions.UR_DENSITY,
-            DuskDensityFunctions.AQU_FLOODEDNESS
+            DuskDensityFunctions.AQU_FLOODEDNESS,
+            DuskDensityFunctions.AQU_FLUID_SPREAD
         )
     }
 
@@ -48,6 +51,10 @@ object OverworldDensityFunctionCreator {
         val shiftZ = this.dense(NoiseRouterData.SHIFT_Z)
         this.register(DuskDensityFunctions.TEMPERATURE, noi2D(NoiseParametersKeys.TEMPERATURE))
         this.register(DuskDensityFunctions.HUMIDITY, noi2D(NoiseParametersKeys.VEGETATION))
+        this.register(
+            DuskDensityFunctions.UR_TYPE,
+            flatCacheNoi2D(DuskNoiseParametersKeys.UR_TYPE)
+        )
         this.register(
             DuskDensityFunctions.CONTINENT_WIERD,
             add(
@@ -99,7 +106,7 @@ object OverworldDensityFunctionCreator {
 
         this.register(
             DuskDensityFunctions.PLATEAU_TYPE,
-            const(-1)
+            const(1)//flatCacheNoi2D(DuskNoiseParametersKeys.PLATEAU_TYPE)
         )
 
         val grandCanyonBias = 0.825f
@@ -146,10 +153,6 @@ object OverworldDensityFunctionCreator {
             noise(this.noiseHold(NoiseParametersKeys.AQUIFER_BARRIER), 0.5)
         )
         this.register(
-            DuskDensityFunctions.AQU_FLUID_SPREAD,
-            noise(this.noiseHold(NoiseParametersKeys.AQUIFER_FLUID_LEVEL_SPREAD), 0.7142857142857143)
-        )
-        this.register(
             DuskDensityFunctions.AQU_LAVA,
             noise(this.noiseHold(NoiseParametersKeys.AQUIFER_LAVA))
         )
@@ -170,6 +173,8 @@ object OverworldDensityFunctionCreator {
         urCondition: RegistryKey<DensityFunction>,
         urDensity: RegistryKey<DensityFunction>,
         aquiferFloodedness: RegistryKey<DensityFunction>,
+        aquiferFluidSpread: RegistryKey<DensityFunction>,
+        caves: Boolean = false
     ) {
         val data = OverworldTerrainCreator.TerrainParametersData(
             this.wrap(continents),
@@ -179,26 +184,26 @@ object OverworldDensityFunctionCreator {
             this.wrap(DuskDensityFunctions.PLATEAU_TYPE),
             this.wrap(DuskDensityFunctions.GRAND_CANYON_RIDGES_FOLDED)
         )
-        val dataSimple = data.simple()
 
+        this.caveRiver(data, urCondition, urDensity)
         this.register(
-            urCondition,
-            copySpline(OverworldTerrainCreator.undergroundRiverCondition(this.wrap(NoiseRouterData.Y), data))
-        )
-        this.register(
-            urDensity,
+            aquiferFloodedness,
             rangeChoice(
                 this.dense(urCondition),
-                0.5f,
-                1.1f,
-                add(
-                    -0.003,
-                    add(
-                        clampedGradientY(-10, 138, -1, 1).square(),
-                        interpolated(this.dense(NoiseRouterData.RIDGES_OVERWORLD)).square()
-                    )
-                ),
-                const(1000000)
+                0.5,
+                1.1,
+                const(1),
+                noise(this.noiseHold(NoiseParametersKeys.AQUIFER_FLUID_LEVEL_FLOODEDNESS), 0.67)
+            )
+        )
+        this.register(
+            aquiferFluidSpread,
+            rangeChoice(
+                this.dense(urCondition),
+                0.5,
+                1.5,
+                const(0.5),
+                noise(this.noiseHold(NoiseParametersKeys.AQUIFER_FLUID_LEVEL_SPREAD), 0.7142857)
             )
         )
 
@@ -221,14 +226,14 @@ object OverworldDensityFunctionCreator {
         this.register(
             jaggedness,
             NoiseRouterData.splineWithBlending(
-                copySpline(OverworldTerrainCreator.jaggednessSpline(dataSimple, amplified)),
+                copySpline(OverworldTerrainCreator.jaggednessSpline(data, amplified)),
                 getBlendOffset()
             )
         )
         this.register(
             factor,
             NoiseRouterData.splineWithBlending(
-                add(10, copySpline(OverworldTerrainCreator.factorSpline(dataSimple, amplified))),
+                add(10, copySpline(OverworldTerrainCreator.factorSpline(data, amplified))),
                 getBlendOffset()
             )
         )
@@ -246,33 +251,109 @@ object OverworldDensityFunctionCreator {
             idwj,
             surfaceSlide(amplified, add(-45.0 / 64.0, withoutJagged).clamp(-64.0, 64.0))
         )
-        this.register(
-            finalDensity,
-            interpolated(blendDensity(this.createFinalDensity(amplified, largeBiome, cheese))).squeeze()
-        )
 
-
-        this.register(
-            aquiferFloodedness,
-            rangeChoice(
-                this.dense(urCondition),
-                0.5f,
-                1.1f,
-                const(1),
-                noise(this.noiseHold(NoiseParametersKeys.AQUIFER_FLUID_LEVEL_FLOODEDNESS), 0.67)
+        if (caves) {
+            val cheeseAndEntrance = min(
+                this.dense(cheese),
+                multiply(
+                    5,
+                    this.dense(NoiseRouterData.CAVES_ENTRANCES_OVERWORLD)
+                )
             )
-        )
-
+            val slopedCaves = rangeChoice(
+                this.dense(cheese),
+                -1000000,
+                1.5625,
+                cheeseAndEntrance,
+                this.underground(this.dense(cheese))
+            )
+            this.register(
+                finalDensity,
+                min(
+                    multiply(
+                        0.64,
+                        min(
+                            this.dense(urDensity),
+                            interpolated(blendDensity(surfaceSlide(amplified, slopedCaves)))
+                        )
+                    ).squeeze(),
+                    this.dense(NoiseRouterData.CAVES_NOODLE_OVERWORLD)
+                )
+            )
+        } else {
+            this.register(
+                finalDensity,
+                multiply(
+                    0.64,
+                    min(
+                        this.dense(urDensity),
+                        interpolated(blendDensity(surfaceSlide(amplified, this.dense(cheese))))
+                    )
+                ).squeeze()
+            )
+        }
     }
 
-
-    private fun BootstrapContext<DensityFunction>.createFinalDensity(
-        amplified: Boolean,
-        largeBiome: Boolean,
-        cheese: RegistryKey<DensityFunction>
-    ): DensityFunction {
-        val slide = surfaceSlide(amplified, this.dense(cheese))
-        return NoiseRouterData.postProcess(slide)
+    private fun BootstrapContext<DensityFunction>.caveRiver(
+        data: OverworldTerrainCreator.TerrainParametersData<DensityFunctions.Spline.Point, DensityFunctions.Spline.FunctionWrapper>,
+        condition: RegistryKey<DensityFunction>,
+        density: RegistryKey<DensityFunction>,
+    ) {
+        this.register(
+            condition,
+            rangeChoice(
+                this.dense(NoiseRouterData.Y),
+                45,
+                10000,
+                flatCache(cache2D(copySpline(OverworldTerrainCreator.undergroundRiverCondition(data)))),
+                const(0)
+            )
+        )
+        this.register(
+            density,
+            rangeChoice(
+                this.dense(condition),
+                0.5,
+                1.1,
+                add(
+                    -0.003,
+                    add(
+                        interpolated(
+                            multiply(
+                                add(
+                                    0.7,
+                                    multiply(
+                                        0.3,
+                                        flatCacheNoi2D(DuskNoiseParametersKeys.UR_HEIGHT)
+                                    )
+                                ),
+                                rangeChoice(
+                                    this.dense(DuskDensityFunctions.UR_TYPE),
+                                    0,
+                                    10000,
+                                    clampedGradientY(-10, 62, -1, 0),
+                                    clampedGradientY(-10, 138, -1, 1),
+                                )
+                            )
+                        ).square(),
+                        interpolated(
+                            multiply(
+                                this.dense(NoiseRouterData.RIDGES_OVERWORLD),
+                                copySpline(
+                                    Spline.builder(this.wrap(NoiseRouterData.Y))
+                                        .add(60f, 1.5f)
+                                        .add(71f, 1.26f)
+                                        .add(87f, 2.889f, 0.05f)
+                                        .add(103f, 3.218f, 0.07f)
+                                        .build()
+                                )
+                            )
+                        ).square()
+                    )
+                ),
+                const(1000000)
+            )
+        )
     }
 
     private fun surfaceSlide(amplified: Boolean, density: DensityFunction): DensityFunction {
@@ -304,6 +385,64 @@ object OverworldDensityFunctionCreator {
             this.noiseHold(noise)
         )
 
+    private fun BootstrapContext<DensityFunction>.flatCacheNoi2D(
+        noise: RegistryKey<DoublePerlinNoiseSampler.NoiseParameters>,
+        scaleXZ: Double = 0.25
+    ): DensityFunction =
+        flatCache(
+            cache2D(
+                shiftedNoise2d(
+                    this.dense(NoiseRouterData.SHIFT_X),
+                    this.dense(NoiseRouterData.SHIFT_Z),
+                    scaleXZ,
+                    this.noiseHold(noise)
+                )
+            )
+        )
+
+
+    private fun BootstrapContext<*>.underground(slopedCheese: DensityFunction): DensityFunction {
+        val spaghetti2D = this.dense(NoiseRouterData.CAVES_SPAGHETTI_2D_OVERWORLD)
+        val spaghettiRough = this.dense(NoiseRouterData.CAVES_SPAGHETTI_ROUGHNESS_FUNCTION_OVERWORLD)
+        val caveLayerNoise = noise(this.noiseHold(NoiseParametersKeys.CAVE_LAYER), 8.0)
+        val caveLayer = multiply(4, caveLayerNoise.square())
+        val caveCheese = noise(this.noiseHold(NoiseParametersKeys.CAVE_CHEESE), 0.6666666666666666)
+        val surfaceOrCave = add(
+            add(
+                0.27,
+                caveCheese
+            ).clamp(-1.0, 1.0),
+            add(
+                1.5,
+                multiply(
+                    -0.64,
+                    slopedCheese
+                )
+            ).clamp(0.0, 0.5)
+        )
+        val surfaceAndCave = add(caveLayer, surfaceOrCave)
+        val entrances = min(
+            min(
+                surfaceAndCave,
+                this.dense(NoiseRouterData.CAVES_ENTRANCES_OVERWORLD)
+            ),
+            add(
+                spaghetti2D,
+                spaghettiRough
+            )
+        )
+        val cavePillars = this.dense(NoiseRouterData.CAVES_PILLARS_OVERWORLD)
+        val cavePillarsSelector = rangeChoice(
+            cavePillars,
+            -1000000,
+            0.03,
+            const(-1000000),
+            cavePillars
+        )
+        return max(entrances, cavePillarsSelector)
+    }
+
+
     fun BootstrapContext<ChunkGeneratorSettings>.overworld(largeBiome: Boolean, amplified: Boolean): NoiseRouter {
         return NoiseRouter(
             this.dense(DuskDensityFunctions.AQU_BARRIER),
@@ -324,9 +463,96 @@ object OverworldDensityFunctionCreator {
         )
     }
 
-    /*fun overworld(
-        densityFunction: HolderProvider<DensityFunction>,
-        parameters: HolderProvider<DoublePerlinNoiseSampler.NoiseParameters>,
+    /*
+    fun BootstrapContext<ChunkGeneratorSettings>.overworldConvert(
+        largeBiome: Boolean,
+        amplified: Boolean
+    ): NoiseRouter {
+        val aquiferBarrier = noise(this.noiseHold(NoiseParametersKeys.AQUIFER_BARRIER), 0.5)
+        val aquiferFloodedness = noise(this.noiseHold(NoiseParametersKeys.AQUIFER_FLUID_LEVEL_FLOODEDNESS), 0.67)
+        val aquiferSpread = noise(this.noiseHold(NoiseParametersKeys.AQUIFER_FLUID_LEVEL_SPREAD), 0.7143)
+        val aquiferLava = noise(this.noiseHold(NoiseParametersKeys.AQUIFER_LAVA))
+        val shiftX = this.dense(NoiseRouterData.SHIFT_X)
+        val shiftZ = this.dense(NoiseRouterData.SHIFT_Z)
+        val temperature = shiftedNoise2d(
+            shiftX, shiftZ, 0.25,
+            this.noiseHold(if (largeBiome) NoiseParametersKeys.TEMPERATURE_LARGE else NoiseParametersKeys.TEMPERATURE)
+        )
+        val vegetation = shiftedNoise2d(
+            shiftX,
+            shiftZ,
+            0.25,
+            this.noiseHold(if (largeBiome) NoiseParametersKeys.VEGETATION_LARGE else NoiseParametersKeys.VEGETATION)
+        )
+        val factor = this.dense(
+            if (largeBiome) NoiseRouterData.FACTOR_OVERWORLD_LARGE_BIOME
+            else if (amplified) NoiseRouterData.FACTOR_OVERWORLD_AMPLIFIED
+            else NoiseRouterData.FACTOR_OVERWORLD
+        )
+        val depth = this.dense(
+            if (largeBiome) NoiseRouterData.DEPTH_OVERWORLD_LARGE_BIOME
+            else if (amplified) NoiseRouterData.DEPTH_OVERWORLD_AMPLIFIED
+            else NoiseRouterData.DEPTH_OVERWORLD
+        )
+        val idwj = NoiseRouterData.noiseGradientDensity(cache2D(factor), depth)
+        val slopedCheese = this.dense(
+            if (largeBiome) NoiseRouterData.SLOPED_CHEESE_OVERWORLD_LARGE_BIOME
+            else if (amplified) NoiseRouterData.SLOPED_CHEESE_OVERWORLD_AMPLIFIED
+            else NoiseRouterData.SLOPED_CHEESE_OVERWORLD
+        )
+        val cheeseAndEntrance = min(
+            slopedCheese,
+            multiply(
+                5,
+                this.dense(NoiseRouterData.CAVES_ENTRANCES_OVERWORLD)
+            )
+        )
+        val slopedCaves = rangeChoice(
+            slopedCheese,
+            -1000000,
+            1.5625,
+            cheeseAndEntrance,
+            underground(slopedCheese)
+        )
+        val finalDensity = min(
+            NoiseRouterData.postProcess(
+                surfaceSlide(
+                    amplified,
+                    slopedCaves
+                )
+            ), this.dense(NoiseRouterData.CAVES_NOODLE_OVERWORLD)
+        )
+        return NoiseRouter(
+            aquiferBarrier,
+            aquiferFloodedness,
+            aquiferSpread,
+            aquiferLava,
+            temperature,
+            vegetation,
+            this.dense(
+                if (largeBiome) NoiseRouterData.CONTINENTS_OVERWORLD_LARGE_BIOME
+                else NoiseRouterData.CONTINENTS_OVERWORLD
+            ),
+            this.dense(
+                if (largeBiome) NoiseRouterData.EROSION_OVERWORLD_LARGE_BIOME
+                else NoiseRouterData.EROSION_OVERWORLD
+            ),
+            depth,
+            this.dense(NoiseRouterData.RIDGES_OVERWORLD),
+            surfaceSlide(
+                amplified,
+                add(-0.703125, idwj).clamp(-64.0, 64.0)
+            ),
+            finalDensity,
+            const(0),
+            const(0),
+            const(0)
+        )
+    }
+
+    fun overworld(
+        densityFunction: RegistryKey<DensityFunction>,
+        parameters: RegistryKey<DoublePerlinNoiseSampler.NoiseParameters>,
         largeBiome: Boolean,
         amplified: Boolean
     ): NoiseRouter {

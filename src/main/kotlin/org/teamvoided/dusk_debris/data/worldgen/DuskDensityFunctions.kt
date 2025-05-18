@@ -25,14 +25,16 @@ object DuskDensityFunctions {
     val PLATEAU_TYPE = create("plateau/type")
 
     /** idea used from [Jacobsjo message](https://discord.com/channels/738975290583285762/770775163942993930/948013415748751432)**/
+    val UR_TYPE = create("underground_rivers/type")
     val UR_CONDITION = create("underground_rivers/picker")
     val UR_DENSITY = create("underground_rivers/density")
 
 
     val AQU_BARRIER = create("aquifer/barrier")
     val AQU_FLOODEDNESS = create("aquifer/floodedness")
-    val AQU_FLOODEDNESS_LB = create("aquifer/floodedness")
-    val AQU_FLUID_SPREAD = create("aquifer/fluid_spread")
+    val AQU_FLOODEDNESS_LB = create("large_biomes/aquifer/floodedness")
+    val AQU_FLUID_SPREAD = create("aquifer/fluid_level_spread")
+    val AQU_FLUID_SPREAD_LB = create("large_biomes/aquifer/fluid_level_spread")
     val AQU_LAVA = create("aquifer/lava")
 
 

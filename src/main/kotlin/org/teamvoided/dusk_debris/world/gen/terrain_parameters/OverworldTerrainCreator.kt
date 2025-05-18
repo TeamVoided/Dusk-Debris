@@ -18,8 +18,6 @@ object OverworldTerrainCreator {
     private var JAGGEDNESS_AMPLIFIED: ToFloatFunction<Float> =
         ToFloatFunction.createUnlimited { it * 2.0f }
 
-    val EROS: List<Float> = listOf(-0.85f, -0.7f, -0.4f, -0.35f, -0.2f, -0.1f, 0.2f, 0.4f, 0.55f, 0.7f)
-
     /** VANILLA CONTINENTALNESS VALUES
      *
      * types, repeat names are not mistakes, the game just copies those splines
@@ -37,7 +35,9 @@ object OverworldTerrainCreator {
      * CONTINENTALNESS VALUES
      *
      * types
-     * - -1.1 - Mushroom Island, mushroom island spline
+     * - -1.2 - Mushroom Island, mushroom island spline
+     * - -1.11 - Mushroom Shore 1, mushroom island shore spline, it's just shoreline 2
+     * - -1.1 - Mushroom Shore 2, mushroom island shore spline, it's just shoreline 1
      * - -1.02 - Deepest ocean, deepest point of all oceans
      * - -0.7 - Deep ocean, shallowest point of deep ocean biomes
      * - -0.3 - Ocean, deepest point of ocean biomes
@@ -50,7 +50,9 @@ object OverworldTerrainCreator {
      * - 1 - Inland, tallest points
      **/
     enum class Cont(val f: Float) {
-        MushroomIsland(-1.1f),
+        MushroomIsland(-1.2f),
+        MushroomShore2(-1.11f),
+        MushroomShore1(-1.1f),
         DeepestOcean(-1.02f),
         DeepOcean(-0.7f),
         Ocean(-0.3f),
@@ -98,7 +100,6 @@ object OverworldTerrainCreator {
     ): Spline<C, I> {
         data.amplifier = if (amplified) OFFSET_AMPLIFIED else NO_TRANSFORM
 
-        val island = Offset.mushroomIsland(data)
         val deepestOcean = Offset.ocean(2f, data)
         val deepOcean = Offset.ocean(1.5f, data)
         val ocean = Offset.ocean(1f, data)
@@ -113,22 +114,24 @@ object OverworldTerrainCreator {
 
         val offset = Spline.builder(data.continents, data.amplifier)
 
-        offset.add(Cont.MushroomIsland.f, island)
-        offset.add(Cont.DeepestOcean.f, deepestOcean)
-        offset.add(Cont.DeepOcean.f, deepOcean)
-        offset.add(Cont.Ocean.f, ocean)
-        offset.add(Cont.Coast1.f, coast1)
-        offset.add(Cont.Coast2.f, coast2)
-        offset.add(Cont.Shoreline1.f, shoreline1)
-        offset.add(Cont.Shoreline2.f, shoreline2)
-        offset.add(Cont.Outland.f, outland)
-        offset.add(Cont.Midland.f, midland)
+        //offset.add(Cont.MushroomIsland.f, inland)
+        //offset.add(Cont.MushroomShore2.f, shoreline1)
+        //offset.add(Cont.MushroomShore1.f, shoreline2)
+        //offset.add(Cont.DeepestOcean.f, deepestOcean)
+        //offset.add(Cont.DeepOcean.f, deepOcean)
+        //offset.add(Cont.Ocean.f, ocean)
+        //offset.add(Cont.Coast1.f, coast1)
+        //offset.add(Cont.Coast2.f, coast2)
+        //offset.add(Cont.Shoreline1.f, shoreline1)
+        //offset.add(Cont.Shoreline2.f, shoreline2)
+        //offset.add(Cont.Outland.f, outland)
+        //offset.add(Cont.Midland.f, midland)
         offset.add(Cont.Inland.f, inland)
         return offset.build()
     }
 
     fun <C, I : ToFloatFunction<C>> factorSpline(
-        data: TerrainParametersDataSimple<C, I>,
+        data: TerrainParametersData<C, I>,
         amplified: Boolean
     ): Spline<C, I> {
         data.amplifier = if (amplified) FACTOR_AMPLIFIED else NO_TRANSFORM
@@ -142,7 +145,7 @@ object OverworldTerrainCreator {
     }
 
     fun <C, I : ToFloatFunction<C>> jaggednessSpline(
-        data: TerrainParametersDataSimple<C, I>,
+        data: TerrainParametersData<C, I>,
         amplified: Boolean
     ): Spline<C, I> {
         data.amplifier = if (amplified) JAGGEDNESS_AMPLIFIED else NO_TRANSFORM
@@ -151,32 +154,28 @@ object OverworldTerrainCreator {
         return spline.build()
     }
 
-    fun <C, I : ToFloatFunction<C>> undergroundRiverCondition(y: I, data: TerrainParametersData<C, I>): Spline<C, I> {
-        val elevation = Spline.builder(y)
-            .add(54f, 0f)
-            .add(55f, 1f)
-            .add(75f, 1f)
-            .add(76f, 0f)
-            .build()
+    fun <C, I : ToFloatFunction<C>> undergroundRiverCondition(data: TerrainParametersData<C, I>): Spline<C, I> {
         val ridgesF = Spline.builder(data.ridgesFolded)
-            .add(-0.75f, elevation)
-            .add(-0.7f, 0f)
+            .add(-0.7f, 1f)
+            .add(-0.6f, 0f)
             .build()
         val plateauType = Spline.builder(data.plateauType)
             .add(Plateaus.PlatType.Plateau.max, 0f)
             .add(Plateaus.PlatType.Cave.min, ridgesF)
             .build()
-        val erosion = Spline.builder(data.erosion)
+        val erosionOutland = Spline.builder(data.erosion)
             .add(Eros.MountainInland.f, 0f)
             .add(Eros.Plateau1.f, plateauType)
             .add(Eros.Plateau2.f, plateauType)
             .add(Eros.Valley.f, 0f)
             .build()
         val continents = Spline.builder(data.continents)
+            .add(Cont.MushroomShore1.f, erosionOutland)
+            .add(Cont.DeepestOcean.f, 0f)
             .add(Cont.Coast2.f, 0f)
-            .add(Cont.Shoreline1.f, erosion)
+            .add(Cont.Shoreline1.f, erosionOutland)
             .build()
-        return continents
+        return ridgesF
     }
 
     data class TerrainParametersData<C, I : ToFloatFunction<C>>(
@@ -186,17 +185,6 @@ object OverworldTerrainCreator {
         val ridgesFolded: I,
         val plateauType: I,
         val grandCanyonRF: I,
-        var amplifier: ToFloatFunction<Float> = NO_TRANSFORM
-    ) {
-        fun simple(): TerrainParametersDataSimple<C, I> =
-            TerrainParametersDataSimple(continents, erosion, ridges, ridgesFolded, amplifier)
-    }
-
-    data class TerrainParametersDataSimple<C, I : ToFloatFunction<C>>(
-        val continents: I,
-        val erosion: I,
-        val ridges: I,
-        val ridgesFolded: I,
         var amplifier: ToFloatFunction<Float> = NO_TRANSFORM
     )
 }

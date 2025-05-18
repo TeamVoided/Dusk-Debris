@@ -10,7 +10,7 @@ import org.teamvoided.dusk_debris.world.gen.terrain_parameters.overworld.Offset
 object Plateaus {
     /** PLATEAU TYPE NOTES (see DuskDensityFunctions.class for descriptions)
      *
-     * layered canyon, -0.75 -1, two plateaus, one that starts at the Eroded point, and one half as high at the Default point, layeredCanyon()
+     * layered canyon, -0.75 -1, two plateaus, one that starts at the Eroded point, and one half as high at the default plateay, layeredCanyon()
      *
      * eroded canyon, -0.6 -0.7, plateau but the start is halfway inland (no change on riverbank, create a slope), canyon()
      *
@@ -33,9 +33,9 @@ object Plateaus {
         contNumber: Float,
         data: OverworldTerrainCreator.TerrainParametersData<C, I>
     ): Spline<C, I> {
-        val cave = plateauCave(contNumber, data)
+        val cave = plateau(contNumber, data, true)
         val plateau = plateau(contNumber, data)
-        val canyon = plateau(contNumber, data, data.grandCanyonRF)
+        val canyon = plateau(contNumber, data, false, data.grandCanyonRF)
         val eroded = canyon(contNumber, data)
         val layered = canyon(contNumber, data)
 
@@ -51,31 +51,13 @@ object Plateaus {
         return spline.build()
     }
 
-    private fun <C, I : ToFloatFunction<C>> plateauCave(
-        contNumber: Float,
-        data: OverworldTerrainCreator.TerrainParametersData<C, I>
-    ): Spline<C, I> {
-        val depress = -1f to (Offset.elev(104 + contNumber * 16))
-        val plateau = -0.4f to Offset.elev(108 + contNumber * 20)
-        val plateauEnd = 0.4f to plateau.second
-        val final = 1f to Offset.elev(120 + contNumber * 20)
-
-        val finalSlope = calculateSlope(plateauEnd, final)
-
-        val spline = Spline.builder(data.ridgesFolded, data.amplifier)
-            .add(depress)
-            .add(plateau)
-            .add(plateauEnd)
-            .add(final, finalSlope)
-        return spline.build()
-    }
-
     private fun <C, I : ToFloatFunction<C>> plateau(
         contNumber: Float,
         data: OverworldTerrainCreator.TerrainParametersData<C, I>,
+        depress: Boolean = false,
         rf: I = data.ridgesFolded
     ): Spline<C, I> {
-        val riverbed = -1f to (Offset.elev(30 + contNumber * 8))
+        val riverbed = -1f to (Offset.elev(if (depress) 30 + contNumber * 8 else 80 + contNumber * 16))
         val plateau = -0.4f to Offset.elev(108 + contNumber * 20)
         val plateauEnd = 0.4f to plateau.second
         val final = 1f to Offset.elev(120 + contNumber * 20)

@@ -3,25 +3,28 @@ package org.teamvoided.dusk_debris.data.gen.world.gen
 import net.minecraft.registry.BootstrapContext
 import net.minecraft.registry.RegistryKey
 import net.minecraft.util.math.noise.DoublePerlinNoiseSampler.NoiseParameters
+import org.teamvoided.dusk_debris.data.gen.world.gen.NoiseCreator.nether
 import org.teamvoided.dusk_debris.data.gen.world.gen.NoiseCreator.register
-import org.teamvoided.dusk_debris.data.gen.world.gen.NoiseCreator.registerNetherBiomeNoises
 import org.teamvoided.dusk_debris.data.worldgen.DuskNoiseParametersKeys
 
 object NoiseCreator {
     fun bootstrap(c: BootstrapContext<NoiseParameters>) {
         c.overworld()
         c.nether()
+        c.register(DuskNoiseParametersKeys.EXAMPLE, -5, 1)
     }
 
     private fun BootstrapContext<NoiseParameters>.overworld() {
-        this.register(DuskNoiseParametersKeys.CONTINENTAL_WEIRDNESS, -8, 1.0, -1.0)
-        this.register(DuskNoiseParametersKeys.GRAND_CANYON, -8, 1.0, 3.0, 1.0)
+        this.register(DuskNoiseParametersKeys.CONTINENTAL_WEIRDNESS, -8, 1, 1)
+        this.register(DuskNoiseParametersKeys.GRAND_CANYON, -8, 1, 3, 1)
+        this.register(DuskNoiseParametersKeys.PLATEAU_TYPE, -8, 1, 1, 0, 1, 1)
+        this.register(DuskNoiseParametersKeys.UR_TYPE, -7, 1)
+        this.register(DuskNoiseParametersKeys.UR_HEIGHT, -6, 1, 1, 1)
     }
 
     private fun BootstrapContext<NoiseParameters>.nether() {
-        //register(c, DuskNoiseParametersKeys.LAVA_TUBE, -8, 1.0, -2.0, 1.0, 0.0, 0.0, 0.0)
-        this.register(DuskNoiseParametersKeys.LAVA_LEVEL, -10, 1.0)
-        this.register(DuskNoiseParametersKeys.EXAMPLE, -5, 1.0)
+        //register(c, DuskNoiseParametersKeys.LAVA_TUBE, -8, 1, -2, 1, 0, 0, 0)
+        this.register(DuskNoiseParametersKeys.LAVA_LEVEL, -10, 1)
         this.registerNetherBiomeNoises(
             0,
             DuskNoiseParametersKeys.TEMPERATURE_NETHER,
@@ -38,7 +41,7 @@ object NoiseCreator {
         //    DuskNoiseParametersKeys.EROSION_LARGE_NETHER,
         //    DuskNoiseParametersKeys.DROP_CEILING_LARGE
         //)
-        this.register(DuskNoiseParametersKeys.RIDGE_NETHER, -7, 1.0, 2.0, 1.0, 0.0, 0.0, 0.0)
+        this.register(DuskNoiseParametersKeys.RIDGE_NETHER, -7, 1, 2, 1, 0, 0, 0)
     }
 
 
@@ -50,19 +53,21 @@ object NoiseCreator {
         erosion: RegistryKey<NoiseParameters>,
         dropCeiling: RegistryKey<NoiseParameters>
     ) {
-        this.register(temperature, -10 + octaveOffset, 1.5, 0.0, 1.0, 0.0, 0.0, 0.0)
-        this.register(humidity, -8 + octaveOffset, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0)
-        this.register(continentalness, -9 + octaveOffset, 1.0, 1.0, 2.0, 2.0, 2.0, 1.0, 1.0, 1.0, 1.0)
-        this.register(erosion, -9 + octaveOffset, 1.0, 1.0, 0.0, 1.0, 1.0)
-        this.register(dropCeiling, -6 + octaveOffset, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0)
+        this.register(temperature, -10 + octaveOffset, 1.5, 0, 1, 0, 0, 0)
+        this.register(humidity, -8 + octaveOffset, 1, 1, 0, 0, 0, 0)
+        this.register(continentalness, -9 + octaveOffset, 1, 1, 2, 2, 2, 1, 1, 1, 1)
+        this.register(erosion, -9 + octaveOffset, 1, 1, 0, 1, 1)
+        this.register(dropCeiling, -6 + octaveOffset, 1, 1, 1, 1, 0, 1, 0, 1)
     }
 
     private fun BootstrapContext<NoiseParameters>.register(
         key: RegistryKey<NoiseParameters>,
         firstOctave: Int,
-        firstAmplitude: Double,
-        vararg amplitudes: Double
+        firstAmplitude: Number,
+        vararg amplitudes: Number
     ) {
-        this.register(key, NoiseParameters(firstOctave, firstAmplitude, *amplitudes))
+        val array = DoubleArray(amplitudes.size)
+        amplitudes.forEachIndexed { idx, it -> array[idx] = it.toDouble() }
+        this.register(key, NoiseParameters(firstOctave, firstAmplitude.toDouble(), *array))
     }
 }

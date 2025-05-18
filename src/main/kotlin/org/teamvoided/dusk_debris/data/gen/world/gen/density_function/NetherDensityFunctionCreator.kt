@@ -33,10 +33,6 @@ object NetherDensityFunctionCreator {
     fun BootstrapContext<DensityFunction>.theNetherCreator() {
         val noiseParameters = this.getRegistryLookup(RegistryKeys.NOISE_PARAMETERS)
         val densityFunctions = this.getRegistryLookup(RegistryKeys.DENSITY_FUNCTION)
-        this.register(
-            DuskDensityFunctions.EXAMPLE,
-            DensityFunctions.noise(this.noiseHold(DuskNoiseParametersKeys.EXAMPLE), 0.25, 0.0)
-        )
         this.parameters()
         this.shapers()
         this.pillar()

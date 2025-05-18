@@ -7,9 +7,13 @@ import net.minecraft.registry.RegistryKeys
 import net.minecraft.util.math.noise.DoublePerlinNoiseSampler.NoiseParameters
 import net.minecraft.world.gen.DensityFunction
 import net.minecraft.world.gen.DensityFunction.NoiseHolder
+import net.minecraft.world.gen.DensityFunctions
 import net.minecraft.world.gen.DensityFunctions.*
+import org.teamvoided.dusk_debris.data.gen.world.gen.DensityFunctionCreator.noiseHold
 import org.teamvoided.dusk_debris.data.gen.world.gen.density_function.NetherDensityFunctionCreator.theNetherCreator
 import org.teamvoided.dusk_debris.data.gen.world.gen.density_function.OverworldDensityFunctionCreator.overworldCreator
+import org.teamvoided.dusk_debris.data.worldgen.DuskDensityFunctions
+import org.teamvoided.dusk_debris.data.worldgen.DuskNoiseParametersKeys
 import org.teamvoided.dusk_debris.world.gen.density_functions.SingleDensityFunctionInput
 
 object DensityFunctionCreator {
@@ -17,6 +21,10 @@ object DensityFunctionCreator {
     fun bootstrap(c: BootstrapContext<DensityFunction>) {
         c.overworldCreator()
         c.theNetherCreator()
+        c.register(
+            DuskDensityFunctions.EXAMPLE,
+            noise(c.noiseHold(DuskNoiseParametersKeys.EXAMPLE), 0.25, 0.0)
+        )
     }
 //    NoiseRouterData.class
 

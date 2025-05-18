@@ -5,7 +5,7 @@ import net.minecraft.util.math.Spline
 import org.teamvoided.dusk_debris.util.world_helper.add
 import org.teamvoided.dusk_debris.util.world_helper.calculateSlope
 import org.teamvoided.dusk_debris.world.gen.terrain_parameters.OverworldTerrainCreator.TerrainParametersData
-import org.teamvoided.dusk_debris.world.gen.terrain_parameters.OverworldTerrainCreator.EROS
+import org.teamvoided.dusk_debris.world.gen.terrain_parameters.OverworldTerrainCreator.Eros
 import org.teamvoided.dusk_debris.world.gen.terrain_parameters.overworld.offset.Plateaus.createPlateaus
 import kotlin.math.max
 
@@ -15,16 +15,14 @@ object Offset {
     private fun addSL(inputY: Number): Float = inputY.toFloat() / 128f
 
 
-
-
     fun <C, I : ToFloatFunction<C>> offsetEros(
         contNumber: Float, //increase this number the further inland you go, from 0 to 1 (outland to inland)
         data: TerrainParametersData<C, I>,
     ): Spline<C, I> {
         val spline = Spline.builder(data.erosion, data.amplifier)
-            .add(-1f, mountain(108, 256, true, data))
-            .add(-0.6f, mountain(50, 256, false, data))
-            .add(-0.55f, createPlateaus(contNumber, data))
+            //.add(-1f, mountain(108, 256, true, data))
+            //.add(-0.6f, mountain(50, 256, false, data))
+            //.add(-0.55f, createPlateaus(contNumber, data))
             .add(-0.35f, createPlateaus(contNumber, data))
         return spline.build()
     }
@@ -81,34 +79,9 @@ object Offset {
 
 
         val ocean = Spline.builder(data.erosion, data.amplifier)
-            .add(EROS.first(), trenches)
-            .add(EROS[0], moderate)
-            .add(EROS.last(), flats)
+            .add(Eros.Mountain.f, trenches)
+            .add(Eros.FlatsHigh.f, moderate)
+            .add(Eros.FlatsLow.f, flats)
         return ocean.build()
-    }
-
-    fun <C, I : ToFloatFunction<C>> mushroomIsland(data: TerrainParametersData<C, I>): Spline<C, I> {
-        val riverbed = -1f to elev(52)
-        val mushroomPeaks = mountain(48, 200, false, data)
-
-        val plateauBank = -0.4f to elev(92)
-        val plateauPeak = 1f to elev(111)
-        val plateauSlope = calculateSlope(plateauBank, plateauPeak)
-        val mushroomPlateaus = Spline.builder(data.ridgesFolded, data.amplifier)
-            .add(riverbed, calculateSlope(riverbed, plateauPeak))
-            .add(plateauBank, plateauSlope)
-            .add(plateauPeak, plateauSlope)
-
-        val flats = -0.4f to elev(78)
-        val mushroomFlats = Spline.builder(data.ridgesFolded, data.amplifier)
-            .add(riverbed, calculateSlope(riverbed, flats) * 2)
-            .add(flats)
-
-        return Spline.builder(data.erosion, data.amplifier)
-            .add(EROS[1], mushroomPeaks, -0.1f)
-            .add(EROS[2], mushroomPlateaus.build())
-            .add(EROS[3], mushroomPlateaus.build())
-            .add(EROS[5], mushroomFlats.build()).build()
-        //NOTE: add a mushroom swamp
     }
 }
