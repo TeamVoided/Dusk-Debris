@@ -4,7 +4,6 @@
   "package": "org.teamvoided.dusk_debris.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "BiomeMixin",
     "BlockEntityTypeMixin",
     "BlockWithEntityAccessor",
     "ChunkNoiseSamplerMixin",

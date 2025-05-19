@@ -22,11 +22,11 @@ class OverworldDebugCreator {
     private val fullRange = range(-1, 1)
 
     private val splitterEros = false
-    private val splitterCons = true
+    private val splitterCons = false
 
     private fun addDebugBiomesTo(biomeEntryConsumer: Consumer<Pair<NoiseHypercube, RegistryKey<Biome>>>) {
         val plains = NoiseHyper3(
-            Biomes.PLAINS,
+            Biomes.THE_VOID,
             fullRange,
             fullRange,
             nonOcean,
@@ -35,15 +35,13 @@ class OverworldDebugCreator {
             fullRange,
             0.01f
         )
-        val beach = plains.copy().biome(Biomes.BEACH).continentalness(cBeach)
-        val ocean = plains.copy().biome(Biomes.OCEAN).continentalness(cOcean)
-        val deepO = plains.copy().biome(Biomes.DEEP_OCEAN).continentalness(cDeepOcean)
-        val mushI = plains.copy().biome(Biomes.MUSHROOM_FIELDS).continentalness(cMushIsle)
         biomeEntryConsumer.accept(plains.create())
-        biomeEntryConsumer.accept(beach.create())
-        biomeEntryConsumer.accept(ocean.create())
-        biomeEntryConsumer.accept(deepO.create())
-        biomeEntryConsumer.accept(mushI.create())
+        if (splitterCons) {
+            biomeEntryConsumer.accept(plains.copy().biome(Biomes.BEACH).continentalness(cBeach).create())
+            biomeEntryConsumer.accept(plains.copy().biome(Biomes.OCEAN).continentalness(cOcean).create())
+            biomeEntryConsumer.accept(plains.copy().biome(Biomes.DEEP_OCEAN).continentalness(cDeepOcean).create())
+            biomeEntryConsumer.accept(plains.copy().biome(Biomes.MUSHROOM_FIELDS).continentalness(cMushIsle).create())
+        }
 
         if (splitterEros) {
             val eros = NoiseHyper3(

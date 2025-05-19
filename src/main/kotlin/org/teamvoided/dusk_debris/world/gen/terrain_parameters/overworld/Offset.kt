@@ -6,6 +6,7 @@ import org.teamvoided.dusk_debris.util.world_helper.add
 import org.teamvoided.dusk_debris.util.world_helper.calculateSlope
 import org.teamvoided.dusk_debris.world.gen.terrain_parameters.OverworldTerrainCreator.TerrainParametersData
 import org.teamvoided.dusk_debris.world.gen.terrain_parameters.OverworldTerrainCreator.Eros
+import org.teamvoided.dusk_debris.world.gen.terrain_parameters.overworld.offset.Mountains
 import org.teamvoided.dusk_debris.world.gen.terrain_parameters.overworld.offset.Plateaus.createPlateaus
 import kotlin.math.max
 
@@ -16,15 +17,26 @@ object Offset {
 
 
     fun <C, I : ToFloatFunction<C>> offsetEros(
-        contNumber: Float, //increase this number the further inland you go, from 0 to 1 (outland to inland)
+        contNumber: Float, //increase this number the further inland you go, from 0 to 1 (shoreline to inland)
         data: TerrainParametersData<C, I>,
     ): Spline<C, I> {
-        val spline = Spline.builder(data.erosion, data.amplifier)
-            //.add(-1f, mountain(108, 256, true, data))
-            //.add(-0.6f, mountain(50, 256, false, data))
-            //.add(-0.55f, createPlateaus(contNumber, data))
-            .add(-0.35f, createPlateaus(contNumber, data))
-        return spline.build()
+        val erosion = Spline.builder(data.erosion, data.amplifier)
+            .add(Eros.TallMountain.f, Mountains.mountain(108, 256, true, data))
+            .add(Eros.Mountain.f, Mountains.mountain(50, 256, false, data))
+            .add(Eros.Plateau1.f, createPlateaus(contNumber, data))
+            .add(Eros.Plateau2.f, createPlateaus(contNumber, data))
+        if (contNumber > 0.5f) {
+            erosion
+                .add(Eros.FlatsHigh.f, flatsAndUpper(57, 87, 99, data))
+                .add(Eros.FlatsMed.f, flatsAndUpper(52, 75, 85, data))
+                .add(Eros.FlatsLow.f, flatsAndUpper(50, 63, 70, data))
+        } else {
+            erosion
+                .add(Eros.FlatsHigh.f, flats(55, 87, data))
+                .add(Eros.FlatsMed.f, flats(50, 75, data))
+                .add(Eros.FlatsLow.f, flats(48, 63, data))
+        }
+        return erosion.build()
     }
 
     fun <C, I : ToFloatFunction<C>> offsetBeach(data: TerrainParametersData<C, I>): Spline<C, I> {
@@ -34,27 +46,45 @@ object Offset {
         return spline.build()
     }
 
-
-    private fun <C, I : ToFloatFunction<C>> mountain(
+    private fun <C, I : ToFloatFunction<C>> flats(
         riverbed: Int,
-        peak: Int,
-        valley: Boolean,
+        bank: Int,
         data: TerrainParametersData<C, I>
     ): Spline<C, I> {
-        val mountainRiverbed = -1f to elev(riverbed)
-        val mountainPeak = 1f to elev(peak)
-        val mountainSlope = calculateSlope(mountainRiverbed, mountainPeak)
+        val river = -1f to elev(riverbed)
+        val shore = -0.4f to elev(bank)
+        val end = 1f to shore.second * 1.25f
 
-        val mountain = Spline.builder(data.ridgesFolded, data.amplifier)
-        if (valley) {
-            mountain.add(mountainRiverbed)
-            mountain.add(0f, (mountainRiverbed.second + mountainPeak.second) / 2f, mountainSlope)
-        } else {
-            mountain.add(mountainRiverbed, mountainSlope)
-        }
+        val riverSlope = calculateSlope(river, shore) * 1.5f
 
-        mountain.add(mountainPeak, mountainSlope)
-        return mountain.build()
+        val flats = Spline.builder(data.ridgesFolded, data.amplifier)
+            .add(river, riverSlope)
+            .add(shore)
+            .add(end)
+        return flats.build()
+    }
+
+    private fun <C, I : ToFloatFunction<C>> flatsAndUpper(
+        riverbed: Int,
+        bank: Int,
+        middle: Int,
+        data: TerrainParametersData<C, I>
+    ): Spline<C, I> {
+        val river = -1f to elev(riverbed)
+        val shore = -0.4f to elev(bank)
+        val mid = 0f to shore.second * 1.1f
+        val high = 0.4f to elev(middle)
+        val end = 0.4f to high.second * 1.1f
+
+        val riverSlope = calculateSlope(river, shore) * 1.25f
+
+        val flats = Spline.builder(data.ridgesFolded, data.amplifier)
+            .add(river, riverSlope)
+            .add(shore)
+            .add(mid)
+            .add(high)
+            .add(end)
+        return flats.build()
     }
 
     fun <C, I : ToFloatFunction<C>> ocean(

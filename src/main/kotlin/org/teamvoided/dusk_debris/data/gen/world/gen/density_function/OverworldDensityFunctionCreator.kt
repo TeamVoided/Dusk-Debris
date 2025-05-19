@@ -106,7 +106,7 @@ object OverworldDensityFunctionCreator {
 
         this.register(
             DuskDensityFunctions.PLATEAU_TYPE,
-            const(1)//flatCacheNoi2D(DuskNoiseParametersKeys.PLATEAU_TYPE)
+            const(-1)//flatCacheNoi2D(DuskNoiseParametersKeys.PLATEAU_TYPE)
         )
 
         val grandCanyonBias = 0.825f
@@ -342,9 +342,9 @@ object OverworldDensityFunctionCreator {
                                 copySpline(
                                     Spline.builder(this.wrap(NoiseRouterData.Y))
                                         .add(60f, 1.5f)
-                                        .add(71f, 1.26f)
-                                        .add(87f, 2.889f, 0.05f)
-                                        .add(103f, 3.218f, 0.07f)
+                                        .add(70f, 1.5f)
+                                        .add(90f, 3f, 0.05f)
+                                        .add(100f, 3.25f, 0.05f)
                                         .build()
                                 )
                             )

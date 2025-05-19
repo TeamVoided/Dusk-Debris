@@ -84,9 +84,9 @@ object OverworldTerrainCreator {
     enum class Eros(val f: Float) {
         TallMountain(-0.85f),
         Mountain(-0.7f),
-        MountainInland(-0.4f),
+        MountainShort(-0.4f),
         Plateau1(-0.35f),
-        Plateau2(-0.2f),
+        Plateau2(-0.3f),
         Valley(-0.1f),
         FlatsHigh(0.2f),
         FlatsMed(0.4f),
@@ -156,7 +156,7 @@ object OverworldTerrainCreator {
 
     fun <C, I : ToFloatFunction<C>> undergroundRiverCondition(data: TerrainParametersData<C, I>): Spline<C, I> {
         val ridgesF = Spline.builder(data.ridgesFolded)
-            .add(-0.7f, 1f)
+            .add(-0.65f, 1f)
             .add(-0.6f, 0f)
             .build()
         val plateauType = Spline.builder(data.plateauType)
@@ -164,7 +164,7 @@ object OverworldTerrainCreator {
             .add(Plateaus.PlatType.Cave.min, ridgesF)
             .build()
         val erosionOutland = Spline.builder(data.erosion)
-            .add(Eros.MountainInland.f, 0f)
+            .add(Eros.MountainShort.f, 0f)
             .add(Eros.Plateau1.f, plateauType)
             .add(Eros.Plateau2.f, plateauType)
             .add(Eros.Valley.f, 0f)

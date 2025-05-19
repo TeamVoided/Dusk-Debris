@@ -31,7 +31,7 @@ object DuskDebrisClient {
             if (entityRenderer !is SnifferEntityRenderer) return@register
             registrationHelper.register(SnifferOverlayFeatureRenderer(entityRenderer))
         }
-        ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(WaterColormapResourceSupplier())
+        //ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(WaterColormapResourceSupplier())
 
         //CameraSubmersionType.entries.forEach { println(it) }
 

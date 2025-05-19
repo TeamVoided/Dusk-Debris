@@ -18,7 +18,7 @@ object Plateaus {
      *
      * plateau, 0.5 -0.2, just a plateau, plateau()
      *
-     * cave river, 1 0.55, a plateau with no river, plateauCave()
+     * cave river, 1 0.55, a plateau with no river, plateau()
      *
      **/
     enum class PlatType(val min: Float, val max: Float = min) {
@@ -57,7 +57,7 @@ object Plateaus {
         depress: Boolean = false,
         rf: I = data.ridgesFolded
     ): Spline<C, I> {
-        val riverbed = -1f to (Offset.elev(if (depress) 30 + contNumber * 8 else 80 + contNumber * 16))
+        val riverbed = -1f to (Offset.elev(if (depress) 85 + contNumber * 16 else 30 + contNumber * 8))
         val plateau = -0.4f to Offset.elev(108 + contNumber * 20)
         val plateauEnd = 0.4f to plateau.second
         val final = 1f to Offset.elev(120 + contNumber * 20)
