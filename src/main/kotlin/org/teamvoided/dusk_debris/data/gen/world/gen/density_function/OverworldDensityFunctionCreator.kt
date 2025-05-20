@@ -106,7 +106,7 @@ object OverworldDensityFunctionCreator {
 
         this.register(
             DuskDensityFunctions.PLATEAU_TYPE,
-            const(-1)//flatCacheNoi2D(DuskNoiseParametersKeys.PLATEAU_TYPE)
+            const(-0.35)//flatCacheNoi2D(DuskNoiseParametersKeys.PLATEAU_TYPE)
         )
 
         val grandCanyonBias = 0.825f

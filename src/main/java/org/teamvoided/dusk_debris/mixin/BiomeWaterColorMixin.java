@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.teamvoided.dusk_debris.world.WaterColors;
 
 @Mixin(Biome.class)
-public class BiomeMixin {
+public class BiomeWaterColorMixin {
 
     @Shadow
     @Final

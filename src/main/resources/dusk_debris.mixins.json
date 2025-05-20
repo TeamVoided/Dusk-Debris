@@ -9,13 +9,11 @@
     "ChunkNoiseSamplerMixin",
     "EntityWindLogicMixin",
     "FabricDynamicRegistryMixin",
-    "FreezeTopLayerFeatureMixin",
     "MangroveRootsBlockMixin",
     "PaintingEntityMixin",
     "PersistentProjectileEntityAccessor",
     "PillagerSpawnerMixin",
     "SnifferEntityMixin",
-    "SpreadableBlockMixin",
     "TrialSpawnerStateMixin",
     "claw.EntityClawLogicMixin",
     "debugger.StateManagerMixin",
@@ -41,6 +39,8 @@
     "fluid_tag.water.GlassBottleItemMixin",
     "pixel_accurate.CombinedSignBlockMixin",
     "pixel_accurate.WallSignBlockMixin",
+    "snow.FreezeTopLayerFeatureMixin",
+    "snow.SpreadableBlockMixin",
     "spell.PlayerEntitySpellMixin"
   ],
   "injectors": {

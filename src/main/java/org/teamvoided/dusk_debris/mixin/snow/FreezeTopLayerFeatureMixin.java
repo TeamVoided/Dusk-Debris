@@ -1,4 +1,4 @@
-package org.teamvoided.dusk_debris.mixin;
+package org.teamvoided.dusk_debris.mixin.snow;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;

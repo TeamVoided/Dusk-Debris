@@ -21,21 +21,21 @@ object Offset {
         data: TerrainParametersData<C, I>,
     ): Spline<C, I> {
         val erosion = Spline.builder(data.erosion, data.amplifier)
-            .add(Eros.TallMountain.f, Mountains.mountain(108, 256, true, data))
-            .add(Eros.Mountain.f, Mountains.mountain(50, 256, false, data))
+            //.add(Eros.TallMountain.f, Mountains.mountain(108, 256, true, data))
+            //.add(Eros.Mountain.f, Mountains.mountain(50, 256, false, data))
             .add(Eros.Plateau1.f, createPlateaus(contNumber, data))
-            .add(Eros.Plateau2.f, createPlateaus(contNumber, data))
-        if (contNumber > 0.5f) {
-            erosion
-                .add(Eros.FlatsHigh.f, flatsAndUpper(57, 87, 99, data))
-                .add(Eros.FlatsMed.f, flatsAndUpper(52, 75, 85, data))
-                .add(Eros.FlatsLow.f, flatsAndUpper(50, 63, 70, data))
-        } else {
-            erosion
-                .add(Eros.FlatsHigh.f, flats(55, 87, data))
-                .add(Eros.FlatsMed.f, flats(50, 75, data))
-                .add(Eros.FlatsLow.f, flats(48, 63, data))
-        }
+            //.add(Eros.Plateau2.f, createPlateaus(contNumber, data))
+        //if (contNumber > 0.5f) {
+        //    erosion
+        //        .add(Eros.FlatsHigh.f, flatsAndUpper(57, 87, 99, data))
+        //        .add(Eros.FlatsMed.f, flatsAndUpper(52, 75, 85, data))
+        //        .add(Eros.FlatsLow.f, flatsAndUpper(50, 63, 70, data))
+        //} else {
+        //    erosion
+        //        .add(Eros.FlatsHigh.f, flats(55, 87, data))
+        //        .add(Eros.FlatsMed.f, flats(50, 75, data))
+        //        .add(Eros.FlatsLow.f, flats(48, 63, data))
+        //}
         return erosion.build()
     }
 
