@@ -114,15 +114,15 @@ object OverworldDensityFunctionCreator {
             1,
             add(
                 multiply(
-                    0.5,
+                    0.1,
                     add(
                         1,
                         this.dense(NoiseRouterData.RIDGES_FOLDED_OVERWORLD)
                     )
                 ),
                 multiply(
-                    2,
-                    this.noi2D(DuskNoiseParametersKeys.GRAND_CANYON).square()
+                    4,
+                    this.noi2D(DuskNoiseParametersKeys.GRAND_CANYON, 0.75).square()
                 )
             )
         )
