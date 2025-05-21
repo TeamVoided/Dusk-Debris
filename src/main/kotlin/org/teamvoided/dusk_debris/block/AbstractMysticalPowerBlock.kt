@@ -5,6 +5,7 @@ import net.minecraft.block.BlockState
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.state.StateManager
 import net.minecraft.util.math.BlockPos
+import net.minecraft.util.math.Direction
 import net.minecraft.util.random.RandomGenerator
 import net.minecraft.world.WorldAccess
 import org.teamvoided.dusk_debris.block.not_blocks.DuskProperties
@@ -16,7 +17,7 @@ abstract class AbstractMysticalPowerBlock(settings: Settings) : Block(settings) 
 
     override fun scheduledTick(state: BlockState, world: ServerWorld, pos: BlockPos, random: RandomGenerator) {
         val isActive = state.get(DuskProperties.ACTIVE)
-        world.setBlockState(pos, state.with(DuskProperties.ACTIVE, !isActive))
+        world.setBlockState(pos, state.with(DuskProperties.ACTIVE, !isActive), 2)
         if (!isActive) scheduleTick(state.block, world, pos, disableDelay)
         super.scheduledTick(state, world, pos, random)
     }
@@ -29,7 +30,7 @@ abstract class AbstractMysticalPowerBlock(settings: Settings) : Block(settings) 
     }
 
     companion object {
-        const val activationDelay = 10
+        const val activationDelay = 2
         const val disableDelay = activationDelay * 10
     }
 }

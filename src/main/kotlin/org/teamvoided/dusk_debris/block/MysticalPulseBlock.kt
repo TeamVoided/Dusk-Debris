@@ -7,7 +7,7 @@ import net.minecraft.util.random.RandomGenerator
 
 class MysticalPulseBlock(settings: Settings) : AbstractMysticalPowerBlock(settings) {
     override fun randomTick(state: BlockState, world: ServerWorld, pos: BlockPos, random: RandomGenerator) {
-        if (random.nextInt(127) == 0) scheduleTick(state.block, world, pos, 0)
+        if (random.nextInt(1) == 0) scheduleTick(state.block, world, pos, 0)
         super.randomTick(state, world, pos, random)
     }
 }

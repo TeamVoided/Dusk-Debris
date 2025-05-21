@@ -15,7 +15,10 @@ class MysticalStreamBlock(settings: Settings) : AbstractMysticalPowerBlock(setti
         pos: BlockPos,
         neighborPos: BlockPos
     ): BlockState {
-        if (neighborState.block is AbstractMysticalPowerBlock && neighborState.get(DuskProperties.ACTIVE))
+        if (neighborState.block is AbstractMysticalPowerBlock &&
+            !state.get(DuskProperties.ACTIVE) &&
+            neighborState.get(DuskProperties.ACTIVE)
+        )
             scheduleTick(state.block, world, pos)
         return super.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos)
     }

@@ -1,14 +1,24 @@
 package org.teamvoided.dusk_debris.util.model_helper
 
 import net.minecraft.block.Block
-import net.minecraft.block.enums.ChestType
 import net.minecraft.data.client.model.*
-import net.minecraft.state.property.Properties
 import net.minecraft.util.Identifier
-import org.teamvoided.dusk_debris.block.not_blocks.ChestPhase
 import org.teamvoided.dusk_debris.block.not_blocks.DuskProperties
 import org.teamvoided.dusk_debris.util.block
 import org.teamvoided.dusk_debris.util.model
+import org.teamvoided.dusk_debris.util.suffix
+
+
+fun BlockStateModelGenerator.registerActive(block: Block, activeSuffix: String = "_active") {
+    val identifier = TexturedModel.CUBE_ALL.create(block, this.modelCollector)
+    val identifier2 = TexturedModel.makeFactory({ Texture.all(it.model().suffix(activeSuffix)) }, Models.CUBE_ALL)
+        .createWithSuffix(block, activeSuffix, this.modelCollector)
+    this.blockStateCollector.accept(
+        VariantsBlockStateSupplier.create(block).coordinate(
+            BlockStateModelGenerator.createBooleanModelMap(DuskProperties.ACTIVE, identifier2, identifier)
+        )
+    )
+}
 
 
 //fun BlockStateModelGenerator.stoneChest(block: Block) {

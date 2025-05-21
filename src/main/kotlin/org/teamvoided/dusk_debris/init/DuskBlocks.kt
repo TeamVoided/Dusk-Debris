@@ -64,6 +64,10 @@ object DuskBlocks {
         "purple_bubble_blossom", BubbleBlossomBlock(copy(SPORE_BLOSSOM).ticksRandomly())
     ).cutout()
 
+    val MYTHROCK = register("mythrock", Block(copy(STONE)))
+    val MYTHROCK_ARTERY = register("mythrock_artery", MysticalStreamBlock(copy(MYTHROCK)))
+    val MYTHROCK_HEART = register("mythrock_heart", MysticalPulseBlock(copy(MYTHROCK).ticksRandomly()))
+
     val BRONZE_BLOCK = register(
         "bronze_block", Block(
             Settings.create().mapColor(MapColor.BROWN).toolRequired().strength(3.0F, 6.0F)
@@ -945,7 +949,7 @@ object DuskBlocks {
     )
     val GALLERY_MAPLE_BUTTON =
         register("gallery_maple_button", buttonOf(DuskBlockSetType.GALLERY_MAPLE_BLOCK_SET_TYPE))
-            
+
     val GALLERY_MAPLE_SIGN = registerNoItem(
         "gallery_maple_sign", signOf(DuskBlockSetType.GALLERY_MAPLE_WOOD_TYPE, GALLERY_MAPLE_PLANKS)
     )
@@ -993,12 +997,12 @@ object DuskBlocks {
     )
     val WITHERING_BONEWOOD_STAIRS =
         register("withering_bonewood_stairs", stairsOf(WITHERING_BONEWOOD_PLANKS))
-            
+
     val WITHERING_BONEWOOD_SLAB = register("withering_bonewood_slab", slabOf(WITHERING_BONEWOOD_PLANKS))
-        
+
     val WITHERING_BONEWOOD_FENCE =
         register("withering_bonewood_fence", fenceOf(WITHERING_BONEWOOD_PLANKS))
-            
+
     val WITHERING_BONEWOOD_FENCE_GATE = register(
         "withering_bonewood_fence_gate",
         FenceGateBlock(DuskBlockSetType.WITHERING_BONEWOOD_WOOD_TYPE, copy(WITHERING_BONEWOOD_PLANKS).solid())
@@ -1006,7 +1010,8 @@ object DuskBlocks {
     val WITHERING_BONEWOOD_DOOR = registerNoItem(
         "withering_bonewood_door",
         DoorBlock(
-            DuskBlockSetType.WITHERING_BONEWOOD_BLOCK_SET_TYPE, copy(WITHERING_BONEWOOD_PLANKS).strength(3.0f).nonOpaque(),
+            DuskBlockSetType.WITHERING_BONEWOOD_BLOCK_SET_TYPE,
+            copy(WITHERING_BONEWOOD_PLANKS).strength(3.0f).nonOpaque(),
         ).cutout()
     )
     val WITHERING_BONEWOOD_TRAPDOOR = register(
@@ -1017,10 +1022,10 @@ object DuskBlocks {
     )
 
     val PAINTED_ROSE = register("painted_rose", PaintedRoseBlock(DuskBlockSettings.PAINTED_ROSE).cutout())
-        
+
 
     val BROWN_TREE_FUNGUS = register("brown_tree_fungus", TransparentBlock(copy(BROWN_MUSHROOM)).cutout())
-        
+
     val SPIDERLILY = register(
         "spiderlily", SpiderlilyBlock(copy(ROSE_BUSH).ticksRandomly())
     )
@@ -1030,13 +1035,13 @@ object DuskBlocks {
         )
     )
     val WATER_FERN = registerNoItem("water_fern", WaterFernBlock(copy(LILY_PAD)).cutout())
-        
+
     val BUNNY_GRAVE = register("bunny_grave", BunnyGraveBlock(copy(STONE_BRICK_WALL)))
 
     // celestal block
-  /*  val BIG_CELESTAL_CHAIN = register(
-        "big_celestal_chain", BigChainBlock(copy(CHAIN).sounds(BlockSoundGroup.BLOCK_VAULT_BREAK)).cutout()
-    )*/
+    /*  val BIG_CELESTAL_CHAIN = register(
+          "big_celestal_chain", BigChainBlock(copy(CHAIN).sounds(BlockSoundGroup.BLOCK_VAULT_BREAK)).cutout()
+      )*/
     val BIG_MOON_LANTERN = register(
         "big_moon_lantern",
         BigLanternWithSpiralBlock(
