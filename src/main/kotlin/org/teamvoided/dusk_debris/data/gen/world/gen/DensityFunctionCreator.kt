@@ -7,14 +7,12 @@ import net.minecraft.registry.RegistryKeys
 import net.minecraft.util.math.noise.DoublePerlinNoiseSampler.NoiseParameters
 import net.minecraft.world.gen.DensityFunction
 import net.minecraft.world.gen.DensityFunction.NoiseHolder
-import net.minecraft.world.gen.DensityFunctions
 import net.minecraft.world.gen.DensityFunctions.*
-import org.teamvoided.dusk_debris.data.gen.world.gen.DensityFunctionCreator.noiseHold
 import org.teamvoided.dusk_debris.data.gen.world.gen.density_function.NetherDensityFunctionCreator.theNetherCreator
 import org.teamvoided.dusk_debris.data.gen.world.gen.density_function.OverworldDensityFunctionCreator.overworldCreator
 import org.teamvoided.dusk_debris.data.worldgen.DuskDensityFunctions
 import org.teamvoided.dusk_debris.data.worldgen.DuskNoiseParametersKeys
-import org.teamvoided.dusk_debris.world.gen.density_functions.SingleDensityFunctionInput
+import org.teamvoided.dusk_debris.world.gen.density_functions.SingleDensityFunctionModifier
 
 object DensityFunctionCreator {
 
@@ -60,15 +58,16 @@ object DensityFunctionCreator {
         return rangeChoice(input, minInclusive, maxInclusive, constant(maxInclusive), input)
     }
 
-    fun round(input: DensityFunction): DensityFunction {
-        return SingleDensityFunctionInput(SingleDensityFunctionInput.Type.ROUND, input)
-    }
+    fun DensityFunction.round(): DensityFunction = mapped(this, SingleDensityFunctionModifier.Type.ROUND)
 
-    fun floor(input: DensityFunction): DensityFunction {
-        return SingleDensityFunctionInput(SingleDensityFunctionInput.Type.FLOOR, input)
-    }
+    fun DensityFunction.floor(): DensityFunction = mapped(this, SingleDensityFunctionModifier.Type.FLOOR)
 
-    fun ceil(input: DensityFunction): DensityFunction {
-        return SingleDensityFunctionInput(SingleDensityFunctionInput.Type.CEIL, input)
-    }
+    fun DensityFunction.ceil(): DensityFunction = mapped(this, SingleDensityFunctionModifier.Type.CEIL)
+
+    fun DensityFunction.squareRoot(): DensityFunction = mapped(this, SingleDensityFunctionModifier.Type.SQUARE_ROOT)
+
+    fun DensityFunction.cubeRoot(): DensityFunction = mapped(this, SingleDensityFunctionModifier.Type.CUBE_ROOT)
+
+    private fun mapped(input: DensityFunction, type: SingleDensityFunctionModifier.Type): DensityFunction =
+        SingleDensityFunctionModifier.create(type, input)
 }

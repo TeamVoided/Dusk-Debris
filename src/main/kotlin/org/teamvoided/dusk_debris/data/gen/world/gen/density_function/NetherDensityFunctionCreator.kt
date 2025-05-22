@@ -15,6 +15,7 @@ import net.minecraft.world.gen.noise.NoiseRouterData
 import org.teamvoided.dusk_debris.data.gen.world.gen.DensityFunctionCreator
 import org.teamvoided.dusk_debris.data.gen.world.gen.DensityFunctionCreator.dense
 import org.teamvoided.dusk_debris.data.gen.world.gen.DensityFunctionCreator.denseHold
+import org.teamvoided.dusk_debris.data.gen.world.gen.DensityFunctionCreator.floor
 import org.teamvoided.dusk_debris.data.gen.world.gen.DensityFunctionCreator.noise
 import org.teamvoided.dusk_debris.data.gen.world.gen.DensityFunctionCreator.noiseHold
 import org.teamvoided.dusk_debris.data.gen.world.gen.DensityFunctionCreator.registerAndWrap
@@ -62,20 +63,18 @@ object NetherDensityFunctionCreator {
                 if (LAVA) {
                     DensityFunctions.max(
                         DensityFunctions.multiply(
-                            DensityFunctionCreator.floor(
-                                DensityFunctions.multiply(
-                                    DensityFunctions.constant(32.0 / 4.0),
-                                    DensityFunctions.mapFromUnitToValue(
-                                        DensityFunctions.noise(
-                                            this.noiseHold(DuskNoiseParametersKeys.LAVA_LEVEL),
-                                            1.0,
-                                            0.0,
-                                        ),
-                                        -0.25,
-                                        1.0
-                                    )
+                            DensityFunctions.multiply(
+                                DensityFunctions.constant(32.0 / 4.0),
+                                DensityFunctions.mapFromUnitToValue(
+                                    DensityFunctions.noise(
+                                        this.noiseHold(DuskNoiseParametersKeys.LAVA_LEVEL),
+                                        1.0,
+                                        0.0,
+                                    ),
+                                    -0.25,
+                                    1.0
                                 )
-                            ),
+                            ).floor(),
                             DensityFunctions.constant(4.0)
                         ),
                         DensityFunctions.zero()
@@ -316,7 +315,8 @@ object NetherDensityFunctionCreator {
         val erosion = DensityFunctions.Spline.FunctionWrapper(erosionKey)
         val dropCeiling = DensityFunctions.Spline.FunctionWrapper(dropCeilingKey)
         val ridges = DensityFunctions.Spline.FunctionWrapper(this.denseHold(DuskDensityFunctions.RIDGES_NETHER))
-        val ridgesFolded = DensityFunctions.Spline.FunctionWrapper(this.denseHold(DuskDensityFunctions.RIDGES_FOLDED_NETHER))
+        val ridgesFolded =
+            DensityFunctions.Spline.FunctionWrapper(this.denseHold(DuskDensityFunctions.RIDGES_FOLDED_NETHER))
         val offsetFloorSpline = registerAndWrap(
             offsetFloorKey,
 //            add(

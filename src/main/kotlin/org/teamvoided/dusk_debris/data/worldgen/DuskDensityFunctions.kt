@@ -38,6 +38,7 @@ object DuskDensityFunctions {
     val AQU_LAVA = create("aquifer/lava")
 
 
+    //* - - - * THE NETHER * - - - *//
     val NETHER_PILLARS = nether("nether_pillars")
 
     val LAVA_LEVEL = nether("lava_level")
