@@ -68,6 +68,12 @@ object DensityFunctionCreator {
 
     fun DensityFunction.cubeRoot(): DensityFunction = mapped(this, SingleDensityFunctionModifier.Type.CUBE_ROOT)
 
+    fun DensityFunction.sin(): DensityFunction = mapped(this, SingleDensityFunctionModifier.Type.SIN)
+
+    fun DensityFunction.cos(): DensityFunction = mapped(this, SingleDensityFunctionModifier.Type.COS)
+
+    fun DensityFunction.tan(): DensityFunction = mapped(this, SingleDensityFunctionModifier.Type.TAN)
+
     private fun mapped(input: DensityFunction, type: SingleDensityFunctionModifier.Type): DensityFunction =
         SingleDensityFunctionModifier.create(type, input)
 }
