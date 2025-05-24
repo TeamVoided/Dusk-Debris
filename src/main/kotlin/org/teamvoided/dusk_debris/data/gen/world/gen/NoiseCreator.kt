@@ -16,8 +16,13 @@ object NoiseCreator {
 
     private fun BootstrapContext<NoiseParameters>.overworld() {
         this.register(DuskNoiseParametersKeys.CONTINENTAL_WEIRDNESS, -8, 1, 1)
-        this.register(DuskNoiseParametersKeys.GRAND_CANYON, -8, 1, 3, 1)
+
         this.register(DuskNoiseParametersKeys.PLATEAU_TYPE, -8, 1, 1, 0, 1, 1)
+        this.register(DuskNoiseParametersKeys.GRAND_CANYON, -8, 1, 3, 1)
+
+        this.register(DuskNoiseParametersKeys.FLATS_TYPE, -8, 1, 0, 1)
+        this.register(DuskNoiseParametersKeys.FLATS_ELEV, -7, 1)
+
         this.register(DuskNoiseParametersKeys.UR_TYPE, -7, 1)
         this.register(DuskNoiseParametersKeys.UR_HEIGHT, -6, 1, 1, 1)
     }

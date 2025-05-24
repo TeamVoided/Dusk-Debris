@@ -33,18 +33,22 @@ fun splineCommand(cx: CommandContext<ServerCommandSource>): Int {
             val zAlt = z > zRange || -z > zRange
 
             val cont = 1f
-            val eros = 0f
+            val eros = OverworldTerrainCreator.Eros.Flats1.f
             val ridg = 0f
             val riFl = zSample
-            val plat = xSample
+            val plat = 0f
             val gcrf = riFl
+            val flTy = xSample
+            val flEl = 0f
             val data = OverworldTerrainCreator.TerrainParametersData(
                 ToFloatFunction.createUnlimited { cont },
                 ToFloatFunction.createUnlimited { eros },
                 ToFloatFunction.createUnlimited { ridg },
                 ToFloatFunction.createUnlimited { riFl },
                 ToFloatFunction.createUnlimited { plat },
-                ToFloatFunction.createUnlimited { gcrf }
+                ToFloatFunction.createUnlimited { gcrf },
+                ToFloatFunction.createUnlimited { flTy },
+                ToFloatFunction.createUnlimited { flEl }
             )
             val spline: Spline<Float, ToFloatFunction<Float>> = OverworldTerrainCreator.offsetSpline(data, false)
             //val spline: Spline<Float, ToFloatFunction<Float>> = VanillaTerrainParametersCreator.method_42056(

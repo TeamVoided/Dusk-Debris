@@ -10,12 +10,18 @@ object DuskNoiseParametersKeys {
 
     val CONTINENTAL_WEIRDNESS = create("parameters/continental_weirdness")
 
-    val GRAND_CANYON = create("plateau/grand_canyon")
     val PLATEAU_TYPE = create("plateau/type")
+    val GRAND_CANYON = create("plateau/grand_canyon")
+
+    val FLATS_TYPE = create("flats/type")
+    val FLATS_ELEV = create("flats/elev")
+
     val UR_TYPE = create("underground_river/type")
     val UR_HEIGHT = create("underground_river/height")
 
 
+
+    //* - - - * THE NETHER * - - - *//
     //val LAVA_TUBE = create("lava_tube")
     val LAVA_LEVEL = create("nether/lava_level")
 

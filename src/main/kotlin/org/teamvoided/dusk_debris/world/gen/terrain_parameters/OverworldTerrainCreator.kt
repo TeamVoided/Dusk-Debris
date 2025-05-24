@@ -88,9 +88,8 @@ object OverworldTerrainCreator {
         Plateau1(-0.35f),
         Plateau2(-0.3f),
         Valley(-0.1f),
-        FlatsHigh(0.2f),
-        FlatsMed(0.4f),
-        FlatsLow(0.55f),
+        Flats1(0.25f),
+        Flats2(0.58f),
         Swamp(0.7f);
     }
 
@@ -185,6 +184,8 @@ object OverworldTerrainCreator {
         val ridgesFolded: I,
         val plateauType: I,
         val grandCanyonRF: I,
+        val flatsType: I,
+        val flatsElev: I,
         var amplifier: ToFloatFunction<Float> = NO_TRANSFORM
     )
 }

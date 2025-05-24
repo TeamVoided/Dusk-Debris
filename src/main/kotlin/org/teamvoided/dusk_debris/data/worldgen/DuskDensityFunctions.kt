@@ -23,6 +23,8 @@ object DuskDensityFunctions {
 
     val GRAND_CANYON_RIDGES_FOLDED = create("plateau/grand_canyon_ridges_folded")
     val PLATEAU_TYPE = create("plateau/type")
+    val FLATS_TYPE = create("flats/type")
+    val FLATS_ELEV = create("flats/elevation")
 
     /** idea used from [Jacobsjo message](https://discord.com/channels/738975290583285762/770775163942993930/948013415748751432)**/
     val UR_TYPE = create("underground_rivers/type")

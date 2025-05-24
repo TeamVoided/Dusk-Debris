@@ -106,7 +106,15 @@ object OverworldDensityFunctionCreator {
 
         this.register(
             DuskDensityFunctions.PLATEAU_TYPE,
-            const(-0.35)//flatCacheNoi2D(DuskNoiseParametersKeys.PLATEAU_TYPE)
+           flatCacheNoi2D(DuskNoiseParametersKeys.PLATEAU_TYPE)
+        )
+        this.register(
+            DuskDensityFunctions.FLATS_TYPE,
+            flatCacheNoi2D(DuskNoiseParametersKeys.FLATS_TYPE)
+        )
+        this.register(
+            DuskDensityFunctions.FLATS_ELEV,
+            flatCacheNoi2D(DuskNoiseParametersKeys.FLATS_ELEV)
         )
 
         val grandCanyonBias = 0.825f
@@ -182,7 +190,9 @@ object OverworldDensityFunctionCreator {
             this.wrap(NoiseRouterData.RIDGES_OVERWORLD),
             this.wrap(NoiseRouterData.RIDGES_FOLDED_OVERWORLD),
             this.wrap(DuskDensityFunctions.PLATEAU_TYPE),
-            this.wrap(DuskDensityFunctions.GRAND_CANYON_RIDGES_FOLDED)
+            this.wrap(DuskDensityFunctions.GRAND_CANYON_RIDGES_FOLDED),
+            this.wrap(DuskDensityFunctions.FLATS_TYPE),
+            this.wrap(DuskDensityFunctions.FLATS_ELEV)
         )
 
         this.caveRiver(data, urCondition, urDensity)

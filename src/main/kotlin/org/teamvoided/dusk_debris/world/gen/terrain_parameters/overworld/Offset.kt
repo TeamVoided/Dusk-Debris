@@ -6,9 +6,9 @@ import org.teamvoided.dusk_debris.util.world_helper.add
 import org.teamvoided.dusk_debris.util.world_helper.calculateSlope
 import org.teamvoided.dusk_debris.world.gen.terrain_parameters.OverworldTerrainCreator.TerrainParametersData
 import org.teamvoided.dusk_debris.world.gen.terrain_parameters.OverworldTerrainCreator.Eros
+import org.teamvoided.dusk_debris.world.gen.terrain_parameters.overworld.offset.Flats.createFlats
 import org.teamvoided.dusk_debris.world.gen.terrain_parameters.overworld.offset.Mountains
 import org.teamvoided.dusk_debris.world.gen.terrain_parameters.overworld.offset.Plateaus.createPlateaus
-import kotlin.math.max
 
 object Offset {
     const val SEA_LEVEL = 63
@@ -20,22 +20,15 @@ object Offset {
         contNumber: Float, //increase this number the further inland you go, from 0 to 1 (shoreline to inland)
         data: TerrainParametersData<C, I>,
     ): Spline<C, I> {
+        val plateau = createPlateaus(contNumber, data)
+        val flats = createFlats(contNumber, data)
         val erosion = Spline.builder(data.erosion, data.amplifier)
-            //.add(Eros.TallMountain.f, Mountains.mountain(108, 256, true, data))
-            //.add(Eros.Mountain.f, Mountains.mountain(50, 256, false, data))
-            .add(Eros.Plateau1.f, createPlateaus(contNumber, data))
-            //.add(Eros.Plateau2.f, createPlateaus(contNumber, data))
-        //if (contNumber > 0.5f) {
-        //    erosion
-        //        .add(Eros.FlatsHigh.f, flatsAndUpper(57, 87, 99, data))
-        //        .add(Eros.FlatsMed.f, flatsAndUpper(52, 75, 85, data))
-        //        .add(Eros.FlatsLow.f, flatsAndUpper(50, 63, 70, data))
-        //} else {
-        //    erosion
-        //        .add(Eros.FlatsHigh.f, flats(55, 87, data))
-        //        .add(Eros.FlatsMed.f, flats(50, 75, data))
-        //        .add(Eros.FlatsLow.f, flats(48, 63, data))
-        //}
+            .add(Eros.TallMountain.f, Mountains.mountain(108, 256, true, data))
+            .add(Eros.Mountain.f, Mountains.mountain(50, 256, false, data))
+            .add(Eros.Plateau1.f, plateau)
+            .add(Eros.Plateau2.f, plateau)
+            .add(Eros.Flats1.f, flats)
+            .add(Eros.Flats2.f, flats)
         return erosion.build()
     }
 
@@ -44,47 +37,6 @@ object Offset {
             .add(-1f, elev(48))
             .add(-0.4f, 0f)
         return spline.build()
-    }
-
-    private fun <C, I : ToFloatFunction<C>> flats(
-        riverbed: Int,
-        bank: Int,
-        data: TerrainParametersData<C, I>
-    ): Spline<C, I> {
-        val river = -1f to elev(riverbed)
-        val shore = -0.4f to elev(bank)
-        val end = 1f to shore.second * 1.25f
-
-        val riverSlope = calculateSlope(river, shore) * 1.5f
-
-        val flats = Spline.builder(data.ridgesFolded, data.amplifier)
-            .add(river, riverSlope)
-            .add(shore)
-            .add(end)
-        return flats.build()
-    }
-
-    private fun <C, I : ToFloatFunction<C>> flatsAndUpper(
-        riverbed: Int,
-        bank: Int,
-        middle: Int,
-        data: TerrainParametersData<C, I>
-    ): Spline<C, I> {
-        val river = -1f to elev(riverbed)
-        val shore = -0.4f to elev(bank)
-        val mid = 0f to shore.second * 1.1f
-        val high = 0.4f to elev(middle)
-        val end = 0.4f to high.second * 1.1f
-
-        val riverSlope = calculateSlope(river, shore) * 1.25f
-
-        val flats = Spline.builder(data.ridgesFolded, data.amplifier)
-            .add(river, riverSlope)
-            .add(shore)
-            .add(mid)
-            .add(high)
-            .add(end)
-        return flats.build()
     }
 
     fun <C, I : ToFloatFunction<C>> ocean(
@@ -110,8 +62,8 @@ object Offset {
 
         val ocean = Spline.builder(data.erosion, data.amplifier)
             .add(Eros.Mountain.f, trenches)
-            .add(Eros.FlatsHigh.f, moderate)
-            .add(Eros.FlatsLow.f, flats)
+            .add(Eros.Flats1.f, moderate)
+            .add(Eros.Flats2.f, flats)
         return ocean.build()
     }
 }
