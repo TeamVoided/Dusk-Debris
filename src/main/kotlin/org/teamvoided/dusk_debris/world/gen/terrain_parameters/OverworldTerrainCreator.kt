@@ -105,10 +105,10 @@ object OverworldTerrainCreator {
         val coast1 = Offset.ocean(0.8f, data)
         val coast2 = Offset.offsetBeach(data)
         val shoreline1 = Offset.offsetBeach(data)
-        val shoreline2 = Offset.offsetEros(0.2f, data)
-        val outland = Offset.offsetEros(0.4f, data)
-        val midland = Offset.offsetEros(0.6f, data)
-        val inland = Offset.offsetEros(1f, data)
+        val shoreline2 = Offset.offsetEros(0f, data)
+        val outland = Offset.offsetEros(0.5f, data)
+        val midland = Offset.offsetEros(1f, data)
+        val inland = Offset.offsetEros(1.2f, data)
 
 
         val offset = Spline.builder(data.continents, data.amplifier)
@@ -124,8 +124,8 @@ object OverworldTerrainCreator {
         //offset.add(Cont.Shoreline1.f, shoreline1)
         //offset.add(Cont.Shoreline2.f, shoreline2)
         //offset.add(Cont.Outland.f, outland)
-        //offset.add(Cont.Midland.f, midland)
-        offset.add(Cont.Inland.f, inland)
+        offset.add(Cont.Midland.f, midland)
+        //offset.add(Cont.Inland.f, inland)
         return offset.build()
     }
 

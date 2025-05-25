@@ -8,15 +8,26 @@ import org.teamvoided.dusk_debris.DuskDebris.id
 object DuskDensityFunctions {
     val EXAMPLE = create("example")
 
-    val TEMPERATURE = create("parameters/temperature")
-    val HUMIDITY = create("parameters/humidity")
-    val CONTINENT_WIERD = create("parameters/continentalness_wierd")
-    val RIDGES_WEIRD = create("parameters/ridges_weird")
+    /**PARAMETER TYPES
+     *
+     * Base means basic noise, usually is just the vanilla files
+     *
+     * Router means manipulated for biome threshold noise, if no shaper is present use router for biome noise
+     *
+     * Shaper means manipulated for terrain shape
+     * */
+    val TEMPERATURE = create("parameters/base/temperature")
+    val HUMIDITY = create("parameters/base/humidity")
+    val CONTINENT_ROUTER = router("continentalness")
+    val EROSION_ROUTER = router("erosion")
+    val RIDGES_ROUTER = router("ridges")
+
     val DEPTH = create("parameters/depth")
-    val SLOPED_CHEESE = create("shapers/sloped_cheese")
     val OFFSET = create("shapers/offset")
     val JAGGEDNESS = create("shapers/jaggedness")
     val FACTOR = create("shapers/factor")
+    val EXTRA_OFFSET = create("shapers/offset_extra")
+    val SLOPED_CHEESE = create("shapers/sloped_cheese")
     val OVERWORLD_IDWJ = create("initial_density_without_jaggedness")
     val OVERWORLD_FINAL_DENSITY = create("final_density")
 
@@ -31,6 +42,9 @@ object DuskDensityFunctions {
     val UR_CONDITION = create("underground_rivers/picker")
     val UR_DENSITY = create("underground_rivers/density")
 
+    val STONE_TOWERS = create("stone_tower/range")
+    val STONE_TOWERS_TOWER = create("stone_tower/tower")
+    val STONE_TOWERS_MOUND = create("stone_tower/mound")
 
     val AQU_BARRIER = create("aquifer/barrier")
     val AQU_FLOODEDNESS = create("aquifer/floodedness")
@@ -93,6 +107,12 @@ object DuskDensityFunctions {
 
     private fun nether(id: String): RegistryKey<DensityFunction> =
         RegistryKey.of(RegistryKeys.DENSITY_FUNCTION, id("nether/$id"))
+
+    private fun router(id: String): RegistryKey<DensityFunction> =
+        RegistryKey.of(RegistryKeys.DENSITY_FUNCTION, id("parameters/router/$id"))
+
+    private fun shaper(id: String): RegistryKey<DensityFunction> =
+        RegistryKey.of(RegistryKeys.DENSITY_FUNCTION, id("parameters/shaper/$id"))
 
     private fun create(id: String): RegistryKey<DensityFunction> = RegistryKey.of(RegistryKeys.DENSITY_FUNCTION, id(id))
 }

@@ -13,7 +13,7 @@ import org.teamvoided.dusk_debris.world.gen.terrain_parameters.overworld.offset.
 object Offset {
     const val SEA_LEVEL = 63
     fun elev(inputY: Number): Float = addSL(inputY.toFloat() - SEA_LEVEL)
-    private fun addSL(inputY: Number): Float = inputY.toFloat() / 128f
+    private fun addSL(inputY: Number): Float = (inputY.toFloat() - 0.25f) / 128f
 
 
     fun <C, I : ToFloatFunction<C>> offsetEros(

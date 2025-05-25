@@ -20,11 +20,15 @@ object NoiseCreator {
         this.register(DuskNoiseParametersKeys.PLATEAU_TYPE, -8, 1, 1, 0, 1, 1)
         this.register(DuskNoiseParametersKeys.GRAND_CANYON, -8, 1, 3, 1)
 
-        this.register(DuskNoiseParametersKeys.FLATS_TYPE, -8, 1, 0, 1)
-        this.register(DuskNoiseParametersKeys.FLATS_ELEV, -7, 1)
+        this.register(DuskNoiseParametersKeys.FLATS_TYPE, -6, 1, 0, 1)
+        this.register(DuskNoiseParametersKeys.FLATS_ELEV, -5, 1)
 
         this.register(DuskNoiseParametersKeys.UR_TYPE, -7, 1)
         this.register(DuskNoiseParametersKeys.UR_HEIGHT, -6, 1, 1, 1)
+
+        this.register(DuskNoiseParametersKeys.STONE_TOWERS, -7, 1,1)
+        this.register(DuskNoiseParametersKeys.STONE_TOWERS_HEIGHT, -6, 1, 1, 1)
+        this.register(DuskNoiseParametersKeys.STONE_TOWERS_OFFSET, -7, 1)
     }
 
     private fun BootstrapContext<NoiseParameters>.nether() {
