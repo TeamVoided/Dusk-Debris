@@ -28,6 +28,12 @@ object PlacedFeatureCreator {
         c.netherPlacedFeatureCreators()
 
         c.register(
+            DuskPlacedFeatures.OAK_CHECHED,
+            DuskConfiguredFeatures.OAK,
+            PlacedFeatureUtil.createWouldSurvivePlacementModifier(Blocks.OAK_SAPLING)
+        )
+
+        c.register(
             DuskPlacedFeatures.CYPRESS,
             DuskConfiguredFeatures.SWAMP_CYPRESS,
             PlacedFeatureUtil.createWouldSurvivePlacementModifier(Blocks.OAK_SAPLING)

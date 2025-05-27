@@ -1,4 +1,4 @@
-package org.teamvoided.dusk_debris.world.gen.trunk
+package org.teamvoided.dusk_debris.world.gen.tree.trunk
 
 import com.google.common.collect.Lists
 import com.mojang.serialization.MapCodec

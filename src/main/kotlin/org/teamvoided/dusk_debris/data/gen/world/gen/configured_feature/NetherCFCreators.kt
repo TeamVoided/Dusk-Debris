@@ -25,7 +25,7 @@ import org.teamvoided.dusk_debris.init.worldgen.DuskFeatures
 import org.teamvoided.dusk_debris.world.gen.configured_feature.config.HugeNethershroomFeatureConfig
 import org.teamvoided.dusk_debris.world.gen.configured_feature.config.NoiseSurfaceFeatureConfig
 
-object NetherConfiguredFeatureCreators {
+object NetherCFCreators {
     fun BootstrapContext<ConfiguredFeature<*, *>>.netherConfiguredFeatureCreators() {
         this.nethershrooms()
         this.registerConfiguredFeature(

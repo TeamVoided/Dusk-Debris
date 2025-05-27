@@ -1,4 +1,4 @@
-package org.teamvoided.dusk_debris.world.gen.foliage
+package org.teamvoided.dusk_debris.world.gen.tree.foliage
 
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
@@ -10,7 +10,7 @@ import net.minecraft.world.gen.foliage.FoliagePlacer
 import net.minecraft.world.gen.foliage.FoliagePlacerType
 import org.teamvoided.dusk_debris.init.worldgen.trees.DuskTreeStuff
 
-class CypressFoliagePlacer(intProvider: IntProvider?, intProvider2: IntProvider?) :
+class CypressFoliagePlacer(intProvider: IntProvider, intProvider2: IntProvider) :
     FoliagePlacer(intProvider, intProvider2) {
     override fun getType(): FoliagePlacerType<*> {
         return DuskTreeStuff.CYPRESS_FOLIAGE_PLACER

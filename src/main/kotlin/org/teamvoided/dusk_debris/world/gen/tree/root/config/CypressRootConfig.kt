@@ -1,4 +1,4 @@
-package org.teamvoided.dusk_debris.world.gen.root.config
+package org.teamvoided.dusk_debris.world.gen.tree.root.config
 
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder

@@ -8,6 +8,9 @@ import org.teamvoided.dusk_debris.DuskDebris.id
 @Suppress("MemberVisibilityCanBePrivate")
 object DuskPlacedFeatures {
 
+    val OAK_CHECHED = create("tree/oak_checked")
+
+
     val CYPRESS = create("swamp/cypress")
     val TALL_CYPRESS = create("swamp/tall_cypress")
     val TREES_SWAMP = create("swamp/trees_swamp")

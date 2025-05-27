@@ -1,4 +1,4 @@
-package org.teamvoided.dusk_debris.world.gen.root
+package org.teamvoided.dusk_debris.world.gen.tree.root
 
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
@@ -17,7 +17,7 @@ import net.minecraft.world.gen.stateprovider.BlockStateProvider
 import org.teamvoided.dusk_debris.init.worldgen.trees.DuskTreeStuff
 import org.teamvoided.dusk_debris.util.isInSet
 import org.teamvoided.dusk_debris.util.isInTag
-import org.teamvoided.dusk_debris.world.gen.root.config.CypressRootConfig
+import org.teamvoided.dusk_debris.world.gen.tree.root.config.CypressRootConfig
 import java.util.*
 import java.util.function.BiConsumer
 

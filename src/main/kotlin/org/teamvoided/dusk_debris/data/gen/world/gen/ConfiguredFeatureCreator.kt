@@ -1,43 +1,27 @@
 package org.teamvoided.dusk_debris.data.gen.world.gen
 
-import com.google.common.collect.ImmutableList
 import net.minecraft.block.Block
-import net.minecraft.block.BlockState
 import net.minecraft.block.Blocks
-import net.minecraft.registry.*
-import net.minecraft.registry.tag.BlockTags
-import net.minecraft.unmapped.C_cxbmzbuz
-import net.minecraft.util.math.float_provider.UniformFloatProvider
+import net.minecraft.registry.BootstrapContext
+import net.minecraft.registry.Holder
+import net.minecraft.registry.RegistryKey
+import net.minecraft.registry.RegistryKeys
 import net.minecraft.util.math.int_provider.ConstantIntProvider
-import net.minecraft.util.math.int_provider.UniformIntProvider
-import net.minecraft.util.math.noise.DoublePerlinNoiseSampler.NoiseParameters
-import net.minecraft.world.gen.blockpredicate.BlockPredicate
 import net.minecraft.world.gen.feature.*
 import net.minecraft.world.gen.feature.size.TwoLayersFeatureSize
+import net.minecraft.world.gen.feature.util.ConfiguredFeatureUtil
 import net.minecraft.world.gen.feature.util.PlacedFeatureUtil
-import net.minecraft.world.gen.root.AboveRootPlacement
+import net.minecraft.world.gen.foliage.BlobFoliagePlacer
 import net.minecraft.world.gen.stateprovider.BlockStateProvider
-import net.minecraft.world.gen.stateprovider.NoiseBlockStateProvider
-import net.minecraft.world.gen.stateprovider.SimpleBlockStateProvider
-import net.minecraft.world.gen.treedecorator.LeavesVineTreeDecorator
-import net.minecraft.world.gen.treedecorator.TreeDecorator
 import net.minecraft.world.gen.trunk.StraightTrunkPlacer
-import org.teamvoided.dusk_debris.data.gen.world.gen.configured_feature.NetherConfiguredFeatureCreators.netherConfiguredFeatureCreators
-import org.teamvoided.dusk_debris.data.tags.DuskBlockTags
+import org.teamvoided.dusk_debris.data.gen.world.gen.configured_feature.NetherCFCreators.netherConfiguredFeatureCreators
+import org.teamvoided.dusk_debris.data.gen.world.gen.configured_feature.SwampCFCreators.swampConfiguredFeatureCreators
+import org.teamvoided.dusk_debris.data.gen.world.gen.configured_feature.TestCFCreators.testConfiguredFeatureCreators
 import org.teamvoided.dusk_debris.data.worldgen.DuskConfiguredFeatures
-import org.teamvoided.dusk_debris.data.worldgen.DuskPlacedFeatures
-import org.teamvoided.dusk_debris.init.DuskBlocks
 import org.teamvoided.dusk_debris.init.worldgen.DuskFeatures
 import org.teamvoided.dusk_debris.world.gen.configured_feature.ThresholdPlacedFeature
-import org.teamvoided.dusk_debris.world.gen.configured_feature.config.GlassSpikeFeatureConfig
 import org.teamvoided.dusk_debris.world.gen.configured_feature.config.NoiseFeatureConfig
-import org.teamvoided.dusk_debris.world.gen.configured_feature.config.TorusFeatureConfig
-import org.teamvoided.dusk_debris.world.gen.configured_feature.config.rock_spires.RockFormationFeatureConfig
-import org.teamvoided.dusk_debris.world.gen.configured_feature.config.rock_spires.SurfaceFormationFeatureConfig
-import org.teamvoided.dusk_debris.world.gen.foliage.CypressFoliagePlacer
-import org.teamvoided.dusk_debris.world.gen.root.CypressRootPlacer
-import org.teamvoided.dusk_debris.world.gen.root.config.CypressRootConfig
-import java.util.*
+import org.teamvoided.dusk_debris.world.gen.tree.foliage.OakFoliagePlacer
 
 @Suppress("DEPRECATION")
 object ConfiguredFeatureCreator {
@@ -47,142 +31,21 @@ object ConfiguredFeatureCreator {
         val placedFeatures = c.getRegistryLookup(RegistryKeys.PLACED_FEATURE)
         val block = c.getRegistryLookup(RegistryKeys.BLOCK)
         c.netherConfiguredFeatureCreators()
-
+        c.swampConfiguredFeatureCreators()
+        c.testConfiguredFeatureCreators()
 
         c.registerConfiguredFeature(
-            DuskConfiguredFeatures.DISK_MUD, Feature.DISK, DiskFeatureConfig(
-                C_cxbmzbuz.method_43312(Blocks.CLAY), BlockPredicate.matchingBlocks(listOf(Blocks.DIRT, Blocks.MUD)),
-                UniformIntProvider.create(2, 6),
-                2
-            )
-        )
-
-        val cypressLog = BlockStateProvider.of(DuskBlocks.CYPRESS_LOG)
-        val cypressRoots = CypressRootPlacer(
-            UniformIntProvider.create(1, 3),
-            BlockStateProvider.of(Blocks.MANGROVE_ROOTS),
-            Optional.of<AboveRootPlacement>(
-                AboveRootPlacement(
-                    BlockStateProvider.of(Blocks.MOSS_CARPET),
-                    0.5f
-                )
-            ),
-            CypressRootConfig(
-                block.getTagOrThrow(BlockTags.MANGROVE_ROOTS_CAN_GROW_THROUGH),
-                HolderSet.createDirect(
-                    { obj: Block -> obj.builtInRegistryHolder },
-                    *arrayOf<Block>(Blocks.MUD, Blocks.MUDDY_MANGROVE_ROOTS)
-                ),
-                BlockStateProvider.of(Blocks.MUDDY_MANGROVE_ROOTS),
-                8,
-                15,
-                0.2f
-            )
-        )
-        c.registerConfiguredFeature(
-            DuskConfiguredFeatures.SWAMP_CYPRESS,
+            DuskConfiguredFeatures.OAK,
             Feature.TREE,
             TreeFeatureConfig.Builder(
-                cypressLog,
-                StraightTrunkPlacer(5, 3, 3),
-                BlockStateProvider.of(DuskBlocks.CYPRESS_LEAVES),
-                CypressFoliagePlacer(ConstantIntProvider.create(3), ConstantIntProvider.create(0)),
-                Optional.of(
-                    cypressRoots
-                ),
+                BlockStateProvider.of(Blocks.OAK_LOG),
+                StraightTrunkPlacer(6, 0, 0),
+                BlockStateProvider.of(Blocks.OAK_LEAVES),
+                OakFoliagePlacer(3, 0),
                 TwoLayersFeatureSize(1, 0, 1)
-            ).dirtProvider(cypressLog).ignoreVines().decorators(
-                ImmutableList.of<TreeDecorator>(LeavesVineTreeDecorator(0.25f))
-            ).build()
-        )
-        c.registerConfiguredFeature(
-            DuskConfiguredFeatures.TALL_SWAMP_CYPRESS,
-            Feature.TREE,
-            TreeFeatureConfig.Builder(
-                cypressLog,
-                StraightTrunkPlacer(7, 5, 4),
-                BlockStateProvider.of(DuskBlocks.CYPRESS_LEAVES),
-                CypressFoliagePlacer(ConstantIntProvider.create(3), ConstantIntProvider.create(0)),
-                Optional.of(
-                    cypressRoots
-                ),
-                TwoLayersFeatureSize(1, 0, 1)
-            ).dirtProvider(cypressLog).ignoreVines().decorators(
-                ImmutableList.of<TreeDecorator>(LeavesVineTreeDecorator(0.25f))
-            ).build()
-        )
-        c.registerConfiguredFeature(
-            DuskConfiguredFeatures.TREES_SWAMP, Feature.RANDOM_SELECTOR, RandomFeatureConfig(
-                listOf(
-                    WeightedPlacedFeature(
-                        placedFeatures.getHolderOrThrow(DuskPlacedFeatures.TALL_CYPRESS),
-                        0.85f
-                    )
-                ), placedFeatures.getHolderOrThrow(DuskPlacedFeatures.CYPRESS)
-            )
+            ).ignoreVines().build()
         )
 
-
-
-
-
-        c.registerConfiguredFeature(
-            DuskConfiguredFeatures.GLASS_SPIKE,
-            DuskFeatures.GLASS_SPIKE,
-            GlassSpikeFeatureConfig(
-                BlockStateProvider.of(
-                    Blocks.TINTED_GLASS.defaultState
-                ),
-                BlockTags.REPLACEABLE,
-                UniformIntProvider.create(-3, 3),
-                UniformIntProvider.create(0, 10),
-                UniformIntProvider.create(3, 4),
-                UniformIntProvider.create(1, 2),
-                -16,
-                16,
-                0.05
-            )
-        )
-        c.registerConfiguredFeature(
-            DuskConfiguredFeatures.TORUS,
-            DuskFeatures.TORUS,
-            TorusFeatureConfig(
-                BlockStateProvider.of(
-                    DuskBlocks.CRYSTAL_BLOCK.defaultState
-                ),
-                BlockTags.REPLACEABLE,
-                UniformIntProvider.create(4, 13),
-                UniformIntProvider.create(2, 6),
-                UniformIntProvider.create(2, 6),
-                UniformFloatProvider.create(0f, 1f),
-                UniformFloatProvider.create(0f, 1f),
-                UniformFloatProvider.create(0.5f, 1.5f)
-            )
-        )
-        c.createOverworldTorus(
-            DuskConfiguredFeatures.COBBLESTONE_TORUS,
-            NoiseBlockStateProvider(
-                6789L,
-                NoiseParameters(0, 1.0, *DoubleArray(0)),
-                0.5f,
-                listOf<BlockState>(
-                    Blocks.COBBLESTONE.defaultState,
-                    Blocks.MOSSY_COBBLESTONE.defaultState
-                )
-            )
-        )
-        c.createOverworldTorus(
-            DuskConfiguredFeatures.STONE_TORUS,
-            BlockStateProvider.of(Blocks.STONE)
-        )
-        c.registerConfiguredFeature(
-            DuskConfiguredFeatures.OVERWORLD_TORUS,
-            Feature.RANDOM_BOOLEAN_SELECTOR,
-            RandomBooleanFeatureConfig(
-                c.emptyPlaceInLine(DuskConfiguredFeatures.COBBLESTONE_TORUS),
-                c.emptyPlaceInLine(DuskConfiguredFeatures.STONE_TORUS),
-            )
-        )
 
         c.registerConfiguredFeature(
             DuskConfiguredFeatures.BOREAL_VALLEY_VEGETATION,
@@ -208,49 +71,7 @@ object ConfiguredFeatureCreator {
             DuskFeatures.SEQUOIA_TREE,
             DefaultFeatureConfig()
         )
-        c.registerConfiguredFeature(
-            DuskConfiguredFeatures.ROCK_SPIRE,
-            DuskFeatures.ROCK_SPIRE,
-            spire
-        )
-        c.registerConfiguredFeature(
-            DuskConfiguredFeatures.LARGE_ROCK_SPIRE,
-            DuskFeatures.ROCK_SPIRE,
-            spire_large
-        )
-        c.registerConfiguredFeature(
-            DuskConfiguredFeatures.GRASS_SPIRE,
-            DuskFeatures.SURFACE_SPIRE,
-            SurfaceFormationFeatureConfig(
-                SimpleBlockStateProvider.of(Blocks.GRASS_BLOCK),
-                SimpleBlockStateProvider.of(Blocks.DIRT),
-                spire
-            )
-        )
-        c.registerConfiguredFeature(
-            DuskConfiguredFeatures.LARGE_GRASS_SPIRE,
-            DuskFeatures.SURFACE_SPIRE,
-            SurfaceFormationFeatureConfig(
-                SimpleBlockStateProvider.of(Blocks.GRASS_BLOCK),
-                SimpleBlockStateProvider.of(Blocks.DIRT),
-                spire_large
-            )
-        )
     }
-
-    private val spire = RockFormationFeatureConfig(
-        DuskBlockTags.GROUND_AND_REPLACEABLE,
-        UniformIntProvider.create(16, 80),
-        UniformIntProvider.create(7, 16),
-        UniformFloatProvider.create(1f, 3f)
-    )
-
-    private val spire_large = RockFormationFeatureConfig(
-        DuskBlockTags.GROUND_AND_REPLACEABLE,
-        UniformIntProvider.create(48, 120),
-        UniformIntProvider.create(17, 24),
-        UniformFloatProvider.create(1f, 3f)
-    )
 
     fun BootstrapContext<ConfiguredFeature<*, *>>.emptyPlaceInLine(registryKey: RegistryKey<ConfiguredFeature<*, *>>): Holder<PlacedFeature> {
         return PlacedFeatureUtil.placedInline(
@@ -259,25 +80,25 @@ object ConfiguredFeatureCreator {
         )
     }
 
-    fun BootstrapContext<ConfiguredFeature<*, *>>.createOverworldTorus(
-        registryKey: RegistryKey<ConfiguredFeature<*, *>>,
-        blockStateProvider: BlockStateProvider
-    ) {
-        this.registerConfiguredFeature(
-            registryKey,
-            DuskFeatures.TORUS,
-            TorusFeatureConfig(
-                blockStateProvider,
-                BlockTags.REPLACEABLE,
-                UniformIntProvider.create(4, 13),
-                UniformIntProvider.create(2, 6),
-                UniformIntProvider.create(2, 6),
-                UniformFloatProvider.create(0.175f, 0.325f),
-                UniformFloatProvider.create(0f, 1f),
-                UniformFloatProvider.create(0.5f, 1.5f)
-            )
+    private fun tree(
+        trunk: Block,
+        foliage: Block,
+        baseHeight: Int,
+        firstRandomHeight: Int,
+        secondRandomHeight: Int,
+        foliageRadius: Int
+    ): TreeFeatureConfig.Builder {
+        return TreeFeatureConfig.Builder(
+            BlockStateProvider.of(trunk),
+            StraightTrunkPlacer(baseHeight, firstRandomHeight, secondRandomHeight),
+            BlockStateProvider.of(foliage),
+            BlobFoliagePlacer(
+                ConstantIntProvider.create(foliageRadius), ConstantIntProvider.create(0), 3
+            ),
+            TwoLayersFeatureSize(1, 0, 1)
         )
     }
+
 
     fun <FC : FeatureConfig, F : Feature<FC>> BootstrapContext<ConfiguredFeature<*, *>>.registerConfiguredFeature(
         registryKey: RegistryKey<ConfiguredFeature<*, *>>,
