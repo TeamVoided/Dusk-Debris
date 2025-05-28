@@ -29,13 +29,61 @@ class BirchFoliagePlacer(radius: IntProvider, offset: IntProvider) : FoliageHelp
     ) {
         val blockPos = node.center.up(offset)
         val isBig = node.isGiantTrunk
-        this.genSquareRandomNoCorners(world, placer, random, config, blockPos, isBig, -4, 2)
-
-
-        this.genSquareRoundedRand(world, placer, random, config, blockPos, isBig, -4, 1, 1.0)
+        this.genSquareRandomNoCorners(world, placer, random, config, blockPos, isBig, -4, 1)
+        this.birch1(world, placer, random, config, blockPos, isBig, -3, 2)
+        this.birch2(world, placer, random, config, blockPos, isBig, -2, 2, 1, 2)
+        this.birch2(world, placer, random, config, blockPos, isBig, -1, 2, 2)
+        this.birch3(world, placer, random, config, blockPos, isBig, 0, 2)
+        this.genSquareNoCorners(world, placer, random, config, blockPos, isBig, 1, 1)
+        if (radius > 1)
+            this.genSquare(world, placer, random, config, blockPos, isBig, 2, 0)
     }
 
-    private fun innerRandom(
+    //random inner diamond
+    private fun birch1(
+        world: TestableWorld,
+        place: Placer,
+        random: RandomGenerator,
+        config: TreeFeatureConfig,
+        centerPos: BlockPos,
+        isEven: Boolean,
+        y: Int,
+        radius: Int,
+        chanceLeafs: Int = 1
+    ) = genShapeAbsInputs(world, place, random, config, centerPos, isEven, y, radius)
+    { dx, dz ->
+        val xz = dx + dz
+        val rad = radius * 2 - 1
+        if (xz <= rad) {
+            if (xz == rad - chanceLeafs)
+                random.nextInt(2) == 0
+            else true
+        } else false
+    }
+
+    private fun birch2(
+        world: TestableWorld,
+        place: Placer,
+        random: RandomGenerator,
+        config: TreeFeatureConfig,
+        centerPos: BlockPos,
+        isEven: Boolean,
+        y: Int,
+        radius: Int,
+        rounding: Int = 1,
+        randLeafsRound: Int = 1
+    ) = genShapeAbsInputs(world, place, random, config, centerPos, isEven, y, radius)
+    { dx, dz ->
+        val xz = dx + dz
+        val rad = radius * 2 - rounding
+        if (xz <= rad) {
+            if (xz <= rad - randLeafsRound)
+                random.nextInt(2) == 0
+            else true
+        } else false
+    }
+
+    private fun birch3(
         world: TestableWorld,
         place: Placer,
         random: RandomGenerator,
@@ -45,7 +93,13 @@ class BirchFoliagePlacer(radius: IntProvider, offset: IntProvider) : FoliageHelp
         y: Int,
         radius: Int,
     ) = genShapeAbsInputs(world, place, random, config, centerPos, isEven, y, radius)
-    { dx, dz -> !(dx == radius && dz == radius) }
+    { dx, dz ->
+        if (dx + dz <= radius * 2 - 2) {
+            if (dx == dz && dx != 0)
+                random.nextInt(2) == 0
+            else true
+        } else false
+    }
 
     override fun getRandomHeight(random: RandomGenerator, trunkHeight: Int, config: TreeFeatureConfig): Int = 0
 

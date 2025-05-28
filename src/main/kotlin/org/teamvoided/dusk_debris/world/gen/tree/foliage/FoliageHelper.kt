@@ -48,16 +48,16 @@ abstract class FoliageHelper(radius: IntProvider, offset: IntProvider) : Foliage
         isEven: Boolean,
         y: Int,
         radius: Int,
+        randChance: Float = 0.5f,
         rounding: Double = 2.0,
         randRange: Double = 1.0,
-        randChance: Int = 2,
     ) = genShapeAbsInputs(world, place, random, config, centerPos, isEven, y, radius)
     { dx, dz ->
         val xz = dx + dz
         val rad = radius * 2 - rounding
         if (xz <= rad) {
             if (xz > rad - randRange)
-                random.nextInt(randChance) == 0
+                random.nextFloat() > randChance
             else true
         } else false
     }

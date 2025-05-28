@@ -29,15 +29,18 @@ class OakFoliagePlacer(radius: IntProvider, offset: IntProvider) : FoliageHelper
         val blockPos = node.center.up(offset)
         val isBig = node.isGiantTrunk
         if (!isBig) {
-            this.genSquareRoundedRand(world, placer, random, config, blockPos, false, -4, 1, 1.0)
-            this.genSquareRounded(world, placer, random, config, blockPos, false, -3, 3)
-            this.genSquareRoundedRand(world, placer, random, config, blockPos, false, -2, 3, 1.0)
-            this.genSquareRoundedRand(world, placer, random, config, blockPos, false, -1, 3)
-            this.genSquareRoundedRandEdge(world, placer, random, config, blockPos, false, 0, 3, 3.0)
-            this.genSquareRoundedRand(world, placer, random, config, blockPos, false, 1, 2, 1.0)
-            this.genSquareRoundedRand(world, placer, random, config, blockPos, false, 2, 1, 1.0)
+            val twoThird = 0.3f
+
+            this.genSquareRoundedRand(world, placer, random, config, blockPos, false, -4, radius - 2, twoThird, 1.0)
+            this.genSquareRounded(world, placer, random, config, blockPos, false, -3, radius)
+            this.genSquareRoundedRand(world, placer, random, config, blockPos, false, -2, radius, twoThird, 1.0)
+            this.genSquareRoundedRand(world, placer, random, config, blockPos, false, -1, radius, twoThird)
+            this.genSquareRoundedRandEdge(world, placer, random, config, blockPos, false, 0, radius, 3.0)
+            this.genSquareRoundedRand(world, placer, random, config, blockPos, false, 1, radius - 1, twoThird, 1.0)
+            this.genSquareRoundedRand(world, placer, random, config, blockPos, false, 2, radius - 2, twoThird, 1.0)
         } else {
-            this.genSquareRoundedRand(world, placer, random, config, blockPos, true, 0, 5)
+            val twoThird = 0.3f
+            this.genSquareRoundedRand(world, placer, random, config, blockPos, true, 0, 5, twoThird)
         }
     }
 

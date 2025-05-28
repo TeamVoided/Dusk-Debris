@@ -6,6 +6,8 @@ import net.minecraft.registry.BootstrapContext
 import net.minecraft.registry.Holder
 import net.minecraft.registry.RegistryKey
 import net.minecraft.registry.RegistryKeys
+import net.minecraft.state.property.Properties
+import net.minecraft.util.math.Direction
 import net.minecraft.util.math.int_provider.ConstantIntProvider
 import net.minecraft.world.gen.feature.*
 import net.minecraft.world.gen.feature.size.TwoLayersFeatureSize
@@ -13,6 +15,7 @@ import net.minecraft.world.gen.feature.util.ConfiguredFeatureUtil
 import net.minecraft.world.gen.feature.util.PlacedFeatureUtil
 import net.minecraft.world.gen.foliage.BlobFoliagePlacer
 import net.minecraft.world.gen.stateprovider.BlockStateProvider
+import net.minecraft.world.gen.treedecorator.TreeDecorator
 import net.minecraft.world.gen.trunk.StraightTrunkPlacer
 import org.teamvoided.dusk_debris.data.gen.world.gen.configured_feature.NetherCFCreators.netherConfiguredFeatureCreators
 import org.teamvoided.dusk_debris.data.gen.world.gen.configured_feature.SwampCFCreators.swampConfiguredFeatureCreators
@@ -21,6 +24,8 @@ import org.teamvoided.dusk_debris.data.worldgen.DuskConfiguredFeatures
 import org.teamvoided.dusk_debris.init.worldgen.DuskFeatures
 import org.teamvoided.dusk_debris.world.gen.configured_feature.ThresholdPlacedFeature
 import org.teamvoided.dusk_debris.world.gen.configured_feature.config.NoiseFeatureConfig
+import org.teamvoided.dusk_debris.world.gen.tree.decorator.AttachedToTrunkTreeDecorator
+import org.teamvoided.dusk_debris.world.gen.tree.foliage.BirchFoliagePlacer
 import org.teamvoided.dusk_debris.world.gen.tree.foliage.OakFoliagePlacer
 
 @Suppress("DEPRECATION")
@@ -39,11 +44,22 @@ object ConfiguredFeatureCreator {
             Feature.TREE,
             TreeFeatureConfig.Builder(
                 BlockStateProvider.of(Blocks.OAK_LOG),
-                StraightTrunkPlacer(6, 0, 0),
+                StraightTrunkPlacer(5, 1, 2),
                 BlockStateProvider.of(Blocks.OAK_LEAVES),
                 OakFoliagePlacer(3, 0),
                 TwoLayersFeatureSize(1, 0, 1)
-            ).ignoreVines().build()
+            ).ignoreVines().decorators(logsOnTrunk(Blocks.OAK_LOG)).build()
+        )
+        c.registerConfiguredFeature(
+            DuskConfiguredFeatures.BIRCH,
+            Feature.TREE,
+            TreeFeatureConfig.Builder(
+                BlockStateProvider.of(Blocks.BIRCH_LOG),
+                StraightTrunkPlacer(8, 0, 0),
+                BlockStateProvider.of(Blocks.BIRCH_LEAVES),
+                BirchFoliagePlacer(3, 0),
+                TwoLayersFeatureSize(1, 0, 1)
+            ).ignoreVines().decorators(logsOnTrunk(Blocks.BIRCH_LOG)).build()
         )
 
 
@@ -52,7 +68,7 @@ object ConfiguredFeatureCreator {
             DuskFeatures.RANDOM_NOISE_SELECTOR,
             NoiseFeatureConfig(
                 -6,
-                listOf(1.25, 2.0, 0.0, -2.0),
+                listOf(1.25, 2.0, 0.0, 2.0),
                 listOf(
                     ThresholdPlacedFeature(
                         placedFeatures.getHolderOrThrow(TreePlacedFeatures.MEGA_SPRUCE_CHECKED),
@@ -70,6 +86,21 @@ object ConfiguredFeatureCreator {
             DuskConfiguredFeatures.SEQUOIA_TREE,
             DuskFeatures.SEQUOIA_TREE,
             DefaultFeatureConfig()
+        )
+    }
+
+    private fun logsOnTrunk(block: Block, probability: Float = 0.15f): List<TreeDecorator> {
+        return listOf(
+            AttachedToTrunkTreeDecorator(
+                probability,
+                BlockStateProvider.of(block.defaultState.with(Properties.AXIS, Direction.Axis.Z)),
+                listOf(Direction.NORTH, Direction.SOUTH)
+            ),
+            AttachedToTrunkTreeDecorator(
+                probability,
+                BlockStateProvider.of(block.defaultState.with(Properties.AXIS, Direction.Axis.X)),
+                listOf(Direction.EAST, Direction.WEST)
+            )
         )
     }
 
