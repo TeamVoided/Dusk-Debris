@@ -1097,6 +1097,8 @@ object DuskBlocks {
     // endregion
 
 
+    val STATUE = register("statue", StatueBlock(copy(STONE)))
+
     fun init() {
         DuskBlockSetType.init()
         StrippableBlockRegistry.register(CHARRED_LOG, STRIPPED_CHARRED_LOG)

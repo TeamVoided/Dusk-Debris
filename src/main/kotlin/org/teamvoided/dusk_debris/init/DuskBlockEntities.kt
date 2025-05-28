@@ -9,6 +9,7 @@ import net.minecraft.util.Util
 import org.teamvoided.dusk_debris.DuskDebris.id
 import org.teamvoided.dusk_debris.block.entity.BunnyGraveBlockEntity
 import org.teamvoided.dusk_debris.block.entity.DuskChestBlockEntity
+import org.teamvoided.dusk_debris.block.entity.StatueBlockEntity
 import org.teamvoided.dusk_debris.block.entity.TreasureChestBlockEntity
 import org.teamvoided.dusks_and_dungeons.block.entity.*
 
@@ -35,7 +36,7 @@ object DuskBlockEntities {
             //DuskBlocks.STONE_CHEST
         )
     )
-    
+
     // DnD
     val CELESTAL_BELL: BlockEntityType<CelestalBellBlockEntity> =
         register("celestal_bell", BlockEntityType.Builder.create(::CelestalBellBlockEntity, DuskBlocks.CELESTAL_BELL))
@@ -68,6 +69,10 @@ object DuskBlockEntities {
             DuskBlocks.HAUNTED_BLACKSTONE_GRAVESTONE,
             DuskBlocks.SMALL_HAUNTED_BLACKSTONE_GRAVESTONE
         )
+    )
+
+    val STATUE: BlockEntityType<StatueBlockEntity> = register(
+        "statue", BlockEntityType.Builder.create(::StatueBlockEntity, DuskBlocks.STATUE)
     )
 
 
