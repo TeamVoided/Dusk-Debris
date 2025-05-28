@@ -11,6 +11,7 @@ object DuskConfiguredFeatures {
     val OAK = create("tree/oak")
     val BIRCH = create("tree/birch")
     val BIRCH_TALL = create("tree/birch_tall")
+    val ROCK = create("rock")
 
 
 

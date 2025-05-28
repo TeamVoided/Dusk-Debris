@@ -31,6 +31,8 @@ object DuskFeatures {
 
     val NOISE_SURFACE = register("noise_surface", NoiseSurfaceFeature(NoiseSurfaceFeatureConfig.CODEC))
 
+    val ROCK = register("rock", RockFeature(DefaultFeatureConfig.CODEC))
+
     fun init() {}
 
     private fun <C : FeatureConfig, F : Feature<C>> register(name: String, feature: F): F =

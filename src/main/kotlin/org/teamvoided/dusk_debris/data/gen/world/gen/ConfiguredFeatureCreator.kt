@@ -61,6 +61,10 @@ object ConfiguredFeatureCreator {
                 TwoLayersFeatureSize(1, 0, 1)
             ).ignoreVines().decorators(logsOnTrunk(Blocks.BIRCH_LOG)).build()
         )
+        c.registerConfiguredFeature(
+            DuskConfiguredFeatures.ROCK,
+            DuskFeatures.ROCK
+        )
 
 
         c.registerConfiguredFeature(

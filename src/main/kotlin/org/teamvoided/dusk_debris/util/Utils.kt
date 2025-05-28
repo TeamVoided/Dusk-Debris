@@ -7,19 +7,20 @@ import net.minecraft.loot.function.SetCountLootFunction
 import net.minecraft.loot.provider.number.ConstantLootNumberProvider
 import net.minecraft.loot.provider.number.UniformLootNumberProvider
 import net.minecraft.util.math.BlockPos
+import net.minecraft.util.math.MathHelper
 import net.minecraft.util.math.Vec3d
 import net.minecraft.util.math.Vec3i
 import net.minecraft.world.StructureWorldAccess
 import java.util.function.BiConsumer
 
 object Utils {
-    const val PI = 3.1415927f
+    const val PI = MathHelper.PI
     const val DEG_TO_RAD = 0.017453292f
     const val RAD_TO_DEG = 57.295776f
     const val rotate30 = PI / 6f
     const val rotate45 = PI / 4f
     const val rotate60 = PI / 3f
-    const val rotate90 = PI / 2f
+    const val rotate90 = MathHelper.HALF_PI
     const val rotate120 = rotate90 + rotate30
     const val rotate135 = rotate90 + rotate45
     const val rotate150 = rotate90 + rotate60
@@ -31,7 +32,7 @@ object Utils {
     const val rotate300 = rotate270 + rotate30
     const val rotate315 = rotate270 + rotate45
     const val rotate330 = rotate270 + rotate60
-    const val rotate360 = PI * 2f
+    const val rotate360 = MathHelper.TAU
 
     fun setCount(x: Number, y: Number) = SetCountLootFunction.builder(uniformNum(x, y))
 
