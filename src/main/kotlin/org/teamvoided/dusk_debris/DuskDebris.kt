@@ -43,6 +43,7 @@ object DuskDebris {
 
         DuskCommands.init()
         DuskComponents.init()
+        DuskNet.init()
 
         InitializeFabricEvents()
     }

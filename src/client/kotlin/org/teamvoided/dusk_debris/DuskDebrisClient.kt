@@ -1,17 +1,13 @@
 package org.teamvoided.dusk_debris
 
 import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRendererRegistrationCallback
-import net.fabricmc.fabric.api.resource.ResourceManagerHelper
-import net.minecraft.client.render.CameraSubmersionType
 import net.minecraft.client.render.entity.SnifferEntityRenderer
 import net.minecraft.entity.EntityType
-import net.minecraft.resource.ResourceType
-import net.minecraft.util.math.Vec3d
 import org.teamvoided.dusk_debris.DuskDebris.log
 import org.teamvoided.dusk_debris.entity.DuskEntityModelLayers
 import org.teamvoided.dusk_debris.entity.variant.SnifferOverlayFeatureRenderer
 import org.teamvoided.dusk_debris.init.*
-import org.teamvoided.dusk_debris.resource.WaterColormapResourceSupplier
+import org.teamvoided.dusk_debris.net.DuskNetClient
 
 @Suppress("unused")
 object DuskDebrisClient {
@@ -25,6 +21,7 @@ object DuskDebrisClient {
         DuskParticlesClient.init()
         DuskEntitiesClient.init()
         DuskBlockEntitiesClient.init()
+        DuskNetClient.init()
 
         LivingEntityFeatureRendererRegistrationCallback.EVENT.register { entityType, entityRenderer, registrationHelper, context ->
             if (entityType != EntityType.SNIFFER) return@register

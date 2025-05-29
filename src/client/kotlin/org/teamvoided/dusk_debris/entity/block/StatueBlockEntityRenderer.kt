@@ -21,12 +21,14 @@ class StatueBlockEntityRenderer(
         overlay: Int,
     ) {
         val world = blockEntity.world
+        val entity = blockEntity.entityType.create(world) ?: return
         matrices.push()
         matrices.translate(0.5, 1.0, 0.5)
-        val entity = blockEntity.entityType.create(world)
-        entity?.age = 0
-
-        entityRenderer.render(entity, 0.0, 0.0, 0.0, 0f, 0f, matrices, vertexConsumers, 255)
+        entityRenderer.render(
+            entity, 0.0, 0.0, 0.0,
+            0f, 0f, matrices, vertexConsumers,
+            255
+        )
         matrices.pop()
     }
 }
