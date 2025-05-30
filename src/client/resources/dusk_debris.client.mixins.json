@@ -14,13 +14,10 @@
     "fluid_tag.water.BubbleParticleMixin",
     "fluid_tag.water.CurrentDownParticleMixin",
     "pixel_accurate.SignBlockEntityRendererMixin",
-    "pixel_accurate.SignEditScreenMixin"
+    "pixel_accurate.SignEditScreenMixin",
+    "HeldItemFeatureRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1
-  },
-  "mixins": [
-    "CameraSubmersionTypeMixin",
-    "HeldItemFeatureRendererMixin"
-  ]
+  }
 }

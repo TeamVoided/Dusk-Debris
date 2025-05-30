@@ -17,8 +17,8 @@ import org.teamvoided.dusk_debris.block.voided.sign.VoidWallSignBlock
 import org.teamvoided.dusk_debris.init.DuskBlocks.register
 
 val bonewoodSound = BlockSoundGroup(
-    1.0F,
-    0.8F,
+    1f,
+    0.8f,
     SoundEvents.BLOCK_BONE_BLOCK_BREAK,
     SoundEvents.BLOCK_BONE_BLOCK_STEP,
     SoundEvents.BLOCK_BONE_BLOCK_PLACE,
@@ -26,8 +26,8 @@ val bonewoodSound = BlockSoundGroup(
     SoundEvents.BLOCK_BONE_BLOCK_FALL
 )
 val witheringBonewoodSound = BlockSoundGroup(
-    1.0F,
-    0.0F,
+    1f,
+    0f,
     SoundEvents.BLOCK_BONE_BLOCK_BREAK,
     SoundEvents.BLOCK_BONE_BLOCK_STEP,
     SoundEvents.BLOCK_BONE_BLOCK_PLACE,

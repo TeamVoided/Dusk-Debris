@@ -28,8 +28,8 @@ class WindParticle(
     private var prevRotation = 0f
     private var pitch = 0f
     private var prevPitch = 0f
-    private var rotationOffset = 0.0f
-    private var rotationMultiplier = 0.0f
+    private var rotationOffset = 0f
+    private var rotationMultiplier = 0f
 
     init {
         this.scale = world.random.nextFloat() * 0.2f + 0.1f
@@ -65,10 +65,6 @@ class WindParticle(
         this.method_60373(vertexConsumer, camera, quaternionf, tickDelta)
         quaternionf.rotationY(-3.1415927f + rotation).rotateX(pitch).rotateY(rotateY)
         this.method_60373(vertexConsumer, camera, quaternionf, tickDelta)
-    }
-
-    override fun getBrightness(tint: Float): Int {
-        return 240
     }
 
     override fun getType(): ParticleTextureSheet = ParticleTextureSheet.PARTICLE_SHEET_TRANSLUCENT
