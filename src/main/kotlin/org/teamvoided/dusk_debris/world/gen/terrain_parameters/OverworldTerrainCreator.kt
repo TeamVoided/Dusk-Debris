@@ -2,9 +2,12 @@ package org.teamvoided.dusk_debris.world.gen.terrain_parameters
 
 import net.minecraft.util.function.ToFloatFunction
 import net.minecraft.util.math.Spline
+import net.minecraft.world.biome.source.util.MultiNoiseUtil
+import net.minecraft.world.gen.noise.NoiseRouterData
 import org.teamvoided.dusk_debris.util.world_helper.add
 import org.teamvoided.dusk_debris.world.gen.terrain_parameters.overworld.Offset
 import org.teamvoided.dusk_debris.world.gen.terrain_parameters.overworld.offset.Plateaus
+import kotlin.math.abs
 
 object OverworldTerrainCreator {
     private var NO_TRANSFORM: ToFloatFunction<Float> = ToFloatFunction.IDENTITY
@@ -49,20 +52,20 @@ object OverworldTerrainCreator {
      * - 0.4 - Midland, baseline terrain
      * - 1 - Inland, tallest points
      **/
-    enum class Cont(val f: Float) {
-        MushroomIsland(-1.2f),
-        MushroomShore2(-1.11f),
-        MushroomShore1(-1.1f),
-        DeepestOcean(-1.02f),
-        DeepOcean(-0.7f),
-        Ocean(-0.3f),
-        Coast1(-0.11f),
-        Coast2(-0.1f),
-        Shoreline1(0.1f),
-        Shoreline2(0.11f),
-        Outland(0.2f),
-        Midland(0.4f),
-        Inland(1f);
+    enum class Cont(val f: Float, val string: String = "no name given, continentalness: $f") {
+        MushroomIsland(-1.2f, "Mushroom Island"),
+        MushroomShore2(-1.11f, "Mushroom Inner Shore"),
+        MushroomShore1(-1.1f, "Mushroom Outer Shore"),
+        DeepestOcean(-1.02f, "Deepest Ocean"),
+        DeepOcean(-0.7f, "Deep Ocean"),
+        Ocean(-0.3f, "Ocean"),
+        Coast1(-0.11f, "Outer Ocean or Shore"),
+        Coast2(-0.1f, "Inner Ocean or Shore"),
+        Shoreline1(0.1f, "Outer Shore"),
+        Shoreline2(0.11f, "Inner Shore"),
+        Outland(0.2f, "Outland"),
+        Midland(0.4f, "Midland"),
+        Inland(1f, "Inland");
     }
 
     /** VANILLA EROSION VALUES
@@ -81,7 +84,7 @@ object OverworldTerrainCreator {
      * - 0.7 Swamps
      **/
 
-    enum class Eros(val f: Float) {
+    enum class Eros(val f: Float, val string: String = "no name given, erosion: $f") {
         TallMountain(-0.85f),
         Mountain(-0.7f),
         MountainShort(-0.4f),
@@ -188,4 +191,33 @@ object OverworldTerrainCreator {
         val flatsElev: I,
         var amplifier: ToFloatFunction<Float> = NO_TRANSFORM
     )
+
+
+    fun getContinentalnessDescriptionDF(cont: Double): String {
+        Cont.entries.forEach { if (cont < it.f) return it.string }
+        return "value not assigned, Continentalness: $cont"
+    }
+
+    fun getPeaksAndValleysDescriptionDF(ridges: Double): String {
+        val type = if (ridges > 1) "Rare"
+        else if (ridges < -1) "Weird"
+        else if (ridges < 0) "Alternative"
+        else "Regular"
+
+        val ridges0 = abs(ridges) % 1.0
+        val ridge = if (ridges0 < getPeaksAndValleys(0.05f)) "Valley"
+        else if (ridges0 < getPeaksAndValleys(0.26666665f)) "Low"
+        else if (ridges0 < getPeaksAndValleys(0.4f)) "Mid"
+        else if (ridges0 < getPeaksAndValleys(0.56666666f)) "High"
+        else "Peak"
+
+        return "$type $ridge"
+
+
+        // (x*3)/2
+    }
+
+    private fun getPeaksAndValleys(ridges: Float): Float {
+        return (ridges * 3f) / 2f //(-(abs(abs(ridges) - 0.6666667f) - 0.33333334f) * 3f)
+    }
 }

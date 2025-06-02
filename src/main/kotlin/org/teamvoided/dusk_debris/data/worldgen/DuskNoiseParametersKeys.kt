@@ -16,8 +16,11 @@ object DuskNoiseParametersKeys {
     val FLATS_TYPE = create("flats/type")
     val FLATS_ELEV = create("flats/elev")
 
-    val UR_TYPE = create("underground_river/type")
-    val UR_HEIGHT = create("underground_river/height")
+    val UR_TYPE = create("cave/underground_river/type")
+    val UR_HEIGHT = create("cave/underground_river/height")
+
+    val LAKE_CAVE_CAVERNS = create("cave/lake/cavern")
+    val LAKE_CAVE_PILLARS = create("cave/lake/pillars")
 
     val STONE_TOWERS = create("stone_towers/towers")
     val STONE_TOWERS_HEIGHT = create("stone_towers/height")

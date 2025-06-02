@@ -38,13 +38,18 @@ object DuskDensityFunctions {
     val FLATS_ELEV = create("flats/elevation")
 
     /** idea used from [Jacobsjo message](https://discord.com/channels/738975290583285762/770775163942993930/948013415748751432)**/
-    val UR_TYPE = create("underground_rivers/type")
-    val UR_CONDITION = create("underground_rivers/picker")
-    val UR_DENSITY = create("underground_rivers/density")
+    val UR_TYPE = create("cave/underground_rivers/type")
+    val UR_CONDITION = create("cave/underground_rivers/picker")
+    val UR_DENSITY = create("cave/underground_rivers/density")
 
     val STONE_TOWERS = create("stone_tower/range")
     val STONE_TOWERS_TOWER = create("stone_tower/tower")
     val STONE_TOWERS_MOUND = create("stone_tower/mound")
+
+    val LAKE_CAVE_CONDITION = create("cave/lake/condition")
+    val LAKE_CAVE_CAVERN = create("cave/lake/cavern")
+    val LAKE_CAVE_AQUIFER = create("cave/lake/aquifer")
+    val LAKE_CAVE_DENSITY = create("cave/lake/density")
 
     val AQU_BARRIER = create("aquifer/barrier")
     val AQU_FLOODEDNESS = create("aquifer/floodedness")
