@@ -5,8 +5,10 @@
   "compatibilityLevel": "JAVA_21",
   "client": [
     "BackgroundRendererMixin",
+    "EntityRenderDispatcherAccessor",
     "ExampleMixin",
     "GameRendererMixin",
+    "HeldItemFeatureRendererMixin",
     "LivingEntityRendererMixin",
     "directional_sculk.WorldRendererMixin",
     "fluid_tag.CameraMixin",
@@ -14,8 +16,7 @@
     "fluid_tag.water.BubbleParticleMixin",
     "fluid_tag.water.CurrentDownParticleMixin",
     "pixel_accurate.SignBlockEntityRendererMixin",
-    "pixel_accurate.SignEditScreenMixin",
-    "HeldItemFeatureRendererMixin"
+    "pixel_accurate.SignEditScreenMixin"
   ],
   "injectors": {
     "defaultRequire": 1
