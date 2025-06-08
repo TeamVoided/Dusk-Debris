@@ -20,10 +20,17 @@ val modrinth_id: String? by project
 val curse_id: String? by project
 
 repositories {
-    maven("https://teamvoided.org/releases")
-    maven("https://teamvoided.org/snapshots")
-    maven("https://maven.terraformersmc.com/") { name = "Terraformers" }
-    maven("https://api.modrinth.com/maven")
+    maven("https://teamvoided.org/releases") { content { includeGroup("org.teamvoided") } }
+    maven("https://teamvoided.org/snapshots") { content { includeGroup("org.teamvoided") } }
+    maven("https://maven.fzzyhmstrs.me/") { name = "FzzyMaven"; content { includeGroup("me.fzzyhmstrs") } }
+    maven("https://maven.terraformersmc.com/") {
+        name = "Terraformers"
+        content {
+            includeGroup("com.terraformersmc")
+            includeGroup("dev.emi")
+        }
+    }
+    maven("https://api.modrinth.com/maven") { content { includeGroup("maven.modrinth") } }
     mavenCentral()
 }
 
@@ -41,12 +48,20 @@ modSettings {
 
 dependencies {
     //val geckolib_version = "4.5.1"
+    // Dusks And Dungeons
+    modImplementation("org.teamvoided:dusks_and_dungeons:1.0.0-beta.1")
 
     modImplementation(fileTree("libs"))
     modImplementation(libs.modmenu)
     modImplementation(libs.reef)
     modImplementation(libs.creative.works)
 
+//    modImplementation("org.teamvoided:voidcore:0.1.0")
+//    modImplementation("org.teamvoided:voidmill:1.0.6")
+//    modImplementation("org.teamvoided:headless:1.0.0")
+
+    // Devin
+//    modImplementation("org.teamvoided:devin:0.1.1")
     //modImplementation("software.bernie.geckolib:geckolib-fabric-1.20.6:${geckolib_version}")
 }
 
