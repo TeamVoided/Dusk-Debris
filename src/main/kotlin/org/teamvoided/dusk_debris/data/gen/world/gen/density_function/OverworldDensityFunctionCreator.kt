@@ -30,7 +30,7 @@ object OverworldDensityFunctionCreator {
         this.stoneTowers()
         this.caveLake()
         this.unchangingShapers()
-        this.shapers(false, false)
+        this.shapers(false, false, false)
     }
 
 
@@ -67,11 +67,33 @@ object OverworldDensityFunctionCreator {
         this.register(
             DuskDensityFunctions.EROSION_ROUTER,
             //const(OverworldTerrainCreator.Eros.Flats2.f)
-            this.dense(NoiseRouterData.EROSION_OVERWORLD)
+            add(0, this.dense(NoiseRouterData.EROSION_OVERWORLD))
         )
+
+        // (-||1.5x|-1|)+1, or (RF+1)/2
+        // add(1, multiply(-1, add(-1, multiply(1.5, this.dense(NoiseRouterData.RIDGES_OVERWORLD)).abs()).abs()))
+        val rf = this.dense(NoiseRouterData.RIDGES_FOLDED_OVERWORLD)
         this.register(
             DuskDensityFunctions.RIDGES_ROUTER,
-            this.dense(NoiseRouterData.RIDGES_OVERWORLD).abs()
+            rangeChoice(
+                flatCacheNoi2D(DuskNoiseParametersKeys.RIDGES_WEIRD),
+                1,
+                100000,
+                multiply(-0.5, add(3, rf)),
+                rangeChoice(
+                    flatCacheNoi2D(DuskNoiseParametersKeys.RIDGES_RARE),
+                    1,
+                    100000,
+                    multiply(0.5, add(3, rf)),
+                    rangeChoice(
+                        flatCacheNoi2D(DuskNoiseParametersKeys.RIDGES_ALT),
+                        0,
+                        100000,
+                        multiply(-0.5, add(1, rf)),
+                        multiply(0.5, add(1, rf))
+                    )
+                )
+            )
         )
     }
 
@@ -141,7 +163,7 @@ object OverworldDensityFunctionCreator {
     private fun BootstrapContext<DensityFunction>.shapers(
         amplified: Boolean,
         largeBiome: Boolean,
-        caves: Boolean = false
+        caves: Boolean = true
     ) {
         //every single one of these values has to change depending on *amplified* or *largeBiome*
         val continents: RegistryKey<DensityFunction> = DuskDensityFunctions.CONTINENT_ROUTER
@@ -273,13 +295,16 @@ object OverworldDensityFunctionCreator {
         } else {
             this.register(
                 finalDensity,
-                multiply(
-                    0.64,
-                    min(
-                        this.dense(urDensity),
-                        interpolated(blendDensity(surfaceSlide(amplified, this.dense(cheese))))
-                    )
-                ).squeeze()
+                add(0, this.dense(DuskDensityFunctions.LAKE_CAVE_DENSITY))
+                //multiply(
+                //    0.64,
+                //    min(
+                //        this.dense(urDensity),
+                //        interpolated(
+                //                blendDensity(surfaceSlide(amplified, this.dense(cheese)))
+                //            )
+                //    )
+                //).squeeze()
             )
         }
     }
@@ -370,8 +395,8 @@ object OverworldDensityFunctionCreator {
         scaleXZ: Double = 0.25
     ): DensityFunction =
         shiftedNoise2d(
-            this.dense(NoiseRouterData.SHIFT_X),
-            this.dense(NoiseRouterData.SHIFT_Z),
+            const(0),
+            const(0),
             scaleXZ,
             this.noiseHold(noise)
         )
@@ -379,17 +404,7 @@ object OverworldDensityFunctionCreator {
     fun BootstrapContext<DensityFunction>.flatCacheNoi2D(
         noise: RegistryKey<DoublePerlinNoiseSampler.NoiseParameters>,
         scaleXZ: Double = 0.25
-    ): DensityFunction =
-        flatCache(
-            cache2D(
-                shiftedNoise2d(
-                    this.dense(NoiseRouterData.SHIFT_X),
-                    this.dense(NoiseRouterData.SHIFT_Z),
-                    scaleXZ,
-                    this.noiseHold(noise)
-                )
-            )
-        )
+    ): DensityFunction = flatCache(cache2D(this.noi2D(noise, scaleXZ)))
 
 
     fun BootstrapContext<ChunkGeneratorSettings>.overworld(largeBiome: Boolean, amplified: Boolean): NoiseRouter {

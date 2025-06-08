@@ -14,7 +14,7 @@ object DuskProperties {
 
     val SQUISHED: BooleanProperty = BooleanProperty.of("squished")
     val LID: BooleanProperty = BooleanProperty.of("lid")
-
+    val COCOON: BooleanProperty = BooleanProperty.of("cocoon")
 
     val CHEST_PHASE: EnumProperty<ChestPhase> = EnumProperty.of("chest_phase", ChestPhase::class.java)
 

@@ -19,15 +19,13 @@ import voidlib.devin.world.gen.*
 
 object UndergroundDensityCreator {
     fun BootstrapContext<*>.underground(slopedCheese: DensityFunction): DensityFunction {
-        val spaghetti2D = this.dense(NoiseRouterData.CAVES_SPAGHETTI_2D_OVERWORLD)
-        val spaghettiRough = this.dense(NoiseRouterData.CAVES_SPAGHETTI_ROUGHNESS_FUNCTION_OVERWORLD)
-        val caveLayerNoise = noise(this.noiseHold(NoiseParametersKeys.CAVE_LAYER), 8.0)
-        val caveLayer = multiply(4, caveLayerNoise.square())
-        val caveCheese = noise(this.noiseHold(NoiseParametersKeys.CAVE_CHEESE), 0.6666666666666666)
         val surfaceOrCave = add(
-            add(
-                0.27,
-                caveCheese
+            min(
+                this.dense(DuskDensityFunctions.LAKE_CAVE_DENSITY),
+                add(
+                    0.27,
+                    noise(this.noiseHold(NoiseParametersKeys.CAVE_CHEESE), 0.6666666666666666)
+                )
             ).clamp(-1.0, 1.0),
             add(
                 1.5,
@@ -37,15 +35,19 @@ object UndergroundDensityCreator {
                 )
             ).clamp(0.0, 0.5)
         )
-        val surfaceAndCave = add(caveLayer, surfaceOrCave)
+        val caveLayerNoise = noise(this.noiseHold(NoiseParametersKeys.CAVE_LAYER), 8.0)
+        val caveLayer = multiply(4, caveLayerNoise.square())
         val entrances = min(
             min(
-                surfaceAndCave,
+                add(
+                    caveLayer,
+                    surfaceOrCave
+                ),
                 this.dense(NoiseRouterData.CAVES_ENTRANCES_OVERWORLD)
             ),
             add(
-                spaghetti2D,
-                spaghettiRough
+                this.dense(NoiseRouterData.CAVES_SPAGHETTI_2D_OVERWORLD),
+                this.dense(NoiseRouterData.CAVES_SPAGHETTI_ROUGHNESS_FUNCTION_OVERWORLD)
             )
         )
         val cavePillars = this.dense(NoiseRouterData.CAVES_PILLARS_OVERWORLD)
@@ -58,7 +60,6 @@ object UndergroundDensityCreator {
         )
         return max(entrances, cavePillarsRange)
     }
-
 
 
     fun BootstrapContext<DensityFunction>.caveRiver(
@@ -133,7 +134,7 @@ object UndergroundDensityCreator {
                         this.noiseHold(DuskNoiseParametersKeys.LAKE_CAVE_CAVERNS),
                         1.0,
                         2.0
-                    ).square()
+                    )
                 )
             )
         )
@@ -144,19 +145,6 @@ object UndergroundDensityCreator {
         aquifer: RegistryKey<DensityFunction>,
         density: RegistryKey<DensityFunction>,
     ) {
-        this.register(
-            DuskDensityFunctions.LAKE_CAVE_CAVERN,
-            cacheOnce(
-                add(
-                    clampedGradientY(-16, 84, 1.5, -1.5).cube().abs(),
-                    noise(
-                        this.noiseHold(DuskNoiseParametersKeys.LAKE_CAVE_CAVERNS),
-                        1.0,
-                        2.0
-                    ).square()
-                )
-            )
-        )
         this.register(
             aquifer,
             rangeChoice(

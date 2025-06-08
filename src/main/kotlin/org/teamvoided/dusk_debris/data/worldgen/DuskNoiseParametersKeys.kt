@@ -9,6 +9,9 @@ object DuskNoiseParametersKeys {
     val EXAMPLE = create("example")
 
     val CONTINENTAL_WEIRDNESS = create("parameters/continental_weirdness")
+    val RIDGES_ALT = create("parameters/ridges_alternate")
+    val RIDGES_RARE = create("parameters/ridges_rare")
+    val RIDGES_WEIRD = create("parameters/ridges_weird")
 
     val PLATEAU_TYPE = create("plateau/type")
     val GRAND_CANYON = create("plateau/grand_canyon")

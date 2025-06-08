@@ -1,4 +1,4 @@
-package org.teamvoided.dusk_debris.particle.stupid_particles
+package org.teamvoided.dusk_debris.particle.cube_particles
 
 import com.mojang.blaze3d.vertex.VertexConsumer
 import net.fabricmc.api.EnvType
@@ -11,12 +11,10 @@ import net.minecraft.client.world.ClientWorld
 import net.minecraft.entity.Entity
 import net.minecraft.util.math.Vec3d
 import org.teamvoided.dusk_debris.particle.entity.EinsteinParticleEffect
-import org.teamvoided.dusk_debris.particle.stupid_particles.abstracts.AbstractCubeParticle
+import org.teamvoided.dusk_debris.particle.cube_particles.abstracts.AbstractCubeParticle
 import org.teamvoided.dusk_debris.util.Utils
-import org.teamvoided.dusk_debris.util.sendMessageIngame
 import kotlin.math.cos
 import kotlin.math.sin
-import kotlin.math.tan
 
 class EinsteinOrbitParticle(
     world: ClientWorld,

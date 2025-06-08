@@ -68,12 +68,12 @@ object DuskBiomeModifications {
 //            BiomeTags.OVERWORLD
 //        )
 
-        addCarver(
-            "add_amethyst_geode_carver",
-            DuskConfiguredCarvers.AMETHYST_GEODE,
-            BiomeSelectors.foundInOverworld()
-                .and(tagNo(ConventionalBiomeTags.IS_DEEP_OCEAN))
-        )
+        //addCarver(
+        //    "add_amethyst_geode_carver",
+        //    DuskConfiguredCarvers.AMETHYST_GEODE,
+        //    BiomeSelectors.foundInOverworld()
+        //        .and(tagNo(ConventionalBiomeTags.IS_DEEP_OCEAN))
+        //)
 
         //addFeature(
         //    "add_large_rock_spire",

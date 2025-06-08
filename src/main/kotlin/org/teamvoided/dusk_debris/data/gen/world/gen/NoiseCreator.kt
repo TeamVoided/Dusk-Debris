@@ -17,6 +17,10 @@ object NoiseCreator {
     private fun BootstrapContext<NoiseParameters>.overworld() {
         this.register(DuskNoiseParametersKeys.CONTINENTAL_WEIRDNESS, -8, 1, 1)
 
+        this.register(DuskNoiseParametersKeys.RIDGES_ALT, -7, 1, 2)
+        this.register(DuskNoiseParametersKeys.RIDGES_RARE, -10, 1.5, 0, 0, 0, 1)
+        this.register(DuskNoiseParametersKeys.RIDGES_WEIRD, -10, 1, 1, 2, 2, 2, 1, 1, 1, 1)
+
         this.register(DuskNoiseParametersKeys.PLATEAU_TYPE, -8, 1, 1, 0, 1, 1)
         this.register(DuskNoiseParametersKeys.GRAND_CANYON, -8, 1, 3, 1)
 
@@ -29,7 +33,7 @@ object NoiseCreator {
         this.register(DuskNoiseParametersKeys.LAKE_CAVE_CAVERNS, -7, 1)
         this.register(DuskNoiseParametersKeys.LAKE_CAVE_PILLARS, -4, 2, 1, 0)
 
-        this.register(DuskNoiseParametersKeys.STONE_TOWERS, -7, 1,1)
+        this.register(DuskNoiseParametersKeys.STONE_TOWERS, -7, 1, 1)
         this.register(DuskNoiseParametersKeys.STONE_TOWERS_HEIGHT, -6, 1, 1, 1)
         this.register(DuskNoiseParametersKeys.STONE_TOWERS_OFFSET, -7, 1)
     }

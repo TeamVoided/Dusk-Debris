@@ -1,8 +1,6 @@
-package org.teamvoided.dusk_debris.particle.stupid_particles.models
+package org.teamvoided.dusk_debris.particle.cube_particles.models
 
 import net.minecraft.util.math.Direction
-import org.apache.commons.lang3.math.IEEE754rUtils.max
-import org.teamvoided.dusk_debris.util.sendMessageIngame
 import kotlin.math.abs
 
 class CubeUnwrapped(

@@ -1,4 +1,4 @@
-package org.teamvoided.dusk_debris.particle.stupid_particles.abstracts
+package org.teamvoided.dusk_debris.particle.cube_particles.abstracts
 
 import com.mojang.blaze3d.vertex.VertexConsumer
 import net.minecraft.client.particle.BillboardParticle
@@ -10,8 +10,8 @@ import net.minecraft.util.math.Vec3d
 import org.joml.Quaternionf
 import org.joml.Vector3f
 import org.joml.Vector4f
-import org.teamvoided.dusk_debris.particle.stupid_particles.models.CubeSimple
-import org.teamvoided.dusk_debris.particle.stupid_particles.models.CubeUnwrapped
+import org.teamvoided.dusk_debris.particle.cube_particles.models.CubeSimple
+import org.teamvoided.dusk_debris.particle.cube_particles.models.CubeUnwrapped
 
 abstract class AbstractCubeParticle(
     world: ClientWorld,

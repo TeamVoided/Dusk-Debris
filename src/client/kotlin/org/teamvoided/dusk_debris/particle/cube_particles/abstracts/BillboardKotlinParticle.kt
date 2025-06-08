@@ -1,4 +1,4 @@
-package org.teamvoided.dusk_debris.particle.stupid_particles.abstracts
+package org.teamvoided.dusk_debris.particle.cube_particles.abstracts
 
 import com.mojang.blaze3d.vertex.VertexConsumer
 import net.minecraft.client.particle.BillboardParticle

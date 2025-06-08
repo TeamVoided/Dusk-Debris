@@ -7,8 +7,8 @@ import org.teamvoided.dusk_debris.particle.emmiter.BetweenPointsParticle
 import org.teamvoided.dusk_debris.particle.emmiter.BlunderbombParticle
 import org.teamvoided.dusk_debris.particle.emmiter.FirebombParticle
 import org.teamvoided.dusk_debris.particle.emmiter.GunpowderExplosionEmitterParticle
-import org.teamvoided.dusk_debris.particle.stupid_particles.CubeParticle
-import org.teamvoided.dusk_debris.particle.stupid_particles.EinsteinOrbitParticle
+import org.teamvoided.dusk_debris.particle.cube_particles.CubeParticle
+import org.teamvoided.dusk_debris.particle.cube_particles.EinsteinOrbitParticle
 import org.teamvoided.dusk_debris.particle.vanilla.AdditionalWaterSuspendParticle
 
 object DuskParticlesClient {

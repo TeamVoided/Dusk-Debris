@@ -1,4 +1,4 @@
-package org.teamvoided.dusk_debris.particle.stupid_particles.models
+package org.teamvoided.dusk_debris.particle.cube_particles.models
 
 import com.mojang.blaze3d.vertex.VertexConsumer
 import net.minecraft.client.model.ModelPart
