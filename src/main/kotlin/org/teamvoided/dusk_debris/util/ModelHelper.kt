@@ -11,7 +11,7 @@ import net.minecraft.util.Identifier
 import org.teamvoided.dusk_debris.DuskDebris.MODID
 import org.teamvoided.dusk_debris.DuskDebris.id
 import org.teamvoided.dusk_debris.block.FanBlock
-import org.teamvoided.dusk_debris.block.GildedChaliceBlock
+import org.teamvoided.dusk_debris.block.sot.GildedChaliceBlock
 import org.teamvoided.dusk_debris.block.NethershroomPlantBlock
 import org.teamvoided.dusk_debris.block.RoaringGeyserBlock
 import org.teamvoided.dusk_debris.block.not_blocks.DuskProperties

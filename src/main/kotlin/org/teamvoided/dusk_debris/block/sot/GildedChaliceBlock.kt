@@ -1,4 +1,4 @@
-package org.teamvoided.dusk_debris.block
+package org.teamvoided.dusk_debris.block.sot
 
 import com.mojang.serialization.MapCodec
 import net.minecraft.block.Block
@@ -12,6 +12,7 @@ import net.minecraft.util.math.Direction
 import net.minecraft.util.shape.VoxelShape
 import net.minecraft.util.shape.VoxelShapes
 import net.minecraft.world.BlockView
+import org.teamvoided.dusk_debris.block.MysteriousVesselBlock
 import org.teamvoided.dusk_debris.block.not_blocks.DuskProperties
 import org.teamvoided.dusk_debris.util.rotate
 
