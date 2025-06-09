@@ -4,19 +4,27 @@ import com.mojang.serialization.MapCodec
 import net.minecraft.block.Block
 import net.minecraft.block.BlockState
 import net.minecraft.block.ShapeContext
+import net.minecraft.entity.player.PlayerEntity
+import net.minecraft.item.BlockItem
 import net.minecraft.item.ItemPlacementContext
+import net.minecraft.item.ItemStack
 import net.minecraft.state.StateManager
 import net.minecraft.state.property.IntProperty
+import net.minecraft.util.Hand
+import net.minecraft.util.ItemInteractionResult
+import net.minecraft.util.hit.BlockHitResult
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
 import net.minecraft.util.shape.VoxelShape
 import net.minecraft.util.shape.VoxelShapes
 import net.minecraft.world.BlockView
+import net.minecraft.world.World
 import org.teamvoided.dusk_debris.block.MysteriousVesselBlock
 import org.teamvoided.dusk_debris.block.not_blocks.DuskProperties
+import org.teamvoided.dusk_debris.block.sot.StackedChaliceBlock.Companion.tryMakeFromBlock
 import org.teamvoided.dusk_debris.util.rotate
 
-class GildedChaliceBlock(settings: Settings) : MysteriousVesselBlock(settings) {
+open class GildedChaliceBlock(settings: Settings) : MysteriousVesselBlock(settings) {
     init {
         this.defaultState =
             (stateManager.defaultState)
@@ -53,8 +61,9 @@ class GildedChaliceBlock(settings: Settings) : MysteriousVesselBlock(settings) {
     }
 
     override fun canReplace(state: BlockState, context: ItemPlacementContext): Boolean {
-        if (!context.shouldCancelInteraction() && context.stack.item === asItem() && state.get(CHALICES) < 4) {
-            return true
+        if (!context.shouldCancelInteraction()  && state.get(CHALICES) < 4) {
+            val item = context.stack.item
+            if (item is BlockItem && item.block is GildedChaliceBlock) return true
         }
         return super.canReplace(state, context)
     }
@@ -65,6 +74,16 @@ class GildedChaliceBlock(settings: Settings) : MysteriousVesselBlock(settings) {
             return blockState.cycle(CHALICES)
         }
         return super.getPlacementState(ctx)
+    }
+
+    // Stacked Chalice Code
+    override fun onInteract(
+        stack: ItemStack, state: BlockState, world: World, pos: BlockPos,
+        player: PlayerEntity, hand: Hand, hitResult: BlockHitResult,
+    ): ItemInteractionResult {
+        val result = tryMakeFromBlock(stack, state, world, pos, player)
+        if (result != null) return result
+        return super.onInteract(stack, state, world, pos, player, hand, hitResult)
     }
 
     companion object {

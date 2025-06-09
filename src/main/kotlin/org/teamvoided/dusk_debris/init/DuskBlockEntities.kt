@@ -1,16 +1,20 @@
 package org.teamvoided.dusk_debris.init
 
+import net.minecraft.block.Block
+import net.minecraft.block.BlockState
 import net.minecraft.block.entity.BlockEntity
 import net.minecraft.block.entity.BlockEntityType
 import net.minecraft.datafixer.TypeReferences
 import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
 import net.minecraft.util.Util
+import net.minecraft.util.math.BlockPos
 import org.teamvoided.dusk_debris.DuskDebris.id
 import org.teamvoided.dusk_debris.block.entity.BunnyGraveBlockEntity
 import org.teamvoided.dusk_debris.block.entity.DuskChestBlockEntity
 import org.teamvoided.dusk_debris.block.entity.StatueBlockEntity
 import org.teamvoided.dusk_debris.block.entity.TreasureChestBlockEntity
+import org.teamvoided.dusk_debris.block.sot.entity.StackedChaliceBlockEntity
 import org.teamvoided.dusks_and_dungeons.block.entity.*
 
 object DuskBlockEntities {
@@ -30,11 +34,9 @@ object DuskBlockEntities {
 //        )
 //    )
 
-    val STONE_CHEST: BlockEntityType<DuskChestBlockEntity> = register(
-        "stone_chest", BlockEntityType.Builder.create(
-            ::DuskChestBlockEntity,
-            //DuskBlocks.STONE_CHEST
-        )
+    val STONE_CHEST = register(
+        "stone_chest", ::DuskChestBlockEntity,
+//            DuskBlocks.STONE_CHEST
     )
 
     // DnD
@@ -71,10 +73,14 @@ object DuskBlockEntities {
         )
     )
 
-    val STATUE: BlockEntityType<StatueBlockEntity> = register(
-        "statue", BlockEntityType.Builder.create(::StatueBlockEntity, DuskBlocks.STATUE)
-    )
+    val STATUE = register("statue", ::StatueBlockEntity, DuskBlocks.STATUE)
+    val STACKED_CHALICE = register("stacked_chalice", ::StackedChaliceBlockEntity, DuskBlocks.STACKED_CHALICE)
 
+    private fun <T : BlockEntity> register(
+        id: String, factory: (BlockPos, BlockState) -> T, vararg blocks: Block,
+    ): BlockEntityType<T> {
+        return register(id, BlockEntityType.Builder.create(factory, *blocks))
+    }
 
     private fun <T : BlockEntity> register(id: String, builder: BlockEntityType.Builder<T>): BlockEntityType<T> {
         val type = Util.getChoiceType(TypeReferences.BLOCK_ENTITY, id(id).toString())

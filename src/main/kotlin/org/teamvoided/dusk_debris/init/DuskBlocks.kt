@@ -23,6 +23,7 @@ import org.teamvoided.dusk_debris.DuskDebris.id
 import org.teamvoided.dusk_debris.block.*
 import org.teamvoided.dusk_debris.block.big.BigLanternWithSpiralBlock
 import org.teamvoided.dusk_debris.block.sot.GildedChaliceBlock
+import org.teamvoided.dusk_debris.block.sot.StackedChaliceBlock
 import org.teamvoided.dusk_debris.block.throwable_bomb.BlunderbombBlock
 import org.teamvoided.dusk_debris.block.throwable_bomb.BonecallerBlock
 import org.teamvoided.dusk_debris.block.throwable_bomb.FirebombBlock
@@ -365,6 +366,9 @@ object DuskBlocks {
                 .pistonBehavior(PistonBehavior.DESTROY)
         )
     ).cutout()
+
+    val STACKED_CHALICE = register("stacked_chalice", 16, StackedChaliceBlock(copy(GILDED_CHALICE))).cutout()
+
     val LAPIS_RELIC = register(
         "lapis_relic", 16, PerculiarRelicBlock(
             Settings.create().mapColor(LAPIS_BLOCK.defaultMapColor).pistonBehavior(PistonBehavior.DESTROY)

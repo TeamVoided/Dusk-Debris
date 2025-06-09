@@ -10,8 +10,9 @@ import org.teamvoided.dusk_debris.entity.block.CelestalBellBlockEntityRenderer
 import org.teamvoided.dusk_debris.entity.block.stone_chest.StoneChestBlockEntityRenderer
 import org.teamvoided.dusk_debris.entity.block.treasure_chest.TreasureChestBlockEntityRenderer
 import org.teamvoided.dusks_and_dungeons.block.entity.ChestOSoulsBlockEntity
-import org.teamvoided.dusks_and_dungeons.entity.block.QuarterBlockPileBlockEntityRenderer
 import org.teamvoided.dusk_debris.entity.block.StatueBlockEntityRenderer
+import org.teamvoided.dusk_debris.sot.block.entity.StackedChaliceBlockEntityRenderer
+import org.teamvoided.dusks_and_dungeons.entity.block.QuarterBlockPileBlockEntityRenderer
 
 object DuskBlockEntitiesClient {
     private var decoratedPotBlockEntity = DecoratedPotBlockEntity(BlockPos.ORIGIN, DuskBlocks.POT_O_SCREAMS.defaultState)
@@ -39,6 +40,7 @@ object DuskBlockEntitiesClient {
         }
 
         BlockEntityRendererFactories.register(DuskBlockEntities.STATUE, ::StatueBlockEntityRenderer)
+        BlockEntityRendererFactories.register(DuskBlockEntities.STACKED_CHALICE, ::StackedChaliceBlockEntityRenderer)
 
     }
 }
