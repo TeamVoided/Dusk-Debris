@@ -6,7 +6,7 @@
   "client": [
     "BackgroundRendererMixin",
     "EntityRenderDispatcherAccessor",
-    "ExampleMixin",
+    "ModelMixin",
     "GameRendererMixin",
     "HeldItemFeatureRendererMixin",
     "LivingEntityRendererMixin",

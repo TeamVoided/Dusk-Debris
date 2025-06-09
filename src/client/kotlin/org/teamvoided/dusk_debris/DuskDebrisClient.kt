@@ -32,6 +32,6 @@ object DuskDebrisClient {
 
         //CameraSubmersionType.entries.forEach { println(it) }
 
-        //DuskShaders.init()
+        DuskShaders.init()
     }
 }

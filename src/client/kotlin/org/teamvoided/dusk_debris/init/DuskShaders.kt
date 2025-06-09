@@ -4,22 +4,27 @@ import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.vertex.*
 import net.fabricmc.fabric.api.client.rendering.v1.CoreShaderRegistrationCallback
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents
+import net.minecraft.client.render.RenderPhase.Shader
 import net.minecraft.client.render.ShaderProgram
 import net.minecraft.util.math.Vec3d
-import net.minecraft.util.math.Vec3i
 import org.joml.Matrix4f
 import org.teamvoided.dusk_debris.DuskDebris.id
-import org.teamvoided.dusk_debris.init.DuskShaders.xyz
-import org.teamvoided.dusk_debris.util.toVec3d
 
 object DuskShaders {
     private var customType: ShaderProgram? = null
+
+    val STATUE_SHADER: Shader = Shader { statueRenderType }
+    var statueRenderType: ShaderProgram? = null
+        private set
+
     fun init() {
         CoreShaderRegistrationCallback.EVENT.register { ctx ->
-            ctx.register(id("rendertype_custom"), VertexFormats.POSITION_COLOR) { customType = it }
+            ctx.register(
+                id("rendertype_statue"), VertexFormats.POSITION_COLOR_TEXTURE_OVERLAY_LIGHT_NORMAL
+            ) { statueRenderType = it }
+//            ctx.register(id("rendertype_custom"), VertexFormats.POSITION_COLOR) { customType = it }
         }
-        WorldRenderEvents.AFTER_ENTITIES.register(::renderPlane)
+//        WorldRenderEvents.AFTER_ENTITIES.register(::renderPlane)
     }
 
     fun grayscale(ctx: WorldRenderContext) = ctx.matrixStack()?.apply {
