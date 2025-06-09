@@ -40,6 +40,7 @@ object DuskParticles {
 
     val WIND = complex(WindParticleEffect.CODEC, WindParticleEffect.PACKET_CODEC)
     val SPARK = simple()
+    val RISING_EMBER = simple()
 
     val COSMOS = simple()
     val ENTITY_TEST = complex(EntityTestParticleEffect.CODEC, EntityTestParticleEffect.PACKET_CODEC)
@@ -82,6 +83,7 @@ object DuskParticles {
 
         register("wind", WIND)
         register("spark", SPARK)
+        register("rising_ember", RISING_EMBER)
 
         register("cosmos", COSMOS)
         register("entity_test", ENTITY_TEST)
