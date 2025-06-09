@@ -27,7 +27,7 @@ class StackedChaliceBlockEntity(pos: BlockPos, state: BlockState?) : BlockEntity
         println("Read: $nbt")
 
         if (nbt.contains(KEY)) {
-            val list = nbt.getList(KEY, NbtElement.STRING_TYPE.toInt())
+            val list = nbt.getList(KEY, NbtElement.COMPOUND_TYPE.toInt())
             list.forEachIndexed { index, nbt ->
                 chalices[index] =
                     ItemStack.field_49266.parse(NbtOps.INSTANCE, nbt).resultOrPartial().orElse(ItemStack.EMPTY)
