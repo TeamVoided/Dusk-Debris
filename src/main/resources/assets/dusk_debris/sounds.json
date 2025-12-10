@@ -1,11 +1,26 @@
 {
-  "block.nethershroom.squished": {
+  "block.exhaust.organ_note": {
     "category": "block",
     "sounds": [
       {
-        "name": "dusk_debris:blocks/nethershroom/squished",
-        "stream": true,
-        "volume": 0.75
+        "name": "dusk_debris:blocks/exhaust/organ_note",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "block.exhaust.anticipation": {
+    "category": "block",
+    "sounds": [
+      {
+        "name": "dusk_debris:blocks/exhaust/organ_steam_antic_1"
+      }
+    ]
+  },
+  "block.exhaust.attack": {
+    "category": "block",
+    "sounds": [
+      {
+        "name": "dusk_debris:blocks/exhaust/organ_steam_attack_1"
       }
     ]
   },

@@ -11,6 +11,10 @@ object DuskSoundEvents {
 //    val EVENT_MOB_EFFECT_RAID_OMEN = register("event.mob_effect.raid_omen")
 //    val ENTITY_GENERIC_EXPLODE = registerHolder("entity.generic.explode")
 
+    val BLOCK_ORGAN_NOTE = register("block.exhaust.organ_note")
+    val BLOCK_EXHAUST_ANTICIPATION = register("block.exhaust.anticipation")
+    val BLOCK_EXHAUST_ATTACK = register("block.exhaust.attack")
+
     val BLOCK_NETHERSHROOM_EXPLODE = register("block.nethershroom.explode")
     val BLOCK_NETHERSHROOM_SQUISHED = register("block.nethershroom.squished")
     val BLOCK_NETHERSHROOM_BLOCK_SQUISHED = register("block.nethershroom_block.squished")

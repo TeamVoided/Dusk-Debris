@@ -78,12 +78,12 @@ class ExhaustBlastParticle(
     }
 
     override fun getSize(tickDelta: Float): Float {
-        if (isWarmup && 20 > age) {
-            return super.getSize(tickDelta) * (((age + tickDelta) / 21) / 2 + 0.5f)
-        } else if (maxAge - 6 < age + tickDelta) {
-            return super.getSize(tickDelta) * (((maxAge - (age + tickDelta)) / (maxAge - 6)) + 1) / 2
-        }
-        return super.getSize(tickDelta)
+        return if (isWarmup && 20 > age)
+            super.getSize(tickDelta) * (((age + tickDelta) / 21) / 2 + 0.5f)
+        else if (maxAge - 6 < age + tickDelta)
+            super.getSize(tickDelta) * (((maxAge - (age + tickDelta)) / (maxAge - 6)) + 1) / 2
+        else
+            super.getSize(tickDelta)
     }
 
     override fun move(x: Double, y: Double, z: Double) {
@@ -92,9 +92,11 @@ class ExhaustBlastParticle(
         var dz = z
         if ((dx != 0.0 || dy != 0.0 || dz != 0.0) && (dx * dx + dy * dy + dz * dz < 10000)) {
             val vec3d = Entity.adjustSingleAxisMovementForCollisions(
-                null as Entity?, Vec3d(dx, dy, dz),
+                null as Entity?,
+                Vec3d(dx, dy, dz),
                 this.boundingBox,
-                this.world, listOf()
+                this.world,
+                listOf()
             )
             dx = vec3d.x
             dy = vec3d.y
@@ -123,13 +125,13 @@ class ExhaustBlastParticle(
         this.onGround = true
         val vel = Vector2d(random.nextDouble() - 0.5, random.nextDouble() - 0.5).normalize()
         val velocity = when (direction) {
-            Direction.DOWN -> Vec3d(vel.x, -1.0, vel.y).multiply(0.1)
-            Direction.UP -> Vec3d(vel.x, 1.0, vel.y).multiply(0.1)
-            Direction.NORTH -> Vec3d(vel.x, vel.y, -1.0).multiply(0.1)
-            Direction.SOUTH -> Vec3d(vel.x, vel.y, 1.0).multiply(0.1)
-            Direction.WEST -> Vec3d(-1.0, vel.x, vel.y).multiply(0.1)
-            Direction.EAST -> Vec3d(1.0, vel.x, vel.y).multiply(0.1)
-        }
+            Direction.DOWN -> Vec3d(vel.x, -1.0, vel.y)
+            Direction.UP -> Vec3d(vel.x, 1.0, vel.y)
+            Direction.NORTH -> Vec3d(vel.x, vel.y, -1.0)
+            Direction.SOUTH -> Vec3d(vel.x, vel.y, 1.0)
+            Direction.WEST -> Vec3d(-1.0, vel.x, vel.y)
+            Direction.EAST -> Vec3d(1.0, vel.x, vel.y)
+        }.multiply(0.1)
         this.velocityX = velocity.x
         this.velocityY = velocity.y
         this.velocityZ = velocity.z
@@ -148,8 +150,8 @@ class ExhaustBlastParticle(
             velY: Double,
             velZ: Double,
         ): Particle {
-            val particle: Particle =
-                ExhaustBlastParticle(world, posX, posY, posZ, velX, velY, velZ, this.spriteProvider, true)
+            val particle = ExhaustBlastParticle(world, posX, posY, posZ, velX, velY, velZ, this.spriteProvider, true)
+            particle.setSprite(spriteProvider)
             return particle
         }
     }

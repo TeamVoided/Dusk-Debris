@@ -2,9 +2,15 @@ package org.teamvoided.dusk_debris.block
 
 import net.minecraft.block.Block
 import net.minecraft.block.BlockState
+import net.minecraft.block.Blocks
+import net.minecraft.block.GlazedTerracottaBlock
+import net.minecraft.block.NoteBlock
 import net.minecraft.entity.Entity
+import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.ItemPlacementContext
 import net.minecraft.server.world.ServerWorld
+import net.minecraft.sound.SoundCategory
+import net.minecraft.sound.SoundEvent
 import net.minecraft.state.StateManager
 import net.minecraft.state.property.*
 import net.minecraft.util.math.BlockPos
@@ -20,7 +26,7 @@ import org.teamvoided.dusk_debris.data.tags.DuskEntityTypeTags
 import org.teamvoided.dusk_debris.entity.helper.WindLogic
 import org.teamvoided.dusk_debris.entity.helper.WindLogic.inFanWind
 import org.teamvoided.dusk_debris.init.DuskParticles
-import org.teamvoided.dusk_debris.particle.WindParticleEffect
+import org.teamvoided.dusk_debris.init.DuskSoundEvents
 import org.teamvoided.dusk_debris.util.spawnParticles
 import org.teamvoided.dusk_debris.util.toVec3d
 
@@ -31,7 +37,7 @@ class ExhaustBlock(settings: Settings) : SixWayFacingBlock(settings) {
             .with(POWERED, false)
             .with(FACING, Direction.UP)
             .with(SOURCE, DirectionOrNullState.NONE)
-            .with(AGE, 6)
+            .with(AGE, 25)
 
     }
 
@@ -59,16 +65,74 @@ class ExhaustBlock(settings: Settings) : SixWayFacingBlock(settings) {
         exhaustTick(state, world, pos)
         val source = state.get(SOURCE)
         if (source != DirectionOrNullState.NONE) {
-            if (!world.getBlockState(pos.offset(source.direction)).isOf(this))
-                return state.with(SOURCE, DirectionOrNullState.NONE)
+            //getSource(state, world, pos) ?: return state.with(SOURCE, DirectionOrNullState.NONE)
 
             val targetState: BlockState = world.getBlockState(pos.offset(source.direction))
+            if (!targetState.isOf(this)) return state.with(SOURCE, DirectionOrNullState.NONE)
+            val targetActivity = targetState.get(ACTIVE)
+            if (targetActivity != state.get(ACTIVE) && targetActivity != 0) {
+                if (targetActivity == 1) playAnticipation(state, world, pos, world.random)
+                else playBlast(state, world, pos, world.random)
+            }
+
             return state
-                .with(ACTIVE, targetState.get(ACTIVE))
+                .with(ACTIVE, targetActivity)
                 .with(POWERED, targetState.get(POWERED))
                 .with(AGE, targetState.get(AGE))
         }
         return state
+    }
+
+    private fun getSource(state: BlockState, world: WorldAccess, pos: BlockPos): BlockPos? {
+        val source = state.get(SOURCE).direction ?: return pos
+        val sourcePos = pos.offset(source)
+        val sourceBlock = world.getBlockState(sourcePos)
+        return if (sourceBlock.isOf(this)) getSource(sourceBlock, world, sourcePos)
+        else null
+    }
+
+    private fun setThisAsSource(state: BlockState, world: World, pos: BlockPos) {
+        world.setBlockState(pos, state.with(SOURCE, DirectionOrNullState.NONE))
+        var prevDirection: Direction? = state.get(SOURCE).direction
+        if (prevDirection != null) {
+            var propPos: BlockPos = pos
+            val propagation: MutableList<Pair<BlockPos, Direction>> = mutableListOf()
+
+            for (idx in 0 until MAX_CHECK_DISTANCE) {
+                val sourcePos = propPos.offset(prevDirection)
+                val sourceState = world.getBlockState(sourcePos)
+                if (sourcePos == pos || !sourceState.isOf(this)) break
+                val source = sourceState.get(SOURCE).direction
+                propagation.addFirst(sourcePos to prevDirection!!)
+                if (source == null) {
+                    world.setBlockState(sourcePos.north(5), Blocks.DIAMOND_BLOCK.defaultState)
+                    break
+                }
+                propPos = sourcePos
+                prevDirection = source
+            }
+            propagation.forEach { (pPos, pDir) ->
+                val pState = world.getBlockState(pPos).with(SOURCE, DirectionOrNullState.fromDirection(pDir))
+                world.setBlockState(pPos, pState)
+                setDebugMagTer(pState, world, pPos)
+            }
+        }
+        setDebugMagTer(state.with(SOURCE, DirectionOrNullState.NONE), world, pos)
+    }
+
+    fun setDebugMagTer(state: BlockState, world: World, pos: BlockPos) {
+        val dir = state.get(SOURCE).direction
+        val tarPos = pos.north(5)
+        val worldState = world.getBlockState(tarPos)
+        println(worldState.block)
+        if (worldState.materialReplaceable() || worldState.isOf(Blocks.CHERRY_LOG) || worldState.isOf(Blocks.MAGENTA_GLAZED_TERRACOTTA)) {
+            val newState = if (dir == null) {
+                Blocks.CHERRY_LOG.defaultState
+            } else {
+                Blocks.MAGENTA_GLAZED_TERRACOTTA.defaultState.with(GlazedTerracottaBlock.FACING, dir)
+            }
+            world.setBlockState(tarPos, newState)
+        }
     }
 
     override fun neighborUpdate(
@@ -94,12 +158,11 @@ class ExhaustBlock(settings: Settings) : SixWayFacingBlock(settings) {
     private fun setState(state: BlockState, world: ServerWorld, pos: BlockPos) {
         val bl = world.isReceivingRedstonePower(pos)
         if (bl != state.get(POWERED)) {
-            var blockState = state
             if (!state.get(POWERED)) {
-                blockState = state.cycle(ACTIVE)
+                setThisAsSource(state.with(POWERED, true), world, pos)
                 world.emitGameEvent(null, GameEvent.BLOCK_CHANGE, pos)
             }
-            world.setBlockState(pos, blockState.with(POWERED, bl), 3)
+            world.setBlockState(pos, state.with(POWERED, bl), 3)
         }
         exhaustTick(state, world, pos)
     }
@@ -116,16 +179,22 @@ class ExhaustBlock(settings: Settings) : SixWayFacingBlock(settings) {
     }
 
     override fun scheduledTick(state: BlockState, world: ServerWorld, pos: BlockPos, random: RandomGenerator) {
-        val worldSecond = (world.time % 20).toInt()
+        val worldSecond = (world.time % 10).toInt()
         val activity = state.get(ACTIVE)
         val facing = state.get(FACING)
 
         if (worldSecond == 0 && state.get(SOURCE) == DirectionOrNullState.NONE) {
             if (state.get(AGE) == 0) {
                 val age = when (activity) {
-                    2 -> 6 //2
-                    1 -> 2 //1
-                    0 -> 1 //6
+                    2 -> 12 //2
+                    1 -> {
+                        playBlast(state, world, pos, random)
+                        3
+                    } //1
+                    0 -> {
+                        playAnticipation(state, world, pos, random)
+                        2
+                    } //6
                     else -> 25
                 }
                 world.setBlockState(pos, state.with(AGE, age).cycle(ACTIVE))
@@ -152,6 +221,54 @@ class ExhaustBlock(settings: Settings) : SixWayFacingBlock(settings) {
         exhaustTick(state, world, pos)
     }
 
+    private fun getPower(state: BlockState, world: World, pos: BlockPos): Int {
+        val source = state.get(SOURCE).direction ?: return world.getReceivedRedstonePower(pos)
+        val sourcePos = pos.offset(source)
+        val sourceBlock = world.getBlockState(sourcePos)
+        if (sourceBlock.isOf(this)) {
+            return getPower(sourceBlock, world, sourcePos)
+        } else {
+            world.setBlockState(pos, state.with(SOURCE, DirectionOrNullState.NONE))
+            return getPower(state, world, pos)
+        }
+    }
+
+    private fun getPower(state: BlockState, world: WorldAccess, pos: BlockPos): Int {
+        val source = state.get(SOURCE).direction ?: return world.getReceivedRedstonePower(pos)
+        val sourcePos = pos.offset(source)
+        val sourceBlock = world.getBlockState(sourcePos)
+        return if (sourceBlock.isOf(this)) getPower(sourceBlock, world, sourcePos)
+        else 12
+    }
+
+    private fun playBlast(state: BlockState, world: WorldAccess, pos: BlockPos, random: RandomGenerator) {
+        val note =
+            if (state.get(POWERED)) NoteBlock.getNotePitch((1.6 * getPower(state, world, pos)).toInt())
+            else random.nextFloat() * 0.2f + 0.9f
+        playsound(DuskSoundEvents.BLOCK_ORGAN_NOTE, note, world, pos)
+        playsound(DuskSoundEvents.BLOCK_EXHAUST_ATTACK, random.nextFloat() * 0.2f + 0.9f, world, pos)
+    }
+
+    private fun playAnticipation(state: BlockState, world: WorldAccess, pos: BlockPos, random: RandomGenerator) {
+        playsound(DuskSoundEvents.BLOCK_EXHAUST_ANTICIPATION, random.nextFloat() * 0.2f + 0.9f, world, pos)
+    }
+
+
+    private fun playsound(
+        soundEvent: SoundEvent,
+        pitch: Float,
+        world: WorldAccess,
+        pos: BlockPos
+    ) {
+        world.playSound(
+            null as PlayerEntity?,
+            pos,
+            soundEvent,
+            SoundCategory.BLOCKS,
+            1f, pitch
+        )
+    }
+
     private fun getEntityList(
         world: World,
         pos: BlockPos,
@@ -163,27 +280,31 @@ class ExhaustBlock(settings: Settings) : SixWayFacingBlock(settings) {
     }
 
     private fun warmUpParticles(state: BlockState, world: ServerWorld, pos: BlockPos, random: RandomGenerator) {
-        repeat(random.range(1, 3)) {
+        if (random.nextInt(3) == 0) {
+            val facing = state.get(FACING)
+            val offset = if (facing.id % 2 == 1) facing.vector.toVec3d() else Vec3d.ZERO
             world.spawnParticles(
                 DuskParticles.EXHAUST_WARMUP,
                 Vec3d(
                     random.nextDouble(),
                     random.nextDouble() * random.nextInt(MAX_BLAST_HEIGHT - 10),
                     random.nextDouble()
-                ).rotateFromUp(state.get(FACING)).add(pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble()),
-                Vec3d(0.0, 0.25 + random.nextDouble() * 0.05, 0.0).rotateFromUp(state.get(FACING)),
+                ).rotateFromUp(facing).add(pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble()).add(offset),
+                Vec3d(0.0, 0.25 + random.nextDouble() * 0.05, 0.0).rotateFromUp(facing),
                 32.0
             )
         }
     }
 
     private fun blastParticles(state: BlockState, world: ServerWorld, pos: BlockPos, random: RandomGenerator) {
-        repeat(random.range(7, 15)) {
+        val facing = state.get(FACING)
+        val offset = if (facing.id % 2 == 1) facing.vector.toVec3d() else Vec3d.ZERO
+        repeat(random.range(3, 7)) {
             world.spawnParticles(
                 DuskParticles.EXHAUST_BLAST,
-                Vec3d(random.nextDouble(), random.nextDouble(), random.nextDouble()).rotateFromUp(state.get(FACING))
-                    .add(pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble()),
-                Vec3d(0.0, 0.5 + random.nextDouble() * 0.25, 0.0).rotateFromUp(state.get(FACING)),
+                Vec3d(random.nextDouble(), random.nextDouble(), random.nextDouble()).rotateFromUp(facing)
+                    .add(pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble()).add(offset),
+                Vec3d(0.0, 0.5 + random.nextDouble() * 0.25, 0.0).rotateFromUp(facing),
                 128.0
             )
         }
@@ -207,6 +328,7 @@ class ExhaustBlock(settings: Settings) : SixWayFacingBlock(settings) {
         val SOURCE: EnumProperty<DirectionOrNullState> = DuskProperties.FACING_OR_NULL
         val AGE: IntProperty = Properties.AGE_25
 
-        val MAX_BLAST_HEIGHT = 15
+        const val MAX_BLAST_HEIGHT = 15
+        const val MAX_CHECK_DISTANCE = 32
     }
 }
