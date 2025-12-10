@@ -1,4 +1,4 @@
-package org.teamvoided.dusk_debris.block
+package org.teamvoided.dusk_debris.block.sot
 
 import com.mojang.serialization.MapCodec
 import net.minecraft.block.*

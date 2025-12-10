@@ -20,6 +20,8 @@ object DuskBlockTags {
     val NETHERSHROOM_IGNORE = create("nethershroom_ignore")
     val GUNPOWDER_CONNECTS_TO = create("gunpowder_connects_to")
 
+    val WIND_IGNORE = create("wind_ignore")
+
     val MIDAS_DEEPSLATE_GOLD_ORE = create("enchantment/curse/deepslate_gold_ore")
     val MIDAS_GOLD_ORE = create("enchantment/curse/gold_ore")
     val MIDAS_NETHER_GOLD_ORE = create("enchantment/curse/nether_gold_ore")
@@ -32,6 +34,7 @@ object DuskBlockTags {
     val CONVENTIONAL_STONE_ORES = create("c", "stone_ores")
     val CONVENTIONAL_NETHERRACK_ORES = create("c", "netherrack_ores")
     val CONVENTIONAL_RAW_ORE_BLOCKS = create("c", "raw_ore_blocks")
+    val CONVENTIONAL_GRATE_BLOCKS = create("c", "grate")
 
     val SCULK_SPREAD_SEARCH = create("sculk_spread_search")
 

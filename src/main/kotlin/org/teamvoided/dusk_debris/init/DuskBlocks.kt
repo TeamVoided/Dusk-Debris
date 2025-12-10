@@ -22,8 +22,7 @@ import net.minecraft.util.Color
 import org.teamvoided.dusk_debris.DuskDebris.id
 import org.teamvoided.dusk_debris.block.*
 import org.teamvoided.dusk_debris.block.big.BigLanternWithSpiralBlock
-import org.teamvoided.dusk_debris.block.sot.GildedChaliceBlock
-import org.teamvoided.dusk_debris.block.sot.StackedChaliceBlock
+import org.teamvoided.dusk_debris.block.sot.*
 import org.teamvoided.dusk_debris.block.throwable_bomb.BlunderbombBlock
 import org.teamvoided.dusk_debris.block.throwable_bomb.BonecallerBlock
 import org.teamvoided.dusk_debris.block.throwable_bomb.FirebombBlock
@@ -69,6 +68,8 @@ object DuskBlocks {
     val MYTHROCK = register("mythrock", Block(copy(STONE)))
     val MYTHROCK_ARTERY = register("mythrock_artery", MysticalStreamBlock(copy(MYTHROCK)))
     val MYTHROCK_HEART = register("mythrock_heart", MysticalPulseBlock(copy(MYTHROCK).ticksRandomly()))
+
+    val EXHAUST_BLOCK = register("exhaust_block", ExhaustBlock(copy(DEEPSLATE).ticksRandomly()))
 
     val BRONZE_BLOCK = register(
         "bronze_block", Block(

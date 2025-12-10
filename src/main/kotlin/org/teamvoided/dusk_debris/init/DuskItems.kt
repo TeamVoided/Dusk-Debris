@@ -24,7 +24,7 @@ import net.minecraft.world.World
 import net.minecraft.world.event.GameEvent
 import org.teamvoided.dusk_debris.DuskDebris.id
 import org.teamvoided.dusk_debris.block.DuskBlockLists
-import org.teamvoided.dusk_debris.block.GunpowderBarrelBlock
+import org.teamvoided.dusk_debris.block.sot.GunpowderBarrelBlock
 import org.teamvoided.dusk_debris.entity.GunpowderBarrelEntity
 import org.teamvoided.dusk_debris.item.*
 import org.teamvoided.dusk_debris.item.throwable_bomb.BlunderbombItem

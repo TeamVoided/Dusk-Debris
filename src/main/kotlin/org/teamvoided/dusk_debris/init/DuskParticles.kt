@@ -39,6 +39,8 @@ object DuskParticles {
     val PURPLE_BUBBLE = simple()
 
     val WIND = complex(WindParticleEffect.CODEC, WindParticleEffect.PACKET_CODEC)
+    val EXHAUST_WARMUP = simple()
+    val EXHAUST_BLAST = simple()
     val SPARK = simple()
     val RISING_EMBER = simple()
 
@@ -82,6 +84,8 @@ object DuskParticles {
         register("purple_bubble", PURPLE_BUBBLE)
 
         register("wind", WIND)
+        register("exhaust_warmup", EXHAUST_WARMUP)
+        register("exhaust_blast", EXHAUST_BLAST)
         register("spark", SPARK)
         register("rising_ember", RISING_EMBER)
 

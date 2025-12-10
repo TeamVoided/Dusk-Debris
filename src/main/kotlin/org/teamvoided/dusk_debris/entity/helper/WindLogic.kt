@@ -2,10 +2,14 @@ package org.teamvoided.dusk_debris.entity.helper
 
 import net.minecraft.entity.Entity
 import net.minecraft.entity.player.PlayerEntity
+import net.minecraft.util.math.BlockPos
+import net.minecraft.util.math.Direction
 import net.minecraft.util.math.Vec3d
+import net.minecraft.world.World
+import org.teamvoided.dusk_debris.data.tags.DuskBlockTags
 import org.teamvoided.dusk_debris.util.velocityWind
 
-object FanLogic {
+object WindLogic {
     fun Entity.inFanWind(velocity: Vec3d) {
         this.inFanWind(velocity.x, velocity.y, velocity.z)
     }
@@ -40,5 +44,24 @@ object FanLogic {
             else
                 Math.min(old, input)
         }
+    }
+
+
+    fun windLength(world: World, pos: BlockPos, direction: Direction, maxLength: Int): Int {
+        var retorn = maxLength
+        for (it in 0 until maxLength) {
+            val posCheck = pos.offset(direction, it + 1)
+            val worldBlock = world.getBlockState(pos.offset(direction, it + 1))
+            if (
+                !worldBlock.materialReplaceable() &&
+                !worldBlock.isIn(DuskBlockTags.WIND_IGNORE) &&
+                (worldBlock.isSideSolidFullSquare(world, posCheck, direction) ||
+                        worldBlock.isSideSolidFullSquare(world, posCheck, direction.opposite))
+            ) {
+                retorn = it
+                break
+            }
+        }
+        return retorn
     }
 }

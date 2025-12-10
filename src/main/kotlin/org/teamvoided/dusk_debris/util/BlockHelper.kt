@@ -9,8 +9,8 @@ import net.minecraft.sound.SoundEvents
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.Direction
 import org.teamvoided.dusk_debris.DuskDebris
-import org.teamvoided.dusk_debris.block.CoinPileBlock
-import org.teamvoided.dusk_debris.block.RibbonBlock
+import org.teamvoided.dusk_debris.block.sot.CoinPileBlock
+import org.teamvoided.dusk_debris.block.sot.RibbonBlock
 import org.teamvoided.dusk_debris.block.not_blocks.DuskProperties
 import org.teamvoided.dusk_debris.init.DuskBlocks
 import org.teamvoided.dusk_debris.particle.color.NethershroomSporeParticleEffect

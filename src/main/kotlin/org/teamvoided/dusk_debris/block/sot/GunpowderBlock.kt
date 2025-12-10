@@ -1,4 +1,4 @@
-package org.teamvoided.dusk_debris.block
+package org.teamvoided.dusk_debris.block.sot
 
 import com.google.common.collect.ImmutableMap
 import com.google.common.collect.Maps.newEnumMap

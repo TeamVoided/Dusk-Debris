@@ -18,9 +18,7 @@ import org.teamvoided.dusk_debris.init.DuskBlocks
 import org.teamvoided.dusk_debris.init.DuskItems
 import org.teamvoided.dusk_debris.item.DuskItemLists
 import org.teamvoided.dusk_debris.util.*
-import org.teamvoided.dusk_debris.util.model_helper.bubbleBlock
-import org.teamvoided.dusk_debris.util.model_helper.bubbleBlossomBlock
-import org.teamvoided.dusk_debris.util.model_helper.carpetStairs
+import org.teamvoided.dusk_debris.util.model_helper.*
 import java.util.*
 
 class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
@@ -152,6 +150,7 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
         )
 
 
+        gen.registerExhaust(DuskBlocks.EXHAUST_BLOCK)
         gen.registerCopperFan(DuskBlocks.COPPER_FAN, DuskBlocks.WAXED_COPPER_FAN)
         gen.registerCopperFan(DuskBlocks.EXPOSED_COPPER_FAN, DuskBlocks.WAXED_EXPOSED_COPPER_FAN)
         gen.registerCopperFan(DuskBlocks.WEATHERED_COPPER_FAN, DuskBlocks.WAXED_WEATHERED_COPPER_FAN)

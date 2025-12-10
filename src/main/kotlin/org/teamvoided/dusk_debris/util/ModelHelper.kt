@@ -13,7 +13,7 @@ import org.teamvoided.dusk_debris.DuskDebris.id
 import org.teamvoided.dusk_debris.block.FanBlock
 import org.teamvoided.dusk_debris.block.sot.GildedChaliceBlock
 import org.teamvoided.dusk_debris.block.NethershroomPlantBlock
-import org.teamvoided.dusk_debris.block.RoaringGeyserBlock
+import org.teamvoided.dusk_debris.block.sot.RoaringGeyserBlock
 import org.teamvoided.dusk_debris.block.not_blocks.DuskProperties
 import org.teamvoided.dusk_debris.block.not_blocks.GodhomeBronzePhase
 import java.util.*
@@ -552,72 +552,7 @@ fun BlockStateModelGenerator.registerGeyser(block: Block) {
 }
 
 
-fun BlockStateModelGenerator.registerCopperFan(fan: Block, waxedFan: Block? = null) {
-    val default: Identifier = Models.CUBE_BOTTOM_TOP.upload(fan, Texture.sideTopBottom(fan), this.modelCollector)
-    val power: Identifier =
-        this.createSubModel(fan, "_powered", Models.CUBE_BOTTOM_TOP, ::copperFan) // this is the bulb way
-    val active: Identifier =
-        Models.CUBE_BOTTOM_TOP.upload(fan, "_active", copperFan(fan, "_active"), this.modelCollector)
-    val activePower: Identifier =
-        Models.CUBE_BOTTOM_TOP.upload(
-            fan,
-            "_active_powered",
-            copperFan(fan, "_active", "_powered"),
-            this.modelCollector
-        )
-    this.blockStateCollector.accept(
-        this.createCopperFanBlockState(
-            fan,
-            default,
-            active,
-            power,
-            activePower
-        )
-    )
-    if (waxedFan != null) {
-        this.registerParentedItemModel(waxedFan, ModelIds.getItemModelId(fan.asItem()))
-        this.blockStateCollector.accept(
-            this.createCopperFanBlockState(
-                waxedFan,
-                default,
-                active,
-                power,
-                activePower
-            )
-        )
-    }
-}
 
-fun copperFan(id: Identifier): Texture {
-    return Texture()
-        .put(TextureKey.TOP, id.suffix("_top"))
-        .put(TextureKey.SIDE, id.suffix("_side"))
-        .put(TextureKey.BOTTOM, id.suffix("_bottom"))
-}
-
-fun copperFan(block: Block, suffix: String, powered: String = ""): Texture {
-    return Texture()
-        .put(TextureKey.TOP, block.model(suffix + powered + "_top"))
-        .put(TextureKey.SIDE, block.model(powered + "_side"))
-        .put(TextureKey.BOTTOM, block.model(powered + "_bottom"))
-}
-
-fun BlockStateModelGenerator.createCopperFanBlockState(
-    block: Block,
-    base: Identifier,
-    active: Identifier,
-    powered: Identifier,
-    activeAndPowered: Identifier
-): BlockStateSupplier {
-    return VariantsBlockStateSupplier.create(block).coordinate(
-        BlockStateVariantMap.create(FanBlock.ACTIVE, Properties.POWERED)
-            .register { activex: Boolean, poweredx: Boolean ->
-                if (activex) BlockStateVariant.create()
-                    .put(VariantSettings.MODEL, if (poweredx) activeAndPowered else active)
-                else BlockStateVariant.create()
-                    .put(VariantSettings.MODEL, if (poweredx) powered else base)
-            }).coordinate(this.createUpDefaultFacingVariantMap())
-}
 
 
 fun parentedItemModel(id: Identifier) = Model(Optional.of(id.withPrefix("item/")), Optional.empty())

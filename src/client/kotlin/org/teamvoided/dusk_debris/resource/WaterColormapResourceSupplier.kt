@@ -23,13 +23,10 @@ class WaterColormapResourceSupplier : SinglePreparationResourceReloader<IntArray
         }
     }
 
-    override fun apply(`is`: IntArray, resourceManager: ResourceManager, profiler: Profiler) {
+    override fun apply(`is`: IntArray, resourceManager: ResourceManager, profiler: Profiler) =
         WaterColors.setColorMap(`is`)
-    }
 
-    override fun getFabricId(): Identifier {
-        return id
-    }
+    override fun getFabricId(): Identifier = id
 
     companion object {
         private val id: Identifier = id("water_colors")

@@ -70,6 +70,11 @@ class BlockTagsProvider(output: FabricDataOutput, registriesFuture: CompletableF
             .forceAddTag(DuskBlockTags.NETHERSHROOM_REPLACEABLE)
             .add(DuskBlocks.NETHERSHROOM_STEM)
 
+        getOrCreateTagBuilder(DuskBlockTags.NETHERSHROOM_IGNORE)
+            .forceAddTag(DuskBlockTags.CONVENTIONAL_GRATE_BLOCKS)
+            .forceAddTag(BlockTags.LEAVES)
+            .add(DuskBlocks.NETHERSHROOM_STEM)
+
         getOrCreateTagBuilder(DuskBlockTags.MIDAS_DEEPSLATE_GOLD_ORE)
             .forceAddTag(DuskBlockTags.CONVENTIONAL_DEEPSLATE_ORES)
         getOrCreateTagBuilder(DuskBlockTags.MIDAS_GOLD_ORE)
@@ -182,6 +187,15 @@ class BlockTagsProvider(output: FabricDataOutput, registriesFuture: CompletableF
     }
 
     private fun conventionTags() {
+        getOrCreateTagBuilder(DuskBlockTags.CONVENTIONAL_GRATE_BLOCKS)
+            .add(Blocks.COPPER_GRATE)
+            .add(Blocks.EXPOSED_COPPER_GRATE)
+            .add(Blocks.WEATHERED_COPPER_GRATE)
+            .add(Blocks.OXIDIZED_COPPER_GRATE)
+            .add(Blocks.WAXED_COPPER_GRATE)
+            .add(Blocks.WAXED_EXPOSED_COPPER_GRATE)
+            .add(Blocks.WAXED_WEATHERED_COPPER_GRATE)
+            .add(Blocks.WAXED_OXIDIZED_COPPER_GRATE)
         getOrCreateTagBuilder(DuskBlockTags.CONVENTIONAL_DEEPSLATE_ORES)
             .add(Blocks.DEEPSLATE_COAL_ORE)
             .add(Blocks.DEEPSLATE_COPPER_ORE)

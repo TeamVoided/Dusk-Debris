@@ -33,6 +33,9 @@ object DuskParticlesClient {
         ParticleFactoryRegistry.getInstance().register(DuskParticles.EINSTEIN_ORBIT, EinsteinOrbitParticle::Factory)
 
         ParticleFactoryRegistry.getInstance().register(DuskParticles.WIND, WindParticle::Factory)
+        ParticleFactoryRegistry.getInstance().register(DuskParticles.EXHAUST_WARMUP, ExhaustBlastParticle::WarmUpFactory)
+        ParticleFactoryRegistry.getInstance().register(DuskParticles.EXHAUST_BLAST, ExhaustBlastParticle::Factory)
+
 
         ParticleFactoryRegistry.getInstance().register(DuskParticles.SPARK, ElectricityParticle::Factory)
 

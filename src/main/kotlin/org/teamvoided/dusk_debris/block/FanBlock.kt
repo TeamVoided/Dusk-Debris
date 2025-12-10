@@ -21,12 +21,12 @@ import net.minecraft.world.World
 import net.minecraft.world.event.GameEvent
 import org.teamvoided.dusk_debris.block.not_blocks.DuskProperties
 import org.teamvoided.dusk_debris.data.tags.DuskEntityTypeTags
-import org.teamvoided.dusk_debris.entity.helper.FanLogic.inFanWind
+import org.teamvoided.dusk_debris.entity.helper.WindLogic
+import org.teamvoided.dusk_debris.entity.helper.WindLogic.inFanWind
 import org.teamvoided.dusk_debris.particle.WindParticleEffect
 import org.teamvoided.dusk_debris.util.spawnParticles
 
-open class FanBlock(val strength: Int, settings: Settings) :
-    SixWayFacingBlock(settings) {
+open class FanBlock(val strength: Int, settings: Settings) : SixWayFacingBlock(settings) {
 
     init {
         this.defaultState = stateManager.defaultState
@@ -117,23 +117,9 @@ open class FanBlock(val strength: Int, settings: Settings) :
         return strength * 0.33333 + 10
     }
 
-    fun getWindLength(world: World, pos: BlockPos, state: BlockState): Int {
-        val facing = state.get(Properties.FACING)
-        var windLength = power().toInt()
-        for (it in 0 until power().toInt()) {
-            val posCheck = pos.offset(facing, it + 1)
-            val worldBlock = world.getBlockState(pos.offset(facing, it + 1))
-            if (
-                !worldBlock.materialReplaceable() &&
-                (worldBlock.isSideSolidFullSquare(world, posCheck, facing) ||
-                        worldBlock.isSideSolidFullSquare(world, posCheck, facing.opposite))
-            ) {
-                windLength = it
-                break
-            }
-        }
-        return windLength
-    }
+    fun getWindLength(world: World, pos: BlockPos, state: BlockState): Int =
+        WindLogic.windLength(world, pos, state.get(Properties.FACING), power().toInt())
+
 
     fun particles(world: ServerWorld, pos: BlockPos, state: BlockState, windLength: Int) {
         val rand = world.random
@@ -187,67 +173,6 @@ open class FanBlock(val strength: Int, settings: Settings) :
         entity.inFanWind(velocity)
     }
 
-    private fun getBox(direction: Direction, windLength: Double): Box {
-        val horizRange = 0.5
-        val vertRange = windLength
-        val vertRangeBottom = -0.5
-        return when (direction) {
-            Direction.UP -> Box(
-                -horizRange,
-                -vertRangeBottom,
-                -horizRange,
-                horizRange,
-                vertRange,
-                horizRange
-            )
-
-            Direction.DOWN -> Box(
-                -horizRange,
-                -vertRange,
-                -horizRange,
-                horizRange,
-                vertRangeBottom,
-                horizRange
-            )
-
-            Direction.NORTH -> Box(
-                -horizRange,
-                -horizRange,
-                -vertRange,
-                horizRange,
-                horizRange,
-                vertRangeBottom
-            )
-
-            Direction.SOUTH -> Box(
-                -horizRange,
-                -horizRange,
-                -vertRangeBottom,
-                horizRange,
-                horizRange,
-                vertRange
-            )
-
-            Direction.EAST -> Box(
-                -vertRangeBottom,
-                -horizRange,
-                -horizRange,
-                vertRange,
-                horizRange,
-                horizRange
-            )
-
-            Direction.WEST -> Box(
-                -vertRange,
-                -horizRange,
-                -horizRange,
-                vertRangeBottom,
-                horizRange,
-                horizRange
-            )
-        }
-    }
-
     companion object {
         val CODEC: MapCodec<FanBlock> = createCodec { settings: Settings ->
             FanBlock(
@@ -258,5 +183,66 @@ open class FanBlock(val strength: Int, settings: Settings) :
         val POWERED: BooleanProperty = Properties.POWERED
         val ACTIVE: BooleanProperty = DuskProperties.ACTIVE
         val FACING: DirectionProperty = Properties.FACING
+
+        fun getBox(direction: Direction, windLength: Double): Box {
+            val horizRange = 0.5
+            val vertRange = windLength
+            val vertRangeBottom = -0.5
+            return when (direction) {
+                Direction.UP -> Box(
+                    -horizRange,
+                    -vertRangeBottom,
+                    -horizRange,
+                    horizRange,
+                    vertRange,
+                    horizRange
+                )
+
+                Direction.DOWN -> Box(
+                    -horizRange,
+                    -vertRange,
+                    -horizRange,
+                    horizRange,
+                    vertRangeBottom,
+                    horizRange
+                )
+
+                Direction.NORTH -> Box(
+                    -horizRange,
+                    -horizRange,
+                    -vertRange,
+                    horizRange,
+                    horizRange,
+                    vertRangeBottom
+                )
+
+                Direction.SOUTH -> Box(
+                    -horizRange,
+                    -horizRange,
+                    -vertRangeBottom,
+                    horizRange,
+                    horizRange,
+                    vertRange
+                )
+
+                Direction.EAST -> Box(
+                    -vertRangeBottom,
+                    -horizRange,
+                    -horizRange,
+                    vertRange,
+                    horizRange,
+                    horizRange
+                )
+
+                Direction.WEST -> Box(
+                    -vertRange,
+                    -horizRange,
+                    -horizRange,
+                    vertRangeBottom,
+                    horizRange,
+                    horizRange
+                )
+            }
+        }
     }
 }

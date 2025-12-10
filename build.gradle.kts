@@ -54,7 +54,7 @@ dependencies {
     modImplementation(fileTree("libs"))
     modImplementation(libs.modmenu)
     modImplementation(libs.reef)
-    modImplementation(libs.creative.works)
+    //modImplementation(libs.creative.works)
 
 //    modImplementation("org.teamvoided:voidcore:0.1.0")
 //    modImplementation("org.teamvoided:voidmill:1.0.6")

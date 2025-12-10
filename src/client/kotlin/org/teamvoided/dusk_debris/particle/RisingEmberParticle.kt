@@ -36,12 +36,12 @@ class RisingEmberParticle(
 
     init {
         this.maxAge = 120 + random.nextInt(8)
-        this.scale = 0.05f
+        this.scale = 0.025f
         this.prevVelocity = Vec3d(velX, velY, velZ)
         this.nextVelocity = randomVelocity()
         this.ageNewOld = 0 to random.nextInt(10) + 10
 
-        val color = Color(0xFF2244)
+        val color = Color(0xFF2244) //0xFFB922 //0xFF8522 //0xFF2244 //0x5D091B
         this.colorRed = color.red / 255f
         this.colorGreen = color.green / 255f
         this.colorBlue = color.blue / 255f
@@ -84,14 +84,14 @@ class RisingEmberParticle(
 
     override fun buildGeometry(vertexConsumer: VertexConsumer, camera: Camera, tickDelta: Float) {
         val vel = getVelocity(tickDelta)
-        val rot = MathHelper.atan2(vel.x, vel.z).toFloat()
+        val rol = MathHelper.atan2(vel.x, vel.z).toFloat()
         val pit = MathHelper.atan2(vel.y, sqrt(vel.x * vel.x + vel.z * vel.z)).toFloat() - Utils.rotate90
-        val rotateY = (age + tickDelta) / 3
+        val yaw = (age + tickDelta) / 3
 
         val quaternionf = Quaternionf()
-        quaternionf.rotationY(rot).rotateX(-pit).rotateY(rotateY)
+        quaternionf.rotationY(rol).rotateX(-pit).rotateY(yaw)
         this.method_60373(vertexConsumer, camera, quaternionf, tickDelta)
-        quaternionf.rotationY(rot - PI).rotateX(pit).rotateY(rotateY)
+        quaternionf.rotationY(rol - PI).rotateX(pit).rotateY(yaw)
         this.method_60373(vertexConsumer, camera, quaternionf, tickDelta)
     }
 

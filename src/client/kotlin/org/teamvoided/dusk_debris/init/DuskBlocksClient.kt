@@ -5,7 +5,7 @@ import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry
 import net.minecraft.client.color.world.BiomeColors
 import net.minecraft.client.color.world.FoliageColors
 import net.minecraft.client.render.RenderLayer
-import org.teamvoided.dusk_debris.block.GunpowderBlock
+import org.teamvoided.dusk_debris.block.sot.GunpowderBlock
 
 object DuskBlocksClient {
     fun init() {

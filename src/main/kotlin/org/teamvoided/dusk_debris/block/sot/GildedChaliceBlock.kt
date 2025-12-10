@@ -19,7 +19,6 @@ import net.minecraft.util.shape.VoxelShape
 import net.minecraft.util.shape.VoxelShapes
 import net.minecraft.world.BlockView
 import net.minecraft.world.World
-import org.teamvoided.dusk_debris.block.MysteriousVesselBlock
 import org.teamvoided.dusk_debris.block.not_blocks.DuskProperties
 import org.teamvoided.dusk_debris.block.sot.StackedChaliceBlock.Companion.tryMakeFromBlock
 import org.teamvoided.dusk_debris.util.rotate
