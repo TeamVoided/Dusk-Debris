@@ -14,57 +14,52 @@ import org.teamvoided.dusk_debris.particle.vanilla.AdditionalWaterSuspendParticl
 object DuskParticlesClient {
     //ParticleManager
     fun init() {
-        ParticleFactoryRegistry.getInstance().register(DuskParticles.TOXIC_SMOKE_PARTICLE, ToxicSmokeParticle::Factory)
-        ParticleFactoryRegistry.getInstance()
-            .register(DuskParticles.GUNPOWDER_EXPLOSION_SMOKE, GunpowderExplosionSmokeParticle::Factory)
-        ParticleFactoryRegistry.getInstance()
-            .register(DuskParticles.GUNPOWDER_EXPLOSION_EMMITER, GunpowderExplosionEmitterParticle.Factory())
-        ParticleFactoryRegistry.getInstance().register(DuskParticles.BLUNDERBOMB, BlunderbombParticle.Factory())
-        ParticleFactoryRegistry.getInstance().register(DuskParticles.FIREBOMB, FirebombParticle.Factory())
-        ParticleFactoryRegistry.getInstance().register(DuskParticles.BONECALLER, BonecallerParticle::Factory)
-        ParticleFactoryRegistry.getInstance().register(DuskParticles.GEYSER, GeyserParticle::Factory)
-        ParticleFactoryRegistry.getInstance().register(DuskParticles.GODHOME, GodhomeParticle::Factory)
-        ParticleFactoryRegistry.getInstance().register(DuskParticles.DRAINED_SOUL, DrainedSoulParticle::SmallFactory)
-        ParticleFactoryRegistry.getInstance().register(DuskParticles.SPELL, SpellParticle::Factory)
-        ParticleFactoryRegistry.getInstance().register(DuskParticles.CUBE, CubeParticle::Factory)
+        val ins = ParticleFactoryRegistry.getInstance()
+        ins.register(DuskParticles.TOXIC_SMOKE_PARTICLE, ToxicSmokeParticle::Factory)
+        ins.register(DuskParticles.GUNPOWDER_EXPLOSION_SMOKE, GunpowderExplosionSmokeParticle::Factory)
+        ins.register(DuskParticles.GUNPOWDER_EXPLOSION_EMMITER, GunpowderExplosionEmitterParticle.Factory())
+        ins.register(DuskParticles.BLUNDERBOMB, BlunderbombParticle.Factory())
+        ins.register(DuskParticles.FIREBOMB, FirebombParticle.Factory())
+        ins.register(DuskParticles.BONECALLER, BonecallerParticle::Factory)
+        ins.register(DuskParticles.GEYSER, GeyserParticle::Factory)
+        ins.register(DuskParticles.GODHOME, GodhomeParticle::Factory)
+        ins.register(DuskParticles.DRAINED_SOUL, DrainedSoulParticle::SmallFactory)
+        ins.register(DuskParticles.SPELL, SpellParticle::Factory)
+        ins.register(DuskParticles.CUBE, CubeParticle::Factory)
 
-        ParticleFactoryRegistry.getInstance().register(DuskParticles.COSMOS, CosmosParticle::Factory)
-        ParticleFactoryRegistry.getInstance().register(DuskParticles.ENTITY_TEST, EntityTestParticle::Factory)
-        ParticleFactoryRegistry.getInstance().register(DuskParticles.EINSTEIN_ORBIT, EinsteinOrbitParticle::Factory)
+        ins.register(DuskParticles.COSMOS, CosmosParticle::Factory)
+        ins.register(DuskParticles.ENTITY_TEST, EntityTestParticle::Factory)
+        ins.register(DuskParticles.EINSTEIN_ORBIT, EinsteinOrbitParticle::Factory)
 
-        ParticleFactoryRegistry.getInstance().register(DuskParticles.WIND, WindParticle::Factory)
-        ParticleFactoryRegistry.getInstance().register(DuskParticles.EXHAUST_WARMUP, ExhaustBlastParticle::WarmUpFactory)
-        ParticleFactoryRegistry.getInstance().register(DuskParticles.EXHAUST_BLAST, ExhaustBlastParticle::Factory)
+        ins.register(DuskParticles.WIND, WindParticle::Factory)
+        ins.register(DuskParticles.EXHAUST_WARMUP, ExhaustBlastParticle::WarmUpFactory)
+        ins.register(DuskParticles.EXHAUST_BLAST, ExhaustBlastParticle::Factory)
+        ins.register(DuskParticles.SNAIL, SnailParticle::Factory)
 
 
-        ParticleFactoryRegistry.getInstance().register(DuskParticles.SPARK, ElectricityParticle::Factory)
+        ins.register(DuskParticles.SPARK, ElectricityParticle::Factory)
 
-        ParticleFactoryRegistry.getInstance()
-            .register(DuskParticles.UNDERACID, AdditionalWaterSuspendParticle::UnderacidFactory)
-        ParticleFactoryRegistry.getInstance().register(DuskParticles.ACID_BUBBLE_POP, BubblePopParticle::Factory)
+        ins.register(DuskParticles.UNDERACID, AdditionalWaterSuspendParticle::UnderacidFactory)
+        ins.register(DuskParticles.ACID_BUBBLE_POP, BubblePopParticle::Factory)
 
-        ParticleFactoryRegistry.getInstance().register(DuskParticles.FLASH, FlashParticle::Factory)
-        ParticleFactoryRegistry.getInstance().register(DuskParticles.RISING_EMBER, RisingEmberParticle::Factory)
+        ins.register(DuskParticles.FLASH, FlashParticle::Factory)
+        ins.register(DuskParticles.RISING_EMBER, RisingEmberParticle::Factory)
 
-        ParticleFactoryRegistry.getInstance()
-            .register(DuskParticles.SMALL_PURPLE_BUBBLE_CUBE, BubbleCubeParticle::SmallFactory)
-        ParticleFactoryRegistry.getInstance().register(DuskParticles.PURPLE_BIOME_BUBBLE, BiomeBubbleParticle::Factory)
-        ParticleFactoryRegistry.getInstance().register(DuskParticles.PURPLE_BUBBLE, DuskBubbleParticle::Factory)
+        ins.register(DuskParticles.SMALL_PURPLE_BUBBLE_CUBE, BubbleCubeParticle::SmallFactory)
+        ins.register(DuskParticles.PURPLE_BIOME_BUBBLE, BiomeBubbleParticle::Factory)
+        ins.register(DuskParticles.PURPLE_BUBBLE, DuskBubbleParticle::Factory)
 
-        ParticleFactoryRegistry.getInstance()
-            .register(DuskParticles.ASTRAS_FLYING_GOOP, AstrasStrangeGoopParticle::FallingGoopFactory)
-        ParticleFactoryRegistry.getInstance()
-            .register(DuskParticles.ASTRAS_LANDED_GOOP, AstrasStrangeGoopParticle::LandedGoopFactory)
+        ins.register(DuskParticles.ASTRAS_FLYING_GOOP, AstrasStrangeGoopParticle::FallingGoopFactory)
+        ins.register(DuskParticles.ASTRAS_LANDED_GOOP, AstrasStrangeGoopParticle::LandedGoopFactory)
 
-        ParticleFactoryRegistry.getInstance()
-            .register(DuskParticles.SHRIEK_DIRECTIONAL, ShriekDirectionalParticle::Factory)
+        ins.register(DuskParticles.SHRIEK_DIRECTIONAL, ShriekDirectionalParticle::Factory)
 
-        ParticleFactoryRegistry.getInstance().register(DuskParticles.BETWEEN_POINTS, BetweenPointsParticle.Factory())
+        ins.register(DuskParticles.BETWEEN_POINTS, BetweenPointsParticle.Factory())
 
         // DnD
-        ParticleFactoryRegistry.getInstance().register(DuskParticles.SPIDERLILY, SpiderlilyPetalParticle::Factory)
-        ParticleFactoryRegistry.getInstance().register(DuskParticles.MUSHROOM_LAUNCH, MushroomLaunchParticle::Factory)
-        ParticleFactoryRegistry.getInstance().register(DuskParticles.DUST_BUNNY, DustBunnyParticle::Factory)
-        ParticleFactoryRegistry.getInstance().register(DuskParticles.SPIRAL, SpiralParticle::Factory)
+        ins.register(DuskParticles.SPIDERLILY, SpiderlilyPetalParticle::Factory)
+        ins.register(DuskParticles.MUSHROOM_LAUNCH, MushroomLaunchParticle::Factory)
+        ins.register(DuskParticles.DUST_BUNNY, DustBunnyParticle::Factory)
+        ins.register(DuskParticles.SPIRAL, SpiralParticle::Factory)
     }
 }

@@ -32,7 +32,7 @@ class ExhaustBlastParticle(
 ) : SpriteBillboardParticle(world, posX, posY, posZ, velX, velY, velZ) {
 
     init {
-        this.setSpriteForAge(spriteProvider)
+        this.setSpriteForAge(this.spriteProvider)
         this.maxAge = if (isWarmup) 40 else 15 + random.nextInt(15)
         this.scale = random.nextFloat() * 0.5f + 0.3f
         this.velocityMultiplier = 0.8f
@@ -41,7 +41,10 @@ class ExhaustBlastParticle(
         this.velocityZ = velZ
         this.onGround = this.isWarmup
 
-        val color = ParticleHelper.chooseColor(Color(0xA88663), Color(0xF2B68E), random)
+        val color = ParticleHelper.chooseColor(
+            Color(0xA89583),
+            Color(0xF1C9AD), random
+        )
         colorRed = color.x
         colorGreen = color.y
         colorBlue = color.z
@@ -59,6 +62,7 @@ class ExhaustBlastParticle(
         if (age++ >= this.maxAge) {
             this.markDead()
         } else {
+            this.setSpriteForAge(this.spriteProvider)
             this.prevPosX = this.x
             this.prevPosY = this.y
             this.prevPosZ = this.z
@@ -78,12 +82,8 @@ class ExhaustBlastParticle(
     }
 
     override fun getSize(tickDelta: Float): Float {
-        return if (isWarmup && 20 > age)
-            super.getSize(tickDelta) * (((age + tickDelta) / 21) / 2 + 0.5f)
-        else if (maxAge - 6 < age + tickDelta)
-            super.getSize(tickDelta) * (((maxAge - (age + tickDelta)) / (maxAge - 6)) + 1) / 2
-        else
-            super.getSize(tickDelta)
+        return if (isWarmup && 20 > age) super.getSize(tickDelta) * (((age + tickDelta) / 21) / 2 + 0.5f)
+        else super.getSize(tickDelta)
     }
 
     override fun move(x: Double, y: Double, z: Double) {

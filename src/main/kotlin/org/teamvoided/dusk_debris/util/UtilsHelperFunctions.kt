@@ -121,6 +121,19 @@ fun box(double: Double): Box {
 fun TestableWorld.isInSet(pos: BlockPos, tag: HolderSet<Block>): Boolean = this.testBlockState(pos) { it.isIn(tag) }
 fun TestableWorld.isInTag(pos: BlockPos, tag: TagKey<Block>): Boolean = this.testBlockState(pos) { it.isIn(tag) }
 
+fun VoxelShape.rotate(times: Int) = rotateVoxelShape(times, this)
+fun VoxelShape.rotateY(times: Int = 1) = rotateVoxelShapeY(times, this)
+
+fun VoxelShape.rotateFromDown(direction: Direction) = when (direction) {
+    Direction.DOWN -> this
+    Direction.UP -> this.rotateY(2)
+    Direction.NORTH -> this.rotateY(1)
+    Direction.EAST -> this.rotateY().rotate(1)
+    Direction.SOUTH -> this.rotateY().rotate(2)
+    Direction.WEST -> this.rotateY().rotate(3)
+    else -> this
+}
+
 fun rotateVoxelShape(times: Int, shape: VoxelShape): VoxelShape {
     val shapes = arrayOf(shape, VoxelShapes.empty())
     for (i in 0 until times) {
@@ -133,7 +146,18 @@ fun rotateVoxelShape(times: Int, shape: VoxelShape): VoxelShape {
     return shapes[0]
 }
 
-fun VoxelShape.rotate(times: Int) = rotateVoxelShape(times, this)
+fun rotateVoxelShapeY(times: Int, shape: VoxelShape): VoxelShape {
+    val shapes = arrayOf(shape, VoxelShapes.empty())
+    for (i in 0 until times) {
+        shapes[0].forEachBox { minX, minY, minZ, maxX, maxY, maxZ ->
+            shapes[1] = VoxelShapes.union(shapes[1], VoxelShapes.cuboid(minX, 1 - maxZ, minY, maxX, 1 - minZ, maxY))
+        }
+        shapes[0] = shapes[1]
+        shapes[1] = VoxelShapes.empty()
+    }
+    return shapes[0]
+}
+
 
 fun Direction.asProperty(): BooleanProperty {
     return when (this) {
