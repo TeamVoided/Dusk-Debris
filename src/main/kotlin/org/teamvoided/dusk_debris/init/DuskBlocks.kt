@@ -52,6 +52,9 @@ object DuskBlocks {
 
     val STRONG_SCAFFOLDING =
         registerStrongScaffolding("strong_scaffolding", StrongScaffoldingBlock(copy(SCAFFOLDING))).cutout()
+    val OVERGROWTH = register("overgrowth", OvergrowthBlock(copy(MOSS_BLOCK)))
+    val OVERGROWTH_BUSH = register("overgrowth_bush", OvergrowthBlock(copy(MOSS_BLOCK)))
+
     //val STONE_CHEST = register("stone_chest", DuskDoubleChestBlock(copy(CHEST)) { DuskBlockEntities.STONE_CHEST })
 
     val ACID = registerNoItem("acid", FluidBlock(DuskFluids.ACID, copy(WATER).mapColor(MapColor.LIME)))

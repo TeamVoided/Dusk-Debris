@@ -21,10 +21,10 @@ import net.minecraft.world.WorldAccess
 import net.minecraft.world.WorldView
 import org.teamvoided.dusk_debris.util.rotateFromDown
 
-class OvergrowthSaplingBlock(settings: Settings) : AzaleaBlock(settings), Waterloggable {
+class OvergrowthBushBlock(settings: Settings) : AzaleaBlock(settings), Waterloggable {
     init {
         this.defaultState = stateManager.defaultState
-            .with(Properties.FACING, Direction.UP)
+            .with(Properties.FACING, Direction.DOWN)
             .with(Properties.WATERLOGGED, false)
     }
 
@@ -32,8 +32,13 @@ class OvergrowthSaplingBlock(settings: Settings) : AzaleaBlock(settings), Waterl
         builder.add(Properties.FACING, Properties.WATERLOGGED)
     }
 
+    override fun canPlaceAt(state: BlockState, world: WorldView, pos: BlockPos): Boolean {
+        val blockPos = pos.offset(state.get(Properties.FACING))
+        return this.canPlantOnTop(world.getBlockState(blockPos), world, blockPos)
+    }
+
     override fun isFertilizable(world: WorldView, pos: BlockPos, state: BlockState): Boolean {
-        return world.getBlockState(pos.offset(world.getBlockState(pos).get(Properties.FACING))).materialReplaceable()
+        return world.getBlockState(pos.offset(state.get(Properties.FACING).opposite)).materialReplaceable()
     }
 
     override fun fertilize(world: ServerWorld, random: RandomGenerator, pos: BlockPos, state: BlockState) {
@@ -64,8 +69,9 @@ class OvergrowthSaplingBlock(settings: Settings) : AzaleaBlock(settings), Waterl
     }
 
     override fun getPlacementState(ctx: ItemPlacementContext): BlockState {
-        val waterlog = ctx.world.getFluidState(ctx.blockPos).fluid == Fluids.WATER
-        return super.getPlacementState(ctx)!!.with(Properties.WATERLOGGED, waterlog)
+        return super.getPlacementState(ctx)!!
+            .with(Properties.WATERLOGGED, ctx.world.getFluidState(ctx.blockPos).fluid == Fluids.WATER)
+            .with(Properties.FACING, ctx.side)
     }
 
     override fun getFluidState(state: BlockState): FluidState {
