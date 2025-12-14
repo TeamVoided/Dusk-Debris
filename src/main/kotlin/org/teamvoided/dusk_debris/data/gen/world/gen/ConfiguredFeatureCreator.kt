@@ -6,12 +6,14 @@ import net.minecraft.registry.BootstrapContext
 import net.minecraft.registry.Holder
 import net.minecraft.registry.RegistryKey
 import net.minecraft.registry.RegistryKeys
+import net.minecraft.registry.tag.BlockTags
 import net.minecraft.state.property.Properties
 import net.minecraft.util.math.Direction
+import net.minecraft.util.math.int_provider.BiasedToBottomIntProvider
 import net.minecraft.util.math.int_provider.ConstantIntProvider
+import net.minecraft.util.math.int_provider.UniformIntProvider
 import net.minecraft.world.gen.feature.*
 import net.minecraft.world.gen.feature.size.TwoLayersFeatureSize
-import net.minecraft.world.gen.feature.util.ConfiguredFeatureUtil
 import net.minecraft.world.gen.feature.util.PlacedFeatureUtil
 import net.minecraft.world.gen.foliage.BlobFoliagePlacer
 import net.minecraft.world.gen.stateprovider.BlockStateProvider
@@ -20,9 +22,12 @@ import net.minecraft.world.gen.trunk.StraightTrunkPlacer
 import org.teamvoided.dusk_debris.data.gen.world.gen.configured_feature.NetherCFCreators.netherConfiguredFeatureCreators
 import org.teamvoided.dusk_debris.data.gen.world.gen.configured_feature.SwampCFCreators.swampConfiguredFeatureCreators
 import org.teamvoided.dusk_debris.data.gen.world.gen.configured_feature.TestCFCreators.testConfiguredFeatureCreators
+import org.teamvoided.dusk_debris.data.tags.DuskBlockTags
 import org.teamvoided.dusk_debris.data.worldgen.DuskConfiguredFeatures
+import org.teamvoided.dusk_debris.init.DuskBlocks
 import org.teamvoided.dusk_debris.init.worldgen.DuskFeatures
 import org.teamvoided.dusk_debris.world.gen.configured_feature.ThresholdPlacedFeature
+import org.teamvoided.dusk_debris.world.gen.configured_feature.config.MushroomFeatureConfig
 import org.teamvoided.dusk_debris.world.gen.configured_feature.config.NoiseFeatureConfig
 import org.teamvoided.dusk_debris.world.gen.tree.decorator.AttachedToTrunkTreeDecorator
 import org.teamvoided.dusk_debris.world.gen.tree.foliage.BirchFoliagePlacer
@@ -39,6 +44,18 @@ object ConfiguredFeatureCreator {
         c.swampConfiguredFeatureCreators()
         c.testConfiguredFeatureCreators()
 
+        c.registerConfiguredFeature(
+            DuskConfiguredFeatures.HUGE_GOLD_MUSHROOM,
+            DuskFeatures.HUGE_GOLDEN_MUSHROOM,
+            MushroomFeatureConfig(
+                BlockTags.REPLACEABLE,
+                BlockTags.REPLACEABLE,
+                BlockStateProvider.of(DuskBlocks.NETHERSHROOM_STEM),
+                BiasedToBottomIntProvider.create(5, 10),
+                BlockStateProvider.of(DuskBlocks.PURPLE_NETHERSHROOM_BLOCK),
+                BiasedToBottomIntProvider.create(1, 7),
+            )
+        )
         c.registerConfiguredFeature(
             DuskConfiguredFeatures.OAK,
             Feature.TREE,

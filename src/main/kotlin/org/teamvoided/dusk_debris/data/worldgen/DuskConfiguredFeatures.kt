@@ -20,6 +20,7 @@ object DuskConfiguredFeatures {
     val TALL_SWAMP_CYPRESS = create("swamp/tall_swamp_cypress")
     val TREES_SWAMP = create("swamp/trees_swamp")
 
+    val HUGE_GOLD_MUSHROOM = create("huge_gold_mushroom")
     val BLUE_NETHERSHROOM = create("nether/blue_nethershroom")
     val HUGE_BLUE_NETHERSHROOM = create("nether/huge_blue_nethershroom")
     val LARGE_BLUE_NETHERSHROOM_PATCH = create("nether/large_blue_nethershroom_patch")

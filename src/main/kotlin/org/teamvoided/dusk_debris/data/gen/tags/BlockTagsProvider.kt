@@ -150,7 +150,13 @@ class BlockTagsProvider(output: FabricDataOutput, registriesFuture: CompletableF
             .add(DuskBlocks.STRIPPED_CYPRESS_LOG)
             .add(DuskBlocks.CYPRESS_WOOD)
             .add(DuskBlocks.STRIPPED_CYPRESS_WOOD)
+        getOrCreateTagBuilder(BlockTags.SAPLINGS)
+            .add(DuskBlocks.OVERGROWTH_BUSH)
+        getOrCreateTagBuilder(BlockTags.LEAVES)
+            .add(DuskBlocks.OVERGROWTH_LEAVES)
 
+        getOrCreateTagBuilder(BlockTags.DIRT)
+            .add(DuskBlocks.OVERGROWTH_BLOCK)
         getOrCreateTagBuilder(BlockTags.SAND)
             .add(DuskBlocks.VOLCANIC_SAND)
             .add(DuskBlocks.SUSPICIOUS_VOLCANIC_SAND)

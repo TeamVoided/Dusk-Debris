@@ -71,7 +71,7 @@ class OvergrowthBushBlock(settings: Settings) : AzaleaBlock(settings), Waterlogg
     override fun getPlacementState(ctx: ItemPlacementContext): BlockState {
         return super.getPlacementState(ctx)!!
             .with(Properties.WATERLOGGED, ctx.world.getFluidState(ctx.blockPos).fluid == Fluids.WATER)
-            .with(Properties.FACING, ctx.side)
+            .with(Properties.FACING, ctx.side.opposite)
     }
 
     override fun getFluidState(state: BlockState): FluidState {

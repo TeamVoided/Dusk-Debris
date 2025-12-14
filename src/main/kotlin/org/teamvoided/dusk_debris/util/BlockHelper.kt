@@ -27,6 +27,11 @@ fun Block.translucent(): Block {
     return this
 }
 
+fun Block.grassTint(): Block {
+    DuskBlocks.GRASS_TINT_BLOCKS.add(this)
+    return this
+}
+
 
 val vesselBlockSound = BlockSoundGroup(
     1f,

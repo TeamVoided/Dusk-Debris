@@ -8,7 +8,7 @@ import net.minecraft.world.WorldAccess
 import org.teamvoided.dusk_debris.world.gen.configured_feature.config.HugeNethershroomFeatureConfig
 
 open class HugeBlueNethershroomFeature(codec: Codec<HugeNethershroomFeatureConfig>) :
-    AbstractHugeNethershroomFeature(codec) {
+    AbstractHugeMushroomFeature<HugeNethershroomFeatureConfig>(codec) {
 
     override fun generateCap(
         world: WorldAccess,

@@ -2,8 +2,11 @@ package org.teamvoided.dusk_debris.init
 
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry
+import net.minecraft.block.Block
+import net.minecraft.client.color.block.BlockColorProvider
 import net.minecraft.client.color.world.BiomeColors
 import net.minecraft.client.color.world.FoliageColors
+import net.minecraft.client.color.world.GrassColors
 import net.minecraft.client.render.RenderLayer
 import org.teamvoided.dusk_debris.block.sot.GunpowderBlock
 
@@ -21,9 +24,17 @@ object DuskBlocksClient {
             DuskBlocks.GUNPOWDER
         )
 
+
+        registerTint({ _, world, pos, _ ->
+            if (world != null && pos != null) BiomeColors.getGrassColor(world, pos)
+            else GrassColors.getDefault()
+        }, *DuskBlocks.GRASS_TINT_BLOCKS.toTypedArray())
         DuskBlocks.CUTOUT_BLOCKS.forEach { BlockRenderLayerMap.INSTANCE.putBlock(it, RenderLayer.getCutout()) }
         DuskBlocks.TRANSLUCENT_BLOCKS.forEach {
             BlockRenderLayerMap.INSTANCE.putBlock(it, RenderLayer.getTranslucent())
         }
     }
+
+    private fun registerTint(provider: BlockColorProvider, vararg blocks: Block) =
+        ColorProviderRegistry.BLOCK.register(provider, *blocks)
 }

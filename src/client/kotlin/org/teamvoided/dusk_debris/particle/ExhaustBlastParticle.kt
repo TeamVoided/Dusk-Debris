@@ -12,6 +12,7 @@ import net.minecraft.util.math.Direction
 import net.minecraft.util.math.MathHelper.lerp
 import net.minecraft.util.math.Vec3d
 import org.joml.Vector2d
+import org.teamvoided.dusk_debris.block.ExhaustBlock
 import org.teamvoided.dusk_debris.util.ParticleHelper
 import org.teamvoided.dusk_debris.util.Utils
 import org.teamvoided.dusk_debris.util.Utils.PI
@@ -32,9 +33,11 @@ class ExhaustBlastParticle(
 ) : SpriteBillboardParticle(world, posX, posY, posZ, velX, velY, velZ) {
 
     init {
-        this.setSpriteForAge(this.spriteProvider)
-        this.maxAge = if (isWarmup) 40 else 15 + random.nextInt(15)
-        this.scale = random.nextFloat() * 0.5f + 0.3f
+        if (!isWarmup) this.setSpriteForAge(this.spriteProvider) else this.setSprite(this.spriteProvider)
+        this.maxAge =
+            if (isWarmup) ExhaustBlock.WORLD_TIME_MOD * ExhaustBlock.WARMUP_DURATION + 10 + random.nextInt(25)
+            else 15 + random.nextInt(15)
+        this.scale = if (isWarmup) random.nextFloat() * 0.3f + 0.2f else random.nextFloat() * 0.5f + 0.3f
         this.velocityMultiplier = 0.8f
         this.velocityX = velX
         this.velocityY = velY
@@ -43,7 +46,8 @@ class ExhaustBlastParticle(
 
         val color = ParticleHelper.chooseColor(
             Color(0xA89583),
-            Color(0xF1C9AD), random
+            Color(0xF1C9AD),
+            random
         )
         colorRed = color.x
         colorGreen = color.y
@@ -54,7 +58,7 @@ class ExhaustBlastParticle(
 
 
     public override fun getBrightness(tickDelta: Float): Int {
-        val upper = if (isWarmup) (15728880 * (age + tickDelta) / (maxAge - 1)).toInt() else 15728880 / 3
+        val upper = if (isWarmup) (15728880 * (age + tickDelta) / (maxAge - 1)).toInt() else 15728880 / 2
         return max(super.getBrightness(tickDelta), upper)
     }
 
@@ -62,16 +66,19 @@ class ExhaustBlastParticle(
         if (age++ >= this.maxAge) {
             this.markDead()
         } else {
-            this.setSpriteForAge(this.spriteProvider)
+            if (!isWarmup) this.setSpriteForAge(this.spriteProvider)
             this.prevPosX = this.x
             this.prevPosY = this.y
             this.prevPosZ = this.z
-            if (maxAge - 5 < age) {
+            if (!this.isWarmup && maxAge - 5 < age) {
                 velocityX *= velocityMultiplier
                 velocityY *= velocityMultiplier
                 velocityZ *= velocityMultiplier
             }
-            if (!this.onGround) {
+            if (this.isWarmup) {
+                val mult = ((age + 5) / (maxAge + 5.0))
+                this.move(this.velocityX * mult, this.velocityY * mult, this.velocityZ * mult)
+            } else if (!this.onGround) {
                 this.move(this.velocityX, this.velocityY, this.velocityZ)
             } else {
                 this.x += velocityX
@@ -81,43 +88,52 @@ class ExhaustBlastParticle(
         }
     }
 
+    override fun buildGeometry(vertexConsumer: VertexConsumer, camera: Camera, tickDelta: Float) {
+        super.buildGeometry(vertexConsumer, camera, tickDelta)
+    }
+
     override fun getSize(tickDelta: Float): Float {
-        return if (isWarmup && 20 > age) super.getSize(tickDelta) * (((age + tickDelta) / 21) / 2 + 0.5f)
-        else super.getSize(tickDelta)
+        val supr = super.getSize(tickDelta)
+        if (isWarmup) return ((age + tickDelta + maxAge) / (2 * maxAge)) * supr
+        return supr
     }
 
     override fun move(x: Double, y: Double, z: Double) {
-        var dx = x
-        var dy = y
-        var dz = z
-        if ((dx != 0.0 || dy != 0.0 || dz != 0.0) && (dx * dx + dy * dy + dz * dz < 10000)) {
-            val vec3d = Entity.adjustSingleAxisMovementForCollisions(
-                null as Entity?,
-                Vec3d(dx, dy, dz),
-                this.boundingBox,
-                this.world,
-                listOf()
-            )
-            dx = vec3d.x
-            dy = vec3d.y
-            dz = vec3d.z
-        }
+        if (isWarmup) {
+            super.move(x, y, z)
+        } else {
+            var dx = x
+            var dy = y
+            var dz = z
+            if ((dx != 0.0 || dy != 0.0 || dz != 0.0) && (dx * dx + dy * dy + dz * dz < 10000)) {
+                val vec3d = Entity.adjustSingleAxisMovementForCollisions(
+                    null as Entity?,
+                    Vec3d(dx, dy, dz),
+                    this.boundingBox,
+                    this.world,
+                    listOf()
+                )
+                dx = vec3d.x
+                dy = vec3d.y
+                dz = vec3d.z
+            }
 
-        if (dx != 0.0 || dy != 0.0 || dz != 0.0) {
-            this.boundingBox = boundingBox.offset(dx, dy, dz)
-            this.repositionFromBoundingBox()
-        }
+            if (dx != 0.0 || dy != 0.0 || dz != 0.0) {
+                this.boundingBox = boundingBox.offset(dx, dy, dz)
+                this.repositionFromBoundingBox()
+            }
 
-        if (x != dx) {
-            setCollide(if (x > 0) Direction.WEST else Direction.EAST)
-        }
+            if (x != dx) {
+                setCollide(if (x > 0) Direction.WEST else Direction.EAST)
+            }
 
-        if (y != dy) {
-            setCollide(if (y > 0) Direction.DOWN else Direction.UP)
-        }
+            if (y != dy) {
+                setCollide(if (y > 0) Direction.DOWN else Direction.UP)
+            }
 
-        if (z != dz) {
-            setCollide(if (z > 0) Direction.NORTH else Direction.SOUTH)
+            if (z != dz) {
+                setCollide(if (z > 0) Direction.NORTH else Direction.SOUTH)
+            }
         }
     }
 
@@ -131,11 +147,11 @@ class ExhaustBlastParticle(
             Direction.SOUTH -> Vec3d(vel.x, vel.y, 1.0)
             Direction.WEST -> Vec3d(-1.0, vel.x, vel.y)
             Direction.EAST -> Vec3d(1.0, vel.x, vel.y)
-        }.multiply(0.1)
+        }.multiply(0.2)
         this.velocityX = velocity.x
         this.velocityY = velocity.y
         this.velocityZ = velocity.z
-        this.age = this.maxAge - 10
+        this.age = this.maxAge - random.nextInt(15) + 5
     }
 
     @Environment(EnvType.CLIENT)

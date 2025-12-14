@@ -7,10 +7,10 @@ import net.minecraft.util.random.RandomGenerator
 import net.minecraft.world.WorldAccess
 import net.minecraft.world.gen.feature.Feature
 import net.minecraft.world.gen.feature.util.FeatureContext
-import org.teamvoided.dusk_debris.world.gen.configured_feature.config.HugeNethershroomFeatureConfig
+import org.teamvoided.dusk_debris.world.gen.configured_feature.config.MushroomFeatureConfig
 
-open class AbstractHugeNethershroomFeature(codec: Codec<HugeNethershroomFeatureConfig>) :
-    Feature<HugeNethershroomFeatureConfig>(codec) {
+open class AbstractHugeMushroomFeature<T: MushroomFeatureConfig>(codec: Codec<T>) :
+    Feature<T>(codec) {
 
     open fun generateCap(
         world: WorldAccess,
@@ -18,7 +18,7 @@ open class AbstractHugeNethershroomFeature(codec: Codec<HugeNethershroomFeatureC
         start: BlockPos,
         yStart: Int,
         mutable: BlockPos.Mutable,
-        config: HugeNethershroomFeatureConfig
+        config: T
     ) {
         mutable[start, 0, yStart] = 0
         if (world.getBlockState(mutable).isIn(config.replaceable)) {
@@ -30,7 +30,7 @@ open class AbstractHugeNethershroomFeature(codec: Codec<HugeNethershroomFeatureC
         world: WorldAccess,
         random: RandomGenerator,
         pos: BlockPos,
-        config: HugeNethershroomFeatureConfig,
+        config: T,
         height: Int,
         mutableBlockPos: BlockPos.Mutable
     ) {
@@ -48,7 +48,7 @@ open class AbstractHugeNethershroomFeature(codec: Codec<HugeNethershroomFeatureC
         pos: BlockPos,
         height: Int,
         mutableBlockPos: BlockPos.Mutable,
-        config: HugeNethershroomFeatureConfig
+        config: T
     ): Boolean {
         val y = pos.y
         if (y >= world.bottomY + 1 && y + height + 1 < world.topY) {
@@ -64,7 +64,7 @@ open class AbstractHugeNethershroomFeature(codec: Codec<HugeNethershroomFeatureC
         }
     }
 
-    override fun place(context: FeatureContext<HugeNethershroomFeatureConfig>): Boolean {
+    override fun place(context: FeatureContext<T>): Boolean {
         val structureWorldAccess = context.world
         val blockPos = context.origin
         val randomGenerator = context.random

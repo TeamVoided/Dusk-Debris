@@ -32,6 +32,7 @@ object DuskFeatures {
     val NOISE_SURFACE = register("noise_surface", NoiseSurfaceFeature(NoiseSurfaceFeatureConfig.CODEC))
 
     val ROCK = register("rock", RockFeature(DefaultFeatureConfig.CODEC))
+    val HUGE_GOLDEN_MUSHROOM = register("huge_golden_mushroom", HugeGoldMushroomFeature(MushroomFeatureConfig.CODEC))
 
     fun init() {}
 

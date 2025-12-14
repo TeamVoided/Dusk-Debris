@@ -4,6 +4,7 @@ import net.minecraft.block.Block
 import net.minecraft.data.client.model.*
 import net.minecraft.state.property.Properties
 import net.minecraft.util.Identifier
+import net.minecraft.util.math.Direction
 import org.teamvoided.dusk_debris.DuskDebris.mc
 import org.teamvoided.dusk_debris.util.block
 import org.teamvoided.dusk_debris.util.model
@@ -11,7 +12,46 @@ import org.teamvoided.dusk_debris.util.model
 
 val WOOD: TextureKey = TextureKey.of("wood")
 val PLANKS: TextureKey = TextureKey.of("planks")
+val PLANT: TextureKey = TextureKey.of("plant")
+val STEM: TextureKey = TextureKey.of("stem")
 
+
+fun BlockStateModelGenerator.registerOvergrowthBush(block: Block) {
+    val texture = Texture()
+        .put(TextureKey.TOP, Texture.getSubId(block, "_top"))
+        .put(TextureKey.SIDE, Texture.getSubId(block, "_side"))
+        .put(TextureKey.PLANT, Texture.getSubId(block, "_plant"))
+        .put(TextureKey.STEM, Texture.getSubId(block, "_plant_stem"))
+    val identifier =
+        block("parent/foliage/template_tinted_bush", TextureKey.TOP, TextureKey.SIDE, TextureKey.PLANT, TextureKey.STEM)
+            .upload(block, texture, this.modelCollector)
+    this.blockStateCollector.accept(
+        VariantsBlockStateSupplier.create(block, BlockStateVariant.create().put(VariantSettings.MODEL, identifier))
+            .coordinate(createDownDefaultRotationStates())
+    )
+}
+
+fun createDownDefaultRotationStates(): BlockStateVariantMap {
+    return BlockStateVariantMap.create(Properties.FACING)
+        .register(Direction.DOWN, BlockStateVariant.create())
+        .register(Direction.UP, BlockStateVariant.create().put(VariantSettings.X, VariantSettings.Rotation.R180))
+        .register(
+            Direction.NORTH, BlockStateVariant.create()
+                .put(VariantSettings.X, VariantSettings.Rotation.R90)
+                .put(VariantSettings.Y, VariantSettings.Rotation.R180)
+        )
+        .register(Direction.SOUTH, BlockStateVariant.create().put(VariantSettings.X, VariantSettings.Rotation.R90))
+        .register(
+            Direction.WEST, BlockStateVariant.create()
+                .put(VariantSettings.X, VariantSettings.Rotation.R90)
+                .put(VariantSettings.Y, VariantSettings.Rotation.R90)
+        )
+        .register(
+            Direction.EAST, BlockStateVariant.create()
+                .put(VariantSettings.X, VariantSettings.Rotation.R90)
+                .put(VariantSettings.Y, VariantSettings.Rotation.R270)
+        )
+}
 
 fun BlockStateModelGenerator.strongScaffolding(block: Block) {
     val texture: Texture = Texture()
@@ -28,9 +68,8 @@ fun BlockStateModelGenerator.strongScaffolding(block: Block) {
 
     this.registerParentedItemModel(block, stable)
     this.blockStateCollector.accept(
-        VariantsBlockStateSupplier.create(block).coordinate(
-            BlockStateModelGenerator.createBooleanModelMap(Properties.BOTTOM, unstable, stable)
-        )
+        VariantsBlockStateSupplier.create(block)
+            .coordinate(BlockStateModelGenerator.createBooleanModelMap(Properties.BOTTOM, unstable, stable))
     )
 }
 

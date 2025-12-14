@@ -41,19 +41,22 @@ import org.teamvoided.dusk_debris.data.worldgen.DuskConfiguredFeatures
 import org.teamvoided.dusk_debris.init.misc.DuskBlockSettings
 import org.teamvoided.dusk_debris.item.StrongScaffoldingItem
 import org.teamvoided.dusk_debris.util.*
+import org.teamvoided.dusks_and_dungeons.util.block.hoe
 
 @Suppress("MemberVisibilityCanBePrivate", "unused", "DEPRECATION")
 object DuskBlocks {
     val BLOCKS = mutableSetOf<Block>()
     val CUTOUT_BLOCKS = mutableSetOf<Block>()
     val TRANSLUCENT_BLOCKS = mutableSetOf<Block>()
+    val GRASS_TINT_BLOCKS = mutableSetOf<Block>()
 
     val TEST_BLOCK = register("test_block", EntityTestParticleBlock(copy(STONE)))
 
     val STRONG_SCAFFOLDING =
         registerStrongScaffolding("strong_scaffolding", StrongScaffoldingBlock(copy(SCAFFOLDING))).cutout()
-    val OVERGROWTH = register("overgrowth", OvergrowthBlock(copy(MOSS_BLOCK)))
-    val OVERGROWTH_BUSH = register("overgrowth_bush", OvergrowthBlock(copy(MOSS_BLOCK)))
+    val OVERGROWTH_BLOCK = register("overgrowth_block", OvergrowthBlock(copy(MOSS_BLOCK))).grassTint().hoe()
+    val OVERGROWTH_BUSH = register("overgrowth_bush", OvergrowthBushBlock(copy(AZALEA))).cutout().grassTint()
+    val OVERGROWTH_LEAVES = register("overgrowth_leaves", LeavesBlock(copy(AZALEA_LEAVES))).cutout().grassTint().hoe()
 
     //val STONE_CHEST = register("stone_chest", DuskDoubleChestBlock(copy(CHEST)) { DuskBlockEntities.STONE_CHEST })
 
