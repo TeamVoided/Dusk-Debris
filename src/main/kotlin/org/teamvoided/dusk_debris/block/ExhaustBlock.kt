@@ -2,8 +2,10 @@ package org.teamvoided.dusk_debris.block
 
 import net.minecraft.block.*
 import net.minecraft.entity.Entity
+import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.ItemPlacementContext
+import net.minecraft.item.ItemStack
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvent
@@ -15,12 +17,19 @@ import net.minecraft.util.math.Vec3d
 import net.minecraft.util.random.RandomGenerator
 import net.minecraft.world.World
 import net.minecraft.world.WorldAccess
+import net.minecraft.world.chunk.Chunk
 import net.minecraft.world.event.GameEvent
+import org.teamvoided.dusk_debris.block.ExhaustBlock.Companion.getExhaustAttachment
+import org.teamvoided.dusk_debris.block.ExhaustBlock.Companion.setExhaustAttachment
+import org.teamvoided.dusk_debris.block.attachments.ExhaustData
 import org.teamvoided.dusk_debris.block.not_blocks.DirectionOrNullState
 import org.teamvoided.dusk_debris.block.not_blocks.DuskProperties
+import org.teamvoided.dusk_debris.data.gen.providers.variants.SnifferVariants
 import org.teamvoided.dusk_debris.data.tags.DuskEntityTypeTags
 import org.teamvoided.dusk_debris.entity.helper.WindLogic
 import org.teamvoided.dusk_debris.entity.helper.WindLogic.inFanWind
+import org.teamvoided.dusk_debris.entity.variant.SnifferVariant
+import org.teamvoided.dusk_debris.init.DuskAttachmentTypes
 import org.teamvoided.dusk_debris.init.DuskParticles
 import org.teamvoided.dusk_debris.init.DuskSoundEvents
 import org.teamvoided.dusk_debris.util.spawnParticles
@@ -37,6 +46,23 @@ class ExhaustBlock(settings: Settings) : SixWayFacingBlock(settings) {
             .with(AGE, COOLDOWN_DURATION)
             .with(NOTE, 0)
 
+    }
+
+    override fun onPlaced(
+        world: World,
+        pos: BlockPos,
+        state: BlockState,
+        placer: LivingEntity?,
+        itemStack: ItemStack
+    ) {
+        super.onPlaced(world, pos, state, placer, itemStack)
+        exhaustTick(state, world, pos)
+
+    }
+
+    override fun onBreak(world: World, pos: BlockPos, state: BlockState, player: PlayerEntity?): BlockState {
+        world.getWorldChunk(pos).removeExhaustAttachment(pos)
+        return super.onBreak(world, pos, state, player)
     }
 
     override fun appendProperties(builder: StateManager.Builder<Block, BlockState>) {
@@ -74,6 +100,9 @@ class ExhaustBlock(settings: Settings) : SixWayFacingBlock(settings) {
         world: WorldAccess,
         pos: BlockPos,
     ): BlockState {
+        //world.getWorldChunk(pos).setExhaustAttachment(pos, )
+
+
         val source = state.get(SOURCE)
         if (source != DirectionOrNullState.NONE) {
             //getSource(state, world, pos) ?: return state.with(SOURCE, DirectionOrNullState.NONE)
@@ -347,7 +376,7 @@ class ExhaustBlock(settings: Settings) : SixWayFacingBlock(settings) {
         val ACTIVE: IntProperty = DuskProperties.ACTIVE_STATE_INT
         val FACING: DirectionProperty = Properties.FACING
         val SOURCE: EnumProperty<DirectionOrNullState> = DuskProperties.FACING_OR_NULL
-        val AGE: IntProperty = Properties.AGE_25
+        val AGE: IntProperty = Properties.AGE_15
         val NOTE: IntProperty = Properties.NOTE
 
         const val WORLD_TIME_MOD = 10
@@ -356,5 +385,19 @@ class ExhaustBlock(settings: Settings) : SixWayFacingBlock(settings) {
         const val BLAST_DURATION = 3
         const val MAX_BLAST_HEIGHT = 15
         const val MAX_CHECK_DISTANCE = 32
+
+        fun Chunk.getExhaustAttachment(blockPos: BlockPos): ExhaustData? =
+            this.getAttached(DuskAttachmentTypes.EXHAUST_DATA)?.get(blockPos)
+
+        fun Chunk.setExhaustAttachment(blockPos: BlockPos, data: ExhaustData) {
+            val current = (this.getAttached(DuskAttachmentTypes.EXHAUST_DATA) ?: mutableMapOf()).toMutableMap()
+            current[blockPos] = data
+            this.setAttached(DuskAttachmentTypes.EXHAUST_DATA, current)
+        }
+        fun Chunk.removeExhaustAttachment(blockPos: BlockPos) {
+            val current = this.getAttached(DuskAttachmentTypes.EXHAUST_DATA)?.toMutableMap() ?: return
+            current.remove(blockPos)
+            this.setAttached(DuskAttachmentTypes.EXHAUST_DATA, current)
+        }
     }
 }
