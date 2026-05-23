@@ -1,8 +1,8 @@
 package org.teamvoided.dusk_debris.data.tags
 
-import net.minecraft.entity.EntityType
-import net.minecraft.registry.RegistryKeys
-import net.minecraft.registry.tag.TagKey
+import net.minecraft.core.registries.Registries
+import net.minecraft.tags.TagKey
+import net.minecraft.world.entity.EntityType
 import org.teamvoided.dusk_debris.DuskDebris.id
 
 object DuskEntityTypeTags {
@@ -25,5 +25,5 @@ object DuskEntityTypeTags {
     // DnD
     val CHILL_CHARGE_GOES_THROUGH = create("chill_charge_goes_through")
 
-    fun create(id: String): TagKey<EntityType<*>> = TagKey.of(RegistryKeys.ENTITY_TYPE, id(id))
+    fun create(id: String): TagKey<EntityType<*>> = TagKey.create(Registries.ENTITY_TYPE, id(id))
 }

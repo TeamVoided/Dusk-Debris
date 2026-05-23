@@ -4,29 +4,29 @@
 //
 package org.teamvoided.dusk_debris.entity.ai.goal
 
-import net.minecraft.entity.EntityType
-import net.minecraft.entity.ai.TargetPredicate
-import net.minecraft.entity.ai.goal.RevengeGoal
-import net.minecraft.entity.mob.PathAwareEntity
-import net.minecraft.world.GameRules
+import net.minecraft.world.entity.EntityType
+import net.minecraft.world.entity.PathfinderMob
+import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal
+import net.minecraft.world.entity.ai.targeting.TargetingConditions
+import net.minecraft.world.level.GameRules
 
-open class InstantRevengeGoal(mob: PathAwareEntity) : RevengeGoal(mob, *arrayOfNulls(0)) {
+open class InstantRevengeGoal(mob: PathfinderMob) : HurtByTargetGoal(mob, *arrayOfNulls(0)) {
 
-    override fun canStart(): Boolean {
-        val livingEntity = mob.attacker
+    override fun canUse(): Boolean {
+        val livingEntity = mob.lastHurtByMob
         if (livingEntity != null) {
-            return if (livingEntity.type === EntityType.PLAYER && mob.world.gameRules.getBooleanValue(GameRules.UNIVERSAL_ANGER)) {
+            return if (livingEntity.type === EntityType.PLAYER && mob.level().gameRules.getBoolean(GameRules.RULE_UNIVERSAL_ANGER)) {
                 false
             } else {
-                this.canTrack(livingEntity, VALID_AVOIDABLES_PREDICATE)
+                this.canAttack(livingEntity, VALID_AVOIDABLES_PREDICATE)
             }
         } else {
             return false
         }
     }
     companion object{
-        private val VALID_AVOIDABLES_PREDICATE: TargetPredicate =
-            TargetPredicate.createAttackable().ignoreVisibility().ignoreDistanceScalingFactor()
+        private val VALID_AVOIDABLES_PREDICATE: TargetingConditions =
+            TargetingConditions.forCombat().ignoreLineOfSight().ignoreInvisibilityTesting()
 
     }
 }

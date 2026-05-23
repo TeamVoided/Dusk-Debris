@@ -3,18 +3,18 @@ package org.teamvoided.dusk_debris.init
 import com.mojang.brigadier.arguments.IntegerArgumentType
 import com.mojang.brigadier.context.CommandContext
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback
-import net.minecraft.command.argument.RegistryEntryArgumentType
-import net.minecraft.entity.EntityType
-import net.minecraft.entity.decoration.DisplayEntity.TextDisplayEntity
-import net.minecraft.entity.passive.SnifferEntity
-import net.minecraft.registry.Holder
-import net.minecraft.server.command.CommandManager.argument
-import net.minecraft.server.command.CommandManager.literal
-import net.minecraft.server.command.ServerCommandSource
-import net.minecraft.text.Text
+import net.minecraft.commands.CommandSourceStack
+import net.minecraft.commands.Commands.argument
+import net.minecraft.commands.Commands.literal
+import net.minecraft.commands.arguments.ResourceArgument
+import net.minecraft.core.Holder
+import net.minecraft.network.chat.Component
+import net.minecraft.world.entity.Display.TextDisplay
+import net.minecraft.world.entity.EntityType
+import net.minecraft.world.entity.animal.sniffer.Sniffer
 import org.teamvoided.dusk_debris.spell.Spell
-import org.teamvoided.dusk_debris.util.splineCommand
 import org.teamvoided.dusk_debris.util.spellController
+import org.teamvoided.dusk_debris.util.splineCommand
 import org.teamvoided.dusk_debris.util.toBlockPos
 import org.teamvoided.dusk_debris.util.variant
 
@@ -26,10 +26,10 @@ object DuskCommands {
         val worldEvent = literal("worldEvent").build()
         dispatcher.root.addChild(worldEvent)
         val eventID = argument("eventID", IntegerArgumentType.integer()).executes { cx ->
-            val world = cx.source.world
+            val world = cx.source.level
             val pos = cx.source.position
             val eventID = IntegerArgumentType.getInteger(cx, "eventID")
-            world.syncWorldEvent(eventID, pos.toBlockPos(), 0)
+            world.levelEvent(eventID, pos.toBlockPos(), 0)
 
             0
         }.build()
@@ -37,8 +37,8 @@ object DuskCommands {
 
         val spell = literal("spell").build()
         dispatcher.root.addChild(spell)
-        val spellType = argument("spell_id", RegistryEntryArgumentType.registryEntry(ctx, DuskRegistryKeys.SPELL))
-            .executes { spell(it, RegistryEntryArgumentType.getRegistryEntry(it, "spell_id", DuskRegistryKeys.SPELL)) }
+        val spellType = argument("spell_id", ResourceArgument.resource(ctx, DuskRegistryKeys.SPELL))
+            .executes { spell(it, ResourceArgument.getResource(it, "spell_id", DuskRegistryKeys.SPELL)) }
             .build()
         spell.addChild(spellType)
 
@@ -47,38 +47,38 @@ object DuskCommands {
     }
 
 
-    fun spell(cx: CommandContext<ServerCommandSource>, registryEntry: Holder.Reference<Spell<*, *>>): Int {
+    fun spell(cx: CommandContext<CommandSourceStack>, registryEntry: Holder.Reference<Spell<*, *>>): Int {
         val player = cx.source.player ?: return 0
         player.spellController.setSpell(player, registryEntry)
-        player.sendMessage(Text.literal("applied spell " + registryEntry.key.toString()), false)
+        player.displayClientMessage(Component.literal("applied spell " + registryEntry.unwrapKey().toString()), false)
         return 1
     }
 
-    fun sniffer(cx: CommandContext<ServerCommandSource>): Int {
-        val world = cx.source.world
+    fun sniffer(cx: CommandContext<CommandSourceStack>): Int {
+        val world = cx.source.level
         val player = cx.source.player ?: return 0
         var offset = 0.0
-        world.registryManager.get(DuskRegistryKeys.SNIFFER_VARIANT).holders().forEach {
-            val pos = player.pos.add(offset, 0.0, 0.0)
+        world.registryAccess().registryOrThrow(DuskRegistryKeys.SNIFFER_VARIANT).holders().forEach {
+            val pos = player.position().add(offset, 0.0, 0.0)
 
-            val sniffer = SnifferEntity(EntityType.SNIFFER, world)
-            sniffer.setPosition(pos)
+            val sniffer = Sniffer(EntityType.SNIFFER, world)
+            sniffer.setPos(pos)
             sniffer.isInvulnerable = true
             sniffer.variant = it
-            sniffer.isAiDisabled = true
+            sniffer.setNoAi(true)
             sniffer.isSilent = true
-            sniffer.yaw = 0f
-            sniffer.addScoreboardTag("summoned_with_command")
-            world.spawnEntity(sniffer)
+            sniffer.setYRot(0f)
+            sniffer.addTag("summoned_with_command")
+            world.addFreshEntity(sniffer)
             sniffer.isBaby
-            sniffer.setPosition(pos.add(0.0, sniffer.height.toDouble(), 0.0))
-            world.spawnEntity(sniffer)
+            sniffer.setPos(pos.add(0.0, sniffer.bbHeight.toDouble(), 0.0))
+            world.addFreshEntity(sniffer)
 
-            val name = TextDisplayEntity(EntityType.TEXT_DISPLAY, world)
-            name.setPosition(pos.add(0.0, 3.0, 0.0))
-            name.text = Text.literal(it.key.get().value.toString())
-            name.addScoreboardTag("summoned_with_command")
-            world.spawnEntity(name)
+            val name = TextDisplay(EntityType.TEXT_DISPLAY, world)
+            name.setPos(pos.add(0.0, 3.0, 0.0))
+            name.text = Component.literal(it.unwrapKey().get().location().toString())
+            name.addTag("summoned_with_command")
+            world.addFreshEntity(name)
 
             offset += EntityType.SNIFFER.width * 2
         }

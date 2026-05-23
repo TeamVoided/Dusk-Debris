@@ -1,14 +1,14 @@
 package org.teamvoided.dusk_debris.init
 
-import net.minecraft.block.Block
-import net.minecraft.block.BlockState
-import net.minecraft.block.entity.BlockEntity
-import net.minecraft.block.entity.BlockEntityType
-import net.minecraft.datafixer.TypeReferences
-import net.minecraft.registry.Registries
-import net.minecraft.registry.Registry
-import net.minecraft.util.Util
-import net.minecraft.util.math.BlockPos
+import net.minecraft.Util
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Registry
+import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.util.datafix.fixes.References
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.entity.BlockEntity
+import net.minecraft.world.level.block.entity.BlockEntityType
+import net.minecraft.world.level.block.state.BlockState
 import org.teamvoided.dusk_debris.DuskDebris.id
 import org.teamvoided.dusk_debris.block.entity.BunnyGraveBlockEntity
 import org.teamvoided.dusk_debris.block.entity.DuskChestBlockEntity
@@ -21,7 +21,7 @@ object DuskBlockEntities {
     fun init() {}
 
     val TREASURE_CHEST: BlockEntityType<TreasureChestBlockEntity> = register(
-        "treasure_chest", BlockEntityType.Builder.create(
+        "treasure_chest", BlockEntityType.Builder.of(
             ::TreasureChestBlockEntity,
             DuskBlocks.FORGOTTEN_CHEST
         )
@@ -41,26 +41,26 @@ object DuskBlockEntities {
 
     // DnD
     val CELESTAL_BELL: BlockEntityType<CelestalBellBlockEntity> =
-        register("celestal_bell", BlockEntityType.Builder.create(::CelestalBellBlockEntity, DuskBlocks.CELESTAL_BELL))
+        register("celestal_bell", BlockEntityType.Builder.of(::CelestalBellBlockEntity, DuskBlocks.CELESTAL_BELL))
 
     val CHEST_O_SOULS: BlockEntityType<ChestOSoulsBlockEntity> =
-        register("chest_o_souls", BlockEntityType.Builder.create(::ChestOSoulsBlockEntity, DuskBlocks.CHEST_O_SOULS))
+        register("chest_o_souls", BlockEntityType.Builder.of(::ChestOSoulsBlockEntity, DuskBlocks.CHEST_O_SOULS))
 
     val QUARTER_BLOCK_PILE: BlockEntityType<QuarterBlockPileBlockEntity> = register(
         "quarter_block_pile",
-        BlockEntityType.Builder.create(::QuarterBlockPileBlockEntity, DuskBlocks.QUARTER_BLOCK_PILE)
+        BlockEntityType.Builder.of(::QuarterBlockPileBlockEntity, DuskBlocks.QUARTER_BLOCK_PILE)
     )
 
     val BUNNY_GRAVE: BlockEntityType<BunnyGraveBlockEntity> =
-        register("bunny_grave", BlockEntityType.Builder.create(::BunnyGraveBlockEntity, DuskBlocks.BUNNY_GRAVE))
+        register("bunny_grave", BlockEntityType.Builder.of(::BunnyGraveBlockEntity, DuskBlocks.BUNNY_GRAVE))
 
     val HAUNTED_BLOCK: BlockEntityType<HauntedBlockEntity> = register(
-        "hauted_block", BlockEntityType.Builder.create(
+        "hauted_block", BlockEntityType.Builder.of(
             ::HauntedBlockEntity,
         )
     )
     val HAUNTED_GRAVESTONE_BLOCK: BlockEntityType<HauntedGravestoneBlockEntity> = register(
-        "haunted_gravestone_block", BlockEntityType.Builder.create(
+        "haunted_gravestone_block", BlockEntityType.Builder.of(
             ::HauntedGravestoneBlockEntity,
             DuskBlocks.HAUNTED_GRAVESTONE,
             DuskBlocks.SMALL_HAUNTED_GRAVESTONE,
@@ -79,11 +79,11 @@ object DuskBlockEntities {
     private fun <T : BlockEntity> register(
         id: String, factory: (BlockPos, BlockState) -> T, vararg blocks: Block,
     ): BlockEntityType<T> {
-        return register(id, BlockEntityType.Builder.create(factory, *blocks))
+        return register(id, BlockEntityType.Builder.of(factory, *blocks))
     }
 
     private fun <T : BlockEntity> register(id: String, builder: BlockEntityType.Builder<T>): BlockEntityType<T> {
-        val type = Util.getChoiceType(TypeReferences.BLOCK_ENTITY, id(id).toString())
-        return Registry.register(Registries.BLOCK_ENTITY_TYPE, id(id), builder.build(type))
+        val type = Util.fetchChoiceType(References.BLOCK_ENTITY, id(id).toString())
+        return Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, id(id), builder.build(type))
     }
 }

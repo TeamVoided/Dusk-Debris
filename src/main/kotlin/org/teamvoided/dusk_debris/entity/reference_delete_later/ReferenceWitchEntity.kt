@@ -1,181 +1,182 @@
 package org.teamvoided.dusk_debris.entity.reference_delete_later
 
-import net.minecraft.component.DataComponentTypes
-import net.minecraft.component.type.PotionContentsComponent
-import net.minecraft.entity.EntityType
-import net.minecraft.entity.EquipmentSlot
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.ai.RangedAttackMob
-import net.minecraft.entity.ai.goal.*
-import net.minecraft.entity.attribute.DefaultAttributeContainer
-import net.minecraft.entity.attribute.EntityAttributeModifier
-import net.minecraft.entity.attribute.EntityAttributes
-import net.minecraft.entity.damage.DamageSource
-import net.minecraft.entity.data.DataTracker
-import net.minecraft.entity.data.TrackedData
-import net.minecraft.entity.data.TrackedDataHandlerRegistry
-import net.minecraft.entity.effect.StatusEffectInstance
-import net.minecraft.entity.effect.StatusEffects
-import net.minecraft.entity.mob.HostileEntity
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.entity.projectile.thrown.PotionEntity
-import net.minecraft.entity.raid.RaiderEntity
-import net.minecraft.item.ItemStack
-import net.minecraft.item.Items
-import net.minecraft.particle.ParticleTypes
-import net.minecraft.potion.Potion
-import net.minecraft.potion.Potions
-import net.minecraft.registry.Holder
-import net.minecraft.registry.tag.DamageTypeTags
-import net.minecraft.registry.tag.FluidTags
-import net.minecraft.server.world.ServerWorld
-import net.minecraft.sound.SoundEvent
-import net.minecraft.sound.SoundEvents
-import net.minecraft.util.Identifier
-import net.minecraft.world.World
-import net.minecraft.world.event.GameEvent
-import java.util.function.Consumer
+import net.minecraft.core.Holder
+import net.minecraft.core.component.DataComponents
+import net.minecraft.core.particles.ParticleTypes
+import net.minecraft.network.syncher.EntityDataAccessor
+import net.minecraft.network.syncher.EntityDataSerializers
+import net.minecraft.network.syncher.SynchedEntityData
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.server.level.ServerLevel
+import net.minecraft.sounds.SoundEvent
+import net.minecraft.sounds.SoundEvents
+import net.minecraft.tags.DamageTypeTags
+import net.minecraft.tags.FluidTags
+import net.minecraft.world.damagesource.DamageSource
+import net.minecraft.world.effect.MobEffects
+import net.minecraft.world.entity.EntityType
+import net.minecraft.world.entity.EquipmentSlot
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.ai.attributes.AttributeModifier
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier
+import net.minecraft.world.entity.ai.attributes.Attributes
+import net.minecraft.world.entity.ai.goal.*
+import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal
+import net.minecraft.world.entity.ai.goal.target.NearestAttackableWitchTargetGoal
+import net.minecraft.world.entity.ai.goal.target.NearestHealableRaiderTargetGoal
+import net.minecraft.world.entity.monster.Monster
+import net.minecraft.world.entity.monster.RangedAttackMob
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.entity.projectile.ThrownPotion
+import net.minecraft.world.entity.raid.Raider
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.Items
+import net.minecraft.world.item.alchemy.Potion
+import net.minecraft.world.item.alchemy.PotionContents
+import net.minecraft.world.item.alchemy.Potions
+import net.minecraft.world.level.Level
+import net.minecraft.world.level.gameevent.GameEvent
 import java.util.function.Predicate
 import kotlin.math.sqrt
 
-class ReferenceWitchEntity(entityType: EntityType<out ReferenceWitchEntity?>?, world: World?) :
-    RaiderEntity(entityType, world), RangedAttackMob {
+class ReferenceWitchEntity(entityType: EntityType<out ReferenceWitchEntity?>?, world: Level?) :
+    Raider(entityType, world), RangedAttackMob {
     private var drinkTimeLeft = 0
-    private var raidGoal: RaidGoal<RaiderEntity?>? = null
-    private var attackPlayerGoal: ToggleableTargetGoal<PlayerEntity?>? = null
+    private var raidGoal: NearestHealableRaiderTargetGoal<Raider?>? = null
+    private var attackPlayerGoal: NearestAttackableWitchTargetGoal<Player?>? = null
 
-    override fun initGoals() {
-        super.initGoals()
-        this.raidGoal = RaidGoal(
+    override fun registerGoals() {
+        super.registerGoals()
+        this.raidGoal = NearestHealableRaiderTargetGoal(
             this,
-            RaiderEntity::class.java,
+            Raider::class.java,
             true,
             Predicate { entity: Any? -> entity != null && this.hasActiveRaid() && entity !== EntityType.WITCH })
         this.attackPlayerGoal =
-            ToggleableTargetGoal(this, PlayerEntity::class.java, 10, true, false, null)
-        goalSelector.add(1, SwimGoal(this))
-        goalSelector.add(2, ProjectileAttackGoal(this, 1.0, 60, 10.0f))
-        goalSelector.add(2, WanderAroundFarGoal(this, 1.0))
-        goalSelector.add(3, LookAtEntityGoal(this, PlayerEntity::class.java, 8.0f))
-        goalSelector.add(3, LookAroundGoal(this))
-        targetSelector.add(
-            1, RevengeGoal(
+            NearestAttackableWitchTargetGoal(this, Player::class.java, 10, true, false, null)
+        goalSelector.addGoal(1, FloatGoal(this))
+        goalSelector.addGoal(2, RangedAttackGoal(this, 1.0, 60, 10.0f))
+        goalSelector.addGoal(2, WaterAvoidingRandomStrollGoal(this, 1.0))
+        goalSelector.addGoal(3, LookAtPlayerGoal(this, Player::class.java, 8.0f))
+        goalSelector.addGoal(3, RandomLookAroundGoal(this))
+        targetSelector.addGoal(
+            1, HurtByTargetGoal(
                 this, *arrayOf<Class<*>>(
-                    RaiderEntity::class.java
+                    Raider::class.java
                 )
             )
         )
-        targetSelector.add(2, this.raidGoal)
-        targetSelector.add(3, this.attackPlayerGoal)
+        targetSelector.addGoal(2, this.raidGoal)
+        targetSelector.addGoal(3, this.attackPlayerGoal)
     }
 
-    override fun initDataTracker(builder: DataTracker.Builder) {
-        super.initDataTracker(builder)
-        builder.add(DRINKING, false)
+    override fun defineSynchedData(builder: SynchedEntityData.Builder) {
+        super.defineSynchedData(builder)
+        builder.define(DRINKING, false)
     }
 
     override fun getAmbientSound(): SoundEvent? {
-        return SoundEvents.ENTITY_WITCH_AMBIENT
+        return SoundEvents.WITCH_AMBIENT
     }
 
     override fun getHurtSound(source: DamageSource): SoundEvent? {
-        return SoundEvents.ENTITY_WITCH_HURT
+        return SoundEvents.WITCH_HURT
     }
 
     override fun getDeathSound(): SoundEvent? {
-        return SoundEvents.ENTITY_WITCH_DEATH
+        return SoundEvents.WITCH_DEATH
     }
 
     var isDrinking: Boolean
-        get() = getDataTracker().get(DRINKING) as Boolean
+        get() = entityData.get(DRINKING) as Boolean
         set(drinking) {
-            getDataTracker().set(DRINKING, drinking)
+            entityData.set(DRINKING, drinking)
         }
 
-    override fun tickMovement() {
-        if (!world.isClient && this.isAlive) {
-            raidGoal!!.decreaseCooldown()
+    override fun aiStep() {
+        if (!level().isClientSide && this.isAlive) {
+            raidGoal!!.decrementCooldown()
             if (raidGoal!!.cooldown <= 0) {
-                attackPlayerGoal!!.setEnabled(true)
+                attackPlayerGoal!!.setCanAttack(true)
             } else {
-                attackPlayerGoal!!.setEnabled(false)
+                attackPlayerGoal!!.setCanAttack(false)
             }
 
             if (this.isDrinking) {
                 if (drinkTimeLeft-- <= 0) {
                     this.isDrinking = false
-                    val itemStack = this.mainHandStack
-                    this.equipStack(EquipmentSlot.MAINHAND, ItemStack.EMPTY)
-                    val potionContentsComponent = itemStack.get(DataComponentTypes.POTION_CONTENTS)
-                    if (itemStack.isOf(Items.POTION) && potionContentsComponent != null) {
-                        potionContentsComponent.forEachEffect(::addStatusEffect)
+                    val itemStack = this.mainHandItem
+                    this.setItemSlot(EquipmentSlot.MAINHAND, ItemStack.EMPTY)
+                    val potionContentsComponent = itemStack.get(DataComponents.POTION_CONTENTS)
+                    if (itemStack.`is`(Items.POTION) && potionContentsComponent != null) {
+                        potionContentsComponent.forEachEffect(::addEffect)
                     }
 
-                    this.emitGameEvent(GameEvent.DRINK)
-                    getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED)!!
+                    this.gameEvent(GameEvent.DRINK)
+                    getAttribute(Attributes.MOVEMENT_SPEED)!!
                         .removeModifier(DRINKING_SPEED_PENALTY_MODIFIER.id())
                 }
             } else {
                 var holder: Holder<Potion?>? = null
-                if (random.nextFloat() < 0.15f && this.isSubmergedIn(FluidTags.WATER) && !this.hasStatusEffect(
-                        StatusEffects.WATER_BREATHING
+                if (random.nextFloat() < 0.15f && this.isEyeInFluid(FluidTags.WATER) && !this.hasEffect(
+                        MobEffects.WATER_BREATHING
                     )
                 ) {
                     holder = Potions.WATER_BREATHING
-                } else if (random.nextFloat() < 0.15f && (this.isOnFire || this.recentDamageSource != null && this.recentDamageSource!!
-                        .isTypeIn(DamageTypeTags.IS_FIRE)) && !this.hasStatusEffect(StatusEffects.FIRE_RESISTANCE)
+                } else if (random.nextFloat() < 0.15f && (this.isOnFire || this.lastDamageSource != null && this.lastDamageSource!!
+                        .`is`(DamageTypeTags.IS_FIRE)) && !this.hasEffect(MobEffects.FIRE_RESISTANCE)
                 ) {
                     holder = Potions.FIRE_RESISTANCE
                 } else if (random.nextFloat() < 0.05f && this.health < this.maxHealth) {
                     holder = Potions.HEALING
-                } else if (random.nextFloat() < 0.5f && (this.target != null) && !this.hasStatusEffect(StatusEffects.SPEED) && (target!!
-                        .squaredDistanceTo(this) > 121.0)
+                } else if (random.nextFloat() < 0.5f && (this.target != null) && !this.hasEffect(MobEffects.MOVEMENT_SPEED) && (target!!
+                        .distanceToSqr(this) > 121.0)
                 ) {
                     holder = Potions.SWIFTNESS
                 }
 
                 if (holder != null) {
-                    this.equipStack(EquipmentSlot.MAINHAND, PotionContentsComponent.createStack(Items.POTION, holder))
-                    this.drinkTimeLeft = this.mainHandStack.getUseTicks(this)
+                    this.setItemSlot(EquipmentSlot.MAINHAND, PotionContents.createItemStack(Items.POTION, holder))
+                    this.drinkTimeLeft = this.mainHandItem.getUseDuration(this)
                     this.isDrinking = true
                     if (!this.isSilent) {
-                        world.playSound(
-                            null as PlayerEntity?,
+                        level().playSound(
+                            null as Player?,
                             this.x,
                             this.y,
                             this.z,
-                            SoundEvents.ENTITY_WITCH_DRINK,
-                            this.soundCategory,
+                            SoundEvents.WITCH_DRINK,
+                            this.soundSource,
                             1.0f,
                             0.8f + random.nextFloat() * 0.4f
                         )
                     }
 
-                    val entityAttributeInstance = this.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED)
+                    val entityAttributeInstance = this.getAttribute(Attributes.MOVEMENT_SPEED)
                     entityAttributeInstance!!.removeModifier(DRINKING_SPEED_MODIFIER_ID)
-                    entityAttributeInstance.addTemporaryModifier(DRINKING_SPEED_PENALTY_MODIFIER)
+                    entityAttributeInstance.addTransientModifier(DRINKING_SPEED_PENALTY_MODIFIER)
                 }
             }
 
             if (random.nextFloat() < 7.5E-4f) {
-                world.sendEntityStatus(this, 15.toByte())
+                level().broadcastEntityEvent(this, 15.toByte())
             }
         }
 
-        super.tickMovement()
+        super.aiStep()
     }
 
-    override fun getCelebratingSound(): SoundEvent {
-        return SoundEvents.ENTITY_WITCH_CELEBRATE
+    override fun getCelebrateSound(): SoundEvent {
+        return SoundEvents.WITCH_CELEBRATE
     }
 
-    override fun handleStatus(status: Byte) {
+    override fun handleEntityEvent(status: Byte) {
         if (status.toInt() == 15) {
             for (i in 0 until random.nextInt(35) + 10) {
-                world.addParticle(
+                level().addParticle(
                     ParticleTypes.WITCH,
                     this.x + random.nextGaussian() * 0.12999999523162842,
-                    this.bounds.maxY + 0.5 + (random.nextGaussian() * 0.12999999523162842),
+                    this.boundingBox.maxY + 0.5 + (random.nextGaussian() * 0.12999999523162842),
                     this.z + random.nextGaussian() * 0.12999999523162842,
                     0.0,
                     0.0,
@@ -183,33 +184,33 @@ class ReferenceWitchEntity(entityType: EntityType<out ReferenceWitchEntity?>?, w
                 )
             }
         } else {
-            super.handleStatus(status)
+            super.handleEntityEvent(status)
         }
     }
 
-    override fun applyEnchantmentsToDamage(source: DamageSource, amount: Float): Float {
+    override fun getDamageAfterMagicAbsorb(source: DamageSource, amount: Float): Float {
         var amount = amount
-        amount = super.applyEnchantmentsToDamage(source, amount)
-        if (source.attacker === this) {
+        amount = super.getDamageAfterMagicAbsorb(source, amount)
+        if (source.entity === this) {
             amount = 0.0f
         }
 
-        if (source.isTypeIn(DamageTypeTags.WITCH_RESISTANT_TO)) {
+        if (source.`is`(DamageTypeTags.WITCH_RESISTANT_TO)) {
             amount *= 0.15f
         }
 
         return amount
     }
 
-    override fun attack(target: LivingEntity, pullProgress: Float) {
+    override fun performRangedAttack(target: LivingEntity, pullProgress: Float) {
         if (!this.isDrinking) {
-            val vec3d = target.velocity
+            val vec3d = target.deltaMovement
             val d = target.x + vec3d.x - this.x
             val e = target.eyeY - 1.100000023841858 - this.y
             val f = target.z + vec3d.z - this.z
             val g = sqrt(d * d + f * f)
             var holder = Potions.HARMING
-            if (target is RaiderEntity) {
+            if (target is Raider) {
                 holder = if (target.getHealth() <= 4.0f) {
                     Potions.HEALING
                 } else {
@@ -217,53 +218,53 @@ class ReferenceWitchEntity(entityType: EntityType<out ReferenceWitchEntity?>?, w
                 }
 
                 this.target = null as LivingEntity?
-            } else if (g >= 8.0 && !target.hasStatusEffect(StatusEffects.SLOWNESS)) {
+            } else if (g >= 8.0 && !target.hasEffect(MobEffects.MOVEMENT_SLOWDOWN)) {
                 holder = Potions.SLOWNESS
-            } else if (target.health >= 8.0f && !target.hasStatusEffect(StatusEffects.POISON)) {
+            } else if (target.health >= 8.0f && !target.hasEffect(MobEffects.POISON)) {
                 holder = Potions.POISON
-            } else if (g <= 3.0 && !target.hasStatusEffect(StatusEffects.WEAKNESS) && random.nextFloat() < 0.25f) {
+            } else if (g <= 3.0 && !target.hasEffect(MobEffects.WEAKNESS) && random.nextFloat() < 0.25f) {
                 holder = Potions.WEAKNESS
             }
 
-            val potionEntity = PotionEntity(this.world, this)
-            potionEntity.setItem(PotionContentsComponent.createStack(Items.SPLASH_POTION, holder))
-            potionEntity.pitch -= -20.0f
-            potionEntity.setVelocity(d, e + g * 0.2, f, 0.75f, 8.0f)
+            val potionEntity = ThrownPotion(this.level(), this)
+            potionEntity.setItem(PotionContents.createItemStack(Items.SPLASH_POTION, holder))
+            potionEntity.xRot -= -20.0f
+            potionEntity.shoot(d, e + g * 0.2, f, 0.75f, 8.0f)
             if (!this.isSilent) {
-                world.playSound(
-                    null as PlayerEntity?,
+                level().playSound(
+                    null as Player?,
                     this.x,
                     this.y,
                     this.z,
-                    SoundEvents.ENTITY_WITCH_THROW,
-                    this.soundCategory,
+                    SoundEvents.WITCH_THROW,
+                    this.soundSource,
                     1.0f,
                     0.8f + random.nextFloat() * 0.4f
                 )
             }
 
-            world.spawnEntity(potionEntity)
+            level().addFreshEntity(potionEntity)
         }
     }
 
-    override fun addBonusForWave(world: ServerWorld, wave: Int, unused: Boolean) {
+    override fun applyRaidBuffs(world: ServerLevel, wave: Int, unused: Boolean) {
     }
 
-    override fun canLead(): Boolean {
+    override fun canBeLeader(): Boolean {
         return false
     }
 
     companion object {
-        private val DRINKING_SPEED_MODIFIER_ID: Identifier = Identifier.ofDefault("drinking")
+        private val DRINKING_SPEED_MODIFIER_ID: ResourceLocation = ResourceLocation.withDefaultNamespace("drinking")
         private val DRINKING_SPEED_PENALTY_MODIFIER =
-            EntityAttributeModifier(DRINKING_SPEED_MODIFIER_ID, -0.25, EntityAttributeModifier.Operation.ADD_VALUE)
-        private val DRINKING: TrackedData<Boolean> = DataTracker.registerData(
-            ReferenceWitchEntity::class.java, TrackedDataHandlerRegistry.BOOLEAN
+            AttributeModifier(DRINKING_SPEED_MODIFIER_ID, -0.25, AttributeModifier.Operation.ADD_VALUE)
+        private val DRINKING: EntityDataAccessor<Boolean> = SynchedEntityData.defineId(
+            ReferenceWitchEntity::class.java, EntityDataSerializers.BOOLEAN
         )
 
-        fun createAttributes(): DefaultAttributeContainer.Builder {
-            return HostileEntity.createAttributes().add(EntityAttributes.GENERIC_MAX_HEALTH, 26.0)
-                .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.25)
+        fun createAttributes(): AttributeSupplier.Builder {
+            return Monster.createMonsterAttributes().add(Attributes.MAX_HEALTH, 26.0)
+                .add(Attributes.MOVEMENT_SPEED, 0.25)
         }
     }
 }

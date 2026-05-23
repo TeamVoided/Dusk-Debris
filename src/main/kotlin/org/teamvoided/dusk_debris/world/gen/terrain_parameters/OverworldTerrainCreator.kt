@@ -1,9 +1,7 @@
 package org.teamvoided.dusk_debris.world.gen.terrain_parameters
 
-import net.minecraft.util.function.ToFloatFunction
-import net.minecraft.util.math.Spline
-import net.minecraft.world.biome.source.util.MultiNoiseUtil
-import net.minecraft.world.gen.noise.NoiseRouterData
+import net.minecraft.util.CubicSpline
+import net.minecraft.util.ToFloatFunction
 import org.teamvoided.dusk_debris.util.world_helper.add
 import org.teamvoided.dusk_debris.world.gen.terrain_parameters.overworld.Offset
 import org.teamvoided.dusk_debris.world.gen.terrain_parameters.overworld.offset.Plateaus
@@ -99,7 +97,7 @@ object OverworldTerrainCreator {
     fun <C, I : ToFloatFunction<C>> offsetSpline(
         data: TerrainParametersData<C, I>,
         amplified: Boolean
-    ): Spline<C, I> {
+    ): CubicSpline<C, I> {
         data.amplifier = if (amplified) OFFSET_AMPLIFIED else NO_TRANSFORM
 
         val deepestOcean = Offset.ocean(2f, data)
@@ -114,7 +112,7 @@ object OverworldTerrainCreator {
         val inland = Offset.offsetEros(1.2f, data)
 
 
-        val offset = Spline.builder(data.continents, data.amplifier)
+        val offset = CubicSpline.builder(data.continents, data.amplifier)
 
         //offset.add(Cont.MushroomIsland.f, inland)
         //offset.add(Cont.MushroomShore2.f, shoreline1)
@@ -135,11 +133,11 @@ object OverworldTerrainCreator {
     fun <C, I : ToFloatFunction<C>> factorSpline(
         data: TerrainParametersData<C, I>,
         amplified: Boolean
-    ): Spline<C, I> {
+    ): CubicSpline<C, I> {
         data.amplifier = if (amplified) FACTOR_AMPLIFIED else NO_TRANSFORM
-        val factorErosion = Spline.builder(data.erosion, data.amplifier)
+        val factorErosion = CubicSpline.builder(data.erosion, data.amplifier)
             .add(0f, 10f)
-        val factorRidgesFolded = Spline.builder(data.ridgesFolded, data.amplifier)
+        val factorRidgesFolded = CubicSpline.builder(data.ridgesFolded, data.amplifier)
             .add(-0.8f, 6f)
             .add(-0.7f, factorErosion.build())
 
@@ -149,29 +147,29 @@ object OverworldTerrainCreator {
     fun <C, I : ToFloatFunction<C>> jaggednessSpline(
         data: TerrainParametersData<C, I>,
         amplified: Boolean
-    ): Spline<C, I> {
+    ): CubicSpline<C, I> {
         data.amplifier = if (amplified) JAGGEDNESS_AMPLIFIED else NO_TRANSFORM
-        val spline = Spline.builder(data.erosion, data.amplifier)
+        val spline = CubicSpline.builder(data.erosion, data.amplifier)
             .add(-1f, 0f)
         return spline.build()
     }
 
-    fun <C, I : ToFloatFunction<C>> undergroundRiverCondition(data: TerrainParametersData<C, I>): Spline<C, I> {
-        val ridgesF = Spline.builder(data.ridgesFolded)
+    fun <C, I : ToFloatFunction<C>> undergroundRiverCondition(data: TerrainParametersData<C, I>): CubicSpline<C, I> {
+        val ridgesF = CubicSpline.builder(data.ridgesFolded)
             .add(-0.65f, 1f)
             .add(-0.6f, 0f)
             .build()
-        val plateauType = Spline.builder(data.plateauType)
+        val plateauType = CubicSpline.builder(data.plateauType)
             .add(Plateaus.PlatType.Plateau.max, 0f)
             .add(Plateaus.PlatType.Cave.min, ridgesF)
             .build()
-        val erosionOutland = Spline.builder(data.erosion)
+        val erosionOutland = CubicSpline.builder(data.erosion)
             .add(Eros.MountainShort.f, 0f)
             .add(Eros.Plateau1.f, plateauType)
             .add(Eros.Plateau2.f, plateauType)
             .add(Eros.Valley.f, 0f)
             .build()
-        val continents = Spline.builder(data.continents)
+        val continents = CubicSpline.builder(data.continents)
             .add(Cont.MushroomShore1.f, erosionOutland)
             .add(Cont.DeepestOcean.f, 0f)
             .add(Cont.Coast2.f, 0f)

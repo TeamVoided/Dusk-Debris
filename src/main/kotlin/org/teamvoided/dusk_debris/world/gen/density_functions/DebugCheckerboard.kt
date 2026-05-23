@@ -3,14 +3,12 @@ package org.teamvoided.dusk_debris.world.gen.density_functions
 import com.mojang.serialization.Codec
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
-import it.unimi.dsi.fastutil.doubles.DoubleArrayList
-import it.unimi.dsi.fastutil.doubles.DoubleList
 import it.unimi.dsi.fastutil.floats.FloatArrayList
-import net.minecraft.util.Util
-import net.minecraft.util.dynamic.CodecHolder
-import net.minecraft.util.math.Direction
-import net.minecraft.world.gen.DensityFunction
-import net.minecraft.world.gen.DensityFunction.ContextProvider
+import net.minecraft.Util
+import net.minecraft.core.Direction
+import net.minecraft.util.KeyDispatchDataCodec
+import net.minecraft.world.level.levelgen.DensityFunction
+import net.minecraft.world.level.levelgen.DensityFunction.ContextProvider
 import org.teamvoided.dusk_debris.util.world_helper.makeCodec
 import kotlin.math.abs
 import kotlin.math.floor
@@ -43,7 +41,7 @@ class DebugCheckerboard(
     override fun minValue(): Double = list.min().toDouble()
     override fun maxValue(): Double = list.max().toDouble()
 
-    override fun codec(): CodecHolder<DebugCheckerboard> = CODEC
+    override fun codec(): KeyDispatchDataCodec<DebugCheckerboard> = CODEC
 
     companion object {
         private val DATA_CODEC: MapCodec<DebugCheckerboard> =
@@ -54,6 +52,6 @@ class DebugCheckerboard(
                     Codec.FLOAT.listOf().fieldOf("values").forGetter { it.list }
                 ).apply(instance, ::DebugCheckerboard)
             }
-        val CODEC: CodecHolder<DebugCheckerboard> = makeCodec(DATA_CODEC)
+        val CODEC: KeyDispatchDataCodec<DebugCheckerboard> = makeCodec(DATA_CODEC)
     }
 }

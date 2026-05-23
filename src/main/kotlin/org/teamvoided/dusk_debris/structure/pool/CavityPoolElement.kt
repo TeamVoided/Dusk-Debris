@@ -7,33 +7,22 @@ import com.mojang.serialization.DataResult
 import com.mojang.serialization.DynamicOps
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
-import net.minecraft.block.Block
-import net.minecraft.block.Blocks
-import net.minecraft.block.JigsawBlock
-import net.minecraft.block.entity.JigsawBlockEntity
-import net.minecraft.block.enums.JigsawOrientation
-import net.minecraft.nbt.NbtCompound
-import net.minecraft.registry.Holder
-import net.minecraft.structure.Structure
-import net.minecraft.structure.StructureManager
-import net.minecraft.structure.StructurePlacementData
-import net.minecraft.structure.StructureTemplateManager
-import net.minecraft.structure.pool.StructurePool
-import net.minecraft.structure.pool.StructurePoolElement
-import net.minecraft.structure.pool.StructurePoolElementType
-import net.minecraft.structure.processor.BlockIgnoreStructureProcessor
-import net.minecraft.structure.processor.JigsawReplacementStructureProcessor
-import net.minecraft.structure.processor.StructureProcessorList
-import net.minecraft.structure.processor.StructureProcessorType
-import net.minecraft.util.BlockMirror
-import net.minecraft.util.BlockRotation
-import net.minecraft.util.Identifier
-import net.minecraft.util.Nullables
-import net.minecraft.util.math.*
-import net.minecraft.util.random.RandomGenerator
-import net.minecraft.world.StructureWorldAccess
-import net.minecraft.world.gen.chunk.ChunkGenerator
-import net.minecraft.world.gen.feature.LiquidSettings
+import net.minecraft.Optionull
+import net.minecraft.core.*
+import net.minecraft.nbt.CompoundTag
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.util.RandomSource
+import net.minecraft.world.level.StructureManager
+import net.minecraft.world.level.WorldGenLevel
+import net.minecraft.world.level.block.*
+import net.minecraft.world.level.block.entity.JigsawBlockEntity
+import net.minecraft.world.level.chunk.ChunkGenerator
+import net.minecraft.world.level.levelgen.structure.BoundingBox
+import net.minecraft.world.level.levelgen.structure.pools.StructurePoolElement
+import net.minecraft.world.level.levelgen.structure.pools.StructurePoolElementType
+import net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool
+import net.minecraft.world.level.levelgen.structure.templatesystem.*
+import net.minecraft.world.phys.Vec3
 import org.teamvoided.dusk_debris.init.worldgen.structure.DuskStructurePoolElementType
 import org.teamvoided.dusk_debris.world.gen.noise.FastNoise
 import java.util.*
@@ -41,36 +30,36 @@ import java.util.*
 class CavityPoolElement(
     //protected val template: Either<Identifier, Structure>,
     private val processors: Holder<StructureProcessorList>,
-    projection: StructurePool.Projection,
+    projection: StructureTemplatePool.Projection,
     private val overrideLiquidSettings: Optional<LiquidSettings>
 ) : StructurePoolElement(projection) {
-    private var blockBox: BlockBox? = null
-    private var jigsawBlocks: MutableList<Structure.StructureBlockInfo> = Lists.newArrayList()
+    private var blockBox: BoundingBox? = null
+    private var jigsawBlocks: MutableList<StructureTemplate.StructureBlockInfo> = Lists.newArrayList()
     //private var structure: Structure = Structure()
 
     override fun getType(): StructurePoolElementType<*> = DuskStructurePoolElementType.CAVITY
 
-    override fun getStart(structureTemplateManager: StructureTemplateManager, rotation: BlockRotation): Vec3i {
+    override fun getSize(structureTemplateManager: StructureTemplateManager, rotation: Rotation): Vec3i {
         //val blockBox = this.blockBox!!
         return Vec3i.ZERO //(blockBox.blockCountX, blockBox.blockCountY, blockBox.blockCountZ)
     }
 
-    override fun getStructureBlockInfos(
+    override fun getShuffledJigsawBlocks(
         structureTemplateManager: StructureTemplateManager,
         pos: BlockPos,
-        rotation: BlockRotation,
-        random: RandomGenerator
-    ): List<Structure.StructureBlockInfo> {
+        rotation: Rotation,
+        random: RandomSource
+    ): List<StructureTemplate.StructureBlockInfo> {
         if (this.jigsawBlocks.isNotEmpty())
             return this.jigsawBlocks
         if (this.blockBox == null)
             createBoxForStructure(structureTemplateManager, pos, rotation, random)
         val blockBox = this.blockBox!!
-        val list: MutableList<Structure.StructureBlockInfo> = Lists.newArrayList()
+        val list: MutableList<StructureTemplate.StructureBlockInfo> = Lists.newArrayList()
         list.add(sbi(blockBox.center, Direction.UP, this.createJigsawNbt("minecraft:center")))
 
-        val size2 = Vec3i(blockBox.blockCountX / 3, blockBox.blockCountY / 3, blockBox.blockCountZ / 3)
-        val min2 = Vec3i(blockBox.minX, blockBox.minY, blockBox.minZ).add(size2)
+        val size2 = Vec3i(blockBox.xSpan / 3, blockBox.ySpan / 3, blockBox.zSpan / 3)
+        val min2 = Vec3i(blockBox.minX(), blockBox.minY(), blockBox.minZ()).offset(size2)
         //val max2 = Vec3i(blockBox.maxX, blockBox.maxY, blockBox.maxZ).subtract(size2)
 
         val debugJigsaw = this.createJigsawNbt(
@@ -81,18 +70,18 @@ class CavityPoolElement(
         )
         Direction.entries.forEach {
             val x = when (it) {
-                Direction.EAST -> blockBox.maxX
-                Direction.WEST -> blockBox.minX
+                Direction.EAST -> blockBox.maxX()
+                Direction.WEST -> blockBox.minX()
                 else -> min2.x + random.nextInt(size2.x)
             }
             val y = when (it) {
-                Direction.UP -> blockBox.maxY
-                Direction.DOWN -> blockBox.minY
+                Direction.UP -> blockBox.maxY()
+                Direction.DOWN -> blockBox.minY()
                 else -> min2.y + random.nextInt(size2.y)
             }
             val z = when (it) {
-                Direction.SOUTH -> blockBox.maxZ
-                Direction.NORTH -> blockBox.minZ
+                Direction.SOUTH -> blockBox.maxZ()
+                Direction.NORTH -> blockBox.minZ()
                 else -> min2.z + random.nextInt(size2.z)
             }
             list.add(sbi(BlockPos(x, y, z), it, debugJigsaw))
@@ -104,14 +93,14 @@ class CavityPoolElement(
     private fun sbi(
         pos: BlockPos,
         direction1: Direction = Direction.DOWN,
-        nbt: NbtCompound = this.createJigsawNbt("minecraft:bottom")
-    ): Structure.StructureBlockInfo {
+        nbt: CompoundTag = this.createJigsawNbt("minecraft:bottom")
+    ): StructureTemplate.StructureBlockInfo {
         val direction2: Direction = if (direction1.axis == Direction.Axis.Y) Direction.SOUTH else Direction.UP
-        return Structure.StructureBlockInfo(
+        return StructureTemplate.StructureBlockInfo(
             pos,
-            Blocks.JIGSAW.defaultState.with(
+            Blocks.JIGSAW.defaultBlockState().setValue(
                 JigsawBlock.ORIENTATION,
-                JigsawOrientation.byDirections(direction1, direction2)
+                FrontAndTop.fromFrontAndTop(direction1, direction2)
             ),
             nbt
         )
@@ -121,8 +110,8 @@ class CavityPoolElement(
     override fun getBoundingBox(
         structureTemplateManager: StructureTemplateManager,
         pos: BlockPos,
-        rotation: BlockRotation
-    ): BlockBox {
+        rotation: Rotation
+    ): BoundingBox {
         if (blockBox == null)
             createBoxForStructure(structureTemplateManager, pos, rotation)
         return this.blockBox!!
@@ -131,8 +120,8 @@ class CavityPoolElement(
     private fun createBoxForStructure(
         structureTemplateManager: StructureTemplateManager,
         pos: BlockPos,
-        rotation: BlockRotation,
-        random: RandomGenerator = RandomGenerator.createLegacy(pos.asLong() + rotation.ordinal)
+        rotation: Rotation,
+        random: RandomSource = RandomSource.create(pos.asLong() + rotation.ordinal)
     ) {
         val x = (random.nextInt(16) + 16)
         val y = (random.nextInt(16) + 16)
@@ -141,24 +130,24 @@ class CavityPoolElement(
         //val y = (Math.random() * 24 + 8).toInt()
         //val z = (Math.random() * 24 + 8).toInt()
 
-        val size: Vec3i = Vec3i(x, y, z).add(-1, -1, -1)
-        val blockPos = Structure.transformAround(BlockPos.ORIGIN, BlockMirror.NONE, rotation, BlockPos.ORIGIN)
+        val size: Vec3i = Vec3i(x, y, z).offset(-1, -1, -1)
+        val blockPos = StructureTemplate.transform(BlockPos.ZERO, Mirror.NONE, rotation, BlockPos.ZERO)
         val blockPos2 =
-            Structure.transformAround(BlockPos.ORIGIN.add(size), BlockMirror.NONE, rotation, BlockPos.ORIGIN)
-        this.blockBox = BlockBox.create(blockPos, blockPos2).offset(pos.x, pos.y, pos.z)
+            StructureTemplate.transform(BlockPos.ZERO.offset(size), Mirror.NONE, rotation, BlockPos.ZERO)
+        this.blockBox = BoundingBox.fromCorners(blockPos, blockPos2).moved(pos.x, pos.y, pos.z)
     }
 
 
-    override fun generate(
+    override fun place(
         structureTemplateManager: StructureTemplateManager,
-        world: StructureWorldAccess,
+        world: WorldGenLevel,
         structureManager: StructureManager,
         chunkGenerator: ChunkGenerator,
         pos: BlockPos,
         pivot: BlockPos,
-        rotation: BlockRotation,
-        box: BlockBox,
-        random: RandomGenerator,
+        rotation: Rotation,
+        box: BoundingBox,
+        random: RandomSource,
         liquidSettings: LiquidSettings,
         keepJigsaws: Boolean
     ): Boolean {
@@ -166,13 +155,13 @@ class CavityPoolElement(
             createBoxForStructure(structureTemplateManager, pos, rotation)
         //throw IllegalStateException("Invalid call to CavityPoolElement.generate, blockBox is null! Call the CavityPoolElement.createBoxForStructure function before CavityPoolElement.generate!")
 
-        val blockBox: BlockBox = this.blockBox!!
+        val blockBox: BoundingBox = this.blockBox!!
         val structurePlacementData = this.createPlacementData(rotation, box, liquidSettings, keepJigsaws)
         createCavity(structurePlacementData, world, blockBox, 18)
-        world.setBlockState(pos, Blocks.GOLD_BLOCK.defaultState, 3)
-        getStructureBlockInfos(structureTemplateManager, pos, rotation, random).forEach {
-            world.setBlockState(it.pos, it.state, 3)
-            world.getBlockEntity(it.pos)?.read(it.nbt, world.registryManager)
+        world.setBlock(pos, Blocks.GOLD_BLOCK.defaultBlockState(), 3)
+        getShuffledJigsawBlocks(structureTemplateManager, pos, rotation, random).forEach {
+            world.setBlock(it.pos, it.state, 3)
+            world.getBlockEntity(it.pos)?.loadWithComponents(it.nbt, world.registryAccess())
         }
         this.blockBox = null
         this.jigsawBlocks.clear()
@@ -180,30 +169,30 @@ class CavityPoolElement(
     }
 
     private fun createCavity(
-        placementData: StructurePlacementData,
-        world: StructureWorldAccess,
-        blockBox: BlockBox,
+        placementData: StructurePlaceSettings,
+        world: WorldGenLevel,
+        blockBox: BoundingBox,
         flags: Int
     ) {
         val noise = FastNoise(world.seed.toInt())
         noise.SetFractalType(FastNoise.FractalType.FBM)
         noise.SetNoiseType(FastNoise.NoiseType.Perlin) //Cubic
         noise.SetFrequency(0.1f)
-        val boxCenter = Vec3d(
-            blockBox.minX + blockBox.blockCountX / 2.0,
-            blockBox.minY + blockBox.blockCountY / 2.0,
-            blockBox.minZ + blockBox.blockCountZ / 2.0
+        val boxCenter = Vec3(
+            blockBox.minX() + blockBox.xSpan / 2.0,
+            blockBox.minY() + blockBox.ySpan / 2.0,
+            blockBox.minZ() + blockBox.zSpan / 2.0
         )
-        for (y in blockBox.minY..blockBox.maxY) {
-            for (x in blockBox.minX..blockBox.maxX) {
-                for (z in blockBox.minZ..blockBox.maxZ) {
+        for (y in blockBox.minY()..blockBox.maxY()) {
+            for (x in blockBox.minX()..blockBox.maxX()) {
+                for (z in blockBox.minZ()..blockBox.maxZ()) {
                     val setPos = BlockPos(x, y, z)
                     val sample = noise.GetNoise(x.toFloat(), y * 0.25f, z.toFloat()) * 2
                     if (getSquaredDistance(setPos, blockBox, boxCenter, sample * sample) >= 1) {
-                        world.setBlockState(setPos, Blocks.STONE.defaultState, flags)
+                        world.setBlock(setPos, Blocks.STONE.defaultBlockState(), flags)
                         updateCavityState(placementData, world, setPos, flags)
                     } else {
-                        world.setBlockState(setPos, Blocks.AIR.defaultState, flags)
+                        world.setBlock(setPos, Blocks.AIR.defaultBlockState(), flags)
                     }
                 }
             }
@@ -211,27 +200,27 @@ class CavityPoolElement(
     }
 
     private fun updateCavityState(
-        placementData: StructurePlacementData,
-        world: StructureWorldAccess,
+        placementData: StructurePlaceSettings,
+        world: WorldGenLevel,
         pos: BlockPos,
         flags: Int
     ) {
-        if (!placementData.shouldUpdateNeighbors()) {
+        if (!placementData.knownShape) {
             val worldState = world.getBlockState(pos)
-            val afterUpdateState = Block.postProcessState(worldState, world, pos)
+            val afterUpdateState = Block.updateFromNeighbourShapes(worldState, world, pos)
             if (worldState != afterUpdateState) {
-                world.setBlockState(pos, afterUpdateState, flags and -2 or 16)
+                world.setBlock(pos, afterUpdateState, flags and -2 or 16)
             }
-            world.updateNeighbors(pos, afterUpdateState.block)
+            world.blockUpdated(pos, afterUpdateState.block)
         }
     }
 
 
-    private fun getSquaredDistance(pos: BlockPos, blockBox: BlockBox, centerBox: Vec3d, sample: Float): Double {
-        val distance = pos.ofCenter().subtract(centerBox)
-        val x = (distance.x / (blockBox.blockCountX / 2))
-        val y = (distance.y / (blockBox.blockCountY / 2))
-        val z = (distance.z / (blockBox.blockCountZ / 2))
+    private fun getSquaredDistance(pos: BlockPos, blockBox: BoundingBox, centerBox: Vec3, sample: Float): Double {
+        val distance = pos.center.subtract(centerBox)
+        val x = (distance.x / (blockBox.xSpan / 2))
+        val y = (distance.y / (blockBox.ySpan / 2))
+        val z = (distance.z / (blockBox.zSpan / 2))
         val retorn = (x * x + y * y + z * z)
         return if (retorn > 0.9 && sample < 0)
             retorn + (sample * (1 - (retorn - 0.9)))
@@ -240,22 +229,22 @@ class CavityPoolElement(
     }
 
     private fun createPlacementData(
-        rotation: BlockRotation,
-        box: BlockBox,
+        rotation: Rotation,
+        box: BoundingBox,
         other: LiquidSettings,
         keepJigsaws: Boolean
-    ): StructurePlacementData {
-        val structurePlacementData = StructurePlacementData()
+    ): StructurePlaceSettings {
+        val structurePlacementData = StructurePlaceSettings()
         structurePlacementData.setBoundingBox(box)
         structurePlacementData.setRotation(rotation)
-        structurePlacementData.setUpdateNeighbors(true)
+        structurePlacementData.setKnownShape(true)
         structurePlacementData.setIgnoreEntities(false)
-        structurePlacementData.addProcessor(BlockIgnoreStructureProcessor.IGNORE_STRUCTURE_BLOCKS)
-        structurePlacementData.setInitializeEntities(true)
-        structurePlacementData.method_61020(overrideLiquidSettings.orElse(other) as LiquidSettings)
-        if (!keepJigsaws) structurePlacementData.addProcessor(JigsawReplacementStructureProcessor.INSTANCE)
+        structurePlacementData.addProcessor(BlockIgnoreProcessor.STRUCTURE_BLOCK)
+        structurePlacementData.setFinalizeEntities(true)
+        structurePlacementData.setLiquidSettings(overrideLiquidSettings.orElse(other) as LiquidSettings)
+        if (!keepJigsaws) structurePlacementData.addProcessor(JigsawReplacementProcessor.INSTANCE)
         Objects.requireNonNull(structurePlacementData)
-        processors.value().list.forEach { structurePlacementData.addProcessor(it) }
+        processors.value().list().forEach { structurePlacementData.addProcessor(it) }
         Objects.requireNonNull(structurePlacementData)
         projection.processors.forEach { structurePlacementData.addProcessor(it) }
         return structurePlacementData
@@ -266,9 +255,9 @@ class CavityPoolElement(
         finalState: String = "minecraft:air",
         pool: String = "minecraft:empty",
         target: String = "minecraft:empty",
-        joint: String = JigsawBlockEntity.Joint.ROLLABLE.asString()
-    ): NbtCompound {
-        val nbtCompound = NbtCompound()
+        joint: String = JigsawBlockEntity.JointType.ROLLABLE.serializedName
+    ): CompoundTag {
+        val nbtCompound = CompoundTag()
         nbtCompound.putString("name", name)
         nbtCompound.putString("final_state", finalState)
         nbtCompound.putString("pool", pool)
@@ -284,22 +273,22 @@ class CavityPoolElement(
     companion object {
         val CODEC: MapCodec<CavityPoolElement>
         private fun <T> encodeTemplate(
-            template: Either<Identifier, Structure>,
+            template: Either<ResourceLocation, StructureTemplate>,
             ops: DynamicOps<T>,
             value: T
         ): DataResult<T> {
             val optional = template.left()
             return if (optional.isEmpty) DataResult.error { "Can not serialize a runtime pool element" }
-            else Identifier.CODEC.encode(optional.get(), ops, value)
+            else ResourceLocation.CODEC.encode(optional.get(), ops, value)
         }
 
         protected fun processorsCodec(): RecordCodecBuilder<CavityPoolElement, Holder<StructureProcessorList>> {
-            return StructureProcessorType.REGISTRY_CODEC.fieldOf("processors")
+            return StructureProcessorType.LIST_CODEC.fieldOf("processors")
                 .forGetter { it!!.processors }
         }
 
         protected fun liquidSettingsCodec(): RecordCodecBuilder<CavityPoolElement, Optional<LiquidSettings>> {
-            return LiquidSettings.codec.optionalFieldOf("override_liquid_settings")
+            return LiquidSettings.CODEC.optionalFieldOf("override_liquid_settings")
                 .forGetter { it!!.overrideLiquidSettings }
         }
 
@@ -308,9 +297,9 @@ class CavityPoolElement(
 //        }
 
         @VisibleForTesting
-        fun selectionPriority(list: MutableList<Structure.StructureBlockInfo>) {
-            list.sortWith(Comparator.comparingInt<Structure.StructureBlockInfo> { info ->
-                Nullables.mapOrDefault(info.nbt(), { it.getInt("selection_priority") }, 0)!!
+        fun selectionPriority(list: MutableList<StructureTemplate.StructureBlockInfo>) {
+            list.sortWith(Comparator.comparingInt<StructureTemplate.StructureBlockInfo> { info ->
+                Optionull.mapOrDefault(info.nbt(), { it.getInt("selection_priority") }, 0)!!
             }.reversed())
         }
 

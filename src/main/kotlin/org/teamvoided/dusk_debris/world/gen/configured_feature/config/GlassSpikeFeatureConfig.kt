@@ -2,13 +2,13 @@ package org.teamvoided.dusk_debris.world.gen.configured_feature.config
 
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
-import net.minecraft.block.Block
-import net.minecraft.registry.RegistryKeys
-import net.minecraft.registry.tag.TagKey
-import net.minecraft.util.math.int_provider.IntProvider
-import net.minecraft.util.math.int_provider.UniformIntProvider
-import net.minecraft.world.gen.feature.FeatureConfig
-import net.minecraft.world.gen.stateprovider.BlockStateProvider
+import net.minecraft.core.registries.Registries
+import net.minecraft.tags.TagKey
+import net.minecraft.util.valueproviders.IntProvider
+import net.minecraft.util.valueproviders.UniformInt
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration
+import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider
 
 class GlassSpikeFeatureConfig(
     val blockstate: BlockStateProvider,
@@ -21,37 +21,37 @@ class GlassSpikeFeatureConfig(
     val maxGenOffset: Int,
     val noiseMultiplier: Double,
 ) :
-    FeatureConfig {
+    FeatureConfiguration {
     companion object {
         private val RANGE: Codec<Double> = Codec.doubleRange(0.0, 1.0)
         val CODEC: Codec<GlassSpikeFeatureConfig> =
             RecordCodecBuilder.create { instance: RecordCodecBuilder.Instance<GlassSpikeFeatureConfig> ->
                 instance.group(
-                    BlockStateProvider.TYPE_CODEC
+                    BlockStateProvider.CODEC
                         .fieldOf("blockstate")
                         .forGetter { it.blockstate },
-                    TagKey.createHashedCodec(RegistryKeys.BLOCK)
+                    TagKey.hashedCodec(Registries.BLOCK)
                         .fieldOf("replaceable")
                         .forGetter { it.replaceable },
                     IntProvider
-                        .method_35004(-20, 20)
+                        .codec(-20, 20)
                         .fieldOf("outer_wall_distance_xz")
-                        .orElse(UniformIntProvider.create(-5, 5))
+                        .orElse(UniformInt.of(-5, 5))
                         .forGetter { config: GlassSpikeFeatureConfig -> config.outerWallDistanceXZ },
                     IntProvider
-                        .method_35004(-20, 20)
+                        .codec(-20, 20)
                         .fieldOf("outer_wall_distance_y")
-                        .orElse(UniformIntProvider.create(-5, 10))
+                        .orElse(UniformInt.of(-5, 10))
                         .forGetter { config: GlassSpikeFeatureConfig -> config.outerWallDistanceY },
                     IntProvider
-                        .method_35004(1, 20)
+                        .codec(1, 20)
                         .fieldOf("distribution_points")
-                        .orElse(UniformIntProvider.create(3, 4))
+                        .orElse(UniformInt.of(3, 4))
                         .forGetter { config: GlassSpikeFeatureConfig -> config.distributionPoints },
                     IntProvider
-                        .method_35004(0, 10)
+                        .codec(0, 10)
                         .fieldOf("point_offset")
-                        .orElse(UniformIntProvider.create(1, 2))
+                        .orElse(UniformInt.of(1, 2))
                         .forGetter { config: GlassSpikeFeatureConfig -> config.pointOffset },
                     Codec.INT
                         .fieldOf("min_gen_offset")

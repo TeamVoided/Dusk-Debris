@@ -2,10 +2,14 @@ package org.teamvoided.dusk_debris.init
 
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents
-import net.minecraft.component.DataComponentMap
-import net.minecraft.item.*
-import net.minecraft.registry.*
-import net.minecraft.text.Text
+import net.minecraft.core.Holder
+import net.minecraft.core.HolderLookup
+import net.minecraft.core.Registry
+import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.network.chat.Component
+import net.minecraft.resources.ResourceKey
+import net.minecraft.world.item.*
+import net.minecraft.world.level.ItemLike
 import org.teamvoided.dusk_debris.DuskDebris.id
 import org.teamvoided.dusk_debris.component.SpellComponent
 import org.teamvoided.dusk_debris.spell.Spell
@@ -84,30 +88,30 @@ object DuskTabs {
 //            .build()
 //    )
 
-    val EVERYTHING: ItemGroup = register("dusk_everything",
+    val EVERYTHING: CreativeModeTab = register("dusk_everything",
         FabricItemGroup.builder()
             .icon { ItemStack(DuskBlocks.OXIDIZED_COPPER_FAN.asItem()) }
-            .name(Text.translatable("Dusk Debris Debug"))
-            .entries { _, entries -> entries.addItem(DuskItems.ITEMS) }
+            .title(Component.translatable("Dusk Debris Debug"))
+            .displayItems { _, entries -> entries.addItem(DuskItems.ITEMS) }
             .build()
     )
-    val SPELLS: ItemGroup = register("dusk_spells",
+    val SPELLS: CreativeModeTab = register("dusk_spells",
         FabricItemGroup.builder()
             .icon { ItemStack(DuskItems.DEBUG_SPELL_ITEM) }
-            .name(Text.translatable("itemGroup.dusk_debris.dusk_spells"))
-            .entries { params, entries ->
-                params.holders().getLookup(DuskRegistryKeys.SPELL).ifPresent { registryLookup ->
+            .title(Component.translatable("itemGroup.dusk_debris.dusk_spells"))
+            .displayItems { params, entries ->
+                params.holders().lookup(DuskRegistryKeys.SPELL).ifPresent { registryLookup ->
                     generateSpellEntries(entries, registryLookup)
                 }
             }
             .build())
 
     private fun generateSpellEntries(
-        collector: ItemGroup.ItemStackCollector,
+        collector: CreativeModeTab.Output,
         lookup: HolderLookup<Spell<*, *>>
     ) {
-        lookup.holders().map { forSpell(it) }.forEach { stack: ItemStack ->
-            collector.addStack(stack, ItemGroup.Visibility.PARENT_AND_SEARCH_TABS)
+        lookup.listElements().map { forSpell(it) }.forEach { stack: ItemStack ->
+            collector.accept(stack, CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS)
         }
     }
 
@@ -118,7 +122,7 @@ object DuskTabs {
     }
 
     fun init() {
-        ItemGroupEvents.modifyEntriesEvent(ItemGroups.BUILDING_BLOCKS)
+        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.BUILDING_BLOCKS)
             .register(ItemGroupEvents.ModifyEntries {
                 it.addAfter(
                     Items.CUT_RED_SANDSTONE_SLAB,
@@ -135,7 +139,7 @@ object DuskTabs {
                     DuskBlocks.CUT_VOLCANIC_SANDSTONE_SLAB,
                 )
             })
-        ItemGroupEvents.modifyEntriesEvent(ItemGroups.NATURAL_BLOCKS)
+        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.NATURAL_BLOCKS)
             .register(ItemGroupEvents.ModifyEntries {
                 it.addAfter(
                     Items.RED_SANDSTONE,
@@ -145,27 +149,27 @@ object DuskTabs {
             })
     }
 
-    private fun ItemGroup.ItemStackCollector.addItem(vararg list: ItemConvertible) = this.addItem(list.toList())
-    private fun ItemGroup.ItemStackCollector.addItem(list: Collection<ItemConvertible>) =
-        this.addStacks(list.toStacks())
+    private fun CreativeModeTab.Output.addItem(vararg list: ItemLike) = this.addItem(list.toList())
+    private fun CreativeModeTab.Output.addItem(list: Collection<ItemLike>) =
+        this.acceptAll(list.toStacks())
 
-    private fun ItemGroup.ItemStackCollector.addItem(vararg lists: Collection<ItemConvertible>) =
-        this.addStacks(lists.flatMap { it.toStacks() })
+    private fun CreativeModeTab.Output.addItem(vararg lists: Collection<ItemLike>) =
+        this.acceptAll(lists.flatMap { it.toStacks() })
 
-    private fun Collection<ItemConvertible>.toStacks() = this.toItems().map(Item::getDefaultStack)
-    private fun Collection<ItemConvertible>.toItems() = this.map(ItemConvertible::asItem)
+    private fun Collection<ItemLike>.toStacks() = this.toItems().map(Item::getDefaultInstance)
+    private fun Collection<ItemLike>.toItems() = this.map(ItemLike::asItem)
 
 
     @Suppress("SameParameterValue")
-    private fun register(name: String, itemGroup: ItemGroup): ItemGroup {
-        return Registry.register(Registries.ITEM_GROUP, id(name), itemGroup)
+    private fun register(name: String, itemGroup: CreativeModeTab): CreativeModeTab {
+        return Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, id(name), itemGroup)
     }
 
-    fun getKey(itemGroup: ItemGroup): RegistryKey<ItemGroup>? {
-        return Registries.ITEM_GROUP.getKey(itemGroup)?.getOrNull()
+    fun getKey(itemGroup: CreativeModeTab): ResourceKey<CreativeModeTab>? {
+        return BuiltInRegistries.CREATIVE_MODE_TAB.getResourceKey(itemGroup)?.getOrNull()
     }
 
-    fun ItemGroup.ItemStackCollector.addItems(list: Collection<Item>) {
-        this.addStacks(list.map(Item::getDefaultStack))
+    fun CreativeModeTab.Output.addItems(list: Collection<Item>) {
+        this.acceptAll(list.map(Item::getDefaultInstance))
     }
 }

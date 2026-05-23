@@ -1,8 +1,8 @@
 package org.teamvoided.dusk_debris.data.tags
 
-import net.minecraft.item.Item
-import net.minecraft.registry.RegistryKeys
-import net.minecraft.registry.tag.TagKey
+import net.minecraft.core.registries.Registries
+import net.minecraft.tags.TagKey
+import net.minecraft.world.item.Item
 import org.teamvoided.dusk_debris.DuskDebris.id
 
 object DuskItemTags {
@@ -22,7 +22,7 @@ object DuskItemTags {
     val LEAVES_DONT_POISON = create("leaves_dont_poison")
 
     fun create(id: String): TagKey<Item> {
-        val regTag = TagKey.of(RegistryKeys.ITEM, id(id))
+        val regTag = TagKey.create(Registries.ITEM, id(id))
         ITEM_TAGS.add(regTag)
         return regTag
     }

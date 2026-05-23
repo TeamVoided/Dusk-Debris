@@ -1,25 +1,25 @@
 package org.teamvoided.dusk_debris.block
 
-import net.minecraft.block.BlockState
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Direction
-import net.minecraft.world.WorldAccess
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
+import net.minecraft.world.level.LevelAccessor
+import net.minecraft.world.level.block.state.BlockState
 import org.teamvoided.dusk_debris.block.not_blocks.DuskProperties
 
-class MysticalStreamBlock(settings: Settings) : AbstractMysticalPowerBlock(settings) {
-    override fun getStateForNeighborUpdate(
+class MysticalStreamBlock(settings: Properties) : AbstractMysticalPowerBlock(settings) {
+    override fun updateShape(
         state: BlockState,
         direction: Direction,
         neighborState: BlockState,
-        world: WorldAccess,
+        world: LevelAccessor,
         pos: BlockPos,
         neighborPos: BlockPos
     ): BlockState {
         if (neighborState.block is AbstractMysticalPowerBlock &&
-            !state.get(DuskProperties.ACTIVE) &&
-            neighborState.get(DuskProperties.ACTIVE)
+            !state.getValue(DuskProperties.ACTIVE) &&
+            neighborState.getValue(DuskProperties.ACTIVE)
         )
             scheduleTick(state.block, world, pos)
-        return super.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos)
+        return super.updateShape(state, direction, neighborState, world, pos, neighborPos)
     }
 }

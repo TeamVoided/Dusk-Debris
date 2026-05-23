@@ -4,23 +4,23 @@
 //
 package org.teamvoided.dusk_debris.entity.variant
 
+import com.mojang.blaze3d.vertex.PoseStack
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
-import net.minecraft.client.render.OverlayTexture
-import net.minecraft.client.render.RenderLayer
-import net.minecraft.client.render.VertexConsumerProvider
-import net.minecraft.client.render.entity.feature.FeatureRenderer
-import net.minecraft.client.render.entity.feature.FeatureRendererContext
-import net.minecraft.client.render.entity.model.EntityModel
-import net.minecraft.client.util.math.MatrixStack
-import net.minecraft.entity.Entity
+import net.minecraft.client.model.EntityModel
+import net.minecraft.client.renderer.MultiBufferSource
+import net.minecraft.client.renderer.RenderType
+import net.minecraft.client.renderer.entity.RenderLayerParent
+import net.minecraft.client.renderer.entity.layers.RenderLayer
+import net.minecraft.client.renderer.texture.OverlayTexture
+import net.minecraft.world.entity.Entity
 
 @Environment(EnvType.CLIENT)
-abstract class EyesFeatureRenderer<T : Entity, M : EntityModel<T>>(featureRendererContext: FeatureRendererContext<T, M>) :
-    FeatureRenderer<T, M>(featureRendererContext) {
+abstract class EyesFeatureRenderer<T : Entity, M : EntityModel<T>>(featureRendererContext: RenderLayerParent<T, M>) :
+    RenderLayer<T, M>(featureRendererContext) {
     override fun render(
-        matrices: MatrixStack?,
-        vertexConsumers: VertexConsumerProvider,
+        matrices: PoseStack?,
+        vertexConsumers: MultiBufferSource,
         light: Int,
         entity: T,
         limbAngle: Float,
@@ -31,8 +31,8 @@ abstract class EyesFeatureRenderer<T : Entity, M : EntityModel<T>>(featureRender
         headPitch: Float
     ) {
         val vertexConsumer = vertexConsumers.getBuffer(this.eyesLayer)
-        this.getContextModel().method_60879(matrices, vertexConsumer, 15728640, OverlayTexture.DEFAULT_UV)
+        this.parentModel.renderToBuffer(matrices, vertexConsumer, 15728640, OverlayTexture.NO_OVERLAY)
     }
 
-    abstract val eyesLayer: RenderLayer?
+    abstract val eyesLayer: RenderType?
 }

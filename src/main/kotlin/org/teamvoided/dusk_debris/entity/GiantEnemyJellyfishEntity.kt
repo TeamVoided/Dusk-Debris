@@ -1,105 +1,109 @@
 package org.teamvoided.dusk_debris.entity
 
 import com.mojang.serialization.Dynamic
-import net.minecraft.entity.*
-import net.minecraft.entity.ai.brain.Brain
-import net.minecraft.entity.ai.brain.MemoryModuleType
-import net.minecraft.entity.ai.control.FlightMoveControl
-import net.minecraft.entity.ai.pathing.BirdNavigation
-import net.minecraft.entity.ai.pathing.EntityNavigation
-import net.minecraft.entity.attribute.DefaultAttributeContainer
-import net.minecraft.entity.attribute.EntityAttributes
-import net.minecraft.entity.damage.DamageSource
-import net.minecraft.registry.tag.DamageTypeTags
-import net.minecraft.server.network.DebugInfoSender
-import net.minecraft.server.world.ServerWorld
-import net.minecraft.sound.SoundEvents
-import net.minecraft.util.TimeHelper
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.MathHelper
-import net.minecraft.util.math.Vec3d
-import net.minecraft.util.math.int_provider.UniformIntProvider
-import net.minecraft.util.random.RandomGenerator
-import net.minecraft.world.*
+import net.minecraft.core.BlockPos
+import net.minecraft.network.protocol.game.DebugPackets
+import net.minecraft.server.level.ServerLevel
+import net.minecraft.sounds.SoundEvents
+import net.minecraft.tags.DamageTypeTags
+import net.minecraft.util.Mth
+import net.minecraft.util.RandomSource
+import net.minecraft.util.TimeUtil
+import net.minecraft.util.valueproviders.UniformInt
+import net.minecraft.world.Difficulty
+import net.minecraft.world.DifficultyInstance
+import net.minecraft.world.damagesource.DamageSource
+import net.minecraft.world.entity.*
+import net.minecraft.world.entity.ai.Brain
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier
+import net.minecraft.world.entity.ai.attributes.Attributes
+import net.minecraft.world.entity.ai.control.FlyingMoveControl
+import net.minecraft.world.entity.ai.memory.MemoryModuleType
+import net.minecraft.world.entity.ai.navigation.FlyingPathNavigation
+import net.minecraft.world.entity.ai.navigation.PathNavigation
+import net.minecraft.world.level.Level
+import net.minecraft.world.level.LevelAccessor
+import net.minecraft.world.level.ServerLevelAccessor
+import net.minecraft.world.phys.Vec3
 import org.teamvoided.dusk_debris.data.tags.DuskFluidTags
 import org.teamvoided.dusk_debris.util.Utils.DEG_TO_RAD
 import java.util.*
 
-class GiantEnemyJellyfishEntity(entityType: EntityType<GiantEnemyJellyfishEntity>, world: World) :
+class GiantEnemyJellyfishEntity(entityType: EntityType<GiantEnemyJellyfishEntity>, world: Level) :
     AbstractJellyfishEntity(entityType, world) {
 
     init {
-        this.moveControl = FlightMoveControl(this, 20, true)
+        this.moveControl = FlyingMoveControl(this, 20, true)
     }
 
-    override fun initialize(
-        world: ServerWorldAccess,
-        difficulty: LocalDifficulty,
-        spawnReason: SpawnReason,
-        entityData: EntityData?
-    ): EntityData? {
+    override fun finalizeSpawn(
+        world: ServerLevelAccessor,
+        difficulty: DifficultyInstance,
+        spawnReason: MobSpawnType,
+        entityData: SpawnGroupData?
+    ): SpawnGroupData? {
         val random = world.random
         Objects.requireNonNull(random)
-        this.getAttributeInstance(EntityAttributes.GENERIC_SCALE)!!.baseValue = generateSizeBonus(random).toDouble()
+        this.getAttribute(Attributes.SCALE)!!.baseValue = generateSizeBonus(random).toDouble()
 
         GiantEnemyJellyfishBrain.setCurrentPosAsHome(this)
-        return super.initialize(world, difficulty, spawnReason, entityData)
+        return super.finalizeSpawn(world, difficulty, spawnReason, entityData)
     }
 
-    override fun mobTick() {
-        this.getWorld().profiler.push("giantEnemyJellyfishBrain")
-        (brain as Brain<GiantEnemyJellyfishEntity>).tick(this.getWorld() as ServerWorld, this)
-        this.getWorld().profiler.pop()
-        this.getWorld().profiler.push("giantEnemyJellyfishActivityUpdate")
+    override fun customServerAiStep() {
+        this.level().profiler.push("giantEnemyJellyfishBrain")
+        (brain as Brain<GiantEnemyJellyfishEntity>).tick(this.level() as ServerLevel, this)
+        this.level().profiler.pop()
+        this.level().profiler.push("giantEnemyJellyfishActivityUpdate")
         GiantEnemyJellyfishBrain.updateActivities(this)
-        super.mobTick()
+        super.customServerAiStep()
     }
 
-    override fun deserializeBrain(dynamic: Dynamic<*>): Brain<*> {
-        return GiantEnemyJellyfishBrain.create(this, createBrainProfile().deserialize(dynamic))
+    override fun makeBrain(dynamic: Dynamic<*>): Brain<*> {
+        return GiantEnemyJellyfishBrain.create(this, brainProvider().makeBrain(dynamic))
     }
 
-    override fun createBrainProfile(): Brain.Profile<GiantEnemyJellyfishEntity> {
+    override fun brainProvider(): Brain.Provider<GiantEnemyJellyfishEntity> {
         return GiantEnemyJellyfishBrain.createProfile()
     }
 
-    override fun sendAiDebugData() {
-        super.sendAiDebugData()
-        DebugInfoSender.sendBrainDebugData(this)
+    override fun sendDebugPackets() {
+        super.sendDebugPackets()
+        DebugPackets.sendEntityBrain(this)
     }
 
-    override fun createNavigation(world: World): EntityNavigation {
-        val birdNavigation = BirdNavigation(this, world)
-        birdNavigation.setCanPathThroughDoors(false)
-        birdNavigation.setCanSwim(true)
-        birdNavigation.setCanEnterOpenDoors(true)
+    override fun createNavigation(world: Level): PathNavigation {
+        val birdNavigation = FlyingPathNavigation(this, world)
+        birdNavigation.setCanOpenDoors(false)
+        birdNavigation.setCanFloat(true)
+        birdNavigation.setCanPassDoors(true)
         return birdNavigation
     }
 
-    override fun travel(movementInput: Vec3d) {
-        if (this.isLogicalSideForUpdatingMovement) {
+    override fun travel(movementInput: Vec3) {
+        if (this.isControlledByLocalInstance) {
 //            if (this.isTouchingWater) {
 //                this.updateVelocity(0.02f, movementInput)
 //                this.move(MovementType.SELF, this.velocity)
 //                this.velocity = velocity.multiply(0.8)
 //            } else
             if (this.isInLava) {
-                this.updateVelocity(0.02f, movementInput)
-                this.move(MovementType.SELF, this.velocity)
-                this.velocity = velocity.multiply(0.5)
+                this.moveRelative(0.02f, movementInput)
+                this.move(MoverType.SELF, this.deltaMovement)
+                this.setDeltaMovement(deltaMovement.scale(0.5))
             } else {
-                this.updateVelocity(this.movementSpeed, movementInput)
-                this.move(MovementType.SELF, this.velocity)
-                this.velocity = velocity.multiply(0.91)
+                this.moveRelative(this.speed, movementInput)
+                this.move(MoverType.SELF, this.deltaMovement)
+                this.setDeltaMovement(deltaMovement.scale(0.91))
             }
         }
 
-        this.updateLimbs(false)
+        this.calculateEntityAnimation(false)
     }
 
-    override fun getDefaultDimensions(pose: EntityPose): EntityDimensions {
+    override fun getDefaultDimensions(pose: Pose): EntityDimensions {
         val dimensions = super.getDefaultDimensions(pose)
-        return if (!isProtectedByMembrane()) dimensions.scaled(0.37f)
+        return if (!isProtectedByMembrane()) dimensions.scale(0.37f)
         else dimensions
     }
 
@@ -110,36 +114,36 @@ class GiantEnemyJellyfishEntity(entityType: EntityType<GiantEnemyJellyfishEntity
     fun isProtectedByMembrane(): Boolean = true
 
 
-    override fun chooseRandomAngerTime() {
-        this.angerTime = ANGER_TIME_RANGE.get(this.random);
+    override fun startPersistentAngerTimer() {
+        this.remainingPersistentAngerTime = ANGER_TIME_RANGE.sample(this.random);
     }
 
     fun getRecentAttacker(): Optional<LivingEntity> {
-        return getBrain().getOptionalMemory(MemoryModuleType.HURT_BY)
-            .map { obj: DamageSource -> obj.attacker }
+        return getBrain().getMemory(MemoryModuleType.HURT_BY)
+            .map { obj: DamageSource -> obj.entity }
             .filter { entity: Entity? -> entity is LivingEntity }
             .map { entity: Entity? -> entity as LivingEntity }
     }
 
-    override fun damage(source: DamageSource, amount: Float): Boolean {
+    override fun hurt(source: DamageSource, amount: Float): Boolean {
         if (isInvulnerableTo(source)) {
-            if (source.attacker != null) {
-                val entity: Entity = source.attacker!!
+            if (source.entity != null) {
+                val entity: Entity = source.entity!!
                 launchFromFacing(entity, -(amount * 0.2f + 0.5f))
             }
             return this.isRemoved || this.isInvulnerable
-        } else return super.damage(source, amount)
+        } else return super.hurt(source, amount)
     }
 
-    override fun applyDamage(source: DamageSource, amount: Float) {
-        super.applyDamage(source, amount)
+    override fun actuallyHurt(source: DamageSource, amount: Float) {
+        super.actuallyHurt(source, amount)
     }
 
     override fun isInvulnerableTo(damageSource: DamageSource): Boolean {
         return if (
             isProtectedByMembrane() &&
-            !damageSource.isTypeIn(DamageTypeTags.BYPASSES_INVULNERABILITY) &&
-            !damageSource.isSourceCreativePlayer
+            !damageSource.`is`(DamageTypeTags.BYPASSES_INVULNERABILITY) &&
+            !damageSource.isCreativePlayer
         ) {
             true
         } else {
@@ -148,11 +152,11 @@ class GiantEnemyJellyfishEntity(entityType: EntityType<GiantEnemyJellyfishEntity
     }
 
     private fun launchFromFacing(entity: Entity, mult: Float) {
-        val pitchSin: Double = MathHelper.sin(entity.pitch * DEG_TO_RAD).toDouble()
-        val pitchCos: Double = MathHelper.cos(entity.pitch * DEG_TO_RAD).toDouble()
-        val yawSin: Double = MathHelper.sin(entity.yaw * DEG_TO_RAD).toDouble()
-        val yawCos: Double = MathHelper.cos(entity.yaw * DEG_TO_RAD).toDouble()
-        entity.addVelocity(
+        val pitchSin: Double = Mth.sin(entity.xRot * DEG_TO_RAD).toDouble()
+        val pitchCos: Double = Mth.cos(entity.xRot * DEG_TO_RAD).toDouble()
+        val yawSin: Double = Mth.sin(entity.yRot * DEG_TO_RAD).toDouble()
+        val yawCos: Double = Mth.cos(entity.yRot * DEG_TO_RAD).toDouble()
+        entity.push(
             -yawSin * pitchCos * mult,
             -pitchSin * mult,
             yawCos * pitchCos * mult
@@ -160,31 +164,31 @@ class GiantEnemyJellyfishEntity(entityType: EntityType<GiantEnemyJellyfishEntity
     }
 
     fun playRoarSound() {
-        this.makeSound(SoundEvents.ENTITY_WARDEN_ROAR)
+        this.makeSound(SoundEvents.WARDEN_ROAR)
     }
 
     override fun updateAnimations() {
-            this.idleAnimationState.start(this.age)
+            this.idleAnimationState.startIfStopped(this.tickCount)
     }
 
-    private fun generateSizeBonus(random: RandomGenerator): Float { //biased to bottom
+    private fun generateSizeBonus(random: RandomSource): Float { //biased to bottom
         return 1f + random.nextFloat() * random.nextFloat() * 1.66667f
     }
 
     fun canSpawn(
         type: EntityType<GiantEnemyJellyfishEntity>,
-        world: WorldAccess,
-        spawnReason: SpawnReason,
+        world: LevelAccessor,
+        spawnReason: MobSpawnType,
         pos: BlockPos,
-        random: RandomGenerator
+        random: RandomSource
     ): Boolean {
         if (world.difficulty != Difficulty.PEACEFUL) {
-            if (SpawnReason.isSpawner(spawnReason)) {
+            if (MobSpawnType.isSpawner(spawnReason)) {
                 return true
             } else if (random.nextInt(20) == 0) {
-                return !(!world.getFluidState(pos).isIn(DuskFluidTags.ACID) ||
-                        !world.getFluidState(pos.up()).isIn(DuskFluidTags.ACID) ||
-                        !world.getFluidState(pos.up(2)).isIn(DuskFluidTags.ACID))
+                return !(!world.getFluidState(pos).`is`(DuskFluidTags.ACID) ||
+                        !world.getFluidState(pos.above()).`is`(DuskFluidTags.ACID) ||
+                        !world.getFluidState(pos.above(2)).`is`(DuskFluidTags.ACID))
             }
         }
         return false
@@ -193,13 +197,13 @@ class GiantEnemyJellyfishEntity(entityType: EntityType<GiantEnemyJellyfishEntity
 
     companion object {
 
-        val ANGER_TIME_RANGE: UniformIntProvider = TimeHelper.betweenSeconds(40, 79)
-        val VULNERABLE_TIME: UniformIntProvider = TimeHelper.betweenSeconds(40, 79)
+        val ANGER_TIME_RANGE: UniformInt = TimeUtil.rangeOfSeconds(40, 79)
+        val VULNERABLE_TIME: UniformInt = TimeUtil.rangeOfSeconds(40, 79)
 
-        fun createAttributes(): DefaultAttributeContainer.Builder {
+        fun createAttributes(): AttributeSupplier.Builder {
             return AbstractJellyfishEntity.createAttributes()
-                .add(EntityAttributes.GENERIC_MAX_HEALTH, 30.0)
-                .add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 5.0)
+                .add(Attributes.MAX_HEALTH, 30.0)
+                .add(Attributes.ATTACK_DAMAGE, 5.0)
         }
     }
 }

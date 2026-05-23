@@ -1,24 +1,24 @@
 package org.teamvoided.dusk_debris.entity
 
-import net.minecraft.entity.EntityType
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.MovementType
-import net.minecraft.entity.attribute.DefaultAttributeContainer
-import net.minecraft.entity.attribute.EntityAttributes
-import net.minecraft.entity.damage.DamageSource
-import net.minecraft.entity.damage.DamageTypes
-import net.minecraft.entity.passive.WolfEntity
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.registry.tag.DamageTypeTags
-import net.minecraft.registry.tag.EntityTypeTags
-import net.minecraft.util.function.BooleanBiFunction
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Box
-import net.minecraft.util.math.Vec3d
-import net.minecraft.util.shape.VoxelShapes
-import net.minecraft.world.World
+import net.minecraft.core.BlockPos
+import net.minecraft.tags.DamageTypeTags
+import net.minecraft.tags.EntityTypeTags
+import net.minecraft.world.damagesource.DamageSource
+import net.minecraft.world.damagesource.DamageTypes
+import net.minecraft.world.entity.EntityType
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.MoverType
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier
+import net.minecraft.world.entity.ai.attributes.Attributes
+import net.minecraft.world.entity.animal.Wolf
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.level.Level
+import net.minecraft.world.phys.AABB
+import net.minecraft.world.phys.Vec3
+import net.minecraft.world.phys.shapes.BooleanOp
+import net.minecraft.world.phys.shapes.Shapes
 
-abstract class AbstractVolaphyraEntity(entityType: EntityType<out AbstractVolaphyraEntity>, world: World) :
+abstract class AbstractVolaphyraEntity(entityType: EntityType<out AbstractVolaphyraEntity>, world: Level) :
     AbstractJellyfishEntity(entityType, world) {
     var propulsionTicks: Int = 0
     override fun tick() {
@@ -26,17 +26,17 @@ abstract class AbstractVolaphyraEntity(entityType: EntityType<out AbstractVolaph
         this.propulsionTicks++
     }
 
-    override fun move(movementType: MovementType, movement: Vec3d) {
+    override fun move(movementType: MoverType, movement: Vec3) {
         super.move(movementType, movement)
-        checkBlockCollision()
+        checkInsideBlocks()
     }
 
     fun checkCollisionForPop() {
-        val box = this.bounds.expand(0.1)
-        val blockPos = BlockPos.create(box.minX + 1.0E-7, box.minY + 1.0E-7, box.minZ + 1.0E-7)
-        val blockPos2 = BlockPos.create(box.maxX - 1.0E-7, box.maxY - 1.0E-7, box.maxZ - 1.0E-7)
-        if (!this.isInvulnerable && !world.isClient && world.isRegionLoaded(blockPos, blockPos2)) {
-            if (this.noClip || !this.isAlive) {
+        val box = this.boundingBox.inflate(0.1)
+        val blockPos = BlockPos.containing(box.minX + 1.0E-7, box.minY + 1.0E-7, box.minZ + 1.0E-7)
+        val blockPos2 = BlockPos.containing(box.maxX - 1.0E-7, box.maxY - 1.0E-7, box.maxZ - 1.0E-7)
+        if (!this.isInvulnerable && !level().isClientSide && level().hasChunksAt(blockPos, blockPos2)) {
+            if (this.noPhysics || !this.isAlive) {
                 return
             } else {
                 val the = checkBlockBoxes(box)
@@ -48,11 +48,11 @@ abstract class AbstractVolaphyraEntity(entityType: EntityType<out AbstractVolaph
     }
 
     fun checkCollisionForPathing(): Boolean { //returns true if there is a collision box below
-        val box = this.bounds.expand(0.0, this.height * 2.0, 0.0).offset(0.0, this.height * -4.0, 0.0)
-        val blockPos = BlockPos.create(box.minX + 1.0E-7, box.minY + 1.0E-7, box.minZ + 1.0E-7)
-        val blockPos2 = BlockPos.create(box.maxX - 1.0E-7, box.maxY - 1.0E-7, box.maxZ - 1.0E-7)
-        if (!this.isInvulnerable && !world.isClient && world.isRegionLoaded(blockPos, blockPos2)) {
-            if (this.noClip || !this.isAlive) {
+        val box = this.boundingBox.inflate(0.0, this.bbHeight * 2.0, 0.0).move(0.0, this.bbHeight * -4.0, 0.0)
+        val blockPos = BlockPos.containing(box.minX + 1.0E-7, box.minY + 1.0E-7, box.minZ + 1.0E-7)
+        val blockPos2 = BlockPos.containing(box.maxX - 1.0E-7, box.maxY - 1.0E-7, box.maxZ - 1.0E-7)
+        if (!this.isInvulnerable && !level().isClientSide && level().hasChunksAt(blockPos, blockPos2)) {
+            if (this.noPhysics || !this.isAlive) {
                 return false
             } else {
                 val belowNotAir = checkBlockBoxes(box)
@@ -64,46 +64,46 @@ abstract class AbstractVolaphyraEntity(entityType: EntityType<out AbstractVolaph
         return false
     }
 
-    private fun checkBlockBoxes(box: Box): Boolean {
-        return BlockPos.stream(box).anyMatch { pos: BlockPos ->
-            val blockState = world.getBlockState(pos)
+    private fun checkBlockBoxes(box: AABB): Boolean {
+        return BlockPos.betweenClosedStream(box).anyMatch { pos: BlockPos ->
+            val blockState = level().getBlockState(pos)
             !blockState.isAir &&
-                    VoxelShapes.matchesAnywhere(
-                        blockState.getCollisionShape(this.world, pos)
-                            .offset(pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble()),
-                        VoxelShapes.cuboid(box),
-                        BooleanBiFunction.AND
+                    Shapes.joinIsNotEmpty(
+                        blockState.getCollisionShape(this.level(), pos)
+                            .move(pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble()),
+                        Shapes.create(box),
+                        BooleanOp.AND
                     )
         }
     }
 
-    override fun travel(movementInput: Vec3d?) {}
+    override fun travel(movementInput: Vec3?) {}
 
     override fun updateAnimations() {
         if (propulsionTicks <= 0) {
             idleAnimationState.stop()
         } else {
-            idleAnimationState.start(this.age)
+            idleAnimationState.startIfStopped(this.tickCount)
         }
     }
 
-    override fun handleStatus(status: Byte) {
+    override fun handleEntityEvent(status: Byte) {
         if (status.toInt() == 19) {
             this.propulsionTicks = 0
         } else {
-            super.handleStatus(status)
+            super.handleEntityEvent(status)
         }
     }
 
     open fun take3DKnockback(strengthInput: Double, x: Double, y: Double, z: Double) {
         var strength = strengthInput
-        strength *= 1.0 - this.getAttributeValue(EntityAttributes.GENERIC_KNOCKBACK_RESISTANCE)
+        strength *= 1.0 - this.getAttributeValue(Attributes.KNOCKBACK_RESISTANCE)
         if (!(strength <= 0.0)) {
-            this.velocityDirty = true
-            val vec3d = velocity
+            this.hasImpulse = true
+            val vec3d = deltaMovement
 
-            val vec3d2 = Vec3d(x, y, z).normalize().multiply(strength)
-            this.setVelocity(
+            val vec3d2 = Vec3(x, y, z).normalize().scale(strength)
+            this.setDeltaMovement(
                 vec3d.x / 2.0 - vec3d2.x,
                 vec3d.y / 2.0 - vec3d2.y,
                 vec3d.z / 2.0 - vec3d2.z
@@ -114,39 +114,39 @@ abstract class AbstractVolaphyraEntity(entityType: EntityType<out AbstractVolaph
     open fun setFlying(source: DamageSource, amount: Float) {}
 
 
-    override fun damage(source: DamageSource, amount: Float): Boolean {
-        this.despawnCounter = 0
-        val entity2 = source.attacker
+    override fun hurt(source: DamageSource, amount: Float): Boolean {
+        this.noActionTime = 0
+        val entity2 = source.entity
         if (entity2 != null) {
             if (entity2 is LivingEntity) {
-                if (!source.isTypeIn(DamageTypeTags.NO_ANGER) &&
-                    (!source.isType(DamageTypes.WIND_CHARGE) || !type.isIn(EntityTypeTags.NO_ANGER_FROM_WIND_CHARGE))
+                if (!source.`is`(DamageTypeTags.NO_ANGER) &&
+                    (!source.`is`(DamageTypes.WIND_CHARGE) || !type.`is`(EntityTypeTags.NO_ANGER_FROM_WIND_CHARGE))
                 ) {
-                    this.attacker = entity2
+                    this.setLastHurtByMob(entity2)
                 }
             }
 
-            if (entity2 is PlayerEntity) {
-                this.playerHitTimer = 100
-                this.attackingPlayer = entity2
-            } else if (entity2 is WolfEntity) {
-                if (entity2.isTamed) {
-                    this.playerHitTimer = 100
+            if (entity2 is Player) {
+                this.lastHurtByPlayerTime = 100
+                this.lastHurtByPlayer = entity2
+            } else if (entity2 is Wolf) {
+                if (entity2.isTame) {
+                    this.lastHurtByPlayerTime = 100
                     val var11 = entity2.owner
-                    if (var11 is PlayerEntity) {
-                        this.attackingPlayer = var11
+                    if (var11 is Player) {
+                        this.lastHurtByPlayer = var11
                     } else {
-                        this.attackingPlayer = null
+                        this.lastHurtByPlayer = null
                     }
                 }
             }
         }
-        if (world.isClient || this.isDead) {
+        if (level().isClientSide || this.isDeadOrDying) {
             return false
-        } else if (source.isTypeIn(DamageTypeTags.BYPASSES_INVULNERABILITY) || source.type == this.damageSources.genericKill().type) {
+        } else if (source.`is`(DamageTypeTags.BYPASSES_INVULNERABILITY) || source.type() == this.damageSources().genericKill().type()) {
             this.setFlying(source, amount)
-            return super.damage(source, amount)
-        } else if (!source.isTypeIn(DamageTypeTags.NO_KNOCKBACK)) {
+            return super.hurt(source, amount)
+        } else if (!source.`is`(DamageTypeTags.NO_KNOCKBACK)) {
             this.setFlying(source, amount)
         }
         return false
@@ -158,10 +158,10 @@ abstract class AbstractVolaphyraEntity(entityType: EntityType<out AbstractVolaph
     }
 
     companion object {
-        fun createAttributes(): DefaultAttributeContainer.Builder {
+        fun createAttributes(): AttributeSupplier.Builder {
             return AbstractJellyfishEntity.createAttributes()
-                .add(EntityAttributes.GENERIC_MAX_HEALTH, 1.0)
-                .add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 40.0)
+                .add(Attributes.MAX_HEALTH, 1.0)
+                .add(Attributes.ATTACK_DAMAGE, 40.0)
         }
     }
 }

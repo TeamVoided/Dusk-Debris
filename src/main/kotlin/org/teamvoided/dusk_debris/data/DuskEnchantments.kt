@@ -1,18 +1,18 @@
 package org.teamvoided.dusk_debris.data
 
-import net.minecraft.enchantment.Enchantment
-import net.minecraft.registry.RegistryKey
-import net.minecraft.registry.RegistryKeys
+import net.minecraft.core.registries.Registries
+import net.minecraft.resources.ResourceKey
+import net.minecraft.world.item.enchantment.Enchantment
 import org.teamvoided.dusk_debris.DuskDebris
 import org.teamvoided.dusk_debris.util.curse
 import org.teamvoided.dusk_debris.util.particle
 import org.teamvoided.dusk_debris.util.treasure
 
 object DuskEnchantments {
-    val ENCHANTMENTS = mutableSetOf<RegistryKey<Enchantment>>()
-    val CURSES = mutableSetOf<RegistryKey<Enchantment>>()
-    val TREASURE = mutableSetOf<RegistryKey<Enchantment>>()
-    val ENCHANTMENT_PARTICLE = mutableSetOf<RegistryKey<Enchantment>>()
+    val ENCHANTMENTS = mutableSetOf<ResourceKey<Enchantment>>()
+    val CURSES = mutableSetOf<ResourceKey<Enchantment>>()
+    val TREASURE = mutableSetOf<ResourceKey<Enchantment>>()
+    val ENCHANTMENT_PARTICLE = mutableSetOf<ResourceKey<Enchantment>>()
 
     val BREAKING = create("curse/breaking").curse()
     val CURSE_OF_THE_FUNNY = create("curse/funny").curse()
@@ -36,8 +36,8 @@ object DuskEnchantments {
     val IMPALING = create("minecraft/enchantment/impaling")
 //    val WIND_BURST = create("minecraft/enchantment/wind_burst")
 
-    private fun create(id: String): RegistryKey<Enchantment> {
-        val enchantment = RegistryKey.of(RegistryKeys.ENCHANTMENT, DuskDebris.id(id))
+    private fun create(id: String): ResourceKey<Enchantment> {
+        val enchantment = ResourceKey.create(Registries.ENCHANTMENT, DuskDebris.id(id))
         ENCHANTMENTS.add(enchantment)
         return enchantment
     }

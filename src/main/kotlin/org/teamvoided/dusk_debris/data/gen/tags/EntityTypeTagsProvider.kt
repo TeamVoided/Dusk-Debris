@@ -3,9 +3,9 @@ package org.teamvoided.dusk_debris.data.gen.tags
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalEntityTypeTags
-import net.minecraft.entity.EntityType
-import net.minecraft.registry.HolderLookup
-import net.minecraft.registry.tag.EntityTypeTags
+import net.minecraft.core.HolderLookup
+import net.minecraft.tags.EntityTypeTags
+import net.minecraft.world.entity.EntityType
 import org.teamvoided.dusk_debris.data.tags.DuskEntityTypeTags
 import org.teamvoided.dusk_debris.entity.DuskEntityLists.DUSK_SKELETON_ENTITIES
 import org.teamvoided.dusk_debris.entity.DuskEntityLists.THROWABLE_BOMB_ENTITIES
@@ -14,7 +14,7 @@ import java.util.concurrent.CompletableFuture
 
 class EntityTypeTagsProvider(output: FabricDataOutput, registriesFuture: CompletableFuture<HolderLookup.Provider>) :
     FabricTagProvider.EntityTypeTagProvider(output, registriesFuture) {
-    override fun configure(arg: HolderLookup.Provider) {
+    override fun addTags(arg: HolderLookup.Provider) {
         duskTags()
         vanillaTags()
         dnd()

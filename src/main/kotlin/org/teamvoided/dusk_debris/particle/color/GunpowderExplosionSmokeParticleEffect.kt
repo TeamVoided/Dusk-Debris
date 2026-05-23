@@ -4,17 +4,17 @@ import com.mojang.serialization.Codec
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.fabricmc.fabric.api.particle.v1.FabricParticleTypes
-import net.minecraft.network.RegistryByteBuf
-import net.minecraft.network.codec.PacketCodec
-import net.minecraft.network.codec.PacketCodecs
-import net.minecraft.particle.ParticleEffect
-import net.minecraft.particle.ParticleType
+import net.minecraft.core.particles.ParticleOptions
+import net.minecraft.core.particles.ParticleType
+import net.minecraft.network.RegistryFriendlyByteBuf
+import net.minecraft.network.codec.ByteBufCodecs
+import net.minecraft.network.codec.StreamCodec
 import org.teamvoided.dusk_debris.init.DuskParticles
 import java.awt.Color
 
 class GunpowderExplosionSmokeParticleEffect(
     val color: Color
-) : ParticleEffect {
+) : ParticleOptions {
     constructor(
         color: Int
     ) : this(Color(color))
@@ -29,9 +29,9 @@ class GunpowderExplosionSmokeParticleEffect(
                     Codec.INT.fieldOf("color").forGetter { it.color.rgb }
                 ).apply(instance, ::GunpowderExplosionSmokeParticleEffect)
             }
-        val PACKET_CODEC: PacketCodec<RegistryByteBuf, GunpowderExplosionSmokeParticleEffect> =
-            PacketCodec.tuple(
-                PacketCodecs.INT, { it.color.rgb },
+        val PACKET_CODEC: StreamCodec<RegistryFriendlyByteBuf, GunpowderExplosionSmokeParticleEffect> =
+            StreamCodec.composite(
+                ByteBufCodecs.INT, { it.color.rgb },
                 ::GunpowderExplosionSmokeParticleEffect
             )
         val REGISTER = FabricParticleTypes.complex(CODEC, PACKET_CODEC)

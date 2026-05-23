@@ -2,33 +2,33 @@ package org.teamvoided.dusk_debris.world.gen.tree.foliage
 
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.int_provider.ConstantIntProvider
-import net.minecraft.util.math.int_provider.IntProvider
-import net.minecraft.util.random.RandomGenerator
-import net.minecraft.world.TestableWorld
-import net.minecraft.world.gen.feature.TreeFeatureConfig
-import net.minecraft.world.gen.foliage.FoliagePlacerType
+import net.minecraft.core.BlockPos
+import net.minecraft.util.RandomSource
+import net.minecraft.util.valueproviders.ConstantInt
+import net.minecraft.util.valueproviders.IntProvider
+import net.minecraft.world.level.LevelSimulatedReader
+import net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration
+import net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacerType
 import org.teamvoided.dusk_debris.init.worldgen.trees.DuskTreeStuff
 
 class BirchFoliagePlacer(radius: IntProvider, offset: IntProvider) : FoliageHelper(radius, offset) {
-    constructor(radius: Int, offset: Int) : this(ConstantIntProvider.create(radius), ConstantIntProvider.create(offset))
+    constructor(radius: Int, offset: Int) : this(ConstantInt.of(radius), ConstantInt.of(offset))
 
-    override fun getType(): FoliagePlacerType<BirchFoliagePlacer> = DuskTreeStuff.BIRCH_FOLIAGE_PLACER
+    override fun type(): FoliagePlacerType<BirchFoliagePlacer> = DuskTreeStuff.BIRCH_FOLIAGE_PLACER
 
     override fun createFoliage(
-        world: TestableWorld,
-        placer: Placer,
-        random: RandomGenerator,
-        config: TreeFeatureConfig,
+        world: LevelSimulatedReader,
+        placer: FoliageSetter,
+        random: RandomSource,
+        config: TreeConfiguration,
         trunkHeight: Int,
-        node: TreeNode,
+        node: FoliageAttachment,
         foliageHeight: Int,
         radius: Int,
         offset: Int
     ) {
-        val blockPos = node.center.up(offset)
-        val isBig = node.isGiantTrunk
+        val blockPos = node.pos().above(offset)
+        val isBig = node.doubleTrunk()
         this.genSquareRandomNoCorners(world, placer, random, config, blockPos, isBig, -4, 1)
         this.birch1(world, placer, random, config, blockPos, isBig, -3, 2)
         this.birch2(world, placer, random, config, blockPos, isBig, -2, 2, 1, 2)
@@ -41,10 +41,10 @@ class BirchFoliagePlacer(radius: IntProvider, offset: IntProvider) : FoliageHelp
 
     //random inner diamond
     private fun birch1(
-        world: TestableWorld,
-        place: Placer,
-        random: RandomGenerator,
-        config: TreeFeatureConfig,
+        world: LevelSimulatedReader,
+        place: FoliageSetter,
+        random: RandomSource,
+        config: TreeConfiguration,
         centerPos: BlockPos,
         isEven: Boolean,
         y: Int,
@@ -62,10 +62,10 @@ class BirchFoliagePlacer(radius: IntProvider, offset: IntProvider) : FoliageHelp
     }
 
     private fun birch2(
-        world: TestableWorld,
-        place: Placer,
-        random: RandomGenerator,
-        config: TreeFeatureConfig,
+        world: LevelSimulatedReader,
+        place: FoliageSetter,
+        random: RandomSource,
+        config: TreeConfiguration,
         centerPos: BlockPos,
         isEven: Boolean,
         y: Int,
@@ -84,10 +84,10 @@ class BirchFoliagePlacer(radius: IntProvider, offset: IntProvider) : FoliageHelp
     }
 
     private fun birch3(
-        world: TestableWorld,
-        place: Placer,
-        random: RandomGenerator,
-        config: TreeFeatureConfig,
+        world: LevelSimulatedReader,
+        place: FoliageSetter,
+        random: RandomSource,
+        config: TreeConfiguration,
         centerPos: BlockPos,
         isEven: Boolean,
         y: Int,
@@ -101,12 +101,12 @@ class BirchFoliagePlacer(radius: IntProvider, offset: IntProvider) : FoliageHelp
         } else false
     }
 
-    override fun getRandomHeight(random: RandomGenerator, trunkHeight: Int, config: TreeFeatureConfig): Int = 0
+    override fun foliageHeight(random: RandomSource, trunkHeight: Int, config: TreeConfiguration): Int = 0
 
     companion object {
         val CODEC: MapCodec<BirchFoliagePlacer> =
             RecordCodecBuilder.mapCodec { instance ->
-                fillFoliagePlacerFields(instance)
+                foliagePlacerParts(instance)
                     .apply(instance, ::BirchFoliagePlacer)
             }
     }

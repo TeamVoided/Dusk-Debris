@@ -2,9 +2,9 @@ package org.teamvoided.dusk_debris.world.gen.configured_carver.config.debug
 
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
-import net.minecraft.block.BlockState
-import net.minecraft.block.Blocks
-import net.minecraft.world.gen.carver.CarverDebugConfig
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.levelgen.carver.CarverDebugSettings
 
 class LakeCarverDebugConfig(
     debugMode: Boolean,
@@ -14,7 +14,7 @@ class LakeCarverDebugConfig(
     barrierState: BlockState,
     val fluidBarrierState: BlockState,
     val fluidState: BlockState
-) : CarverDebugConfig(debugMode, airState, waterState, lavaState, barrierState) {
+) : CarverDebugSettings(debugMode, airState, waterState, lavaState, barrierState) {
 
 
     companion object {
@@ -22,12 +22,12 @@ class LakeCarverDebugConfig(
         fun default(debug: Boolean = false): LakeCarverDebugConfig {
             return LakeCarverDebugConfig(
                 debug,
-                Blocks.ACACIA_BUTTON.defaultState,
-                Blocks.BLUE_STAINED_GLASS.defaultState,
-                Blocks.ORANGE_STAINED_GLASS.defaultState,
-                Blocks.GLASS.defaultState,
-                Blocks.WARPED_BUTTON.defaultState,
-                Blocks.TINTED_GLASS.defaultState
+                Blocks.ACACIA_BUTTON.defaultBlockState(),
+                Blocks.BLUE_STAINED_GLASS.defaultBlockState(),
+                Blocks.ORANGE_STAINED_GLASS.defaultBlockState(),
+                Blocks.GLASS.defaultBlockState(),
+                Blocks.WARPED_BUTTON.defaultBlockState(),
+                Blocks.TINTED_GLASS.defaultBlockState()
             )
         }
 

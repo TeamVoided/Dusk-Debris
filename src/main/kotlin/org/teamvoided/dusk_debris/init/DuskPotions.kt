@@ -1,9 +1,9 @@
 package org.teamvoided.dusk_debris.init
 
-import net.minecraft.potion.Potion
-import net.minecraft.registry.Holder
-import net.minecraft.registry.Registries
-import net.minecraft.registry.Registry
+import net.minecraft.core.Holder
+import net.minecraft.core.Registry
+import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.world.item.alchemy.Potion
 import org.teamvoided.dusk_debris.DuskDebris.id
 
 object DuskPotions {
@@ -11,5 +11,5 @@ object DuskPotions {
 
 
     private fun register(id: String, entry: Potion): Holder<Potion> =
-        Registry.registerHolder(Registries.POTION, id(id), entry)
+        Registry.registerForHolder(BuiltInRegistries.POTION, id(id), entry)
 }

@@ -1,40 +1,40 @@
 package org.teamvoided.dusk_debris.sot.block.entity
 
-import net.minecraft.block.HorizontalFacingBlock
-import net.minecraft.client.render.VertexConsumerProvider
-import net.minecraft.client.render.block.entity.BlockEntityRenderer
-import net.minecraft.client.render.block.entity.BlockEntityRendererFactory
-import net.minecraft.client.render.model.json.ModelTransformationMode
-import net.minecraft.client.util.math.MatrixStack
-import net.minecraft.item.BlockItem
-import net.minecraft.item.Items
-import net.minecraft.state.property.Properties
-import net.minecraft.util.math.Axis
+import com.mojang.blaze3d.vertex.PoseStack
+import com.mojang.math.Axis
+import net.minecraft.client.renderer.MultiBufferSource
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderer
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider
+import net.minecraft.world.item.BlockItem
+import net.minecraft.world.item.ItemDisplayContext
+import net.minecraft.world.item.Items
+import net.minecraft.world.level.block.HorizontalDirectionalBlock
+import net.minecraft.world.level.block.state.properties.BlockStateProperties
 import org.teamvoided.dusk_debris.block.sot.GildedChaliceBlock
 import org.teamvoided.dusk_debris.block.sot.entity.StackedChaliceBlockEntity
 
 class StackedChaliceBlockEntityRenderer(
-    ctx: BlockEntityRendererFactory.Context,
+    ctx: BlockEntityRendererProvider.Context,
 ) : BlockEntityRenderer<StackedChaliceBlockEntity> {
 
-    private val blockRenderer = ctx.renderManager
+    private val blockRenderer = ctx.blockRenderDispatcher
     private val itemRenderer = ctx.itemRenderer
 
     override fun render(
         blockEntity: StackedChaliceBlockEntity,
         tickDelta: Float,
-        matrices: MatrixStack,
-        vertexConsumers: VertexConsumerProvider,
+        matrices: PoseStack,
+        vertexConsumers: MultiBufferSource,
         light: Int,
         overlay: Int,
     ) {
-        val state = blockEntity.cachedState
-        val direction = state.get(HorizontalFacingBlock.FACING)
+        val state = blockEntity.blockState
+        val direction = state.getValue(HorizontalDirectionalBlock.FACING)
 
-        matrices.push()
-        matrices.rotateAround(Axis.Y_POSITIVE.rotationDegrees(-direction.asRotation() - 180), 0.5f, 0.5f, 0.5f)
+        matrices.pushPose()
+        matrices.rotateAround(Axis.YP.rotationDegrees(-direction.toYRot() - 180), 0.5f, 0.5f, 0.5f)
 
-        val chalices = state.get(GildedChaliceBlock.CHALICES)
+        val chalices = state.getValue(GildedChaliceBlock.CHALICES)
         val offsets = listOf(
             listOf(0.0 to 0.0),
             listOf(
@@ -59,28 +59,28 @@ class StackedChaliceBlockEntityRenderer(
             if (item !is BlockItem) continue
             val block = item.block
 
-            var state = block.defaultState
-            if (state.contains(Properties.FACING)) {
-                state = state.with(Properties.FACING, direction)
+            var state = block.defaultBlockState()
+            if (state.hasProperty(BlockStateProperties.FACING)) {
+                state = state.setValue(BlockStateProperties.FACING, direction)
             }
-            matrices.push()
+            matrices.pushPose()
             val off = offsets[index]
             val x = 0.0625
             matrices.translate(off.first * x, 0.0, off.second * x)
-            blockRenderer.renderBlockAsEntity(state, matrices, vertexConsumers, light, overlay)
-            matrices.pop()
+            blockRenderer.renderSingleBlock(state, matrices, vertexConsumers, light, overlay)
+            matrices.popPose()
         }
         if (blockEntity.isEmpty()) {
-            matrices.push()
+            matrices.pushPose()
             matrices.translate(0.5, 0.5, 0.5)
-            itemRenderer.renderItem(
-                Items.BARRIER.defaultStack, ModelTransformationMode.FIXED,
+            itemRenderer.renderStatic(
+                Items.BARRIER.defaultInstance, ItemDisplayContext.FIXED,
                 light, overlay,
                 matrices, vertexConsumers,
-                blockEntity.world, 0
+                blockEntity.level, 0
             )
-            matrices.pop()
+            matrices.popPose()
         }
-        matrices.pop()
+        matrices.popPose()
     }
 }

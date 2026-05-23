@@ -1,10 +1,10 @@
 package org.teamvoided.dusk_debris.mixin;
 
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.noise.OctaveSimplexNoiseSampler;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.BiomeEffects;
-import net.minecraft.world.biome.GenerationSettings;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.BiomeGenerationSettings;
+import net.minecraft.world.level.biome.BiomeSpecialEffects;
+import net.minecraft.world.level.levelgen.synth.PerlinSimplexNoise;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -19,34 +19,34 @@ public class BiomeWaterColorMixin {
 
     @Shadow
     @Final
-    private BiomeEffects effects;
+    private BiomeSpecialEffects specialEffects;
 
     @Shadow
     @Final
-    private Biome.Weather weather;
+    private Biome.ClimateSettings climateSettings;
 
     @Shadow
     @Final
-    private static OctaveSimplexNoiseSampler TEMPERATURE_NOISE;
+    private static PerlinSimplexNoise TEMPERATURE_NOISE;
 
     @Shadow
     @Final
-    private GenerationSettings generationSettings;
+    private BiomeGenerationSettings generationSettings;
 
     @Inject(method = "getWaterColor", at = @At("HEAD"), cancellable = true)
     public void getNewWaterColor(CallbackInfoReturnable<Integer> cir) {
 //        if (new Holder.Direct((Biome) (Object) this).isIn(DuskBiomeTags.getWORLDNOISE_WATER()) ) {
 //            cir.setReturnValue(getCustomWaterColor(this.TEMPERATURE_NOISE, this.TEMPERATURE_NOISE));
 //        } else
-        if (this.effects.getWaterColor() == 4159204) {
+        if (this.specialEffects.getWaterColor() == 4159204) {
             cir.setReturnValue(getCustomWaterColor());
         }
     }
 
     @Unique
     private int getCustomWaterColor() {
-        double d = (double) MathHelper.clamp(this.weather.temperature(), 0.0F, 1.0F);
-        double e = (double) MathHelper.clamp(this.weather.downfall(), 0.0F, 1.0F);
+        double d = (double) Mth.clamp(this.climateSettings.temperature(), 0.0F, 1.0F);
+        double e = (double) Mth.clamp(this.climateSettings.downfall(), 0.0F, 1.0F);
         return WaterColors.getColor(d, e);
     }
 

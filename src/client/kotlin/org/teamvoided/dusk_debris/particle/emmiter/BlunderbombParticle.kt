@@ -2,17 +2,17 @@ package org.teamvoided.dusk_debris.particle.emmiter
 
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
+import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.client.particle.NoRenderParticle
 import net.minecraft.client.particle.Particle
-import net.minecraft.client.particle.ParticleFactory
-import net.minecraft.client.particle.ParticleTextureSheet
-import net.minecraft.client.world.ClientWorld
-import net.minecraft.particle.DefaultParticleType
-import net.minecraft.particle.ParticleTypes
+import net.minecraft.client.particle.ParticleProvider
+import net.minecraft.client.particle.ParticleRenderType
+import net.minecraft.core.particles.ParticleTypes
+import net.minecraft.core.particles.SimpleParticleType
 
 @Environment(EnvType.CLIENT)
 class BlunderbombParticle internal constructor(
-    world: ClientWorld,
+    world: ClientLevel,
     x: Double,
     y: Double,
     z: Double
@@ -22,26 +22,26 @@ class BlunderbombParticle internal constructor(
     private val extraParticle = ParticleTypes.SMOKE
 
     init {
-        this.velocityX = (random.nextFloat() - random.nextFloat()).toDouble()
-        this.velocityY = (random.nextFloat() - random.nextFloat()).toDouble()
-        this.velocityZ = (random.nextFloat() - random.nextFloat()).toDouble()
-        this.velocityY += (random.nextFloat() * 0.4f).toDouble()
-        this.gravityStrength = 1f
-        this.maxAge = 20
+        this.xd = (random.nextFloat() - random.nextFloat()).toDouble()
+        this.yd = (random.nextFloat() - random.nextFloat()).toDouble()
+        this.zd = (random.nextFloat() - random.nextFloat()).toDouble()
+        this.yd += (random.nextFloat() * 0.4f).toDouble()
+        this.gravity = 1f
+        this.lifetime = 20
     }
 
-    override fun getType(): ParticleTextureSheet {
-        return ParticleTextureSheet.NO_RENDER
+    override fun getRenderType(): ParticleRenderType {
+        return ParticleRenderType.NO_RENDER
     }
 
     override fun tick() {
-        this.gravityStrength *= 0.9f
-        this.velocityMultiplier *= 0.975f
+        this.gravity *= 0.9f
+        this.friction *= 0.975f
         super.tick()
-        if (!this.dead) {
-            val f = age.toFloat() / maxAge.toFloat()
+        if (!this.removed) {
+            val f = age.toFloat() / lifetime.toFloat()
             if (random.nextFloat() > f) {
-                world.addParticle(
+                level.addParticle(
                     extraParticle,
                     this.x,
                     this.y,
@@ -55,10 +55,10 @@ class BlunderbombParticle internal constructor(
     }
 
     @Environment(EnvType.CLIENT)
-    class Factory : ParticleFactory<DefaultParticleType> {
+    class Factory : ParticleProvider<SimpleParticleType> {
         override fun createParticle(
-            defaultParticleType: DefaultParticleType,
-            world: ClientWorld,
+            defaultParticleType: SimpleParticleType,
+            world: ClientLevel,
             d: Double,
             e: Double,
             f: Double,

@@ -1,16 +1,17 @@
 package org.teamvoided.dusk_debris.particle
 
+import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.client.particle.*
-import net.minecraft.client.world.ClientWorld
-import net.minecraft.particle.DefaultParticleType
+import net.minecraft.core.particles.ParticleGroup
+import net.minecraft.core.particles.SimpleParticleType
 import java.util.*
 
 class SpiderlilyPetalParticle(
-    world: ClientWorld, x: Double, y: Double, z: Double, velX: Double, velY: Double, velZ: Double
-) : SpriteBillboardParticle(world, x, y, z, velX, velY, velZ) {
+    world: ClientLevel, x: Double, y: Double, z: Double, velX: Double, velY: Double, velZ: Double
+) : TextureSheetParticle(world, x, y, z, velX, velY, velZ) {
 
     constructor(
-        world: ClientWorld, x: Double, y: Double, z: Double
+        world: ClientLevel, x: Double, y: Double, z: Double
     ) : this(
         world,
         x,
@@ -24,52 +25,52 @@ class SpiderlilyPetalParticle(
     private val rotationSpeed: Float
 
     init {
-        this.velocityMultiplier = 1.0f
-        this.velocityX = velX
-        this.velocityY = velY
-        this.velocityZ = velZ
-        this.scale = 0.1f * (this.random.nextFloat() * this.random.nextFloat() * 1.0f + 1.0f)
+        this.friction = 1.0f
+        this.xd = velX
+        this.yd = velY
+        this.zd = velZ
+        this.quadSize = 0.1f * (this.random.nextFloat() * this.random.nextFloat() * 1.0f + 1.0f)
         this.rotationSpeed = (Math.random().toFloat() - 0.5f) * 0.01f
-        this.maxAge = (this.random.nextFloat() * 900).toInt() + 600
+        this.lifetime = (this.random.nextFloat() * 900).toInt() + 600
     }
 
-    override fun getType(): ParticleTextureSheet = ParticleTextureSheet.PARTICLE_SHEET_OPAQUE
-    override fun getGroup(): Optional<ParticleGroup> {
+    override fun getRenderType(): ParticleRenderType = ParticleRenderType.PARTICLE_SHEET_OPAQUE
+    override fun getParticleGroup(): Optional<ParticleGroup> {
         return Optional.of(SNOWFLAKE_PARTICLE_GROUP)
     }
 
     override fun tick() {
-        this.prevPosX = this.x
-        this.prevPosY = this.y
-        this.prevPosZ = this.z
-        if (this.age++ >= this.maxAge) {
-            this.markDead()
+        this.xo = this.x
+        this.yo = this.y
+        this.zo = this.z
+        if (this.age++ >= this.lifetime) {
+            this.remove()
         } else {
             if (this.onGround) {
-                this.prevAngle = this.angle
+                this.oRoll = this.roll
                 age += 4
             } else {
-                this.prevAngle = this.angle
-                this.angle += Math.PI.toFloat() * rotationSpeed * 2.0f
+                this.oRoll = this.roll
+                this.roll += Math.PI.toFloat() * rotationSpeed * 2.0f
             }
-            this.move(this.velocityX, this.velocityY, this.velocityZ)
-            this.velocityX =
-                if (velocityX < 0.1) velocityX + 0.005 else if (velocityX > 0.15) velocityX * 0.9 else velocityX
-            this.velocityZ =
-                if (velocityZ < 0.1) velocityZ + 0.005 else if (velocityZ > 0.15) velocityZ * 0.9 else velocityZ
-            this.velocityY =
-                if (velocityY < 0.05) velocityY + 0.01 else if (velocityY > 0.1) velocityY * 0.9 else velocityY
+            this.move(this.xd, this.yd, this.zd)
+            this.xd =
+                if (xd < 0.1) xd + 0.005 else if (xd > 0.15) xd * 0.9 else xd
+            this.zd =
+                if (zd < 0.1) zd + 0.005 else if (zd > 0.15) zd * 0.9 else zd
+            this.yd =
+                if (yd < 0.05) yd + 0.01 else if (yd > 0.1) yd * 0.9 else yd
         }
     }
 
-    class Factory(private val spriteProvider: SpriteProvider) : ParticleFactory<DefaultParticleType> {
+    class Factory(private val spriteProvider: SpriteSet) : ParticleProvider<SimpleParticleType> {
         override fun createParticle(
-            defaultParticleType: DefaultParticleType, world: ClientWorld,
+            defaultParticleType: SimpleParticleType, world: ClientLevel,
             x: Double, y: Double, z: Double,
             velX: Double, velY: Double, velZ: Double
         ): Particle {
             val snowflakeParticle = SpiderlilyPetalParticle(world, x, y, z, velX, velY, velZ)
-            snowflakeParticle.setSprite(spriteProvider)
+            snowflakeParticle.pickSprite(spriteProvider)
             return snowflakeParticle
         }
     }

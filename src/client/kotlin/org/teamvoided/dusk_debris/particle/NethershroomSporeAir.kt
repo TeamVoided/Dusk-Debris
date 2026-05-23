@@ -2,16 +2,21 @@ package org.teamvoided.dusk_debris.particle
 
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
-import net.minecraft.client.particle.*
-import net.minecraft.client.world.ClientWorld
-import net.minecraft.particle.DefaultParticleType
-import net.minecraft.util.math.MathHelper
+import net.minecraft.client.multiplayer.ClientLevel
+import net.minecraft.client.particle.Particle
+import net.minecraft.client.particle.ParticleProvider
+import net.minecraft.client.particle.SpriteSet
+import net.minecraft.client.particle.SuspendedParticle
+import net.minecraft.core.particles.ParticleGroup
+import net.minecraft.core.particles.SimpleParticleType
+import net.minecraft.util.Mth
 import java.util.*
+
 @Environment(EnvType.CLIENT)
-class NethershroomSporeAir(private val spriteProvider: SpriteProvider) : ParticleFactory<DefaultParticleType> {
+class NethershroomSporeAir(private val spriteProvider: SpriteSet) : ParticleProvider<SimpleParticleType> {
     override fun createParticle(
-        defaultParticleType: DefaultParticleType,
-        world: ClientWorld,
+        defaultParticleType: SimpleParticleType,
+        world: ClientLevel,
         d: Double,
         e: Double,
         f: Double,
@@ -19,7 +24,7 @@ class NethershroomSporeAir(private val spriteProvider: SpriteProvider) : Particl
         h: Double,
         i: Double
     ): Particle {
-        val waterSuspendParticle: WaterSuspendParticle = object : WaterSuspendParticle(
+        val waterSuspendParticle: SuspendedParticle = object : SuspendedParticle(
             world,
             this.spriteProvider,
             d,
@@ -29,12 +34,12 @@ class NethershroomSporeAir(private val spriteProvider: SpriteProvider) : Particl
             -0.8,
             0.0
         ) {
-            override fun getGroup(): Optional<ParticleGroup> {
-                return Optional.of(ParticleGroup.SPORE_BLOSSOM_AIR)
+            override fun getParticleGroup(): Optional<ParticleGroup> {
+                return Optional.of(ParticleGroup.SPORE_BLOSSOM)
             }
         }
-        waterSuspendParticle.maxAge = MathHelper.nextBetween(world.random, 500, 1000)
-        waterSuspendParticle.gravityStrength = 0.01f
+        waterSuspendParticle.setLifetime(Mth.randomBetweenInclusive(world.random, 500, 1000))
+        waterSuspendParticle.gravity = 0.01f
         waterSuspendParticle.setColor(0.32f, 0.5f, 0.22f)
         return waterSuspendParticle
     }

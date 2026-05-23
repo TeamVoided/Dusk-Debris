@@ -3,96 +3,96 @@ package org.teamvoided.dusk_debris.particle
 import com.mojang.blaze3d.vertex.VertexConsumer
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
+import net.minecraft.client.Camera
+import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.client.particle.*
-import net.minecraft.client.render.Camera
-import net.minecraft.client.world.ClientWorld
-import net.minecraft.particle.DefaultParticleType
-import net.minecraft.util.math.MathHelper.lerp
-import net.minecraft.util.math.Vec3d
+import net.minecraft.core.particles.SimpleParticleType
+import net.minecraft.util.Mth.lerp
+import net.minecraft.world.phys.Vec3
 import org.joml.Quaternionf
 import org.joml.Vector3f
 import java.awt.Color
 import kotlin.math.max
 
 class CosmosParticle(
-    world: ClientWorld,
+    world: ClientLevel,
     x: Double,
     y: Double,
     z: Double,
     velocityX: Double,
     velocityY: Double,
     velocityZ: Double
-) : SpriteBillboardParticle(world, x, y, z, velocityX, velocityY, velocityZ) {
+) : TextureSheetParticle(world, x, y, z, velocityX, velocityY, velocityZ) {
     init {
         val colorChoice = random.nextFloat()
-        this.colorRed = lerp(colorChoice, colorOption1.x, colorOption2.x)
-        this.colorGreen = lerp(colorChoice, colorOption1.y, colorOption2.y)
-        this.colorBlue = lerp(colorChoice, colorOption1.z, colorOption2.z)
-        this.colorAlpha = 0f
-        this.velocityX = velocityX
-        this.velocityY = velocityY
-        this.velocityZ = velocityZ
-        this.scale = random.nextFloat() * 0.25f + 0.25f
-        this.maxAge = 40 + random.nextInt(360)
+        this.rCol = lerp(colorChoice, colorOption1.x, colorOption2.x)
+        this.gCol = lerp(colorChoice, colorOption1.y, colorOption2.y)
+        this.bCol = lerp(colorChoice, colorOption1.z, colorOption2.z)
+        this.alpha = 0f
+        this.xd = velocityX
+        this.yd = velocityY
+        this.zd = velocityZ
+        this.quadSize = random.nextFloat() * 0.25f + 0.25f
+        this.lifetime = 40 + random.nextInt(360)
     }
 
-    override fun getType(): ParticleTextureSheet {
-        return ParticleTextureSheet.PARTICLE_SHEET_TRANSLUCENT
+    override fun getRenderType(): ParticleRenderType {
+        return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT
     }
 
-    override fun getBrightness(tint: Float): Int {
+    override fun getLightColor(tint: Float): Int {
         return 240
     }
 
     override fun tick() {
-        this.prevPosX = this.x
-        this.prevPosY = this.y
-        this.prevPosZ = this.z
-        if (this.age++ >= this.maxAge) {
-            this.markDead()
+        this.xo = this.x
+        this.yo = this.y
+        this.zo = this.z
+        if (this.age++ >= this.lifetime) {
+            this.remove()
         } else {
-            if (this.age >= this.maxAge - 20) {
-                setColorAlpha(max(colorAlpha - 0.05f, 0f))
-            } else if (colorAlpha < 1f) {
-                setColorAlpha(colorAlpha + 0.05f)
+            if (this.age >= this.lifetime - 20) {
+                setAlpha(max(alpha - 0.05f, 0f))
+            } else if (alpha < 1f) {
+                setAlpha(alpha + 0.05f)
             }
-            this.x += this.velocityX
-            this.y += this.velocityY
-            this.z += this.velocityZ
+            this.x += this.xd
+            this.y += this.yd
+            this.z += this.zd
         }
     }
 
 
-    override fun method_60373(
+    override fun renderRotatedQuad(
         vertexConsumer: VertexConsumer,
         camera: Camera,
         quaternionf: Quaternionf,
         tickDelta: Float
     ) {
-        val cameraPos = camera.pos
-        val particlePos = Vec3d(
-            lerp(tickDelta.toDouble(), this.prevPosX, this.x),
-            lerp(tickDelta.toDouble(), this.prevPosY, this.y),
-            lerp(tickDelta.toDouble(), this.prevPosZ, this.z)
+        val cameraPos = camera.position
+        val particlePos = Vec3(
+            lerp(tickDelta.toDouble(), this.xo, this.x),
+            lerp(tickDelta.toDouble(), this.yo, this.y),
+            lerp(tickDelta.toDouble(), this.zo, this.z)
         )
         val age2 = age.toDouble() + tickDelta.toDouble()
-        val mult = if (age2 >= maxAge - 20) {
-            ((age2 - (maxAge - 20)) / -20.0) - 1
+        val mult = if (age2 >= lifetime - 20) {
+            ((age2 - (lifetime - 20)) / -20.0) - 1
         } else if (age2 <= 20) {
             (age2 / 20.0) - 2
         } else -1.0
-        val offsetPos = Vec3d(
+        val offsetPos = Vec3(
             particlePos.x - cameraPos.x,
             particlePos.y - cameraPos.y,
             particlePos.z - cameraPos.z
-        ).normalize().multiply(mult)
-        val returnPos = Vec3d(
+        ).normalize().scale(mult)
+        val returnPos = Vec3(
             (particlePos.x - (offsetPos.x) - cameraPos.x),
             (particlePos.y - (offsetPos.y) - cameraPos.y),
             (particlePos.z - (offsetPos.z) - cameraPos.z)
         )
 
-        this.method_60374(
+        this.renderRotatedQuad(
             vertexConsumer,
             quaternionf,
             returnPos.x.toFloat(),
@@ -104,10 +104,10 @@ class CosmosParticle(
 
 
     @Environment(EnvType.CLIENT)
-    class Factory(private val spriteProvider: SpriteProvider) : ParticleFactory<DefaultParticleType> {
+    class Factory(private val spriteProvider: SpriteSet) : ParticleProvider<SimpleParticleType> {
         override fun createParticle(
-            type: DefaultParticleType,
-            world: ClientWorld,
+            type: SimpleParticleType,
+            world: ClientLevel,
             posX: Double,
             posY: Double,
             posZ: Double,
@@ -116,7 +116,7 @@ class CosmosParticle(
             velZ: Double,
         ): Particle {
             val particle = CosmosParticle(world, posX, posY, posZ, velX, velY, velZ)
-            particle.setSprite(spriteProvider)
+            particle.pickSprite(spriteProvider)
             return particle
         }
     }

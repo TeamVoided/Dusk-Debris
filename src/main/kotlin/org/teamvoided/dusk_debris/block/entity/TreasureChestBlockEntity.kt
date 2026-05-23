@@ -1,49 +1,49 @@
 package org.teamvoided.dusk_debris.block.entity
 
-import net.minecraft.block.BlockState
-import net.minecraft.block.entity.ChestLidAnimator
-import net.minecraft.block.entity.LootableContainerBlockEntity
-import net.minecraft.block.entity.ViewerCountManager
-import net.minecraft.client.block.ChestAnimationProgress
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.entity.player.PlayerInventory
-import net.minecraft.inventory.DoubleInventory
-import net.minecraft.inventory.Inventories
-import net.minecraft.item.ItemStack
-import net.minecraft.nbt.NbtCompound
-import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket
-import net.minecraft.registry.HolderLookup
-import net.minecraft.screen.GenericContainerScreenHandler
-import net.minecraft.screen.ScreenHandler
-import net.minecraft.sound.SoundCategory
-import net.minecraft.sound.SoundEvent
-import net.minecraft.sound.SoundEvents
-import net.minecraft.text.Text
-import net.minecraft.util.collection.DefaultedList
-import net.minecraft.util.math.BlockPos
-import net.minecraft.world.World
+import net.minecraft.core.BlockPos
+import net.minecraft.core.HolderLookup
+import net.minecraft.core.NonNullList
+import net.minecraft.nbt.CompoundTag
+import net.minecraft.network.chat.Component
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket
+import net.minecraft.sounds.SoundEvent
+import net.minecraft.sounds.SoundEvents
+import net.minecraft.sounds.SoundSource
+import net.minecraft.world.CompoundContainer
+import net.minecraft.world.ContainerHelper
+import net.minecraft.world.entity.player.Inventory
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.inventory.AbstractContainerMenu
+import net.minecraft.world.inventory.ChestMenu
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.level.Level
+import net.minecraft.world.level.block.entity.ChestLidController
+import net.minecraft.world.level.block.entity.ContainerOpenersCounter
+import net.minecraft.world.level.block.entity.LidBlockEntity
+import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity
+import net.minecraft.world.level.block.state.BlockState
 import org.teamvoided.dusk_debris.init.DuskBlockEntities.TREASURE_CHEST
 
-class TreasureChestBlockEntity : LootableContainerBlockEntity, ChestAnimationProgress {
+class TreasureChestBlockEntity : RandomizableContainerBlockEntity, LidBlockEntity {
     constructor(pos: BlockPos, state: BlockState) : super(TREASURE_CHEST, pos, state)
 
-    private var inventory: DefaultedList<ItemStack>
-    private val stateManager: ViewerCountManager
-    private val lidAnimator: ChestLidAnimator
+    private var inventory: NonNullList<ItemStack>
+    private val stateManager: ContainerOpenersCounter
+    private val lidAnimator: ChestLidController
 
     init {
-        this.inventory = DefaultedList.ofSize(CHEST_SIZE, ItemStack.EMPTY)
-        this.stateManager = object : ViewerCountManager() {
-            override fun onContainerOpen(world: World, pos: BlockPos, state: BlockState) {
-                playSound(world, pos, state, SoundEvents.BLOCK_CHEST_OPEN)
+        this.inventory = NonNullList.withSize(CHEST_SIZE, ItemStack.EMPTY)
+        this.stateManager = object : ContainerOpenersCounter() {
+            override fun onOpen(world: Level, pos: BlockPos, state: BlockState) {
+                playSound(world, pos, state, SoundEvents.CHEST_OPEN)
             }
 
-            override fun onContainerClose(world: World, pos: BlockPos, state: BlockState) {
-                playSound(world, pos, state, SoundEvents.BLOCK_CHEST_CLOSE)
+            override fun onClose(world: Level, pos: BlockPos, state: BlockState) {
+                playSound(world, pos, state, SoundEvents.CHEST_CLOSE)
             }
 
-            override fun onViewerCountUpdate(
-                world: World,
+            override fun openerCountChanged(
+                world: Level,
                 pos: BlockPos,
                 state: BlockState,
                 oldViewerCount: Int,
@@ -52,86 +52,86 @@ class TreasureChestBlockEntity : LootableContainerBlockEntity, ChestAnimationPro
                 this@TreasureChestBlockEntity.onInvOpenOrClose(world, pos, state, oldViewerCount, newViewerCount)
             }
 
-            override fun isPlayerViewing(player: PlayerEntity): Boolean {
-                if (player.currentScreenHandler !is GenericContainerScreenHandler) {
+            override fun isOwnContainer(player: Player): Boolean {
+                if (player.containerMenu !is ChestMenu) {
                     return false
                 } else {
-                    val inventory = (player.currentScreenHandler as GenericContainerScreenHandler).inventory
-                    return inventory === this@TreasureChestBlockEntity || inventory is DoubleInventory && inventory.isPart(
+                    val inventory = (player.containerMenu as ChestMenu).container
+                    return inventory === this@TreasureChestBlockEntity || inventory is CompoundContainer && inventory.contains(
                         this@TreasureChestBlockEntity
                     )
                 }
             }
         }
-        this.lidAnimator = ChestLidAnimator()
+        this.lidAnimator = ChestLidController()
     }
-    override fun writeNbt(nbt: NbtCompound, lookupProvider: HolderLookup.Provider) {
-        super.writeNbt(nbt, lookupProvider)
-        if (!this.writeLootTableNbt(nbt)) {
-            Inventories.writeNbt(nbt, this.inventory, lookupProvider)
+    override fun saveAdditional(nbt: CompoundTag, lookupProvider: HolderLookup.Provider) {
+        super.saveAdditional(nbt, lookupProvider)
+        if (!this.trySaveLootTable(nbt)) {
+            ContainerHelper.saveAllItems(nbt, this.inventory, lookupProvider)
         }
     }
 
-    override fun readNbtImpl(nbt: NbtCompound, lookupProvider: HolderLookup.Provider) {
-        super.readNbtImpl(nbt, lookupProvider)
-        this.inventory = DefaultedList.ofSize(this.size(), ItemStack.EMPTY)
-        if (!this.readLootTableNbt(nbt)) {
-            Inventories.readNbt(nbt, this.inventory, lookupProvider)
+    override fun loadAdditional(nbt: CompoundTag, lookupProvider: HolderLookup.Provider) {
+        super.loadAdditional(nbt, lookupProvider)
+        this.inventory = NonNullList.withSize(this.containerSize, ItemStack.EMPTY)
+        if (!this.tryLoadLootTable(nbt)) {
+            ContainerHelper.loadAllItems(nbt, this.inventory, lookupProvider)
         }
     }
 
 
     protected open fun onInvOpenOrClose(
-        world: World,
+        world: Level,
         pos: BlockPos,
         state: BlockState,
         oldViewerCount: Int,
         newViewerCount: Int
     ) {
         val block = state.block
-        world.addSyncedBlockEvent(pos, block, 1, newViewerCount)
+        world.blockEvent(pos, block, 1, newViewerCount)
     }
 
 
-    override fun toUpdatePacket(): BlockEntityUpdateS2CPacket {
-        return BlockEntityUpdateS2CPacket.of(this)
+    override fun getUpdatePacket(): ClientboundBlockEntityDataPacket {
+        return ClientboundBlockEntityDataPacket.create(this)
     }
 
-    override fun size(): Int = CHEST_SIZE
+    override fun getContainerSize(): Int = CHEST_SIZE
 
-    override fun getContainerName(): Text = Text.translatable("container.treasure_chest")
+    override fun getDefaultName(): Component = Component.translatable("container.treasure_chest")
 
-    override fun getInventory(): DefaultedList<ItemStack> = this.inventory
+    override fun getItems(): NonNullList<ItemStack> = this.inventory
 
-    override fun setInventory(defaultedList: DefaultedList<ItemStack>) {
+    override fun setItems(defaultedList: NonNullList<ItemStack>) {
         this.inventory = defaultedList
     }
 
-    override fun createScreenHandler(syncId: Int, playerInventory: PlayerInventory): ScreenHandler {
-        return GenericContainerScreenHandler.createGeneric9x3(syncId, playerInventory, this)
+    override fun createMenu(syncId: Int, playerInventory: Inventory): AbstractContainerMenu {
+        return ChestMenu.threeRows(syncId, playerInventory, this)
     }
 
-    override fun getAnimationProgress(tickDelta: Float): Float {
-        return this.lidAnimator.getProgress(tickDelta);
+    override fun getOpenNess(tickDelta: Float): Float {
+        return this.lidAnimator.getOpenness(tickDelta);
     }
     fun tick() {
-        if (!this.removed) {
-            stateManager.updateViewerCount(this.getWorld(), this.getPos(), this.cachedState)
+        if (!this.remove) {
+            stateManager.recheckOpeners(this.getLevel(), blockPos, this.blockState)
         }
     }
     companion object {
         val CHEST_SIZE = 27
-        fun playSound(world: World, pos: BlockPos, state: BlockState, soundEvent: SoundEvent?) {
+        fun playSound(world: Level, pos: BlockPos, state: BlockState, soundEvent: SoundEvent?) {
             var d = pos.x.toDouble() + 0.5
             val e = pos.y.toDouble() + 0.5
             var f = pos.z.toDouble() + 0.5
             world.playSound(
-                null as PlayerEntity,
+                null as Player,
                 d,
                 e,
                 f,
                 soundEvent,
-                SoundCategory.BLOCKS,
+                SoundSource.BLOCKS,
                 0.5f,
                 world.random.nextFloat() * 0.1f + 0.9f
             )

@@ -1,17 +1,19 @@
 package org.teamvoided.dusk_debris.util
 
 import net.fabricmc.fabric.api.registry.OxidizableBlocksRegistry
-import net.minecraft.block.*
-import net.minecraft.block.enums.NoteBlockInstrument
-import net.minecraft.block.piston.PistonBehavior
-import net.minecraft.sound.BlockSoundGroup
-import net.minecraft.sound.SoundEvents
-import net.minecraft.util.Identifier
-import net.minecraft.util.math.Direction
+import net.minecraft.core.Direction
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.sounds.SoundEvents
+import net.minecraft.world.level.block.*
+import net.minecraft.world.level.block.state.BlockBehaviour
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.block.state.properties.NoteBlockInstrument
+import net.minecraft.world.level.material.MapColor
+import net.minecraft.world.level.material.PushReaction
 import org.teamvoided.dusk_debris.DuskDebris
+import org.teamvoided.dusk_debris.block.not_blocks.DuskProperties
 import org.teamvoided.dusk_debris.block.sot.CoinPileBlock
 import org.teamvoided.dusk_debris.block.sot.RibbonBlock
-import org.teamvoided.dusk_debris.block.not_blocks.DuskProperties
 import org.teamvoided.dusk_debris.init.DuskBlocks
 import org.teamvoided.dusk_debris.particle.color.NethershroomSporeParticleEffect
 import java.util.function.ToIntFunction
@@ -33,25 +35,25 @@ fun Block.grassTint(): Block {
 }
 
 
-val vesselBlockSound = BlockSoundGroup(
+val vesselBlockSound = SoundType(
     1f,
     2f,
-    SoundEvents.BLOCK_TRIAL_SPAWNER_BREAK,
-    SoundEvents.BLOCK_TRIAL_SPAWNER_STEP,
-    SoundEvents.BLOCK_TRIAL_SPAWNER_PLACE,
-    SoundEvents.BLOCK_TRIAL_SPAWNER_HIT,
-    SoundEvents.BLOCK_TRIAL_SPAWNER_FALL
+    SoundEvents.TRIAL_SPAWNER_BREAK,
+    SoundEvents.TRIAL_SPAWNER_STEP,
+    SoundEvents.TRIAL_SPAWNER_PLACE,
+    SoundEvents.TRIAL_SPAWNER_HIT,
+    SoundEvents.TRIAL_SPAWNER_FALL
 )
 
-val charredLogColor: MapColor = MapColor.BLACK
+val charredLogColor: MapColor = MapColor.COLOR_BLACK
 val charredPlanksColor: MapColor = MapColor.DEEPSLATE
 
-val charredSignId : Identifier= DuskDebris.id("entity/signs/charred")
-val charredHangingSignId: Identifier = DuskDebris.id("entity/signs/hanging/charred")
-val cypressSignId : Identifier= DuskDebris.id("entity/signs/cypress")
-val cypressHangingSignId : Identifier= DuskDebris.id("entity/signs/hanging/cypress")
-val sequoiaSignId: Identifier = DuskDebris.id("entity/signs/sequoia")
-val sequoiaHangingSignId : Identifier= DuskDebris.id("entity/signs/hanging/sequoia")
+val charredSignId : ResourceLocation = DuskDebris.id("entity/signs/charred")
+val charredHangingSignId: ResourceLocation = DuskDebris.id("entity/signs/hanging/charred")
+val cypressSignId : ResourceLocation = DuskDebris.id("entity/signs/cypress")
+val cypressHangingSignId : ResourceLocation = DuskDebris.id("entity/signs/hanging/cypress")
+val sequoiaSignId: ResourceLocation = DuskDebris.id("entity/signs/sequoia")
+val sequoiaHangingSignId : ResourceLocation = DuskDebris.id("entity/signs/hanging/sequoia")
 
 val blueNethershroomSmoke = NethershroomSporeParticleEffect(0x39A2DB)
 val purpleNethershroomSmoke = NethershroomSporeParticleEffect(0x573AD8)
@@ -59,22 +61,22 @@ val smokebombSmoke = NethershroomSporeParticleEffect(0x7F7F7F)
 val gunpowderBarrelColor = 0xF7C53B
 val gunpowderBarrelBlueColor = 0x7FD4FF
 val bonecallerBlockSettings =
-    AbstractBlock.Settings.create().mapColor(Blocks.BONE_BLOCK.defaultMapColor).sounds(BlockSoundGroup.GLASS)
-        .instrument(NoteBlockInstrument.HAT).strength(1f, 0.0f).solidBlock(Blocks::nonSolid)
-        .pistonBehavior(PistonBehavior.DESTROY)
-val coin_stack_settings = AbstractBlock.Settings.create().nonSolid().strength(0.2f)
-    .pistonBehavior(PistonBehavior.DESTROY)
-val coin_pile_settings = AbstractBlock.Settings.create().nonSolid()
-    .strength(0.2f).sounds(BlockSoundGroup.METAL).blockVision { state: BlockState, _, _ ->
-        state.get(CoinPileBlock.LAYERS) >= CoinPileBlock.MAX_LAYERS
-    }.pistonBehavior(PistonBehavior.DESTROY)
+    BlockBehaviour.Properties.of().mapColor(Blocks.BONE_BLOCK.defaultMapColor()).sound(SoundType.GLASS)
+        .instrument(NoteBlockInstrument.HAT).strength(1f, 0.0f).isRedstoneConductor(Blocks::never)
+        .pushReaction(PushReaction.DESTROY)
+val coin_stack_settings = BlockBehaviour.Properties.of().forceSolidOff().strength(0.2f)
+    .pushReaction(PushReaction.DESTROY)
+val coin_pile_settings = BlockBehaviour.Properties.of().forceSolidOff()
+    .strength(0.2f).sound(SoundType.METAL).isViewBlocking { state: BlockState, _, _ ->
+        state.getValue(CoinPileBlock.LAYERS) >= CoinPileBlock.MAX_LAYERS
+    }.pushReaction(PushReaction.DESTROY)
 
 fun light(lightLevel: Int): ToIntFunction<BlockState> {
     return ToIntFunction { lightLevel }
 }
 
 fun godhomeLuminanceOf(mult: Int = 4, add: Int = 7): ToIntFunction<BlockState> {
-    return ToIntFunction { state: BlockState -> state.get(DuskProperties.GODHOME_BRONZE_PHASE).id * mult + add }
+    return ToIntFunction { state: BlockState -> state.getValue(DuskProperties.GODHOME_BRONZE_PHASE).id * mult + add }
 }
 
 fun oxidizeCopperSet(copperList: List<Pair<Block, Block>>) {
@@ -92,39 +94,39 @@ fun oxidizeCopperSet(copperList: List<Pair<Block, Block>>) {
     }
 }
 
-fun registerSkull(id: String, skullType: SkullBlock.SkullType, instrument: NoteBlockInstrument): Block {
+fun registerSkull(id: String, skullType: SkullBlock.Type, instrument: NoteBlockInstrument): Block {
     return DuskBlocks.register(
         id, SkullBlock(
             skullType,
-            AbstractBlock.Settings.create().instrument(instrument).strength(1.0f)
-                .pistonBehavior(PistonBehavior.DESTROY)
+            BlockBehaviour.Properties.of().instrument(instrument).strength(1.0f)
+                .pushReaction(PushReaction.DESTROY)
         )
     )
 }
 
-fun registerWallSkull(id: String, skullType: SkullBlock.SkullType, dropsLike: Block): Block {
+fun registerWallSkull(id: String, skullType: SkullBlock.Type, dropsLike: Block): Block {
     return DuskBlocks.register(
         id,
         WallSkullBlock(
             skullType,
-            AbstractBlock.Settings.create().strength(1.0f).dropsLike(dropsLike)
-                .pistonBehavior(PistonBehavior.DESTROY)
+            BlockBehaviour.Properties.of().strength(1.0f).dropsLike(dropsLike)
+                .pushReaction(PushReaction.DESTROY)
         )
     )
 }
 
 fun registerRibbon(mapColor: MapColor): Block {
     return RibbonBlock(
-        AbstractBlock.Settings.create().mapColor(mapColor).strength(0.1F)
-            .sounds(BlockSoundGroup.WOOL).solidBlock(Blocks::nonSolid)
+        BlockBehaviour.Properties.of().mapColor(mapColor).strength(0.1F)
+            .sound(SoundType.WOOL).isRedstoneConductor(Blocks::never)
     )
 }
 
 fun charredLogOf(topColor: MapColor, sideColor: MapColor): Block {
-    return PillarBlock(AbstractBlock.Settings.create().mapColor { state: BlockState ->
-        if (state.get(
-                PillarBlock.AXIS
+    return RotatedPillarBlock(BlockBehaviour.Properties.of().mapColor { state: BlockState ->
+        if (state.getValue(
+                RotatedPillarBlock.AXIS
             ) === Direction.Axis.Y
         ) topColor else sideColor
-    }.instrument(NoteBlockInstrument.BASS).strength(2.0f).sounds(BlockSoundGroup.WOOD))
+    }.instrument(NoteBlockInstrument.BASS).strength(2.0f).sound(SoundType.WOOD))
 }

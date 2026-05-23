@@ -1,67 +1,67 @@
 package org.teamvoided.dusk_debris.block
 
-import net.minecraft.block.BlockState
-import net.minecraft.block.MushroomBlock
-import net.minecraft.entity.Entity
-import net.minecraft.entity.effect.StatusEffect
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.particle.ParticleEffect
-import net.minecraft.registry.Holder
-import net.minecraft.server.world.ServerWorld
-import net.minecraft.sound.SoundCategory
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.random.RandomGenerator
-import net.minecraft.world.GameRules
-import net.minecraft.world.World
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Holder
+import net.minecraft.core.particles.ParticleOptions
+import net.minecraft.server.level.ServerLevel
+import net.minecraft.sounds.SoundSource
+import net.minecraft.util.RandomSource
+import net.minecraft.world.effect.MobEffect
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.level.GameRules
+import net.minecraft.world.level.Level
+import net.minecraft.world.level.block.HugeMushroomBlock
+import net.minecraft.world.level.block.state.BlockState
 import org.teamvoided.dusk_debris.block.NethershroomPlantBlock.Companion.explode
 import org.teamvoided.dusk_debris.data.tags.DuskEntityTypeTags
 import org.teamvoided.dusk_debris.init.DuskSoundEvents
 
 class NethershroomBlock(
     val delay: Int,
-    val particle: ParticleEffect,
-    val statusEffect: Holder<StatusEffect>,
+    val particle: ParticleOptions,
+    val statusEffect: Holder<MobEffect>,
     val hasDoubleEffect: Boolean,
-    settings: Settings
-) : MushroomBlock(settings) {
+    settings: Properties
+) : HugeMushroomBlock(settings) {
 
-    private fun tryExplode(world: World, state: BlockState, pos: BlockPos, entity: Entity, inverseChance: Int) {
+    private fun tryExplode(world: Level, state: BlockState, pos: BlockPos, entity: Entity, inverseChance: Int) {
         if (
-            entity.isLiving &&
-            !entity.isSneaking &&
-            !entity.type.isIn(DuskEntityTypeTags.IS_NOT_AFFECTED_BY_NETHERSHROOM)
+            entity.showVehicleHealth() &&
+            !entity.isShiftKeyDown &&
+            !entity.type.`is`(DuskEntityTypeTags.IS_NOT_AFFECTED_BY_NETHERSHROOM)
         ) {
-            if (!world.isClient && world.random.nextInt(inverseChance) == 0 && state.isOf(this)) {
-                if ((entity is PlayerEntity || world.gameRules.getBooleanValue(GameRules.DO_MOB_GRIEFING))) {
+            if (!world.isClientSide && world.random.nextInt(inverseChance) == 0 && state.`is`(this)) {
+                if ((entity is Player || world.gameRules.getBoolean(GameRules.RULE_MOBGRIEFING))) {
                     world.playSound(
                         null,
                         pos,
                         DuskSoundEvents.BLOCK_NETHERSHROOM_BLOCK_SQUISHED,
-                        SoundCategory.BLOCKS,
+                        SoundSource.BLOCKS,
                         1f,
                         0.9f + world.random.nextFloat() * 0.2f
                     )
-                    world.scheduleBlockTick(pos, this, delay)
+                    world.scheduleTick(pos, this, delay)
                 }
             }
         }
     }
 
-    override fun onSteppedOn(world: World, pos: BlockPos, state: BlockState, entity: Entity) {
+    override fun stepOn(world: Level, pos: BlockPos, state: BlockState, entity: Entity) {
         tryExplode(world, state, pos, entity, 500)
-        super.onSteppedOn(world, pos, state, entity)
+        super.stepOn(world, pos, state, entity)
     }
 
-    override fun onLandedUpon(world: World, state: BlockState, pos: BlockPos, entity: Entity, fallDistance: Float) {
+    override fun fallOn(world: Level, state: BlockState, pos: BlockPos, entity: Entity, fallDistance: Float) {
         tryExplode(world, state, pos, entity, 10)
-        super.onLandedUpon(world, state, pos, entity, fallDistance)
+        super.fallOn(world, state, pos, entity, fallDistance)
     }
 
-    override fun scheduledTick(state: BlockState, world: ServerWorld, pos: BlockPos, random: RandomGenerator) {
+    override fun tick(state: BlockState, world: ServerLevel, pos: BlockPos, random: RandomSource) {
         explode(world, pos, particle, statusEffect, hasDoubleEffect)
     }
 
-    override fun randomDisplayTick(state: BlockState, world: World, pos: BlockPos, random: RandomGenerator) {
+    override fun animateTick(state: BlockState, world: Level, pos: BlockPos, random: RandomSource) {
 //        if (random.nextDouble() >= 0.8) {
 //            val x = pos.x
 //            val y = pos.y

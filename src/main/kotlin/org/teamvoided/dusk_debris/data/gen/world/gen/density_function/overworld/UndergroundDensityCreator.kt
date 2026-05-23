@@ -1,12 +1,12 @@
 package org.teamvoided.dusk_debris.data.gen.world.gen.density_function.overworld
 
-import net.minecraft.registry.BootstrapContext
-import net.minecraft.registry.RegistryKey
-import net.minecraft.util.math.Spline
-import net.minecraft.world.gen.DensityFunction
-import net.minecraft.world.gen.DensityFunctions
-import net.minecraft.world.gen.noise.NoiseParametersKeys
-import net.minecraft.world.gen.noise.NoiseRouterData
+import net.minecraft.data.worldgen.BootstrapContext
+import net.minecraft.resources.ResourceKey
+import net.minecraft.util.CubicSpline
+import net.minecraft.world.level.levelgen.DensityFunction
+import net.minecraft.world.level.levelgen.DensityFunctions
+import net.minecraft.world.level.levelgen.NoiseRouterData
+import net.minecraft.world.level.levelgen.Noises
 import org.teamvoided.dusk_debris.data.gen.world.gen.DensityFunctionCreator.dense
 import org.teamvoided.dusk_debris.data.gen.world.gen.DensityFunctionCreator.noiseHold
 import org.teamvoided.dusk_debris.data.gen.world.gen.density_function.OverworldDensityFunctionCreator.flatCacheNoi2D
@@ -24,7 +24,7 @@ object UndergroundDensityCreator {
                 this.dense(DuskDensityFunctions.LAKE_CAVE_DENSITY),
                 add(
                     0.27,
-                    noise(this.noiseHold(NoiseParametersKeys.CAVE_CHEESE), 0.6666666666666666)
+                    noise(this.noiseHold(Noises.CAVE_CHEESE), 0.6666666666666666)
                 )
             ).clamp(-1.0, 1.0),
             add(
@@ -35,7 +35,7 @@ object UndergroundDensityCreator {
                 )
             ).clamp(0.0, 0.5)
         )
-        val caveLayerNoise = noise(this.noiseHold(NoiseParametersKeys.CAVE_LAYER), 8.0)
+        val caveLayerNoise = noise(this.noiseHold(Noises.CAVE_LAYER), 8.0)
         val caveLayer = multiply(4, caveLayerNoise.square())
         val entrances = min(
             min(
@@ -43,14 +43,14 @@ object UndergroundDensityCreator {
                     caveLayer,
                     surfaceOrCave
                 ),
-                this.dense(NoiseRouterData.CAVES_ENTRANCES_OVERWORLD)
+                this.dense(NoiseRouterData.ENTRANCES)
             ),
             add(
-                this.dense(NoiseRouterData.CAVES_SPAGHETTI_2D_OVERWORLD),
-                this.dense(NoiseRouterData.CAVES_SPAGHETTI_ROUGHNESS_FUNCTION_OVERWORLD)
+                this.dense(NoiseRouterData.SPAGHETTI_2D),
+                this.dense(NoiseRouterData.SPAGHETTI_ROUGHNESS_FUNCTION)
             )
         )
-        val cavePillars = this.dense(NoiseRouterData.CAVES_PILLARS_OVERWORLD)
+        val cavePillars = this.dense(NoiseRouterData.PILLARS)
         val cavePillarsRange = rangeChoice(
             cavePillars,
             -1000000,
@@ -63,9 +63,9 @@ object UndergroundDensityCreator {
 
 
     fun BootstrapContext<DensityFunction>.caveRiver(
-        data: OverworldTerrainCreator.TerrainParametersData<DensityFunctions.Spline.Point, DensityFunctions.Spline.FunctionWrapper>,
-        condition: RegistryKey<DensityFunction>,
-        density: RegistryKey<DensityFunction>,
+        data: OverworldTerrainCreator.TerrainParametersData<DensityFunctions.Spline.Point, DensityFunctions.Spline.Coordinate>,
+        condition: ResourceKey<DensityFunction>,
+        density: ResourceKey<DensityFunction>,
     ) {
         this.register(
             condition,
@@ -106,13 +106,13 @@ object UndergroundDensityCreator {
                         ).square(),
                         interpolated(
                             multiply(
-                                this.dense(NoiseRouterData.RIDGES_OVERWORLD),
+                                this.dense(NoiseRouterData.RIDGES),
                                 copySpline(
-                                    Spline.builder(this.wrap(NoiseRouterData.Y))
+                                    CubicSpline.builder(this.wrap(NoiseRouterData.Y))
                                         .add(60f, 1.5f)
                                         .add(70f, 1.5f)
-                                        .add(90f, 3f, 0.05f)
-                                        .add(100f, 3.25f, 0.05f)
+                                        .addPoint(90f, 3f, 0.05f)
+                                        .addPoint(100f, 3.25f, 0.05f)
                                         .build()
                                 )
                             )
@@ -141,9 +141,9 @@ object UndergroundDensityCreator {
     }
 
     fun BootstrapContext<DensityFunction>.caveLake(
-        condition: RegistryKey<DensityFunction>,
-        aquifer: RegistryKey<DensityFunction>,
-        density: RegistryKey<DensityFunction>,
+        condition: ResourceKey<DensityFunction>,
+        aquifer: ResourceKey<DensityFunction>,
+        density: ResourceKey<DensityFunction>,
     ) {
         this.register(
             aquifer,

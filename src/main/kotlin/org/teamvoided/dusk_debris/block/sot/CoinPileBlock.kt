@@ -1,161 +1,163 @@
 package org.teamvoided.dusk_debris.block.sot
 
 import com.mojang.serialization.MapCodec
-import net.minecraft.block.Block
-import net.minecraft.block.BlockState
-import net.minecraft.block.ShapeContext
-import net.minecraft.block.Waterloggable
-import net.minecraft.entity.ai.pathing.NavigationType
-import net.minecraft.fluid.FluidState
-import net.minecraft.fluid.Fluids
-import net.minecraft.item.ItemPlacementContext
-import net.minecraft.server.world.ServerWorld
-import net.minecraft.state.StateManager
-import net.minecraft.state.property.BooleanProperty
-import net.minecraft.state.property.IntProperty
-import net.minecraft.state.property.Properties
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Direction
-import net.minecraft.util.random.RandomGenerator
-import net.minecraft.util.shape.VoxelShape
-import net.minecraft.util.shape.VoxelShapes
-import net.minecraft.world.BlockView
-import net.minecraft.world.WorldAccess
-import net.minecraft.world.WorldView
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
+import net.minecraft.server.level.ServerLevel
+import net.minecraft.util.RandomSource
+import net.minecraft.world.item.context.BlockPlaceContext
+import net.minecraft.world.level.BlockGetter
+import net.minecraft.world.level.LevelAccessor
+import net.minecraft.world.level.LevelReader
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.SimpleWaterloggedBlock
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.block.state.StateDefinition
+import net.minecraft.world.level.block.state.properties.BlockStateProperties
+import net.minecraft.world.level.block.state.properties.BooleanProperty
+import net.minecraft.world.level.block.state.properties.IntegerProperty
+import net.minecraft.world.level.material.FluidState
+import net.minecraft.world.level.material.Fluids
+import net.minecraft.world.level.pathfinder.PathComputationType
+import net.minecraft.world.phys.shapes.CollisionContext
+import net.minecraft.world.phys.shapes.Shapes
+import net.minecraft.world.phys.shapes.VoxelShape
 
-class CoinPileBlock(settings: Settings) : Block(settings), Waterloggable {
-    public override fun getCodec(): MapCodec<CoinPileBlock> {
+class CoinPileBlock(settings: Properties) : Block(settings), SimpleWaterloggedBlock {
+    public override fun codec(): MapCodec<CoinPileBlock> {
         return CODEC
     }
 
     init {
-        this.defaultState = stateManager.defaultState
-            .with(LAYERS, 1)
-            .with(WATERLOGGED, false)
+        this.registerDefaultState(
+            stateDefinition.any()
+                .setValue(LAYERS, 1)
+                .setValue(WATERLOGGED, false)
+        )
     }
 
-    override fun canPathfindThrough(state: BlockState, navigationType: NavigationType): Boolean {
+    override fun isPathfindable(state: BlockState, navigationType: PathComputationType): Boolean {
         return when (navigationType) {
-            NavigationType.LAND -> state.get(LAYERS) < IMPASSABLE_HEIGHT
-            NavigationType.WATER -> false
-            NavigationType.AIR -> false
+            PathComputationType.LAND -> state.getValue(LAYERS) < IMPASSABLE_HEIGHT
+            PathComputationType.WATER -> false
+            PathComputationType.AIR -> false
             else -> false
         }
     }
 
-    override fun getOutlineShape(
+    override fun getShape(
         state: BlockState,
-        world: BlockView,
+        world: BlockGetter,
         pos: BlockPos,
-        context: ShapeContext
+        context: CollisionContext
     ): VoxelShape {
-        return LAYERS_TO_SHAPE[state.get(LAYERS)]
+        return LAYERS_TO_SHAPE[state.getValue(LAYERS)]
     }
 
     override fun getCollisionShape(
         state: BlockState,
-        world: BlockView,
+        world: BlockGetter,
         pos: BlockPos,
-        context: ShapeContext
+        context: CollisionContext
     ): VoxelShape {
-        return LAYERS_TO_SHAPE[state.get(LAYERS)]
+        return LAYERS_TO_SHAPE[state.getValue(LAYERS)]
     }
 
-    override fun getSidesShape(state: BlockState, world: BlockView, pos: BlockPos): VoxelShape {
-        return LAYERS_TO_SHAPE[state.get(LAYERS)]
+    override fun getBlockSupportShape(state: BlockState, world: BlockGetter, pos: BlockPos): VoxelShape {
+        return LAYERS_TO_SHAPE[state.getValue(LAYERS)]
     }
 
-    override fun getCameraCollisionShape(
+    override fun getVisualShape(
         state: BlockState,
-        world: BlockView,
+        world: BlockGetter,
         pos: BlockPos,
-        context: ShapeContext
+        context: CollisionContext
     ): VoxelShape {
-        return LAYERS_TO_SHAPE[state.get(LAYERS)]
+        return LAYERS_TO_SHAPE[state.getValue(LAYERS)]
     }
 
-    override fun hasSidedTransparency(state: BlockState): Boolean {
+    override fun useShapeForLightOcclusion(state: BlockState): Boolean {
         return true
     }
 
-    override fun getAmbientOcclusionLightLevel(state: BlockState, world: BlockView, pos: BlockPos): Float {
-        return if (state.get(LAYERS) == MAX_LAYERS) 0.2f else 1.0f
+    override fun getShadeBrightness(state: BlockState, world: BlockGetter, pos: BlockPos): Float {
+        return if (state.getValue(LAYERS) == MAX_LAYERS) 0.2f else 1.0f
     }
 
-    override fun canPlaceAt(state: BlockState, world: WorldView, pos: BlockPos): Boolean {
-        val blockStateDown = world.getBlockState(pos.down())
-        return isFaceFullSquare(blockStateDown.getCollisionShape(world, pos.down()), Direction.UP) ||
-                (blockStateDown.isOf(this) && blockStateDown.get(LAYERS) == MAX_LAYERS)
+    override fun canSurvive(state: BlockState, world: LevelReader, pos: BlockPos): Boolean {
+        val blockStateDown = world.getBlockState(pos.below())
+        return isFaceFull(blockStateDown.getCollisionShape(world, pos.below()), Direction.UP) ||
+                (blockStateDown.`is`(this) && blockStateDown.getValue(LAYERS) == MAX_LAYERS)
     }
 
-    override fun getStateForNeighborUpdate(
+    override fun updateShape(
         state: BlockState,
         direction: Direction,
         neighborState: BlockState,
-        world: WorldAccess,
+        world: LevelAccessor,
         pos: BlockPos,
         neighborPos: BlockPos
     ): BlockState {
-        if (state.get(WATERLOGGED)) {
-            world.scheduleFluidTick(pos, Fluids.WATER, Fluids.WATER.getTickRate(world))
+        if (state.getValue(WATERLOGGED)) {
+            world.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(world))
         }
-        if (!state.canPlaceAt(world, pos)) {
-            world.scheduleBlockTick(pos, this, 1)
+        if (!state.canSurvive(world, pos)) {
+            world.scheduleTick(pos, this, 1)
         }
-        return super.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos)
+        return super.updateShape(state, direction, neighborState, world, pos, neighborPos)
     }
 
-    override fun scheduledTick(state: BlockState, world: ServerWorld, pos: BlockPos?, random: RandomGenerator?) {
-        if (!state.canPlaceAt(world, pos)) {
-            world.breakBlock(pos, true)
+    override fun tick(state: BlockState, world: ServerLevel, pos: BlockPos?, random: RandomSource?) {
+        if (!state.canSurvive(world, pos)) {
+            world.destroyBlock(pos, true)
         }
     }
 
-    override fun canReplace(state: BlockState, context: ItemPlacementContext): Boolean {
-        val layers = state.get(LAYERS)
-        return if (context.stack.isOf(this.asItem()) && layers < MAX_LAYERS) {
-            if (context.canReplaceExisting()) {
-                context.side == Direction.UP
+    override fun canBeReplaced(state: BlockState, context: BlockPlaceContext): Boolean {
+        val layers = state.getValue(LAYERS)
+        return if (context.itemInHand.`is`(this.asItem()) && layers < MAX_LAYERS) {
+            if (context.replacingClickedOnBlock()) {
+                context.clickedFace == Direction.UP
             } else {
                 true
             }
         } else false
     }
 
-    override fun getPlacementState(ctx: ItemPlacementContext): BlockState {
-        var waterlog = ctx.world.getFluidState(ctx.blockPos).fluid == Fluids.WATER
-        val blockState = ctx.world.getBlockState(ctx.blockPos)
-        if (blockState.isOf(this)) {
+    override fun getStateForPlacement(ctx: BlockPlaceContext): BlockState {
+        var waterlog = ctx.level.getFluidState(ctx.clickedPos).type == Fluids.WATER
+        val blockState = ctx.level.getBlockState(ctx.clickedPos)
+        if (blockState.`is`(this)) {
             return blockState.cycle(LAYERS)
         }
-        return defaultState.with(WATERLOGGED, waterlog)
+        return defaultBlockState().setValue(WATERLOGGED, waterlog)
     }
 
     override fun getFluidState(state: BlockState): FluidState {
-        return if (state.get(WATERLOGGED)) Fluids.WATER.getStill(false)
+        return if (state.getValue(WATERLOGGED)) Fluids.WATER.getSource(false)
         else super.getFluidState(state)
     }
 
-    override fun appendProperties(builder: StateManager.Builder<Block, BlockState>) {
+    override fun createBlockStateDefinition(builder: StateDefinition.Builder<Block, BlockState>) {
         builder.add(LAYERS, WATERLOGGED)
     }
 
     companion object {
-        val CODEC: MapCodec<CoinPileBlock> = createCodec(::CoinPileBlock)
+        val CODEC: MapCodec<CoinPileBlock> = simpleCodec(::CoinPileBlock)
         const val MAX_LAYERS: Int = 8
         const val IMPASSABLE_HEIGHT: Int = 5
-        val LAYERS: IntProperty = Properties.LAYERS
-        val WATERLOGGED: BooleanProperty = Properties.WATERLOGGED
+        val LAYERS: IntegerProperty = BlockStateProperties.LAYERS
+        val WATERLOGGED: BooleanProperty = BlockStateProperties.WATERLOGGED
         protected val LAYERS_TO_SHAPE: Array<VoxelShape> = arrayOf(
-            VoxelShapes.empty(),
-            createCuboidShape(0.0, 0.0, 0.0, 16.0, 2.0, 16.0),
-            createCuboidShape(0.0, 0.0, 0.0, 16.0, 4.0, 16.0),
-            createCuboidShape(0.0, 0.0, 0.0, 16.0, 6.0, 16.0),
-            createCuboidShape(0.0, 0.0, 0.0, 16.0, 8.0, 16.0),
-            createCuboidShape(0.0, 0.0, 0.0, 16.0, 10.0, 16.0),
-            createCuboidShape(0.0, 0.0, 0.0, 16.0, 12.0, 16.0),
-            createCuboidShape(0.0, 0.0, 0.0, 16.0, 14.0, 16.0),
-            createCuboidShape(0.0, 0.0, 0.0, 16.0, 16.0, 16.0)
+            Shapes.empty(),
+            box(0.0, 0.0, 0.0, 16.0, 2.0, 16.0),
+            box(0.0, 0.0, 0.0, 16.0, 4.0, 16.0),
+            box(0.0, 0.0, 0.0, 16.0, 6.0, 16.0),
+            box(0.0, 0.0, 0.0, 16.0, 8.0, 16.0),
+            box(0.0, 0.0, 0.0, 16.0, 10.0, 16.0),
+            box(0.0, 0.0, 0.0, 16.0, 12.0, 16.0),
+            box(0.0, 0.0, 0.0, 16.0, 14.0, 16.0),
+            box(0.0, 0.0, 0.0, 16.0, 16.0, 16.0)
         )
     }
 }

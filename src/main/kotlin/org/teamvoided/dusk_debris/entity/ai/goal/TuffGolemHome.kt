@@ -1,9 +1,9 @@
 package org.teamvoided.dusk_debris.entity.ai.goal
 
-import net.minecraft.entity.MovementType
-import net.minecraft.entity.ai.goal.Goal
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Vec3d
+import net.minecraft.core.BlockPos
+import net.minecraft.world.entity.MoverType
+import net.minecraft.world.entity.ai.goal.Goal
+import net.minecraft.world.phys.Vec3
 import org.teamvoided.dusk_debris.entity.TuffGolemEntity
 import java.util.*
 
@@ -13,10 +13,10 @@ open class TuffGolemHome(
 ) : Goal() {
 
     init {
-        this.controls = EnumSet.of(Control.MOVE)
+        this.setFlags(EnumSet.of(Flag.MOVE))
     }
 
-    override fun canStart(): Boolean =
+    override fun canUse(): Boolean =
         !golem.hasControllingPassenger() &&
                 golem.statueTicks > 0 &&
                 golem.summonedPos != null
@@ -24,20 +24,20 @@ open class TuffGolemHome(
     override fun start() {
         if (golem.summonedPos != null && golem.statueTicks > 0) {
             golem.navigation.stop()
-            val target = golem.summonedPos!!.ofBottomCenter()
-            golem.navigation.startMovingTo(target.x, target.y, target.z, 0, this.speed)
+            val target = golem.summonedPos!!.bottomCenter
+            golem.navigation.moveTo(target.x, target.y, target.z, 0, this.speed)
         }
     }
 
     override fun tick() {
         if (golem.summonedPos != null && golem.statueTicks > 0) {
-            val summonPos = golem.squaredDistanceTo(golem.summonedPos!!.ofBottomCenter())
+            val summonPos = golem.distanceToSqr(golem.summonedPos!!.bottomCenter)
             if (summonPos < 0.5) {
                 if (golem.state != golem.statueState && summonPos < 0.1) {
                     golem.setStateStatue()
-                    golem.yaw = (golem.yaw.toInt() / 90) * 90f
+                    golem.setYRot((golem.yRot.toInt() / 90) * 90f)
                 }
-                golem.move(MovementType.SELF, moveTo(golem.summonedPos!!))
+                golem.move(MoverType.SELF, moveTo(golem.summonedPos!!))
             }
             super.tick()
         }
@@ -48,9 +48,9 @@ open class TuffGolemHome(
         super.stop()
     }
 
-    private fun moveTo(endPos: BlockPos): Vec3d {
+    private fun moveTo(endPos: BlockPos): Vec3 {
         val x: Double = ((endPos.x + 0.5) - golem.x) / 8
         val z: Double = ((endPos.z + 0.5) - golem.z) / 8
-        return Vec3d(x, 0.0, z)
+        return Vec3(x, 0.0, z)
     }
 }

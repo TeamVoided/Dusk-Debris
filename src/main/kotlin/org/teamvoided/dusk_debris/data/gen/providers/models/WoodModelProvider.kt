@@ -1,22 +1,22 @@
 package org.teamvoided.dusk_debris.data.gen.providers.models
 
-import net.minecraft.block.Block
-import net.minecraft.data.client.model.BlockStateModelGenerator
-import net.minecraft.data.client.model.TexturedModel
+import net.minecraft.data.models.BlockModelGenerators
+import net.minecraft.data.models.model.TexturedModel
+import net.minecraft.world.level.block.Block
 import org.teamvoided.dusk_debris.init.DuskBlocks
 import org.teamvoided.dusk_debris.util.model_helper.registerOvergrowthBush
 import org.teamvoided.dusk_debris.util.model_helper.strongScaffolding
 
 object WoodModelProvider {
-    fun BlockStateModelGenerator.generateWoodModels() {
+    fun BlockModelGenerators.generateWoodModels() {
         this.woods()
         this.strongScaffolding(DuskBlocks.STRONG_SCAFFOLDING)
         this.registerOvergrowthBush(DuskBlocks.OVERGROWTH_BUSH)
-        this.registerSingleton(DuskBlocks.OVERGROWTH_BLOCK, TexturedModel.LEAVES)
-        this.registerSingleton(DuskBlocks.OVERGROWTH_LEAVES, TexturedModel.LEAVES)
+        this.createTrivialBlock(DuskBlocks.OVERGROWTH_BLOCK, TexturedModel.LEAVES)
+        this.createTrivialBlock(DuskBlocks.OVERGROWTH_LEAVES, TexturedModel.LEAVES)
     }
 
-    private fun BlockStateModelGenerator.woods() {
+    private fun BlockModelGenerators.woods() {
         this.logWoodStrip(
             DuskBlocks.CYPRESS_LEAVES,
             DuskBlocks.CYPRESS_LOG,
@@ -43,7 +43,7 @@ object WoodModelProvider {
             DuskBlocks.SEQUOIA_HANGING_SIGN,
             DuskBlocks.SEQUOIA_WALL_HANGING_SIGN
         )
-        this.registerSingleton(DuskBlocks.POISON_BIRCH_LEAVES, TexturedModel.LEAVES)
+        this.createTrivialBlock(DuskBlocks.POISON_BIRCH_LEAVES, TexturedModel.LEAVES)
         this.logWoodStrip(
             DuskBlocks.GALLERY_MAPLE_SAPLING,
             DuskBlocks.POTTED_GALLERY_MAPLE_SAPLING,
@@ -57,7 +57,7 @@ object WoodModelProvider {
         )
     }
 
-    private fun BlockStateModelGenerator.logWoodStrip(
+    private fun BlockModelGenerators.logWoodStrip(
         sapling: Block,
         saplingPot: Block,
         leaves: Block,
@@ -68,11 +68,11 @@ object WoodModelProvider {
         hangingSign: Block,
         wallHangingSign: Block
     ) {
-        this.registerFlowerPotPlant(sapling, saplingPot, BlockStateModelGenerator.TintType.NOT_TINTED)
+        this.createPlant(sapling, saplingPot, BlockModelGenerators.TintState.NOT_TINTED)
         this.logWoodStrip(leaves, log, wood, strippedLog, strippedWood, hangingSign, wallHangingSign)
     }
 
-    private fun BlockStateModelGenerator.logWoodStrip(
+    private fun BlockModelGenerators.logWoodStrip(
         leaves: Block,
         log: Block,
         wood: Block,
@@ -81,11 +81,11 @@ object WoodModelProvider {
         hangingSign: Block,
         wallHangingSign: Block
     ) {
-        this.registerSingleton(leaves, TexturedModel.LEAVES)
+        this.createTrivialBlock(leaves, TexturedModel.LEAVES)
         this.logWoodStrip(log, wood, strippedLog, strippedWood, hangingSign, wallHangingSign)
     }
 
-    private fun BlockStateModelGenerator.logWoodStrip(
+    private fun BlockModelGenerators.logWoodStrip(
         log: Block,
         wood: Block,
         strippedLog: Block,
@@ -93,17 +93,17 @@ object WoodModelProvider {
         hangingSign: Block,
         wallHangingSign: Block
     ) {
-        this.registerHangingSign(strippedLog, hangingSign, wallHangingSign)
+        this.createHangingSign(strippedLog, hangingSign, wallHangingSign)
         this.logWoodStrip(log, wood, strippedLog, strippedWood)
     }
 
-    private fun BlockStateModelGenerator.logWoodStrip(
+    private fun BlockModelGenerators.logWoodStrip(
         log: Block,
         wood: Block,
         strippedLog: Block,
         strippedWood: Block
     ) {
-        this.registerLog(log).log(log).wood(wood)
-        this.registerLog(strippedLog).log(strippedLog).wood(strippedWood)
+        this.woodProvider(log).logWithHorizontal(log).wood(wood)
+        this.woodProvider(strippedLog).logWithHorizontal(strippedLog).wood(strippedWood)
     }
 }

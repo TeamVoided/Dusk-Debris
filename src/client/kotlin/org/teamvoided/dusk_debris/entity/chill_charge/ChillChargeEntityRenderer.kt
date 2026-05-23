@@ -1,42 +1,42 @@
 package org.teamvoided.dusk_debris.entity.chill_charge
 
-import net.minecraft.client.render.OverlayTexture
-import net.minecraft.client.render.RenderLayer
-import net.minecraft.client.render.VertexConsumerProvider
-import net.minecraft.client.render.entity.EntityRenderer
-import net.minecraft.client.render.entity.EntityRendererFactory
-import net.minecraft.client.util.math.MatrixStack
-import net.minecraft.util.Identifier
-import net.minecraft.util.math.MathHelper
+import com.mojang.blaze3d.vertex.PoseStack
+import net.minecraft.client.renderer.MultiBufferSource
+import net.minecraft.client.renderer.RenderType
+import net.minecraft.client.renderer.entity.EntityRenderer
+import net.minecraft.client.renderer.entity.EntityRendererProvider
+import net.minecraft.client.renderer.texture.OverlayTexture
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.util.Mth
 import org.teamvoided.dusk_debris.DuskDebris.id
 import org.teamvoided.dusk_debris.entity.ChillChargeEntity
 import org.teamvoided.dusk_debris.entity.DuskEntityModelLayers
 import org.teamvoided.dusk_debris.entity.chill_charge.render.ChillChargeEntityModel
 
-class ChillChargeEntityRenderer(context: EntityRendererFactory.Context) :
+class ChillChargeEntityRenderer(context: EntityRendererProvider.Context) :
     EntityRenderer<ChillChargeEntity>(context) {
-    private val model = ChillChargeEntityModel(context.getPart(DuskEntityModelLayers.CHILL_CHARGE))
+    private val model = ChillChargeEntityModel(context.bakeLayer(DuskEntityModelLayers.CHILL_CHARGE))
 
     override fun render(
         chillChargeEntity: ChillChargeEntity,
         yaw: Float,
         tickDelta: Float,
-        matrices: MatrixStack,
-        vertexConsumers: VertexConsumerProvider,
+        matrices: PoseStack,
+        vertexConsumers: MultiBufferSource,
         light: Int
     ) {
-        if (chillChargeEntity.age >= 2 ||
-            !(dispatcher.camera.focusedEntity.squaredDistanceTo(chillChargeEntity) < distance.toDouble())
+        if (chillChargeEntity.tickCount >= 2 ||
+            !(entityRenderDispatcher.camera.entity.distanceToSqr(chillChargeEntity) < distance.toDouble())
         ) {
-            val age = chillChargeEntity.age.toFloat() + tickDelta
+            val age = chillChargeEntity.tickCount.toFloat() + tickDelta
             val vertexConsumer = vertexConsumers.getBuffer(
-                RenderLayer.getBreezeWind(
+                RenderType.breezeWind(
                     TEXTURE, 0.0f, 0.0f
 //                    TEXTURE, this.method_55268(age) % 1.0f, 0.0f
                 )
             )
-            model.setAngles(chillChargeEntity, 0.0f, 0.0f, age, 0.0f, 0.0f)
-            model.method_60879(matrices, vertexConsumer, light, OverlayTexture.DEFAULT_UV)
+            model.setupAnim(chillChargeEntity, 0.0f, 0.0f, age, 0.0f, 0.0f)
+            model.renderToBuffer(matrices, vertexConsumer, light, OverlayTexture.NO_OVERLAY)
             super.render(chillChargeEntity, yaw, tickDelta, matrices, vertexConsumers, light)
         }
     }
@@ -45,13 +45,13 @@ class ChillChargeEntityRenderer(context: EntityRendererFactory.Context) :
         return f * 0.03f
     }
 
-    override fun getTexture(chillChargeEntity: ChillChargeEntity): Identifier {
+    override fun getTextureLocation(chillChargeEntity: ChillChargeEntity): ResourceLocation {
         return TEXTURE
     }
 
     companion object {
         //distance val is for an overide to render the charge
-        private val distance = MathHelper.square(3.5f)
-        private val TEXTURE: Identifier = id("textures/entity/projectiles/chill_charge.png")
+        private val distance = Mth.square(3.5f)
+        private val TEXTURE: ResourceLocation = id("textures/entity/projectiles/chill_charge.png")
     }
 }

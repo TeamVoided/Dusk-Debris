@@ -2,18 +2,16 @@ package org.teamvoided.dusk_debris.spell
 
 import com.mojang.serialization.Codec
 import com.mojang.serialization.MapCodec
-import net.minecraft.entity.LivingEntity
-import net.minecraft.registry.Holder
-import net.minecraft.registry.Registries
-import net.minecraft.text.MutableText
-import net.minecraft.text.Style
-import net.minecraft.text.Text
-import net.minecraft.text.Texts
-import net.minecraft.util.Formatting
-import net.minecraft.util.Util
-import net.minecraft.util.math.Vec3d
-import net.minecraft.util.random.RandomGenerator
-import net.minecraft.world.World
+import net.minecraft.ChatFormatting
+import net.minecraft.core.Holder
+import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.ComponentUtils
+import net.minecraft.network.chat.MutableComponent
+import net.minecraft.network.chat.Style
+import net.minecraft.util.RandomSource
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.level.Level
+import net.minecraft.world.phys.Vec3
 import org.teamvoided.dusk_debris.init.DuskParticles
 import org.teamvoided.dusk_debris.init.DuskRegistries
 import org.teamvoided.dusk_debris.spell.settings.GenericSpellSettings
@@ -24,7 +22,7 @@ abstract class SpellType<SS : SpellSettings>(configCodec: Codec<SS>) {
 
     fun getCodec() = codec
 
-    fun id() = DuskRegistries.SPELL_TYPE.getId(this)!!
+    fun id() = DuskRegistries.SPELL_TYPE.getKey(this)!!
 
     open fun castRequirements(castor: LivingEntity, settings: SS): Boolean = true
 
@@ -36,15 +34,15 @@ abstract class SpellType<SS : SpellSettings>(configCodec: Codec<SS>) {
 
     abstract fun actualSpell(castor: LivingEntity, settings: SS)
 
-    open fun nonEntityBehavior(world: World, random: RandomGenerator, pos: Vec3d, rotation: Vec3d, settings: SS) {
-        if (world.isClient) {
+    open fun nonEntityBehavior(world: Level, random: RandomSource, pos: Vec3, rotation: Vec3, settings: SS) {
+        if (world.isClientSide) {
             repeat(10) {
-                val particlePos = Vec3d(
+                val particlePos = Vec3(
                     (random.nextDouble() - 0.5),
                     (random.nextDouble() - 0.5),
                     (random.nextDouble() - 0.5)
                 ).add(pos)
-                val velocity = rotation.multiply(0.1)
+                val velocity = rotation.scale(0.1)
                 world.addParticle(
                     DuskParticles.DRAINED_SOUL,
                     particlePos.x, particlePos.y, particlePos.z,
@@ -55,9 +53,9 @@ abstract class SpellType<SS : SpellSettings>(configCodec: Codec<SS>) {
     }
 
     companion object {
-        fun getFullName(spell: Holder<Spell<*, *>>): Text {
-            val mutableText: MutableText = (spell.value().settings as GenericSpellSettings).description.copy()
-            Texts.setStyleIfAbsent(mutableText, Style.EMPTY.withColor(Formatting.WHITE))
+        fun getFullName(spell: Holder<Spell<*, *>>): Component {
+            val mutableText: MutableComponent = (spell.value().settings as GenericSpellSettings).description.copy()
+            ComponentUtils.mergeStyles(mutableText, Style.EMPTY.withColor(ChatFormatting.WHITE))
             return mutableText
         }
 

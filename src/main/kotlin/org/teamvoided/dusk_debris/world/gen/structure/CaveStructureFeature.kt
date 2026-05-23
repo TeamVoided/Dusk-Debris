@@ -2,20 +2,20 @@ package org.teamvoided.dusk_debris.world.gen.structure
 
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
-import net.minecraft.block.Blocks
-import net.minecraft.registry.Holder
-import net.minecraft.structure.StructureType
-import net.minecraft.structure.pool.EmptyPoolElement
-import net.minecraft.structure.pool.StructurePool
-import net.minecraft.util.BlockRotation
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Direction
-import net.minecraft.world.EmptyBlockView
-import net.minecraft.world.gen.HeightContext
-import net.minecraft.world.gen.feature.LiquidSettings
-import net.minecraft.world.gen.feature.StructureFeature
-import net.minecraft.world.gen.heightprovider.ConstantHeightProvider
-import net.minecraft.world.gen.heightprovider.HeightProvider
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
+import net.minecraft.core.Holder
+import net.minecraft.world.level.EmptyBlockGetter
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.block.Rotation
+import net.minecraft.world.level.levelgen.WorldGenerationContext
+import net.minecraft.world.level.levelgen.heightproviders.ConstantHeight
+import net.minecraft.world.level.levelgen.heightproviders.HeightProvider
+import net.minecraft.world.level.levelgen.structure.Structure
+import net.minecraft.world.level.levelgen.structure.StructureType
+import net.minecraft.world.level.levelgen.structure.pools.EmptyPoolElement
+import net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool
+import net.minecraft.world.level.levelgen.structure.templatesystem.LiquidSettings
 import org.teamvoided.dusk_debris.init.worldgen.structure.DuskStructureType
 import org.teamvoided.dusk_debris.world.gen.structure.piece.PoolNoJigsawStructurePiece
 import java.util.*
@@ -23,18 +23,18 @@ import kotlin.math.floor
 
 class CaveStructureFeature(
     settings: StructureSettings,
-    val startPool: Holder<StructurePool>,
+    val startPool: Holder<StructureTemplatePool>,
     val height: HeightProvider,
-    val minHeightSearch: ConstantHeightProvider
-) : StructureFeature(settings) {
-    public override fun findGenerationPos(context: GenerationContext): Optional<GenerationStub> {
+    val minHeightSearch: ConstantHeight
+) : Structure(settings) {
+    public override fun findGenerationPoint(context: GenerationContext): Optional<GenerationStub> {
         val chunkRandom = context.random()
 
         val structurePool = startPool.value()
-        val structurePoolElement = structurePool.getRandomElement(chunkRandom)
+        val structurePoolElement = structurePool.getRandomTemplate(chunkRandom)
         if (structurePoolElement is EmptyPoolElement) return Optional.empty()
 
-        val rotation = BlockRotation.random(chunkRandom)
+        val rotation = Rotation.getRandom(chunkRandom)
 
 //        val size = structurePoolElement.getStart(context.structureTemplateManager, rotation)
 
@@ -46,34 +46,34 @@ class CaveStructureFeature(
 //            else -> 0.0 to 0.0
 //        }
 
-        val posX = context.chunkPos().startX + chunkRandom.nextInt(16)
-        val posZ = context.chunkPos().startZ + chunkRandom.nextInt(16)
+        val posX = context.chunkPos().minBlockX + chunkRandom.nextInt(16)
+        val posZ = context.chunkPos().minBlockZ + chunkRandom.nextInt(16)
 
-        val size2 = structurePoolElement.getStart(context.structureTemplateManager, rotation)
+        val size2 = structurePoolElement.getSize(context.structureTemplateManager, rotation)
         val sampleX = floor(posX + (size2.x / if (rotXNeg(rotation)) -2.0 else 2.0)).toInt()
         val sampleZ = floor(posZ + (size2.z / if (rotZNeg(rotation)) -2.0 else 2.0)).toInt()
 
 
-        val heightContext = HeightContext(context.chunkGenerator(), context.world())
-        val minY = minHeightSearch[chunkRandom, heightContext]
-        var posY = height[chunkRandom, heightContext]
+        val heightContext = WorldGenerationContext(context.chunkGenerator(), context.heightAccessor())
+        val minY = minHeightSearch.sample(chunkRandom, heightContext)
+        var posY = height.sample(chunkRandom, heightContext)
 
-        val verticalBlockSample = context.chunkGenerator().getColumnSample(
+        val verticalBlockSample = context.chunkGenerator().getBaseColumn(
             sampleX,
             sampleZ,
-            context.world(),
+            context.heightAccessor(),
             context.randomState()
         )
-        val mutable = BlockPos.Mutable(sampleX, posY, sampleZ)
+        val mutable = BlockPos.MutableBlockPos(sampleX, posY, sampleZ)
 
         while (posY > minY) {
-            val blockState = verticalBlockSample.getState(posY)
+            val blockState = verticalBlockSample.getBlock(posY)
             --posY
-            val blockState2 = verticalBlockSample.getState(posY)
+            val blockState2 = verticalBlockSample.getBlock(posY)
             if (blockState.isAir &&
-                (blockState2.isSideSolidFullSquare(EmptyBlockView.INSTANCE, mutable.setY(posY), Direction.UP) ||
-                        blockState2.isOf(Blocks.SOUL_SAND)) &&
-                !blockState2.isOf(Blocks.BEDROCK)
+                (blockState2.isFaceSturdy(EmptyBlockGetter.INSTANCE, mutable.setY(posY), Direction.UP) ||
+                        blockState2.`is`(Blocks.SOUL_SAND)) &&
+                !blockState2.`is`(Blocks.BEDROCK)
             ) {
                 break
             }
@@ -100,10 +100,10 @@ class CaveStructureFeature(
         }
     }
 
-    fun rotXNeg(r: BlockRotation): Boolean = r == BlockRotation.CLOCKWISE_180 || r == BlockRotation.CLOCKWISE_90
-    fun rotZNeg(r: BlockRotation): Boolean = r == BlockRotation.CLOCKWISE_180 || r == BlockRotation.COUNTERCLOCKWISE_90
+    fun rotXNeg(r: Rotation): Boolean = r == Rotation.CLOCKWISE_180 || r == Rotation.CLOCKWISE_90
+    fun rotZNeg(r: Rotation): Boolean = r == Rotation.CLOCKWISE_180 || r == Rotation.COUNTERCLOCKWISE_90
 
-    override fun getType(): StructureType<*> {
+    override fun type(): StructureType<*> {
         return DuskStructureType.SIMPLE_POOL
     }
 
@@ -112,9 +112,9 @@ class CaveStructureFeature(
             RecordCodecBuilder.mapCodec { instance ->
                 instance.group(
                     settingsCodec(instance),
-                    StructurePool.REGISTRY_CODEC.fieldOf("start_pool").forGetter { it.startPool },
+                    StructureTemplatePool.CODEC.fieldOf("start_pool").forGetter { it.startPool },
                     HeightProvider.CODEC.fieldOf("height").forGetter { it.height },
-                    ConstantHeightProvider.CODEC.fieldOf("min_height_search").forGetter { it.minHeightSearch }
+                    ConstantHeight.CODEC.fieldOf("min_height_search").forGetter { it.minHeightSearch }
                 ).apply(instance, ::CaveStructureFeature)
             }
     }

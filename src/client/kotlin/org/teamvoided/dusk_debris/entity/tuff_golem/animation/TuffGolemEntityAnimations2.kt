@@ -1,336 +1,336 @@
 package org.teamvoided.dusk_debris.entity.tuff_golem.animation
 
-import net.minecraft.client.render.animation.Animation
-import net.minecraft.client.render.animation.AnimationKeyframe
-import net.minecraft.client.render.animation.Animator.rotate
-import net.minecraft.client.render.animation.Animator.translate
-import net.minecraft.client.render.animation.PartAnimation
+import net.minecraft.client.animation.AnimationChannel
+import net.minecraft.client.animation.AnimationDefinition
+import net.minecraft.client.animation.Keyframe
+import net.minecraft.client.animation.KeyframeAnimations.degreeVec
+import net.minecraft.client.animation.KeyframeAnimations.posVec
 
 object TuffGolemEntityAnimations2 {
-    val WALK: Animation = Animation.Builder.withLength(2.0f).looping()
-        .addPartAnimation(
-            "left_arm", PartAnimation(
-                PartAnimation.AnimationTargets.ROTATE,
-                AnimationKeyframe(
+    val WALK: AnimationDefinition = AnimationDefinition.Builder.withLength(2.0f).looping()
+        .addAnimation(
+            "left_arm", AnimationChannel(
+                AnimationChannel.Targets.ROTATION,
+                Keyframe(
                     0.0f,
-                    rotate(0.0f, 0.0f, 0.0f),
-                    PartAnimation.Interpolations.SPLINE
+                    degreeVec(0.0f, 0.0f, 0.0f),
+                    AnimationChannel.Interpolations.CATMULLROM
                 ),
-                AnimationKeyframe(
+                Keyframe(
                     0.5f,
-                    rotate(22.5f, 0.0f, 0.0f),
-                    PartAnimation.Interpolations.SPLINE
+                    degreeVec(22.5f, 0.0f, 0.0f),
+                    AnimationChannel.Interpolations.CATMULLROM
                 ),
-                AnimationKeyframe(
+                Keyframe(
                     1.0f,
-                    rotate(0.0f, 0.0f, 0.0f),
-                    PartAnimation.Interpolations.SPLINE
+                    degreeVec(0.0f, 0.0f, 0.0f),
+                    AnimationChannel.Interpolations.CATMULLROM
                 ),
-                AnimationKeyframe(
+                Keyframe(
                     1.5f,
-                    rotate(-22.5f, 0.0f, 0.0f),
-                    PartAnimation.Interpolations.SPLINE
+                    degreeVec(-22.5f, 0.0f, 0.0f),
+                    AnimationChannel.Interpolations.CATMULLROM
                 ),
-                AnimationKeyframe(
+                Keyframe(
                     2.0f,
-                    rotate(0.0f, 0.0f, 0.0f),
-                    PartAnimation.Interpolations.SPLINE
+                    degreeVec(0.0f, 0.0f, 0.0f),
+                    AnimationChannel.Interpolations.CATMULLROM
                 )
             )
         )
-        .addPartAnimation(
-            "right_arm", PartAnimation(
-                PartAnimation.AnimationTargets.ROTATE,
-                AnimationKeyframe(
+        .addAnimation(
+            "right_arm", AnimationChannel(
+                AnimationChannel.Targets.ROTATION,
+                Keyframe(
                     0.0f,
-                    rotate(0.0f, 0.0f, 0.0f),
-                    PartAnimation.Interpolations.SPLINE
+                    degreeVec(0.0f, 0.0f, 0.0f),
+                    AnimationChannel.Interpolations.CATMULLROM
                 ),
-                AnimationKeyframe(
+                Keyframe(
                     0.5f,
-                    rotate(-22.5f, 0.0f, 0.0f),
-                    PartAnimation.Interpolations.SPLINE
+                    degreeVec(-22.5f, 0.0f, 0.0f),
+                    AnimationChannel.Interpolations.CATMULLROM
                 ),
-                AnimationKeyframe(
+                Keyframe(
                     1.0f,
-                    rotate(0.0f, 0.0f, 0.0f),
-                    PartAnimation.Interpolations.SPLINE
+                    degreeVec(0.0f, 0.0f, 0.0f),
+                    AnimationChannel.Interpolations.CATMULLROM
                 ),
-                AnimationKeyframe(
+                Keyframe(
                     1.5f,
-                    rotate(22.5f, 0.0f, 0.0f),
-                    PartAnimation.Interpolations.SPLINE
+                    degreeVec(22.5f, 0.0f, 0.0f),
+                    AnimationChannel.Interpolations.CATMULLROM
                 ),
-                AnimationKeyframe(
+                Keyframe(
                     2.0f,
-                    rotate(0.0f, 0.0f, 0.0f),
-                    PartAnimation.Interpolations.SPLINE
+                    degreeVec(0.0f, 0.0f, 0.0f),
+                    AnimationChannel.Interpolations.CATMULLROM
                 )
             )
         )
-        .addPartAnimation(
-            "left_leg", PartAnimation(
-                PartAnimation.AnimationTargets.ROTATE,
-                AnimationKeyframe(
+        .addAnimation(
+            "left_leg", AnimationChannel(
+                AnimationChannel.Targets.ROTATION,
+                Keyframe(
                     0.0f,
-                    rotate(0.0f, 0.0f, 0.0f),
-                    PartAnimation.Interpolations.SPLINE
+                    degreeVec(0.0f, 0.0f, 0.0f),
+                    AnimationChannel.Interpolations.CATMULLROM
                 ),
-                AnimationKeyframe(
+                Keyframe(
                     0.5f,
-                    rotate(22.5f, 0.0f, 0.0f),
-                    PartAnimation.Interpolations.SPLINE
+                    degreeVec(22.5f, 0.0f, 0.0f),
+                    AnimationChannel.Interpolations.CATMULLROM
                 ),
-                AnimationKeyframe(
+                Keyframe(
                     1.0f,
-                    rotate(0.0f, 0.0f, 0.0f),
-                    PartAnimation.Interpolations.SPLINE
+                    degreeVec(0.0f, 0.0f, 0.0f),
+                    AnimationChannel.Interpolations.CATMULLROM
                 ),
-                AnimationKeyframe(
+                Keyframe(
                     1.5f,
-                    rotate(-22.5f, 0.0f, 0.0f),
-                    PartAnimation.Interpolations.SPLINE
+                    degreeVec(-22.5f, 0.0f, 0.0f),
+                    AnimationChannel.Interpolations.CATMULLROM
                 ),
-                AnimationKeyframe(
+                Keyframe(
                     2.0f,
-                    rotate(0.0f, 0.0f, 0.0f),
-                    PartAnimation.Interpolations.SPLINE
+                    degreeVec(0.0f, 0.0f, 0.0f),
+                    AnimationChannel.Interpolations.CATMULLROM
                 )
             )
         )
-        .addPartAnimation(
-            "right_leg", PartAnimation(
-                PartAnimation.AnimationTargets.ROTATE,
-                AnimationKeyframe(
+        .addAnimation(
+            "right_leg", AnimationChannel(
+                AnimationChannel.Targets.ROTATION,
+                Keyframe(
                     0.0f,
-                    rotate(0.0f, 0.0f, 0.0f),
-                    PartAnimation.Interpolations.SPLINE
+                    degreeVec(0.0f, 0.0f, 0.0f),
+                    AnimationChannel.Interpolations.CATMULLROM
                 ),
-                AnimationKeyframe(
+                Keyframe(
                     0.5f,
-                    rotate(-22.5f, 0.0f, 0.0f),
-                    PartAnimation.Interpolations.SPLINE
+                    degreeVec(-22.5f, 0.0f, 0.0f),
+                    AnimationChannel.Interpolations.CATMULLROM
                 ),
-                AnimationKeyframe(
+                Keyframe(
                     1.0f,
-                    rotate(0.0f, 0.0f, 0.0f),
-                    PartAnimation.Interpolations.SPLINE
+                    degreeVec(0.0f, 0.0f, 0.0f),
+                    AnimationChannel.Interpolations.CATMULLROM
                 ),
-                AnimationKeyframe(
+                Keyframe(
                     1.5f,
-                    rotate(22.5f, 0.0f, 0.0f),
-                    PartAnimation.Interpolations.SPLINE
+                    degreeVec(22.5f, 0.0f, 0.0f),
+                    AnimationChannel.Interpolations.CATMULLROM
                 ),
-                AnimationKeyframe(
+                Keyframe(
                     2.0f,
-                    rotate(0.0f, 0.0f, 0.0f),
-                    PartAnimation.Interpolations.SPLINE
+                    degreeVec(0.0f, 0.0f, 0.0f),
+                    AnimationChannel.Interpolations.CATMULLROM
                 )
             )
         )
-        .addPartAnimation(
-            "body", PartAnimation(
-                PartAnimation.AnimationTargets.ROTATE,
-                AnimationKeyframe(
+        .addAnimation(
+            "body", AnimationChannel(
+                AnimationChannel.Targets.ROTATION,
+                Keyframe(
                     0.0f,
-                    rotate(0.0f, 0.0f, 0.0f),
-                    PartAnimation.Interpolations.SPLINE
+                    degreeVec(0.0f, 0.0f, 0.0f),
+                    AnimationChannel.Interpolations.CATMULLROM
                 ),
-                AnimationKeyframe(
+                Keyframe(
                     0.5f,
-                    rotate(0.0f, 0.0f, -5.0f),
-                    PartAnimation.Interpolations.SPLINE
+                    degreeVec(0.0f, 0.0f, -5.0f),
+                    AnimationChannel.Interpolations.CATMULLROM
                 ),
-                AnimationKeyframe(
+                Keyframe(
                     1.0f,
-                    rotate(0.0f, 0.0f, 0.0f),
-                    PartAnimation.Interpolations.SPLINE
+                    degreeVec(0.0f, 0.0f, 0.0f),
+                    AnimationChannel.Interpolations.CATMULLROM
                 ),
-                AnimationKeyframe(
+                Keyframe(
                     1.5f,
-                    rotate(0.0f, 0.0f, 5.0f),
-                    PartAnimation.Interpolations.SPLINE
+                    degreeVec(0.0f, 0.0f, 5.0f),
+                    AnimationChannel.Interpolations.CATMULLROM
                 ),
-                AnimationKeyframe(
+                Keyframe(
                     2.0f,
-                    rotate(0.0f, 0.0f, 0.0f),
-                    PartAnimation.Interpolations.SPLINE
+                    degreeVec(0.0f, 0.0f, 0.0f),
+                    AnimationChannel.Interpolations.CATMULLROM
                 )
             )
         )
-        .addPartAnimation(
-            "body", PartAnimation(
-                PartAnimation.AnimationTargets.TRANSLATE,
-                AnimationKeyframe(0.0f, translate(0.0f, 0.0f, 0.0f), PartAnimation.Interpolations.SPLINE),
-                AnimationKeyframe(
+        .addAnimation(
+            "body", AnimationChannel(
+                AnimationChannel.Targets.POSITION,
+                Keyframe(0.0f, posVec(0.0f, 0.0f, 0.0f), AnimationChannel.Interpolations.CATMULLROM),
+                Keyframe(
                     0.5f,
-                    translate(0.0f, -1.0f, 0.0f),
-                    PartAnimation.Interpolations.SPLINE
+                    posVec(0.0f, -1.0f, 0.0f),
+                    AnimationChannel.Interpolations.CATMULLROM
                 ),
-                AnimationKeyframe(1.0f, translate(0.0f, 0.0f, 0.0f), PartAnimation.Interpolations.SPLINE),
-                AnimationKeyframe(
+                Keyframe(1.0f, posVec(0.0f, 0.0f, 0.0f), AnimationChannel.Interpolations.CATMULLROM),
+                Keyframe(
                     1.5f,
-                    translate(0.0f, -1.0f, 0.0f),
-                    PartAnimation.Interpolations.SPLINE
+                    posVec(0.0f, -1.0f, 0.0f),
+                    AnimationChannel.Interpolations.CATMULLROM
                 ),
-                AnimationKeyframe(2.0f, translate(0.0f, 0.0f, 0.0f), PartAnimation.Interpolations.SPLINE)
+                Keyframe(2.0f, posVec(0.0f, 0.0f, 0.0f), AnimationChannel.Interpolations.CATMULLROM)
             )
         )
         .build()
-    val STATUE: Animation = Animation.Builder.withLength(1.0f)
-        .addPartAnimation(
-            "left_arm", PartAnimation(
-                PartAnimation.AnimationTargets.ROTATE,
-                AnimationKeyframe(
+    val STATUE: AnimationDefinition = AnimationDefinition.Builder.withLength(1.0f)
+        .addAnimation(
+            "left_arm", AnimationChannel(
+                AnimationChannel.Targets.ROTATION,
+                Keyframe(
                     0.25f,
-                    rotate(0.0f, 0.0f, 0.0f),
-                    PartAnimation.Interpolations.SPLINE
+                    degreeVec(0.0f, 0.0f, 0.0f),
+                    AnimationChannel.Interpolations.CATMULLROM
                 ),
-                AnimationKeyframe(
+                Keyframe(
                     0.75f,
-                    rotate(-15.0f, 0.0f, 0.0f),
-                    PartAnimation.Interpolations.SPLINE
+                    degreeVec(-15.0f, 0.0f, 0.0f),
+                    AnimationChannel.Interpolations.CATMULLROM
                 ),
-                AnimationKeyframe(
+                Keyframe(
                     1.0f,
-                    rotate(0.0f, 0.0f, 0.0f),
-                    PartAnimation.Interpolations.SPLINE
+                    degreeVec(0.0f, 0.0f, 0.0f),
+                    AnimationChannel.Interpolations.CATMULLROM
                 )
             )
         )
-        .addPartAnimation(
-            "right_arm", PartAnimation(
-                PartAnimation.AnimationTargets.ROTATE,
-                AnimationKeyframe(
+        .addAnimation(
+            "right_arm", AnimationChannel(
+                AnimationChannel.Targets.ROTATION,
+                Keyframe(
                     0.25f,
-                    rotate(0.0f, 0.0f, 0.0f),
-                    PartAnimation.Interpolations.SPLINE
+                    degreeVec(0.0f, 0.0f, 0.0f),
+                    AnimationChannel.Interpolations.CATMULLROM
                 ),
-                AnimationKeyframe(
+                Keyframe(
                     0.75f,
-                    rotate(-15.0f, 0.0f, 0.0f),
-                    PartAnimation.Interpolations.SPLINE
+                    degreeVec(-15.0f, 0.0f, 0.0f),
+                    AnimationChannel.Interpolations.CATMULLROM
                 ),
-                AnimationKeyframe(
+                Keyframe(
                     1.0f,
-                    rotate(0.0f, 0.0f, 0.0f),
-                    PartAnimation.Interpolations.SPLINE
+                    degreeVec(0.0f, 0.0f, 0.0f),
+                    AnimationChannel.Interpolations.CATMULLROM
                 )
             )
         )
-        .addPartAnimation(
-            "body", PartAnimation(
-                PartAnimation.AnimationTargets.ROTATE,
-                AnimationKeyframe(
+        .addAnimation(
+            "body", AnimationChannel(
+                AnimationChannel.Targets.ROTATION,
+                Keyframe(
                     0.25f,
-                    rotate(0.0f, 0.0f, 0.0f),
-                    PartAnimation.Interpolations.SPLINE
+                    degreeVec(0.0f, 0.0f, 0.0f),
+                    AnimationChannel.Interpolations.CATMULLROM
                 ),
-                AnimationKeyframe(
+                Keyframe(
                     0.5f,
-                    rotate(15.0f, 0.0f, 0.0f),
-                    PartAnimation.Interpolations.SPLINE
+                    degreeVec(15.0f, 0.0f, 0.0f),
+                    AnimationChannel.Interpolations.CATMULLROM
                 ),
-                AnimationKeyframe(
+                Keyframe(
                     0.75f,
-                    rotate(15.0f, 0.0f, 0.0f),
-                    PartAnimation.Interpolations.SPLINE
+                    degreeVec(15.0f, 0.0f, 0.0f),
+                    AnimationChannel.Interpolations.CATMULLROM
                 ),
-                AnimationKeyframe(
+                Keyframe(
                     1.0f,
-                    rotate(0.0f, 0.0f, 0.0f),
-                    PartAnimation.Interpolations.SPLINE
+                    degreeVec(0.0f, 0.0f, 0.0f),
+                    AnimationChannel.Interpolations.CATMULLROM
                 )
             )
         )
-        .addPartAnimation(
-            "body", PartAnimation(
-                PartAnimation.AnimationTargets.TRANSLATE,
-                AnimationKeyframe(
+        .addAnimation(
+            "body", AnimationChannel(
+                AnimationChannel.Targets.POSITION,
+                Keyframe(
                     0.25f,
-                    translate(0.0f, 0.0f, 0.0f),
-                    PartAnimation.Interpolations.SPLINE
+                    posVec(0.0f, 0.0f, 0.0f),
+                    AnimationChannel.Interpolations.CATMULLROM
                 ),
-                AnimationKeyframe(1.0f, translate(0.0f, -2.0f, 0.0f), PartAnimation.Interpolations.SPLINE)
+                Keyframe(1.0f, posVec(0.0f, -2.0f, 0.0f), AnimationChannel.Interpolations.CATMULLROM)
             )
         )
         .build()
 
-    val ARISE: Animation = Animation.Builder.withLength(0.75f)
-        .addPartAnimation(
-            "left_arm", PartAnimation(
-                PartAnimation.AnimationTargets.ROTATE,
-                AnimationKeyframe(
+    val ARISE: AnimationDefinition = AnimationDefinition.Builder.withLength(0.75f)
+        .addAnimation(
+            "left_arm", AnimationChannel(
+                AnimationChannel.Targets.ROTATION,
+                Keyframe(
                     0.0f,
-                    rotate(0.0f, 0.0f, 0.0f),
-                    PartAnimation.Interpolations.SPLINE
+                    degreeVec(0.0f, 0.0f, 0.0f),
+                    AnimationChannel.Interpolations.CATMULLROM
                 ),
-                AnimationKeyframe(
+                Keyframe(
                     0.375f,
-                    rotate(-15.0f, 0.0f, 0.0f),
-                    PartAnimation.Interpolations.SPLINE
+                    degreeVec(-15.0f, 0.0f, 0.0f),
+                    AnimationChannel.Interpolations.CATMULLROM
                 ),
-                AnimationKeyframe(
+                Keyframe(
                     0.75f,
-                    rotate(0.0f, 0.0f, 0.0f),
-                    PartAnimation.Interpolations.SPLINE
+                    degreeVec(0.0f, 0.0f, 0.0f),
+                    AnimationChannel.Interpolations.CATMULLROM
                 )
             )
         )
-        .addPartAnimation(
-            "right_arm", PartAnimation(
-                PartAnimation.AnimationTargets.ROTATE,
-                AnimationKeyframe(
+        .addAnimation(
+            "right_arm", AnimationChannel(
+                AnimationChannel.Targets.ROTATION,
+                Keyframe(
                     0.0f,
-                    rotate(0.0f, 0.0f, 0.0f),
-                    PartAnimation.Interpolations.SPLINE
+                    degreeVec(0.0f, 0.0f, 0.0f),
+                    AnimationChannel.Interpolations.CATMULLROM
                 ),
-                AnimationKeyframe(
+                Keyframe(
                     0.375f,
-                    rotate(-15.0f, 0.0f, 0.0f),
-                    PartAnimation.Interpolations.SPLINE
+                    degreeVec(-15.0f, 0.0f, 0.0f),
+                    AnimationChannel.Interpolations.CATMULLROM
                 ),
-                AnimationKeyframe(
+                Keyframe(
                     0.75f,
-                    rotate(0.0f, 0.0f, 0.0f),
-                    PartAnimation.Interpolations.SPLINE
+                    degreeVec(0.0f, 0.0f, 0.0f),
+                    AnimationChannel.Interpolations.CATMULLROM
                 )
             )
         )
-        .addPartAnimation(
-            "body", PartAnimation(
-                PartAnimation.AnimationTargets.ROTATE,
-                AnimationKeyframe(
+        .addAnimation(
+            "body", AnimationChannel(
+                AnimationChannel.Targets.ROTATION,
+                Keyframe(
                     0.0f,
-                    rotate(0.0f, 0.0f, 0.0f),
-                    PartAnimation.Interpolations.SPLINE
+                    degreeVec(0.0f, 0.0f, 0.0f),
+                    AnimationChannel.Interpolations.CATMULLROM
                 ),
-                AnimationKeyframe(
+                Keyframe(
                     0.25f,
-                    rotate(15.0f, 0.0f, 0.0f),
-                    PartAnimation.Interpolations.SPLINE
+                    degreeVec(15.0f, 0.0f, 0.0f),
+                    AnimationChannel.Interpolations.CATMULLROM
                 ),
-                AnimationKeyframe(
+                Keyframe(
                     0.5f,
-                    rotate(15.0f, 0.0f, 0.0f),
-                    PartAnimation.Interpolations.SPLINE
+                    degreeVec(15.0f, 0.0f, 0.0f),
+                    AnimationChannel.Interpolations.CATMULLROM
                 ),
-                AnimationKeyframe(
+                Keyframe(
                     0.75f,
-                    rotate(0.0f, 0.0f, 0.0f),
-                    PartAnimation.Interpolations.SPLINE
+                    degreeVec(0.0f, 0.0f, 0.0f),
+                    AnimationChannel.Interpolations.CATMULLROM
                 )
             )
         )
-        .addPartAnimation(
-            "body", PartAnimation(
-                PartAnimation.AnimationTargets.TRANSLATE,
-                AnimationKeyframe(
+        .addAnimation(
+            "body", AnimationChannel(
+                AnimationChannel.Targets.POSITION,
+                Keyframe(
                     0.0f,
-                    translate(0.0f, -2.0f, 0.0f),
-                    PartAnimation.Interpolations.SPLINE
+                    posVec(0.0f, -2.0f, 0.0f),
+                    AnimationChannel.Interpolations.CATMULLROM
                 ),
-                AnimationKeyframe(0.75f, translate(0.0f, 0.0f, 0.0f), PartAnimation.Interpolations.SPLINE)
+                Keyframe(0.75f, posVec(0.0f, 0.0f, 0.0f), AnimationChannel.Interpolations.CATMULLROM)
             )
         )
         .build()

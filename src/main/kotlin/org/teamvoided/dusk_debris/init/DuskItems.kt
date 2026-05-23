@@ -1,27 +1,26 @@
 package org.teamvoided.dusk_debris.init
 
-import net.minecraft.block.Block
-import net.minecraft.block.dispenser.DispenserBlock
-import net.minecraft.block.dispenser.ItemDispenserBehavior
-import net.minecraft.component.DataComponentTypes
-import net.minecraft.component.type.AttributeModifiersComponent
-import net.minecraft.component.type.DyedColorComponent
-import net.minecraft.component.type.NbtComponent
-import net.minecraft.entity.Entity
-import net.minecraft.entity.EquipmentSlot
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.item.*
-import net.minecraft.registry.Registries
-import net.minecraft.registry.Registry
-import net.minecraft.sound.SoundCategory
-import net.minecraft.sound.SoundEvents
-import net.minecraft.util.Hand
-import net.minecraft.util.Rarity
-import net.minecraft.util.TypedActionResult
-import net.minecraft.util.math.BlockPointer
-import net.minecraft.world.World
-import net.minecraft.world.event.GameEvent
+import net.minecraft.core.Registry
+import net.minecraft.core.component.DataComponents
+import net.minecraft.core.dispenser.BlockSource
+import net.minecraft.core.dispenser.DefaultDispenseItemBehavior
+import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.sounds.SoundEvents
+import net.minecraft.sounds.SoundSource
+import net.minecraft.world.InteractionHand
+import net.minecraft.world.InteractionResultHolder
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.EquipmentSlot
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.item.*
+import net.minecraft.world.item.component.CustomData
+import net.minecraft.world.item.component.DyedItemColor
+import net.minecraft.world.item.component.ItemAttributeModifiers
+import net.minecraft.world.level.Level
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.DispenserBlock
+import net.minecraft.world.level.gameevent.GameEvent
 import org.teamvoided.dusk_debris.DuskDebris.id
 import org.teamvoided.dusk_debris.block.DuskBlockLists
 import org.teamvoided.dusk_debris.block.sot.GunpowderBarrelBlock
@@ -45,42 +44,42 @@ object DuskItems {
 
     val TINY_JELLYFISH = register(
         "tiny_jellyfish", EntityItem(
-            DuskEntities.TINY_ENEMY_JELLYFISH, SoundEvents.ITEM_BUCKET_EMPTY_TADPOLE,
-            Item.Settings().maxCount(1).component(DataComponentTypes.BUCKET_ENTITY_DATA, NbtComponent.DEFAULT)
+            DuskEntities.TINY_ENEMY_JELLYFISH, SoundEvents.BUCKET_EMPTY_TADPOLE,
+            Item.Properties().stacksTo(1).component(DataComponents.BUCKET_ENTITY_DATA, CustomData.EMPTY)
         )
     )
-    val DEBUG_SPELL_ITEM = register("debug_spell_item", DebugSpellItem(Item.Settings().maxCount(1).rarity(Rarity.EPIC)))
+    val DEBUG_SPELL_ITEM = register("debug_spell_item", DebugSpellItem(Item.Properties().stacksTo(1).rarity(Rarity.EPIC)))
 
     val MACE_BLAZE = register(
         "mace_blaze",
         MaceBlazeItem(
-            Item.Settings().rarity(net.minecraft.util.Rarity.EPIC).maxDamage(500)
-                .component(DataComponentTypes.TOOL, MaceBlazeItem.createToolComponent())
-                .attributeModifiersComponent(MaceBlazeItem.createAttributes())
+            Item.Properties().rarity(net.minecraft.world.item.Rarity.EPIC).durability(500)
+                .component(DataComponents.TOOL, MaceBlazeItem.createToolComponent())
+                .attributes(MaceBlazeItem.createAttributes())
         )
     )
 
 
-    val TWISTING_SOUL_CHARGE = register("twisting_soul_charge", ThrowableItem(Item.Settings()))
+    val TWISTING_SOUL_CHARGE = register("twisting_soul_charge", ThrowableItem(Item.Properties()))
 
     val BLUNDERBOMB_ITEM =
-        register("blunderbomb", BlunderbombItem(DuskBlocks.BLUNDERBOMB_BLOCK, Item.Settings().maxCount(16)))
-    val FIREBOMB_ITEM = register("firebomb", FirebombItem(DuskBlocks.FIREBOMB_BLOCK, Item.Settings().maxCount(16)))
+        register("blunderbomb", BlunderbombItem(DuskBlocks.BLUNDERBOMB_BLOCK, Item.Properties().stacksTo(16)))
+    val FIREBOMB_ITEM = register("firebomb", FirebombItem(DuskBlocks.FIREBOMB_BLOCK, Item.Properties().stacksTo(16)))
     val BONECALLER_ITEM =
-        register("bonecaller", BonecallerItem(DuskBlocks.BONECALLER_BLOCK, Item.Settings().maxCount(16)))
+        register("bonecaller", BonecallerItem(DuskBlocks.BONECALLER_BLOCK, Item.Properties().stacksTo(16)))
     val BONECHILLER_ITEM =
-        register("bonechiller", BonechillerItem(DuskBlocks.BONECHILLER_BLOCK, Item.Settings().maxCount(16)))
+        register("bonechiller", BonechillerItem(DuskBlocks.BONECHILLER_BLOCK, Item.Properties().stacksTo(16)))
     val BOGCALLER_ITEM =
-        register("bogcaller", BoneboggerItem(DuskBlocks.BOGCALLER_BLOCK, Item.Settings().maxCount(16)))
+        register("bogcaller", BoneboggerItem(DuskBlocks.BOGCALLER_BLOCK, Item.Properties().stacksTo(16)))
     val BONEWITHER_ITEM =
-        register("bonewither", BonewitherItem(DuskBlocks.BONEWITHER_BLOCK, Item.Settings().maxCount(16)))
+        register("bonewither", BonewitherItem(DuskBlocks.BONEWITHER_BLOCK, Item.Properties().stacksTo(16)))
     val SHADECALLER_ITEM =
-        register("shadecaller", ShadecallerItem(DuskBlocks.SHADECALLER_BLOCK, Item.Settings().maxCount(16)))
+        register("shadecaller", ShadecallerItem(DuskBlocks.SHADECALLER_BLOCK, Item.Properties().stacksTo(16)))
     val BONECALLER_BANDANA =
         register(
             "bonecaller_bandana",
             BonecallerBandanaItem(
-                Item.Settings().maxCount(1).component(DataComponentTypes.DYED_COLOR, DyedColorComponent(0x7F7F7F, true))
+                Item.Properties().stacksTo(1).component(DataComponents.DYED_COLOR, DyedItemColor(0x7F7F7F, true))
             )
         )
 
@@ -89,85 +88,85 @@ object DuskItems {
             "smokebomb",
             SmokebombItem(
                 DuskBlocks.SMOKEBOMB_BLOCK,
-                Item.Settings().maxCount(1).component(DataComponentTypes.DYED_COLOR, DyedColorComponent(0x7F7F7F, true))
+                Item.Properties().stacksTo(1).component(DataComponents.DYED_COLOR, DyedItemColor(0x7F7F7F, true))
             )
         )
-    val BLINDBOMB_ITEM = register("blindbomb", BlindbombItem(DuskBlocks.BLINDBOMB_BLOCK, Item.Settings().maxCount(1)))
+    val BLINDBOMB_ITEM = register("blindbomb", BlindbombItem(DuskBlocks.BLINDBOMB_BLOCK, Item.Properties().stacksTo(1)))
     val POCKETPOISON_ITEM =
-        register("pocketpoison", PocketpoisonItem(DuskBlocks.POCKETPOISON_BLOCK, Item.Settings().maxCount(1)))
+        register("pocketpoison", PocketpoisonItem(DuskBlocks.POCKETPOISON_BLOCK, Item.Properties().stacksTo(1)))
 
     val TREACHEROUS_GOLD_COINS = register(
-        "treacherous_gold_coins", BlockItem(DuskBlocks.TREACHEROUS_GOLD_COIN_STACK, Item.Settings())
+        "treacherous_gold_coins", BlockItem(DuskBlocks.TREACHEROUS_GOLD_COIN_STACK, Item.Properties())
     )
     val TREACHEROUS_ASSORTED_GOLD_COINS = register(
-        "treacherous_assorted_gold_coins", BlockItem(DuskBlocks.TREACHEROUS_GOLD_COIN_PILE, Item.Settings())
+        "treacherous_assorted_gold_coins", BlockItem(DuskBlocks.TREACHEROUS_GOLD_COIN_PILE, Item.Properties())
     )
     val TARNISHED_GOLD_COINS = register(
-        "tarnished_gold_coins", BlockItem(DuskBlocks.TARNISHED_GOLD_COIN_STACK, Item.Settings())
+        "tarnished_gold_coins", BlockItem(DuskBlocks.TARNISHED_GOLD_COIN_STACK, Item.Properties())
     )
     val TARNISHED_ASSORTED_GOLD_COINS = register(
-        "tarnished_assorted_gold_coins", BlockItem(DuskBlocks.TARNISHED_GOLD_COIN_PILE, Item.Settings())
+        "tarnished_assorted_gold_coins", BlockItem(DuskBlocks.TARNISHED_GOLD_COIN_PILE, Item.Properties())
     )
     val LOST_SILVER_COINS = register(
-        "lost_silver_coins", BlockItem(DuskBlocks.LOST_SILVER_COIN_STACK, Item.Settings())
+        "lost_silver_coins", BlockItem(DuskBlocks.LOST_SILVER_COIN_STACK, Item.Properties())
     )
     val LOST_ASSORTED_SILVER_COINS = register(
-        "lost_assorted_silver_coins", BlockItem(DuskBlocks.LOST_SILVER_COIN_PILE, Item.Settings())
+        "lost_assorted_silver_coins", BlockItem(DuskBlocks.LOST_SILVER_COIN_PILE, Item.Properties())
     )
     val SUNKEN_BRONZE_COINS = register(
-        "sunken_bronze_coins", BlockItem(DuskBlocks.SUNKEN_BRONZE_COIN_STACK, Item.Settings())
+        "sunken_bronze_coins", BlockItem(DuskBlocks.SUNKEN_BRONZE_COIN_STACK, Item.Properties())
     )
     val SUNKEN_ASSORTED_BRONZE_COINS = register(
-        "sunken_assorted_bronze_coins", BlockItem(DuskBlocks.SUNKEN_BRONZE_COIN_PILE, Item.Settings())
+        "sunken_assorted_bronze_coins", BlockItem(DuskBlocks.SUNKEN_BRONZE_COIN_PILE, Item.Properties())
     )
 
     val BOG_MUD_BUCKET = register(
         "bog_mud_bucket",
-        PowderSnowBucketItem(DuskBlocks.BOG_MUD, SoundEvents.ITEM_BUCKET_EMPTY, Item.Settings())
+        SolidBucketItem(DuskBlocks.BOG_MUD, SoundEvents.BUCKET_EMPTY, Item.Properties())
     )
 
     val CYPRESS_SIGN = register(
         "cypress_sign",
-        SignItem((Item.Settings()).maxCount(16), DuskBlocks.CYPRESS_SIGN, DuskBlocks.CYPRESS_WALL_SIGN)
+        SignItem((Item.Properties()).stacksTo(16), DuskBlocks.CYPRESS_SIGN, DuskBlocks.CYPRESS_WALL_SIGN)
     )
     val CYPRESS_HANGING_SIGN = register(
         "cypress_hanging_sign",
         HangingSignItem(
             DuskBlocks.CYPRESS_HANGING_SIGN,
             DuskBlocks.CYPRESS_WALL_HANGING_SIGN,
-            Item.Settings().maxCount(16)
+            Item.Properties().stacksTo(16)
         )
     )
 
     val SEQUOIA_SIGN = register(
         "sequoia_sign",
-        SignItem((Item.Settings()).maxCount(16), DuskBlocks.SEQUOIA_SIGN, DuskBlocks.SEQUOIA_WALL_SIGN)
+        SignItem((Item.Properties()).stacksTo(16), DuskBlocks.SEQUOIA_SIGN, DuskBlocks.SEQUOIA_WALL_SIGN)
     )
     val SEQUOIA_HANGING_SIGN = register(
         "sequoia_hanging_sign",
         HangingSignItem(
             DuskBlocks.SEQUOIA_HANGING_SIGN,
             DuskBlocks.SEQUOIA_WALL_HANGING_SIGN,
-            Item.Settings().maxCount(16)
+            Item.Properties().stacksTo(16)
         )
     )
 
     val CHARRED_SIGN = register(
         "charred_sign",
-        SignItem((Item.Settings()).maxCount(16), DuskBlocks.CHARRED_SIGN, DuskBlocks.CHARRED_WALL_SIGN)
+        SignItem((Item.Properties()).stacksTo(16), DuskBlocks.CHARRED_SIGN, DuskBlocks.CHARRED_WALL_SIGN)
     )
     val CHARRED_HANGING_SIGN = register(
         "charred_hanging_sign",
         HangingSignItem(
             DuskBlocks.CHARRED_HANGING_SIGN,
             DuskBlocks.CHARRED_WALL_HANGING_SIGN,
-            Item.Settings().maxCount(16)
+            Item.Properties().stacksTo(16)
         )
     )
 
     // DnD Items
     val GALLERY_MAPLE_DOOR =
-        register("gallery_maple_door", TallBlockItem(DuskBlocks.GALLERY_MAPLE_DOOR, Item.Settings()))
+        register("gallery_maple_door", DoubleHighBlockItem(DuskBlocks.GALLERY_MAPLE_DOOR, Item.Properties()))
 
     val GALLERY_MAPLE_SIGN = register(
         "gallery_maple_sign",
@@ -178,10 +177,10 @@ object DuskItems {
             DuskBlocks.GALLERY_MAPLE_HANGING_SIGN, DuskBlocks.GALLERY_MAPLE_WALL_HANGING_SIGN, CountSettings(16)
         )
     )
-    val BONEWOOD_DOOR = register("bonewood_door", TallBlockItem(DuskBlocks.BONEWOOD_DOOR, Item.Settings()))
+    val BONEWOOD_DOOR = register("bonewood_door", DoubleHighBlockItem(DuskBlocks.BONEWOOD_DOOR, Item.Properties()))
 
     val WITHERING_BONEWOOD_DOOR =
-        register("withering_bonewood_door", TallBlockItem(DuskBlocks.WITHERING_BONEWOOD_DOOR, Item.Settings()))
+        register("withering_bonewood_door", DoubleHighBlockItem(DuskBlocks.WITHERING_BONEWOOD_DOOR, Item.Properties()))
 
 
     val WITCH_HAT = register("witch_hat", EquipableItem(CountSettings(1)))
@@ -190,35 +189,35 @@ object DuskItems {
     val VILE_WITCH_HAT = register("vile_witch_hat", EquipableItem(CountSettings(1)))
     val DIE_ITEM = register(
         "die", DiceItem(
-            CountSettings(16).component(DataComponentTypes.DYED_COLOR, DyedColorComponent(0xFFFFFF, true))
+            CountSettings(16).component(DataComponents.DYED_COLOR, DyedItemColor(0xFFFFFF, true))
         )
     )
 
-    val WATER_FERN = register("water_fern", WaterPlaceableBlockItem(DuskBlocks.WATER_FERN, Item.Settings()))
+    val WATER_FERN = register("water_fern", PlaceOnWaterBlockItem(DuskBlocks.WATER_FERN, Item.Properties()))
 
 
-    val FREEZE_ROD = register("freeze_rod", Item(Item.Settings()))
-    val CHILL_CHARGE = register("chill_charge", ChillChargeItem(Item.Settings()))
+    val FREEZE_ROD = register("freeze_rod", Item(Item.Properties()))
+    val CHILL_CHARGE = register("chill_charge", ChillChargeItem(Item.Properties()))
 
     val WEB_WEAVER =
-        register("web_weaver", BowItem(Item.Settings().maxDamage(404)))
+        register("web_weaver", BowItem(Item.Properties().durability(404)))
     val HARVESTER_SCYTHE = register(
         "harvester_scythe", HarvesterScytheItem(AttributeSettings(HarvesterScytheItem.makeAttributes()))
     )
     val BROOM = register("broom", BroomItem(CountSettings(1)))
 
     fun init() {
-        DuskBlockLists.THROWABLE_BOMB_BLOCK_LIST.forEach { DispenserBlock.registerBehavior(it.asItem()) }
+        DuskBlockLists.THROWABLE_BOMB_BLOCK_LIST.forEach { DispenserBlock.registerProjectileBehavior(it.asItem()) }
         DuskBlockLists.GUNPOWDER_BARREL_BLOCK_LIST.forEach { registerGunpowderDispensedBehavior(it) }
 
-        DispenserBlock.registerBehavior(CHILL_CHARGE)
+        DispenserBlock.registerProjectileBehavior(CHILL_CHARGE)
     }
 
     fun registerGunpowderDispensedBehavior(block: Block) =
-        DispenserBlock.registerBehavior(block, object : ItemDispenserBehavior() {
-            override fun dispenseSilently(pointer: BlockPointer, stack: ItemStack): ItemStack {
-                val world: World = pointer.world()
-                val blockPos = pointer.pos().offset(pointer.state().get(DispenserBlock.FACING))
+        DispenserBlock.registerBehavior(block, object : DefaultDispenseItemBehavior() {
+            override fun execute(pointer: BlockSource, stack: ItemStack): ItemStack {
+                val world: Level = pointer.level()
+                val blockPos = pointer.pos().relative(pointer.state().getValue(DispenserBlock.FACING))
                 val explosiveEntity = GunpowderBarrelEntity(
                     world,
                     blockPos.x.toDouble() + 0.5,
@@ -229,47 +228,48 @@ object DuskItems {
                 explosiveEntity.setProperties(
                     (block as GunpowderBarrelBlock).power,
                     (block).range,
-                    block.defaultState,
+                    block.defaultBlockState(),
 //                world.getBlockState(blockPos) LMAO
                     block.color
                 )
-                world.spawnEntity(explosiveEntity)
+                world.addFreshEntity(explosiveEntity)
                 world.playSound(
-                    null as PlayerEntity?,
+                    null as Player?,
                     explosiveEntity.x,
                     explosiveEntity.y,
                     explosiveEntity.z,
-                    SoundEvents.ENTITY_TNT_PRIMED,
-                    SoundCategory.BLOCKS,
+                    SoundEvents.TNT_PRIMED,
+                    SoundSource.BLOCKS,
                     1.0f,
                     1.0f
                 )
-                world.emitGameEvent(null as Entity?, GameEvent.ENTITY_PLACE, blockPos)
-                stack.decrement(1)
+                world.gameEvent(null as Entity?, GameEvent.ENTITY_PLACE, blockPos)
+                stack.shrink(1)
                 return stack
             }
         })
 
     fun register(id: String, item: Item): Item {
-        val regItem = Registry.register(Registries.ITEM, id(id), item)
+        val regItem = Registry.register(BuiltInRegistries.ITEM, id(id), item)
         ITEMS.add(regItem)
         return regItem
     }
 
-    fun BlockItem(block: Block) = BlockItem(block, Item.Settings())
+    fun BlockItem(block: Block) = BlockItem(block, Item.Properties())
 
 
     // TODO replace with voidlib
-    class EquipableItem(settings: Settings, val slot: EquipmentSlot = EquipmentSlot.HEAD) : Item(settings), Equippable {
-        override fun getPreferredSlot(): EquipmentSlot = slot
-        override fun use(world: World, user: PlayerEntity, hand: Hand): TypedActionResult<ItemStack> =
-            this.use(this, world, user, hand)
+    class EquipableItem(settings: Properties, val slot: EquipmentSlot = EquipmentSlot.HEAD) : Item(settings),
+        Equipable {
+        override fun getEquipmentSlot(): EquipmentSlot = slot
+        override fun use(world: Level, user: Player, hand: InteractionHand): InteractionResultHolder<ItemStack> =
+            this.swapWithEquipmentSlot(this, world, user, hand)
     }
 
     @Suppress("FunctionName")
-    fun AttributeSettings(comp: AttributeModifiersComponent): Item.Settings =
-        Item.Settings().attributeModifiersComponent(comp)
+    fun AttributeSettings(comp: ItemAttributeModifiers): Item.Properties =
+        Item.Properties().attributes(comp)
 
     @Suppress("FunctionName")
-    fun CountSettings(count: Int): Item.Settings = Item.Settings().maxCount(count)
+    fun CountSettings(count: Int): Item.Properties = Item.Properties().stacksTo(count)
 }

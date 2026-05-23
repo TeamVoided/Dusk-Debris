@@ -1,40 +1,40 @@
 package org.teamvoided.dusk_debris.block
 
 import com.mojang.serialization.MapCodec
-import net.minecraft.block.*
-import net.minecraft.block.entity.BlockEntity
-import net.minecraft.block.entity.BlockEntityTicker
-import net.minecraft.block.entity.BlockEntityType
-import net.minecraft.block.enums.ChestType
-import net.minecraft.entity.ai.pathing.NavigationType
-import net.minecraft.entity.mob.PiglinBrain
-import net.minecraft.entity.passive.CatEntity
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.entity.player.PlayerInventory
-import net.minecraft.fluid.FluidState
-import net.minecraft.fluid.Fluids
-import net.minecraft.inventory.DoubleInventory
-import net.minecraft.inventory.Inventory
-import net.minecraft.item.ItemPlacementContext
-import net.minecraft.screen.GenericContainerScreenHandler
-import net.minecraft.screen.NamedScreenHandlerFactory
-import net.minecraft.screen.ScreenHandler
-import net.minecraft.server.world.ServerWorld
-import net.minecraft.stat.Stat
-import net.minecraft.stat.Stats
-import net.minecraft.state.StateManager
-import net.minecraft.state.property.Properties
-import net.minecraft.text.Text
-import net.minecraft.util.*
-import net.minecraft.util.hit.BlockHitResult
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Box
-import net.minecraft.util.math.Direction
-import net.minecraft.util.random.RandomGenerator
-import net.minecraft.util.shape.VoxelShape
-import net.minecraft.world.BlockView
-import net.minecraft.world.World
-import net.minecraft.world.WorldAccess
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
+import net.minecraft.network.chat.Component
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.server.level.ServerLevel
+import net.minecraft.stats.Stat
+import net.minecraft.stats.Stats
+import net.minecraft.util.RandomSource
+import net.minecraft.world.*
+import net.minecraft.world.entity.animal.Cat
+import net.minecraft.world.entity.monster.piglin.PiglinAi
+import net.minecraft.world.entity.player.Inventory
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.inventory.AbstractContainerMenu
+import net.minecraft.world.inventory.ChestMenu
+import net.minecraft.world.item.context.BlockPlaceContext
+import net.minecraft.world.level.BlockGetter
+import net.minecraft.world.level.Level
+import net.minecraft.world.level.LevelAccessor
+import net.minecraft.world.level.block.*
+import net.minecraft.world.level.block.entity.BlockEntity
+import net.minecraft.world.level.block.entity.BlockEntityTicker
+import net.minecraft.world.level.block.entity.BlockEntityType
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.block.state.StateDefinition
+import net.minecraft.world.level.block.state.properties.BlockStateProperties
+import net.minecraft.world.level.block.state.properties.ChestType
+import net.minecraft.world.level.material.FluidState
+import net.minecraft.world.level.material.Fluids
+import net.minecraft.world.level.pathfinder.PathComputationType
+import net.minecraft.world.phys.AABB
+import net.minecraft.world.phys.BlockHitResult
+import net.minecraft.world.phys.shapes.CollisionContext
+import net.minecraft.world.phys.shapes.VoxelShape
 import org.teamvoided.dusk_debris.block.entity.DuskChestBlockEntity
 import org.teamvoided.dusk_debris.block.not_blocks.ChestPhase
 import org.teamvoided.dusk_debris.block.not_blocks.DuskProperties
@@ -45,57 +45,58 @@ import java.util.*
 import java.util.function.BiPredicate
 import java.util.function.Supplier
 
-class DuskDoubleChestBlock(settings: Settings, supplier: Supplier<BlockEntityType<out DuskChestBlockEntity>>) :
-    AbstractDuskChestBlock<DuskChestBlockEntity>(settings, supplier), Waterloggable {
+class DuskDoubleChestBlock(settings: Properties, supplier: Supplier<BlockEntityType<out DuskChestBlockEntity>>) :
+    AbstractDuskChestBlock<DuskChestBlockEntity>(settings, supplier), SimpleWaterloggedBlock {
     init {
-        this.defaultState =
-            stateManager.defaultState
-                .with(Properties.HORIZONTAL_FACING, Direction.NORTH)
-                .with(Properties.CHEST_TYPE, ChestType.SINGLE)
-                .with(DuskProperties.CHEST_PHASE, ChestPhase.CLOSED)
-                .with(Properties.WATERLOGGED, false)
-                .with(DuskProperties.LID, false)
+        this.registerDefaultState(
+            stateDefinition.any()
+                .setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.NORTH)
+                .setValue(BlockStateProperties.CHEST_TYPE, ChestType.SINGLE)
+                .setValue(DuskProperties.CHEST_PHASE, ChestPhase.CLOSED)
+                .setValue(BlockStateProperties.WATERLOGGED, false)
+                .setValue(DuskProperties.LID, false)
+        )
     }
 
-    public override fun getCodec(): MapCodec<out DuskDoubleChestBlock> = CODEC
+    public override fun codec(): MapCodec<out DuskDoubleChestBlock> = CODEC
 
-    override fun getRenderType(state: BlockState): BlockRenderType = BlockRenderType.MODEL
+    override fun getRenderShape(state: BlockState): RenderShape = RenderShape.MODEL
 
-    override fun getStateForNeighborUpdate(
+    override fun updateShape(
         state: BlockState,
         direction: Direction,
         neighborState: BlockState,
-        world: WorldAccess,
+        world: LevelAccessor,
         pos: BlockPos,
         neighborPos: BlockPos
     ): BlockState {
-        if (state.get(Properties.WATERLOGGED)) {
-            world.scheduleFluidTick(pos, Fluids.WATER, Fluids.WATER.getTickRate(world))
+        if (state.getValue(BlockStateProperties.WATERLOGGED)) {
+            world.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(world))
         }
 
-        if (neighborState.isOf(this) && direction.axis.isHorizontal) {
-            val chestType = neighborState.get(Properties.CHEST_TYPE)
-            if (state.get(Properties.CHEST_TYPE) == ChestType.SINGLE &&
+        if (neighborState.`is`(this) && direction.axis.isHorizontal) {
+            val chestType = neighborState.getValue(BlockStateProperties.CHEST_TYPE)
+            if (state.getValue(BlockStateProperties.CHEST_TYPE) == ChestType.SINGLE &&
                 chestType != ChestType.SINGLE &&
-                state.get(Properties.HORIZONTAL_FACING) == neighborState.get(Properties.HORIZONTAL_FACING) &&
+                state.getValue(BlockStateProperties.HORIZONTAL_FACING) == neighborState.getValue(BlockStateProperties.HORIZONTAL_FACING) &&
                 getFacing(neighborState) == direction.opposite
             ) {
-                return state.with(Properties.CHEST_TYPE, chestType.opposite)
+                return state.setValue(BlockStateProperties.CHEST_TYPE, chestType.opposite)
             }
         } else if (getFacing(state) == direction) {
-            return state.with(Properties.CHEST_TYPE, ChestType.SINGLE)
+            return state.setValue(BlockStateProperties.CHEST_TYPE, ChestType.SINGLE)
         }
 
-        return super.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos)
+        return super.updateShape(state, direction, neighborState, world, pos, neighborPos)
     }
 
-    override fun getOutlineShape(
+    override fun getShape(
         state: BlockState,
-        world: BlockView,
+        world: BlockGetter,
         pos: BlockPos,
-        context: ShapeContext
+        context: CollisionContext
     ): VoxelShape {
-        return if (state.get(Properties.CHEST_TYPE) == ChestType.SINGLE) {
+        return if (state.getValue(BlockStateProperties.CHEST_TYPE) == ChestType.SINGLE) {
             SINGLE_SHAPE
         } else {
             when (getFacing(state)) {
@@ -108,97 +109,97 @@ class DuskDoubleChestBlock(settings: Settings, supplier: Supplier<BlockEntityTyp
         }
     }
 
-    override fun getPlacementState(ctx: ItemPlacementContext): BlockState? {
+    override fun getStateForPlacement(ctx: BlockPlaceContext): BlockState? {
         var chestType = ChestType.SINGLE
-        var direction = ctx.playerFacing.opposite
-        val bl = ctx.shouldCancelInteraction()
-        val placeSide = ctx.side
+        var direction = ctx.horizontalDirection.opposite
+        val bl = ctx.isSecondaryUseActive
+        val placeSide = ctx.clickedFace
         if (placeSide.axis.isHorizontal && bl) {
             val neighborChestDir = this.getNeighborChestDirection(ctx, placeSide.opposite)
             if (neighborChestDir != null && neighborChestDir.axis != placeSide.axis) {
                 direction = neighborChestDir
                 chestType =
-                    if (neighborChestDir.rotateYCounterclockwise() == placeSide.opposite) ChestType.LEFT
+                    if (neighborChestDir.counterClockWise == placeSide.opposite) ChestType.LEFT
                     else ChestType.RIGHT
             }
         }
 
         if (chestType == ChestType.SINGLE && !bl) {
-            if (direction == this.getNeighborChestDirection(ctx, direction.rotateYClockwise())) {
+            if (direction == this.getNeighborChestDirection(ctx, direction.clockWise)) {
                 chestType = ChestType.RIGHT
-            } else if (direction == this.getNeighborChestDirection(ctx, direction.rotateYCounterclockwise())) {
+            } else if (direction == this.getNeighborChestDirection(ctx, direction.counterClockWise)) {
                 chestType = ChestType.LEFT
             }
         }
 
-        val fluidState = ctx.world.getFluidState(ctx.blockPos)
-        return defaultState
-            .with(Properties.HORIZONTAL_FACING, direction)
-            .with(Properties.CHEST_TYPE, chestType)
-            .with(Properties.WATERLOGGED, fluidState.fluid == Fluids.WATER)
+        val fluidState = ctx.level.getFluidState(ctx.clickedPos)
+        return defaultBlockState()
+            .setValue(BlockStateProperties.HORIZONTAL_FACING, direction)
+            .setValue(BlockStateProperties.CHEST_TYPE, chestType)
+            .setValue(BlockStateProperties.WATERLOGGED, fluidState.type == Fluids.WATER)
     }
 
     override fun getFluidState(state: BlockState): FluidState {
-        return if (state.get(Properties.WATERLOGGED)) Fluids.WATER.getStill(false) else super.getFluidState(state)
+        return if (state.getValue(BlockStateProperties.WATERLOGGED)) Fluids.WATER.getSource(false) else super.getFluidState(state)
     }
 
-    private fun getNeighborChestDirection(ctx: ItemPlacementContext, dir: Direction): Direction? {
-        val blockState = ctx.world.getBlockState(ctx.blockPos.offset(dir))
-        return if (blockState.isOf(this) && blockState.get(Properties.CHEST_TYPE) == ChestType.SINGLE)
-            blockState.get(Properties.HORIZONTAL_FACING)
+    private fun getNeighborChestDirection(ctx: BlockPlaceContext, dir: Direction): Direction? {
+        val blockState = ctx.level.getBlockState(ctx.clickedPos.relative(dir))
+        return if (blockState.`is`(this) && blockState.getValue(BlockStateProperties.CHEST_TYPE) == ChestType.SINGLE)
+            blockState.getValue(BlockStateProperties.HORIZONTAL_FACING)
         else null
     }
 
-    override fun onStateReplaced(state: BlockState, world: World, pos: BlockPos, newState: BlockState, moved: Boolean) {
-        ItemScatterer.scatterInventory(state, newState, world, pos)
-        super.onStateReplaced(state, world, pos, newState, moved)
+    override fun onRemove(state: BlockState, world: Level, pos: BlockPos, newState: BlockState, moved: Boolean) {
+        Containers.dropContentsOnDestroy(state, newState, world, pos)
+        super.onRemove(state, world, pos, newState, moved)
     }
 
-    override fun onUse(
+    override fun useWithoutItem(
         state: BlockState,
-        world: World,
+        world: Level,
         pos: BlockPos,
-        entity: PlayerEntity,
+        entity: Player,
         hitResult: BlockHitResult
-    ): ActionResult {
-        if (world.isClient) {
-            return ActionResult.SUCCESS
+    ): InteractionResult {
+        if (world.isClientSide) {
+            return InteractionResult.SUCCESS
         } else {
-            val namedScreenHandlerFactory = this.createScreenHandlerFactory(state, world, pos)
+            val namedScreenHandlerFactory = this.getMenuProvider(state, world, pos)
             if (namedScreenHandlerFactory != null) {
-                entity.openHandledScreen(namedScreenHandlerFactory)
-                entity.incrementStat(this.openStat)
-                PiglinBrain.onGuardedBlockInteracted(entity, true)
+                entity.openMenu(namedScreenHandlerFactory)
+                entity.awardStat(this.openStat)
+                PiglinAi.angerNearbyPiglins(entity, true)
             }
 
-            return ActionResult.CONSUME
+            return InteractionResult.CONSUME
         }
     }
 
-    protected val openStat: Stat<Identifier>
-        get() = Stats.CUSTOM.getOrCreateStat(Stats.OPEN_CHEST)
+    protected val openStat: Stat<ResourceLocation>
+        get() = Stats.CUSTOM.get(Stats.OPEN_CHEST)
 
     val expectedEntityType: BlockEntityType<out DuskChestBlockEntity>
         get() = entityTypeRetriever.get()
 
     override fun getBlockEntitySource(
         state: BlockState,
-        world: World,
+        world: Level,
         pos: BlockPos,
         ignoreBlocked: Boolean
-    ): DoubleBlockProperties.PropertySource<out DuskChestBlockEntity> {
-        val biPredicate: BiPredicate<WorldAccess, BlockPos> =
+    ): DoubleBlockCombiner.NeighborCombineResult<out DuskChestBlockEntity> {
+        val biPredicate: BiPredicate<LevelAccessor, BlockPos> =
             if (ignoreBlocked) {
                 BiPredicate { _, _ -> false }
             } else {
                 BiPredicate(Companion::isChestBlocked)
             }
 
-        return DoubleBlockProperties.toPropertySource(
+        return DoubleBlockCombiner.combineWithNeigbour(
             this.entityTypeRetriever.get(),
             Companion::getDoubleBlockType,
             Companion::getFacing,
-            Properties.HORIZONTAL_FACING,
+            BlockStateProperties.HORIZONTAL_FACING,
             state,
             world,
             pos,
@@ -206,55 +207,55 @@ class DuskDoubleChestBlock(settings: Settings, supplier: Supplier<BlockEntityTyp
         )
     }
 
-    override fun createScreenHandlerFactory(
+    override fun getMenuProvider(
         state: BlockState,
-        world: World,
+        world: Level,
         pos: BlockPos
-    ): NamedScreenHandlerFactory? {
+    ): MenuProvider? {
         return getBlockEntitySource(state, world, pos, false)
             .apply(NAME_RETRIEVER)
             .orElse(null)
     }
 
-    override fun createBlockEntity(pos: BlockPos, state: BlockState): BlockEntity = DuskChestBlockEntity(pos, state)
+    override fun newBlockEntity(pos: BlockPos, state: BlockState): BlockEntity = DuskChestBlockEntity(pos, state)
 
     override fun <T : BlockEntity> getTicker(
-        world: World,
+        world: Level,
         state: BlockState,
         type: BlockEntityType<T>
     ): BlockEntityTicker<T>? {
-        return checkType(type, expectedEntityType, DuskChestBlockEntity::tick)
+        return createTickerHelper(type, expectedEntityType, DuskChestBlockEntity::tick)
     }
 
-    override fun hasComparatorOutput(state: BlockState): Boolean = true
+    override fun hasAnalogOutputSignal(state: BlockState): Boolean = true
 
-    override fun getComparatorOutput(state: BlockState, world: World, pos: BlockPos): Int {
-        return ScreenHandler.calculateComparatorOutput(getInventory(this, state, world, pos, false))
+    override fun getAnalogOutputSignal(state: BlockState, world: Level, pos: BlockPos): Int {
+        return AbstractContainerMenu.getRedstoneSignalFromContainer(getInventory(this, state, world, pos, false))
     }
 
-    override fun rotate(state: BlockState, rotation: BlockRotation): BlockState =
-        state.with(Properties.HORIZONTAL_FACING, rotation.rotate(state.get(Properties.HORIZONTAL_FACING)))
+    override fun rotate(state: BlockState, rotation: Rotation): BlockState =
+        state.setValue(BlockStateProperties.HORIZONTAL_FACING, rotation.rotate(state.getValue(BlockStateProperties.HORIZONTAL_FACING)))
 
 
-    override fun mirror(state: BlockState, mirror: BlockMirror): BlockState =
-        state.rotate(mirror.getRotation(state.get(Properties.HORIZONTAL_FACING)))
+    override fun mirror(state: BlockState, mirror: Mirror): BlockState =
+        state.rotate(mirror.getRotation(state.getValue(BlockStateProperties.HORIZONTAL_FACING)))
 
 
-    override fun appendProperties(builder: StateManager.Builder<Block, BlockState>) {
+    override fun createBlockStateDefinition(builder: StateDefinition.Builder<Block, BlockState>) {
         builder.add(
-            Properties.HORIZONTAL_FACING,
-            Properties.CHEST_TYPE,
+            BlockStateProperties.HORIZONTAL_FACING,
+            BlockStateProperties.CHEST_TYPE,
             DuskProperties.CHEST_PHASE,
-            Properties.WATERLOGGED,
+            BlockStateProperties.WATERLOGGED,
             DuskProperties.LID
         )
     }
 
-    override fun canPathfindThrough(state: BlockState, navigationType: NavigationType): Boolean {
+    override fun isPathfindable(state: BlockState, navigationType: PathComputationType): Boolean {
         return false
     }
 
-    override fun scheduledTick(state: BlockState, world: ServerWorld, pos: BlockPos, random: RandomGenerator) {
+    override fun tick(state: BlockState, world: ServerLevel, pos: BlockPos, random: RandomSource) {
         val blockEntity = world.getBlockEntity(pos)!!
         if (blockEntity is DuskChestBlockEntity) {
             blockEntity.onScheduledTick()
@@ -263,56 +264,56 @@ class DuskDoubleChestBlock(settings: Settings, supplier: Supplier<BlockEntityTyp
 
     companion object {
         val CODEC: MapCodec<DuskDoubleChestBlock> =
-            createCodec { settings: Settings -> DuskDoubleChestBlock(settings) { DuskBlockEntities.STONE_CHEST } }
+            simpleCodec { settings: Properties -> DuskDoubleChestBlock(settings) { DuskBlockEntities.STONE_CHEST } }
         val DOUBLE_SHAPE: VoxelShape =
-            createCuboidShape(1.0, 0.0, 0.0, 15.0, 14.0, 15.0)
+            box(1.0, 0.0, 0.0, 15.0, 14.0, 15.0)
         val SINGLE_SHAPE: VoxelShape =
-            createCuboidShape(1.0, 0.0, 1.0, 15.0, 14.0, 15.0)
+            box(1.0, 0.0, 1.0, 15.0, 14.0, 15.0)
 
-        private val INVENTORY_RETRIEVER: DoubleBlockProperties.PropertyRetriever<DuskChestBlockEntity, Optional<Inventory>> =
-            object : DoubleBlockProperties.PropertyRetriever<DuskChestBlockEntity, Optional<Inventory>> {
-                override fun getFromBoth(
+        private val INVENTORY_RETRIEVER: DoubleBlockCombiner.Combiner<DuskChestBlockEntity, Optional<Container>> =
+            object : DoubleBlockCombiner.Combiner<DuskChestBlockEntity, Optional<Container>> {
+                override fun acceptDouble(
                     chestBlockEntity: DuskChestBlockEntity,
                     chestBlockEntity2: DuskChestBlockEntity
-                ): Optional<Inventory> {
-                    return Optional.of(DoubleInventory(chestBlockEntity, chestBlockEntity2))
+                ): Optional<Container> {
+                    return Optional.of(CompoundContainer(chestBlockEntity, chestBlockEntity2))
                 }
 
-                override fun getFrom(chestBlockEntity: DuskChestBlockEntity): Optional<Inventory> {
+                override fun acceptSingle(chestBlockEntity: DuskChestBlockEntity): Optional<Container> {
                     return Optional.of(chestBlockEntity)
                 }
 
-                override fun getFallback(): Optional<Inventory> {
+                override fun acceptNone(): Optional<Container> {
                     return Optional.empty()
                 }
             }
 
-        private val NAME_RETRIEVER: DoubleBlockProperties.PropertyRetriever<DuskChestBlockEntity, Optional<NamedScreenHandlerFactory>> =
+        private val NAME_RETRIEVER: DoubleBlockCombiner.Combiner<DuskChestBlockEntity, Optional<MenuProvider>> =
             object :
-                DoubleBlockProperties.PropertyRetriever<DuskChestBlockEntity, Optional<NamedScreenHandlerFactory>> {
-                override fun getFromBoth(
+                DoubleBlockCombiner.Combiner<DuskChestBlockEntity, Optional<MenuProvider>> {
+                override fun acceptDouble(
                     chestBlockEntity: DuskChestBlockEntity,
                     chestBlockEntity2: DuskChestBlockEntity
-                ): Optional<NamedScreenHandlerFactory> {
-                    val inventory: Inventory = DoubleInventory(chestBlockEntity, chestBlockEntity2)
-                    return Optional.of<NamedScreenHandlerFactory>(object : NamedScreenHandlerFactory {
+                ): Optional<MenuProvider> {
+                    val inventory: Container = CompoundContainer(chestBlockEntity, chestBlockEntity2)
+                    return Optional.of<MenuProvider>(object : MenuProvider {
                         override fun createMenu(
                             i: Int,
-                            playerInventory: PlayerInventory,
-                            playerEntity: PlayerEntity
-                        ): ScreenHandler? {
-                            if (chestBlockEntity.checkUnlocked(playerEntity) &&
-                                chestBlockEntity2.checkUnlocked(playerEntity)
+                            playerInventory: Inventory,
+                            playerEntity: Player
+                        ): AbstractContainerMenu? {
+                            if (chestBlockEntity.canOpen(playerEntity) &&
+                                chestBlockEntity2.canOpen(playerEntity)
                             ) {
-                                chestBlockEntity.setupLoot(playerInventory.player)
-                                chestBlockEntity2.setupLoot(playerInventory.player)
-                                return GenericContainerScreenHandler.createGeneric9x6(i, playerInventory, inventory)
+                                chestBlockEntity.unpackLootTable(playerInventory.player)
+                                chestBlockEntity2.unpackLootTable(playerInventory.player)
+                                return ChestMenu.sixRows(i, playerInventory, inventory)
                             } else {
                                 return null
                             }
                         }
 
-                        override fun getDisplayName(): Text {
+                        override fun getDisplayName(): Component {
                             return if (chestBlockEntity.hasCustomName())
                                 chestBlockEntity.displayName
                             else if (chestBlockEntity2.hasCustomName())
@@ -322,56 +323,56 @@ class DuskDoubleChestBlock(settings: Settings, supplier: Supplier<BlockEntityTyp
                     })
                 }
 
-                override fun getFrom(chestBlockEntity: DuskChestBlockEntity): Optional<NamedScreenHandlerFactory> {
+                override fun acceptSingle(chestBlockEntity: DuskChestBlockEntity): Optional<MenuProvider> {
                     return Optional.of(chestBlockEntity)
                 }
 
-                override fun getFallback(): Optional<NamedScreenHandlerFactory> {
+                override fun acceptNone(): Optional<MenuProvider> {
                     return Optional.empty()
                 }
             }
 
-        fun getDoubleBlockType(state: BlockState): DoubleBlockProperties.Type {
-            val chestType = state.get(Properties.CHEST_TYPE)
+        fun getDoubleBlockType(state: BlockState): DoubleBlockCombiner.BlockType {
+            val chestType = state.getValue(BlockStateProperties.CHEST_TYPE)
             return if (chestType == ChestType.SINGLE) {
-                DoubleBlockProperties.Type.SINGLE
+                DoubleBlockCombiner.BlockType.SINGLE
             } else {
-                if (chestType == ChestType.LEFT) DoubleBlockProperties.Type.FIRST
-                else DoubleBlockProperties.Type.SECOND
+                if (chestType == ChestType.LEFT) DoubleBlockCombiner.BlockType.FIRST
+                else DoubleBlockCombiner.BlockType.SECOND
             }
         }
 
         fun getFacing(state: BlockState): Direction {
-            val direction = state.get(Properties.HORIZONTAL_FACING)
-            return if (state.get(Properties.CHEST_TYPE) == ChestType.RIGHT) direction.rotateYClockwise()
-            else direction.rotateYCounterclockwise()
+            val direction = state.getValue(BlockStateProperties.HORIZONTAL_FACING)
+            return if (state.getValue(BlockStateProperties.CHEST_TYPE) == ChestType.RIGHT) direction.clockWise
+            else direction.counterClockWise
         }
 
         fun getInventory(
             block: DuskDoubleChestBlock,
             state: BlockState,
-            world: World,
+            world: Level,
             pos: BlockPos,
             ignoreBlocked: Boolean
-        ): Inventory? {
+        ): Container? {
             return block.getBlockEntitySource(state, world, pos, ignoreBlocked)
                 .apply(INVENTORY_RETRIEVER)
                 .orElse(null)
         }
 
-        fun isChestBlocked(world: WorldAccess, pos: BlockPos): Boolean {
+        fun isChestBlocked(world: LevelAccessor, pos: BlockPos): Boolean {
             return hasBlockOnTop(world, pos) || hasOcelotOnTop(world, pos)
         }
 
-        private fun hasBlockOnTop(world: BlockView, pos: BlockPos): Boolean {
-            val blockPos = pos.up()
-            return world.getBlockState(blockPos).isSolidBlock(world, blockPos)
+        private fun hasBlockOnTop(world: BlockGetter, pos: BlockPos): Boolean {
+            val blockPos = pos.above()
+            return world.getBlockState(blockPos).isRedstoneConductor(world, blockPos)
         }
 
-        private fun hasOcelotOnTop(world: WorldAccess, pos: BlockPos): Boolean {
-            val list = world.getNonSpectatingEntities(
-                CatEntity::class.java,
-                Box(
+        private fun hasOcelotOnTop(world: LevelAccessor, pos: BlockPos): Boolean {
+            val list = world.getEntitiesOfClass(
+                Cat::class.java,
+                AABB(
                     pos.x.toDouble(),
                     (pos.y + 1).toDouble(),
                     pos.z.toDouble(),

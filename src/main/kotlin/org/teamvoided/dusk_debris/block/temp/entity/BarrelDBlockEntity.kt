@@ -1,46 +1,46 @@
 package org.teamvoided.dusk_debris.block.temp.entity
 
-import net.minecraft.block.BlockState
-import net.minecraft.block.entity.BlockEntityType
-import net.minecraft.block.entity.LootableContainerBlockEntity
-import net.minecraft.block.entity.ViewerCountManager
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.entity.player.PlayerInventory
-import net.minecraft.inventory.Inventories
-import net.minecraft.item.ItemStack
-import net.minecraft.nbt.NbtCompound
-import net.minecraft.registry.HolderLookup
-import net.minecraft.screen.GenericContainerScreenHandler
-import net.minecraft.screen.ScreenHandler
-import net.minecraft.sound.SoundCategory
-import net.minecraft.sound.SoundEvent
-import net.minecraft.sound.SoundEvents
-import net.minecraft.state.property.Properties
-import net.minecraft.text.Text
-import net.minecraft.util.collection.DefaultedList
-import net.minecraft.util.math.BlockPos
-import net.minecraft.world.World
+import net.minecraft.core.BlockPos
+import net.minecraft.core.HolderLookup
+import net.minecraft.core.NonNullList
+import net.minecraft.nbt.CompoundTag
+import net.minecraft.network.chat.Component
+import net.minecraft.sounds.SoundEvent
+import net.minecraft.sounds.SoundEvents
+import net.minecraft.sounds.SoundSource
+import net.minecraft.world.ContainerHelper
+import net.minecraft.world.entity.player.Inventory
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.inventory.AbstractContainerMenu
+import net.minecraft.world.inventory.ChestMenu
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.level.Level
+import net.minecraft.world.level.block.entity.BlockEntityType
+import net.minecraft.world.level.block.entity.ContainerOpenersCounter
+import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.block.state.properties.BlockStateProperties
 
 class BarrelDBlockEntity(pos: BlockPos, state: BlockState) :
-    LootableContainerBlockEntity(BlockEntityType.BARREL, pos, state) {
-    private var inventory: DefaultedList<ItemStack>
-    private val stateManager: ViewerCountManager
+    RandomizableContainerBlockEntity(BlockEntityType.BARREL, pos, state) {
+    private var inventory: NonNullList<ItemStack>
+    private val stateManager: ContainerOpenersCounter
 
     init {
-        this.inventory = DefaultedList.ofSize(27, ItemStack.EMPTY)
-        this.stateManager = object : ViewerCountManager() {
-            override fun onContainerOpen(world: World, pos: BlockPos, state: BlockState) {
-                this@BarrelDBlockEntity.playSound(state, SoundEvents.BLOCK_BARREL_OPEN)
+        this.inventory = NonNullList.withSize(27, ItemStack.EMPTY)
+        this.stateManager = object : ContainerOpenersCounter() {
+            override fun onOpen(world: Level, pos: BlockPos, state: BlockState) {
+                this@BarrelDBlockEntity.playSound(state, SoundEvents.BARREL_OPEN)
                 this@BarrelDBlockEntity.setOpen(state, true)
             }
 
-            override fun onContainerClose(world: World, pos: BlockPos, state: BlockState) {
-                this@BarrelDBlockEntity.playSound(state, SoundEvents.BLOCK_BARREL_CLOSE)
+            override fun onClose(world: Level, pos: BlockPos, state: BlockState) {
+                this@BarrelDBlockEntity.playSound(state, SoundEvents.BARREL_CLOSE)
                 this@BarrelDBlockEntity.setOpen(state, false)
             }
 
-            override fun onViewerCountUpdate(
-                world: World,
+            override fun openerCountChanged(
+                world: Level,
                 pos: BlockPos,
                 state: BlockState,
                 oldViewerCount: Int,
@@ -49,10 +49,10 @@ class BarrelDBlockEntity(pos: BlockPos, state: BlockState) :
 
             }
 
-            override fun isPlayerViewing(player: PlayerEntity): Boolean {
-                val currentScreenHandler = player.currentScreenHandler
-                if (currentScreenHandler is GenericContainerScreenHandler) {
-                    val inventory = currentScreenHandler.inventory
+            override fun isOwnContainer(player: Player): Boolean {
+                val currentScreenHandler = player.containerMenu
+                if (currentScreenHandler is ChestMenu) {
+                    val inventory = currentScreenHandler.container
                     return inventory == this@BarrelDBlockEntity
                 } else {
                     return false
@@ -61,67 +61,67 @@ class BarrelDBlockEntity(pos: BlockPos, state: BlockState) :
         }
     }
 
-    override fun writeNbt(nbt: NbtCompound, lookupProvider: HolderLookup.Provider) {
-        super.writeNbt(nbt, lookupProvider)
-        if (!this.writeLootTableNbt(nbt)) {
-            Inventories.writeNbt(nbt, this.inventory, lookupProvider)
+    override fun saveAdditional(nbt: CompoundTag, lookupProvider: HolderLookup.Provider) {
+        super.saveAdditional(nbt, lookupProvider)
+        if (!this.trySaveLootTable(nbt)) {
+            ContainerHelper.saveAllItems(nbt, this.inventory, lookupProvider)
         }
     }
 
-    override fun readNbtImpl(nbt: NbtCompound, lookupProvider: HolderLookup.Provider) {
-        super.readNbtImpl(nbt, lookupProvider)
-        this.inventory = DefaultedList.ofSize(this.size(), ItemStack.EMPTY)
-        if (!this.readLootTableNbt(nbt)) {
-            Inventories.readNbt(nbt, this.inventory, lookupProvider)
+    override fun loadAdditional(nbt: CompoundTag, lookupProvider: HolderLookup.Provider) {
+        super.loadAdditional(nbt, lookupProvider)
+        this.inventory = NonNullList.withSize(this.containerSize, ItemStack.EMPTY)
+        if (!this.tryLoadLootTable(nbt)) {
+            ContainerHelper.loadAllItems(nbt, this.inventory, lookupProvider)
         }
     }
 
-    override fun size(): Int = 27
+    override fun getContainerSize(): Int = 27
 
-    override fun getInventory(): DefaultedList<ItemStack> = this.inventory
+    override fun getItems(): NonNullList<ItemStack> = this.inventory
 
-    override fun setInventory(stacks: DefaultedList<ItemStack>) {
+    override fun setItems(stacks: NonNullList<ItemStack>) {
         this.inventory = stacks
     }
 
-    override fun getContainerName(): Text {
-        return Text.translatable("container.barrel")
+    override fun getDefaultName(): Component {
+        return Component.translatable("container.barrel")
     }
 
-    override fun createScreenHandler(syncId: Int, playerInventory: PlayerInventory): ScreenHandler {
-        return GenericContainerScreenHandler.createGeneric9x3(syncId, playerInventory, this)
+    override fun createMenu(syncId: Int, playerInventory: Inventory): AbstractContainerMenu {
+        return ChestMenu.threeRows(syncId, playerInventory, this)
     }
 
-    override fun onOpen(player: PlayerEntity) {
-        if (!this.removed && !player.isSpectator) {
-            stateManager.openContainer(player, this.getWorld(), this.getPos(), this.cachedState)
+    override fun startOpen(player: Player) {
+        if (!this.remove && !player.isSpectator) {
+            stateManager.incrementOpeners(player, this.getLevel(), blockPos, this.blockState)
         }
     }
 
-    override fun onClose(player: PlayerEntity) {
-        if (!this.removed && !player.isSpectator) {
-            stateManager.closeContainer(player, this.getWorld(), this.getPos(), this.cachedState)
+    override fun stopOpen(player: Player) {
+        if (!this.remove && !player.isSpectator) {
+            stateManager.decrementOpeners(player, this.getLevel(), blockPos, this.blockState)
         }
     }
 
     fun tick() {
-        if (!this.removed) {
-            stateManager.updateViewerCount(this.getWorld(), this.getPos(), this.cachedState)
+        if (!this.remove) {
+            stateManager.recheckOpeners(this.getLevel(), blockPos, this.blockState)
         }
     }
 
     fun setOpen(state: BlockState, open: Boolean) {
-        world!!.setBlockState(this.getPos(), state.with(Properties.OPEN, open), 3)
+        level!!.setBlock(blockPos, state.setValue(BlockStateProperties.OPEN, open), 3)
     }
 
     fun playSound(state: BlockState, soundEvent: SoundEvent?) {
-        val vec3i = state.get(Properties.HORIZONTAL_FACING).vector
-        val d = pos.x.toDouble() + 0.5 + (vec3i.x.toDouble() / 2.0)
-        val e = pos.y.toDouble() + 0.5 + (vec3i.y.toDouble() / 2.0)
-        val f = pos.z.toDouble() + 0.5 + (vec3i.z.toDouble() / 2.0)
-        world!!.playSound(
-            null, d, e, f, soundEvent, SoundCategory.BLOCKS, 0.5f,
-            world!!.random.nextFloat() * 0.1f + 0.9f
+        val vec3i = state.getValue(BlockStateProperties.HORIZONTAL_FACING).normal
+        val d = worldPosition.x.toDouble() + 0.5 + (vec3i.x.toDouble() / 2.0)
+        val e = worldPosition.y.toDouble() + 0.5 + (vec3i.y.toDouble() / 2.0)
+        val f = worldPosition.z.toDouble() + 0.5 + (vec3i.z.toDouble() / 2.0)
+        level!!.playSound(
+            null, d, e, f, soundEvent, SoundSource.BLOCKS, 0.5f,
+            level!!.random.nextFloat() * 0.1f + 0.9f
         )
     }
 }

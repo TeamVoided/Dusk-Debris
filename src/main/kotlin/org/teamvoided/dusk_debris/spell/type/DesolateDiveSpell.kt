@@ -1,21 +1,19 @@
 package org.teamvoided.dusk_debris.spell.type
 
 import com.mojang.serialization.Codec
-import net.minecraft.block.BlockState
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.attribute.EntityAttributeModifier
-import net.minecraft.entity.attribute.EntityAttributes
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.sound.SoundEvents
-import net.minecraft.util.Identifier
-import net.minecraft.util.crash.CrashException
-import net.minecraft.util.crash.CrashReport
-import net.minecraft.util.crash.CrashReportSection
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Box
-import net.minecraft.util.math.Vec3d
+import net.minecraft.CrashReport
+import net.minecraft.CrashReportCategory
+import net.minecraft.ReportedException
+import net.minecraft.core.BlockPos
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.ai.attributes.AttributeModifier
+import net.minecraft.world.entity.ai.attributes.Attributes
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.phys.AABB
+import net.minecraft.world.phys.Vec3
 import org.teamvoided.dusk_debris.DuskDebris
-import org.teamvoided.dusk_debris.init.DuskParticles
 import org.teamvoided.dusk_debris.spell.SpellType
 import org.teamvoided.dusk_debris.spell.settings.GenericSpellSettings
 import org.teamvoided.dusk_debris.util.spellController
@@ -24,14 +22,14 @@ import kotlin.math.abs
 class DesolateDiveSpell(codec: Codec<GenericSpellSettings>) : SpellType<GenericSpellSettings>(codec) {
 
     override fun castRequirements(castor: LivingEntity, settings: GenericSpellSettings): Boolean {
-        return if (castor is PlayerEntity) castor.pitch < -45 && castor.isSneaking
+        return if (castor is Player) castor.xRot < -45 && castor.isShiftKeyDown
         else true
     }
 
     override fun onCast(castor: LivingEntity, settings: GenericSpellSettings) {
         addGravity(castor, -castor.gravity)
-        castor.velocity = Vec3d.ZERO
-        castor.velocityDirty = true
+        castor.setDeltaMovement(Vec3.ZERO)
+        castor.hasImpulse = true
         castor.spellController.spellTicksLeft = settings.cooldown
     }
 
@@ -42,14 +40,14 @@ class DesolateDiveSpell(codec: Codec<GenericSpellSettings>) : SpellType<GenericS
         } else if (castor.spellController.spellTicksLeft <= settings.cooldown - 4) {
             castor.resetFallDistance()
             addGravity(castor)
-            castor.velocity = castor.velocity.multiply(0.0, 4.0, 0.0)
-            castor.velocityDirty = true
+            castor.setDeltaMovement(castor.deltaMovement.multiply(0.0, 4.0, 0.0))
+            castor.hasImpulse = true
             tryCheckDiveBlockActions(castor)
-            if (castor.isOnGround)
+            if (castor.onGround())
                 actualSpell(castor, settings)
         } else {
-            castor.velocity = castor.velocity.multiply(0.0)
-            castor.velocityDirty = true
+            castor.setDeltaMovement(castor.deltaMovement.scale(0.0))
+            castor.hasImpulse = true
         }
     }
 
@@ -60,10 +58,10 @@ class DesolateDiveSpell(codec: Codec<GenericSpellSettings>) : SpellType<GenericS
     override fun actualSpell(castor: LivingEntity, settings: GenericSpellSettings) {
         onCastEnd(castor, settings)
         castor.spellController.spellTicksLeft = 8
-        val world = castor.world
+        val world = castor.level()
         val random = castor.random
 
-        world.syncWorldEvent(1501, castor.blockPos, 750)
+        world.levelEvent(1501, castor.blockPosition(), 750)
         //repeat(10) {
         //    val particlePos = Vec3d(
         //        (random.nextDouble() - 0.5),
@@ -79,7 +77,7 @@ class DesolateDiveSpell(codec: Codec<GenericSpellSettings>) : SpellType<GenericS
 //
         //world.playSound(
         //    castor.x, castor.y, castor.z,
-        //    SoundEvents.ENTITY_WITHER_AMBIENT,
+        //    SoundEvents.WITHER_AMBIENT,
         //    castor.soundCategory,
         //    0.2f,
         //    1.3f + random.nextFloat() * 0.4f,
@@ -89,49 +87,49 @@ class DesolateDiveSpell(codec: Codec<GenericSpellSettings>) : SpellType<GenericS
 
     private fun addGravity(castor: LivingEntity, value: Double = 0.4) {
         val modifier =
-            EntityAttributeModifier(MODIFIER_ID, value, EntityAttributeModifier.Operation.ADD_VALUE)
-        val entityAttributeGravityInstance = castor.getAttributeInstance(EntityAttributes.GENERIC_GRAVITY)
+            AttributeModifier(MODIFIER_ID, value, AttributeModifier.Operation.ADD_VALUE)
+        val entityAttributeGravityInstance = castor.getAttribute(Attributes.GRAVITY)
         entityAttributeGravityInstance!!.removeModifier(MODIFIER_ID)
-        entityAttributeGravityInstance.addTemporaryModifier(modifier)
+        entityAttributeGravityInstance.addTransientModifier(modifier)
     }
 
     private fun removeTempAttribute(
         castor: LivingEntity,
-    ) = castor.getAttributeInstance(EntityAttributes.GENERIC_GRAVITY)!!.removeModifier(MODIFIER_ID)
+    ) = castor.getAttribute(Attributes.GRAVITY)!!.removeModifier(MODIFIER_ID)
 
 
     private fun tryCheckDiveBlockActions(castor: LivingEntity) {
         try {
             this.checkBlockCollision(castor)
         } catch (var4: Throwable) {
-            val crashReport = CrashReport.create(var4, "Checking entity block collision for dive block logic")
-            val crashReportSection = crashReport.addElement("Entity being checked for dive block logic")
-            castor.populateCrashReport(crashReportSection)
-            throw CrashException(crashReport)
+            val crashReport = CrashReport.forThrowable(var4, "Checking entity block collision for dive block logic")
+            val crashReportSection = crashReport.addCategory("Entity being checked for dive block logic")
+            castor.fillCrashReportCategory(crashReportSection)
+            throw ReportedException(crashReport)
         }
     }
 
     private fun checkBlockCollision(castor: LivingEntity) {
-        val box: Box = castor.bounds
-        val minY = box.minY - 0.5 - abs(castor.velocity.y)
-        val cornerMin = BlockPos.create(box.minX - 0.5, minY, box.minZ - 0.5)
-        val cornerMax = BlockPos.create(box.maxX + 0.5, box.minY + 0.5, box.maxZ + 0.5)
-        if (castor.world.isRegionLoaded(cornerMin, cornerMax)) {
-            val mutable = BlockPos.Mutable()
+        val box: AABB = castor.boundingBox
+        val minY = box.minY - 0.5 - abs(castor.deltaMovement.y)
+        val cornerMin = BlockPos.containing(box.minX - 0.5, minY, box.minZ - 0.5)
+        val cornerMax = BlockPos.containing(box.maxX + 0.5, box.minY + 0.5, box.maxZ + 0.5)
+        if (castor.level().hasChunksAt(cornerMin, cornerMax)) {
+            val mutable = BlockPos.MutableBlockPos()
             for (x in cornerMin.x..cornerMax.x) {
                 for (y in cornerMin.y..cornerMax.y) {
                     for (z in cornerMin.z..cornerMax.z) {
                         if (!castor.isAlive) return
                         mutable.set(x, y, z)
-                        val blockState: BlockState = castor.world.getBlockState(mutable)
+                        val blockState: BlockState = castor.level().getBlockState(mutable)
                         try {
-                            blockState.onEntityCollision(castor.world, mutable, castor)
+                            blockState.entityInside(castor.level(), mutable, castor)
                             //castor.onBlockCollision(blockState)
                         } catch (throwable: Throwable) {
-                            val crashReport = CrashReport.create(throwable, "Colliding entity with block")
-                            val crashReportSection = crashReport.addElement("Block being collided with")
-                            CrashReportSection.addBlockInfo(crashReportSection, castor.world, mutable, blockState)
-                            throw CrashException(crashReport)
+                            val crashReport = CrashReport.forThrowable(throwable, "Colliding entity with block")
+                            val crashReportSection = crashReport.addCategory("Block being collided with")
+                            CrashReportCategory.populateBlockDetails(crashReportSection, castor.level(), mutable, blockState)
+                            throw ReportedException(crashReport)
                         }
                     }
                 }
@@ -140,6 +138,6 @@ class DesolateDiveSpell(codec: Codec<GenericSpellSettings>) : SpellType<GenericS
     }
 
     companion object {
-        val MODIFIER_ID: Identifier = DuskDebris.id("spell.desolate_dive")
+        val MODIFIER_ID: ResourceLocation = DuskDebris.id("spell.desolate_dive")
     }
 }

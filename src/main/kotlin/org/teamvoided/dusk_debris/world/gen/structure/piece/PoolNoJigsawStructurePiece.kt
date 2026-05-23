@@ -3,24 +3,24 @@ package org.teamvoided.dusk_debris.world.gen.structure.piece
 import com.mojang.logging.LogUtils
 import com.mojang.serialization.DataResult
 import com.mojang.serialization.DynamicOps
-import net.minecraft.block.Blocks
-import net.minecraft.nbt.NbtCompound
-import net.minecraft.nbt.NbtElement
+import net.minecraft.core.BlockPos
+import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.NbtOps
-import net.minecraft.structure.StructureManager
-import net.minecraft.structure.StructureTemplateManager
-import net.minecraft.structure.piece.StructurePiece
-import net.minecraft.structure.piece.StructurePieceSerializationContext
-import net.minecraft.structure.pool.StructurePoolElement
-import net.minecraft.util.BlockRotation
-import net.minecraft.util.math.BlockBox
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.ChunkPos
-import net.minecraft.util.random.RandomGenerator
-import net.minecraft.world.StructureWorldAccess
-import net.minecraft.world.gen.chunk.ChunkGenerator
-import net.minecraft.world.gen.feature.JigsawFeature
-import net.minecraft.world.gen.feature.LiquidSettings
+import net.minecraft.nbt.Tag
+import net.minecraft.util.RandomSource
+import net.minecraft.world.level.ChunkPos
+import net.minecraft.world.level.StructureManager
+import net.minecraft.world.level.WorldGenLevel
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.block.Rotation
+import net.minecraft.world.level.chunk.ChunkGenerator
+import net.minecraft.world.level.levelgen.structure.BoundingBox
+import net.minecraft.world.level.levelgen.structure.StructurePiece
+import net.minecraft.world.level.levelgen.structure.pieces.StructurePieceSerializationContext
+import net.minecraft.world.level.levelgen.structure.pools.StructurePoolElement
+import net.minecraft.world.level.levelgen.structure.structures.JigsawStructure
+import net.minecraft.world.level.levelgen.structure.templatesystem.LiquidSettings
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager
 import org.slf4j.Logger
 import org.teamvoided.dusk_debris.init.worldgen.structure.DuskStructurePieceType
 import java.util.*
@@ -29,7 +29,7 @@ class PoolNoJigsawStructurePiece : StructurePiece {
     private val poolElement: StructurePoolElement
     var pos: BlockPos
     private val groundLevelDelta: Int
-    private val rotationSet: BlockRotation
+    private val rotationSet: Rotation
     private val structureTemplateManager: StructureTemplateManager
     private val liquidSettings: LiquidSettings
 
@@ -38,8 +38,8 @@ class PoolNoJigsawStructurePiece : StructurePiece {
         poolElement: StructurePoolElement,
         pos: BlockPos,
         groundLevelDelta: Int,
-        rotation: BlockRotation,
-        boundingBox: BlockBox,
+        rotation: Rotation,
+        boundingBox: BoundingBox,
         liquidSettings: LiquidSettings
     ) : super(DuskStructurePieceType.SIMPLE, 0, boundingBox) {
         this.structureTemplateManager = structureTemplateManager
@@ -50,46 +50,46 @@ class PoolNoJigsawStructurePiece : StructurePiece {
         this.liquidSettings = liquidSettings
     }
 
-    constructor(world: StructurePieceSerializationContext, nbt: NbtCompound) :
+    constructor(world: StructurePieceSerializationContext, nbt: CompoundTag) :
             super(DuskStructurePieceType.SIMPLE, nbt) {
         this.structureTemplateManager = world.structureTemplateManager()
         this.pos = BlockPos(nbt.getInt("PosX"), nbt.getInt("PosY"), nbt.getInt("PosZ"))
         this.groundLevelDelta = nbt.getInt("ground_level_delta")
-        val dynamicOps: DynamicOps<NbtElement> = world.registryManager().createSerializationContext(NbtOps.INSTANCE)
+        val dynamicOps: DynamicOps<Tag> = world.registryAccess().createSerializationContext(NbtOps.INSTANCE)
         this.poolElement = StructurePoolElement.CODEC.parse(dynamicOps, nbt.getCompound("pool_element"))
             .getPartialOrThrow { IllegalStateException("Invalid pool element found: $it") }
-        this.rotationSet = BlockRotation.valueOf(nbt.getString("rotation"))
+        this.rotationSet = Rotation.valueOf(nbt.getString("rotation"))
         this.boundingBox = poolElement.getBoundingBox(this.structureTemplateManager, this.pos, this.rotation)
-        this.liquidSettings = LiquidSettings.codec.parse(NbtOps.INSTANCE, nbt["liquid_settings"]).result()
-            .orElse(JigsawFeature.DEFAULT_LIQUID_SETTING)
+        this.liquidSettings = LiquidSettings.CODEC.parse(NbtOps.INSTANCE, nbt["liquid_settings"]).result()
+            .orElse(JigsawStructure.DEFAULT_LIQUID_SETTINGS)
     }
 
-    override fun writeNbt(context: StructurePieceSerializationContext, nbt: NbtCompound) {
+    override fun addAdditionalSaveData(context: StructurePieceSerializationContext, nbt: CompoundTag) {
         nbt.putInt("PosX", pos.x)
         nbt.putInt("PosY", pos.y)
         nbt.putInt("PosZ", pos.z)
         nbt.putInt("ground_level_delta", this.groundLevelDelta)
-        val dynamicOps: DynamicOps<NbtElement> = context.registryManager().createSerializationContext(NbtOps.INSTANCE)
-        val dataResult: DataResult<NbtElement> = StructurePoolElement.CODEC.encodeStart(dynamicOps, this.poolElement)
+        val dynamicOps: DynamicOps<Tag> = context.registryAccess().createSerializationContext(NbtOps.INSTANCE)
+        val dataResult: DataResult<Tag> = StructurePoolElement.CODEC.encodeStart(dynamicOps, this.poolElement)
         val logger = LOGGER
         Objects.requireNonNull(logger)
         dataResult.resultOrPartial(logger::error).ifPresent { nbt.put("pool_element", it) }
         nbt.putString("rotation", this.rotation.name)
 
-        if (this.liquidSettings != JigsawFeature.DEFAULT_LIQUID_SETTING) {
+        if (this.liquidSettings != JigsawStructure.DEFAULT_LIQUID_SETTINGS) {
             nbt.put(
                 "liquid_settings",
-                LiquidSettings.codec.encodeStart(NbtOps.INSTANCE, this.liquidSettings).getOrThrow()
+                LiquidSettings.CODEC.encodeStart(NbtOps.INSTANCE, this.liquidSettings).getOrThrow()
             )
         }
     }
 
-    override fun generate(
-        world: StructureWorldAccess,
+    override fun postProcess(
+        world: WorldGenLevel,
         structureManager: StructureManager,
         chunkGenerator: ChunkGenerator,
-        random: RandomGenerator,
-        boundingBox: BlockBox,
+        random: RandomSource,
+        boundingBox: BoundingBox,
         chunkPos: ChunkPos,
         pos: BlockPos
     ) {
@@ -97,15 +97,15 @@ class PoolNoJigsawStructurePiece : StructurePiece {
     }
 
     fun generate(
-        world: StructureWorldAccess,
+        world: WorldGenLevel,
         structureManager: StructureManager,
         chunkGenerator: ChunkGenerator,
-        random: RandomGenerator,
-        boundingBox: BlockBox,
+        random: RandomSource,
+        boundingBox: BoundingBox,
         pos: BlockPos,
         keepJigsaws: Boolean
     ) {
-        poolElement.generate(
+        poolElement.place(
             this.structureTemplateManager,
             world,
             structureManager,
@@ -122,28 +122,28 @@ class PoolNoJigsawStructurePiece : StructurePiece {
 //        net.minecraft.structure.piece.StructurePiece.createBox
     }
 
-    private fun StructureWorldAccess.setBlocksBoxCorners(box: BlockBox) {
+    private fun WorldGenLevel.setBlocksBoxCorners(box: BoundingBox) {
         val poses = listOf(
-            BlockPos(box.minX, box.minY, box.minZ),
-            BlockPos(box.maxX, box.minY, box.minZ),
-            BlockPos(box.minX, box.minY, box.maxZ),
-            BlockPos(box.maxX, box.minY, box.maxZ),
-            BlockPos(box.minX, box.maxY, box.minZ),
-            BlockPos(box.maxX, box.maxY, box.minZ),
-            BlockPos(box.minX, box.maxY, box.maxZ),
-            BlockPos(box.maxX, box.maxY, box.maxZ)
+            BlockPos(box.minX(), box.minY(), box.minZ()),
+            BlockPos(box.maxX(), box.minY(), box.minZ()),
+            BlockPos(box.minX(), box.minY(), box.maxZ()),
+            BlockPos(box.maxX(), box.minY(), box.maxZ()),
+            BlockPos(box.minX(), box.maxY(), box.minZ()),
+            BlockPos(box.maxX(), box.maxY(), box.minZ()),
+            BlockPos(box.minX(), box.maxY(), box.maxZ()),
+            BlockPos(box.maxX(), box.maxY(), box.maxZ())
         )
         poses.forEach {
-            this.setBlockState(it, Blocks.TINTED_GLASS.defaultState, 2)
+            this.setBlock(it, Blocks.TINTED_GLASS.defaultBlockState(), 2)
         }
     }
 
-    override fun translate(x: Int, y: Int, z: Int) {
-        super.translate(x, y, z)
-        this.pos = pos.add(x, y, z)
+    override fun move(x: Int, y: Int, z: Int) {
+        super.move(x, y, z)
+        this.pos = pos.offset(x, y, z)
     }
 
-    override fun getRotation(): BlockRotation {
+    override fun getRotation(): Rotation {
         return this.rotationSet
     }
 

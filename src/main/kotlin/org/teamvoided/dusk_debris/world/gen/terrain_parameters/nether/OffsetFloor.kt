@@ -1,7 +1,7 @@
 package org.teamvoided.dusk_debris.world.gen.terrain_parameters.nether
 
-import net.minecraft.util.function.ToFloatFunction
-import net.minecraft.util.math.Spline
+import net.minecraft.util.CubicSpline
+import net.minecraft.util.ToFloatFunction
 import org.teamvoided.dusk_debris.util.world_helper.add
 import org.teamvoided.dusk_debris.util.world_helper.calculateSlope
 import org.teamvoided.dusk_debris.world.gen.terrain_parameters.NetherTerrainParametersCreator.nFloor
@@ -12,12 +12,12 @@ object OffsetFloor {
     fun <C, I : ToFloatFunction<C>> createWarpedIsland(
         ridgesFolded: I,
         amplifier: ToFloatFunction<Float>
-    ): Spline<C, I> {
-        val warpedIsland = Spline.builder(ridgesFolded, amplifier)
-            .add(-1f, nFloor(24), 0.2f)
-            .add(-0.4f, nFloor(38), 0.4f)
-            .add(0.25f, nFloor(64), 0.4f)
-            .add(0.8f, nFloor(128), 0.4f)
+    ): CubicSpline<C, I> {
+        val warpedIsland = CubicSpline.builder(ridgesFolded, amplifier)
+            .addPoint(-1f, nFloor(24), 0.2f)
+            .addPoint(-0.4f, nFloor(38), 0.4f)
+            .addPoint(0.25f, nFloor(64), 0.4f)
+            .addPoint(0.8f, nFloor(128), 0.4f)
         return warpedIsland.build()
     }
 
@@ -27,15 +27,15 @@ object OffsetFloor {
         mult: Float,
         ridgesFolded: I,
         amplifier: ToFloatFunction<Float>
-    ): Spline<C, I> {
+    ): CubicSpline<C, I> {
         val valley1 = nFloor(valley)
         val peak1 = nFloor(peak) * mult
 
         val slope = calculateSlope(peak1, valley1, 1f, -1f)
 
-        val spline = Spline.builder(ridgesFolded, amplifier)
-            .add(-1f, valley1, slope)
-            .add(1f, peak1, slope)
+        val spline = CubicSpline.builder(ridgesFolded, amplifier)
+            .addPoint(-1f, valley1, slope)
+            .addPoint(1f, peak1, slope)
         return spline.build()
     }
 
@@ -45,7 +45,7 @@ object OffsetFloor {
         mult: Float,
         ridgesFolded: I,
         amplifier: ToFloatFunction<Float>
-    ): Spline<C, I> {
+    ): CubicSpline<C, I> {
         val point1 = -1f to nFloor(valley)
         val point2 = -.4f to nFloor(peak) * mult
 //        val point3 = 0f to nFloor(peak)*mult
@@ -55,7 +55,7 @@ object OffsetFloor {
         val slopeValley = calculateSlope(point1, point4)
         val slopePeak = calculateSlope(point2, point5)
 
-        val spline = Spline.builder(ridgesFolded, amplifier)
+        val spline = CubicSpline.builder(ridgesFolded, amplifier)
             .add(point1, slopeValley)
             .add(point2)
 //            .add(point3)
@@ -64,11 +64,11 @@ object OffsetFloor {
         return spline.build()
     }
 
-    fun <C, I : ToFloatFunction<C>> createWall(ridgesFolded: I, amplifier: ToFloatFunction<Float>): Spline<C, I> {
+    fun <C, I : ToFloatFunction<C>> createWall(ridgesFolded: I, amplifier: ToFloatFunction<Float>): CubicSpline<C, I> {
         val point1 = -0.9f to nFloor(16)
         val point2 = -0.4f to nFloor(128)
         val slope = calculateSlope(point1, point2)
-        val spline = Spline.builder(ridgesFolded, amplifier)
+        val spline = CubicSpline.builder(ridgesFolded, amplifier)
             .add(point1, slope)
             .add(point2, slope * 2)
         return spline.build()
@@ -78,7 +78,7 @@ object OffsetFloor {
         mult: Float,
         ridgesFolded: I,
         amplifier: ToFloatFunction<Float>
-    ): Spline<C, I> {
+    ): CubicSpline<C, I> {
         val riverbed = -0.8f to nFloor(24)
         val shelf1Min = -0.6f to nFloor(64)
         val shelf1Max = 0.25f to nFloor(90) * mult
@@ -92,7 +92,7 @@ object OffsetFloor {
         val shelf2MaxDer = calculateSlope(shelf2Min, shelf2Max)
 
 
-        val shelf = Spline.builder(ridgesFolded, amplifier)
+        val shelf = CubicSpline.builder(ridgesFolded, amplifier)
             .add(riverbed, riverbedDer)
             .add(shelf1Min, shelf1MinDer)
             .add(shelf1Max, shelf1MaxDer)
@@ -105,7 +105,7 @@ object OffsetFloor {
         mult: Float,
         ridgesFolded: I,
         amplifier: ToFloatFunction<Float>
-    ): Spline<C, I> {
+    ): CubicSpline<C, I> {
         val riverbed = -1f to nFloor(24)
         val riverbank = -0.4f to nFloor(32)
         val elev1 = 0f to nFloor(48) * mult
@@ -118,7 +118,7 @@ object OffsetFloor {
         val elev2Der = calculateSlope(elev1, elev2)
         val elev3Der = calculateSlope(elev2, elev3)
 
-        val flats = Spline.builder(ridgesFolded, amplifier)
+        val flats = CubicSpline.builder(ridgesFolded, amplifier)
             .add(riverbed, riverbedDer)
             .add(riverbank, riverbankDer)
             .add(elev1, elev1Der)
@@ -131,7 +131,7 @@ object OffsetFloor {
         mult: Float,
         ridgesFolded: I,
         amplifier: ToFloatFunction<Float>
-    ): Spline<C, I> {
+    ): CubicSpline<C, I> {
         val elev1 = -1f to nFloor(12)
         val elev2 = -0.4f to nFloor(48) * mult
         val elev3 = 0f to nFloor(48) * mult
@@ -141,7 +141,7 @@ object OffsetFloor {
         val der1 = calculateSlope(elev2, elev5)
         val der5 = calculateSlope(elev2, elev5)
 
-        val flats = Spline.builder(ridgesFolded, amplifier)
+        val flats = CubicSpline.builder(ridgesFolded, amplifier)
             .add(elev1, der1)
             .add(elev2)
             .add(elev3)
@@ -154,7 +154,7 @@ object OffsetFloor {
         mult: Float,
         ridgesFolded: I,
         amplifier: ToFloatFunction<Float>
-    ): Spline<C, I> {
+    ): CubicSpline<C, I> {
         val riverbed = -0.4f to nFloor(24)
         val elev1 = 0f to nFloor(32) * mult
         val elev2 = 0.4f to nFloor(32) * mult
@@ -162,7 +162,7 @@ object OffsetFloor {
 
         val der = calculateSlope(elev2, elev3)
 
-        val flats = Spline.builder(ridgesFolded, amplifier)
+        val flats = CubicSpline.builder(ridgesFolded, amplifier)
             .add(riverbed)
             .add(elev1)
             .add(elev2, der)
@@ -171,11 +171,11 @@ object OffsetFloor {
     }
 
     fun <C, I : ToFloatFunction<C>> createAlternate(
-        positive: Spline<C, I>,
-        negative: Spline<C, I>,
+        positive: CubicSpline<C, I>,
+        negative: CubicSpline<C, I>,
         ridges: I
-    ): Spline<C, I> {
-        val spline = Spline.builder(ridges)
+    ): CubicSpline<C, I> {
+        val spline = CubicSpline.builder(ridges)
             .add(-0.05f, negative)
             .add(0.05f, positive)
         return spline.build()

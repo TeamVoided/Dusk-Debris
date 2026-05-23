@@ -3,10 +3,10 @@ package org.teamvoided.dusk_debris.world.gen.density_functions
 import com.mojang.serialization.Codec
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
-import net.minecraft.util.dynamic.CodecHolder
-import net.minecraft.util.math.MathHelper
-import net.minecraft.world.gen.DensityFunction
-import net.minecraft.world.gen.DensityFunction.ContextProvider
+import net.minecraft.util.KeyDispatchDataCodec
+import net.minecraft.util.Mth
+import net.minecraft.world.level.levelgen.DensityFunction
+import net.minecraft.world.level.levelgen.DensityFunction.ContextProvider
 import org.teamvoided.dusk_debris.util.world_helper.makeCodec
 import kotlin.math.ceil
 import kotlin.math.floor
@@ -28,10 +28,10 @@ class CheckerboardNoise(
             val xCeil: Double = checkerboardCeil(c.blockX(), horizontalSize, shiftX.compute(c))
             val zCeil: Double = checkerboardCeil(c.blockZ(), horizontalSize, shiftZ.compute(c))
 
-            val noiseXFZF = noise.sample(xFloor, y, zFloor)
-            val noiseXCZF = noise.sample(xCeil, y, zFloor)
-            val noiseXFZC = noise.sample(xFloor, y, zCeil)
-            val noiseXCZC = noise.sample(xCeil, y, zCeil)
+            val noiseXFZF = noise.getValue(xFloor, y, zFloor)
+            val noiseXCZF = noise.getValue(xCeil, y, zFloor)
+            val noiseXFZC = noise.getValue(xFloor, y, zCeil)
+            val noiseXCZC = noise.getValue(xCeil, y, zCeil)
 
             val xLerp: Double
             val zLerp: Double
@@ -43,16 +43,16 @@ class CheckerboardNoise(
                 zLerp = (((c.blockZ() % horizontalSize) / horizontalSize))
             }
 
-            val lerpXF = MathHelper.clampedLerp(noiseXFZF, noiseXCZF, xLerp)
-            val lerpXC = MathHelper.clampedLerp(noiseXFZC, noiseXCZC, xLerp)
-            val lerpZ = MathHelper.clampedLerp(lerpXF, lerpXC, zLerp)
+            val lerpXF = Mth.clampedLerp(noiseXFZF, noiseXCZF, xLerp)
+            val lerpXC = Mth.clampedLerp(noiseXFZC, noiseXCZC, xLerp)
+            val lerpZ = Mth.clampedLerp(lerpXF, lerpXC, zLerp)
 
             return lerpZ
         } else {
             val x: Double = checkerboardFloor(c.blockX(), horizontalSize, shiftX.compute(c))
             val y: Double = c.blockY() + shiftY.compute(c)
             val z: Double = checkerboardFloor(c.blockZ(), horizontalSize, shiftZ.compute(c))
-            return noise.sample(x, y, z)
+            return noise.getValue(x, y, z)
         }
     }
 
@@ -92,9 +92,9 @@ class CheckerboardNoise(
 
     override fun minValue(): Double = -this.maxValue()
 
-    override fun maxValue(): Double = noise.maxValue
+    override fun maxValue(): Double = noise.maxValue()
 
-    override fun codec(): CodecHolder<CheckerboardNoise> = CODEC
+    override fun codec(): KeyDispatchDataCodec<CheckerboardNoise> = CODEC
 
     companion object {
         val threshold = 0.8
@@ -112,6 +112,6 @@ class CheckerboardNoise(
                     .apply(instance, ::CheckerboardNoise)
             }
 
-        val CODEC: CodecHolder<CheckerboardNoise> = makeCodec(DATA_CODEC)
+        val CODEC: KeyDispatchDataCodec<CheckerboardNoise> = makeCodec(DATA_CODEC)
     }
 }

@@ -5,21 +5,21 @@
 package org.teamvoided.dusk_debris.entity
 
 import com.mojang.logging.LogUtils
-import net.minecraft.block.piston.PistonBehavior
-import net.minecraft.entity.*
-import net.minecraft.entity.data.DataTracker
-import net.minecraft.entity.data.TrackedData
-import net.minecraft.entity.data.TrackedDataHandlerRegistry
-import net.minecraft.nbt.NbtCompound
-import net.minecraft.particle.ColoredParticleEffect
-import net.minecraft.particle.ParticleEffect
-import net.minecraft.particle.ParticleTypes
-import net.minecraft.server.world.ServerWorld
-import net.minecraft.util.math.MathHelper
-import net.minecraft.util.math.Vec3d
-import net.minecraft.world.LocalDifficulty
-import net.minecraft.world.ServerWorldAccess
-import net.minecraft.world.World
+import net.minecraft.core.particles.ColorParticleOption
+import net.minecraft.core.particles.ParticleOptions
+import net.minecraft.core.particles.ParticleTypes
+import net.minecraft.nbt.CompoundTag
+import net.minecraft.network.syncher.EntityDataAccessor
+import net.minecraft.network.syncher.EntityDataSerializers
+import net.minecraft.network.syncher.SynchedEntityData
+import net.minecraft.server.level.ServerLevel
+import net.minecraft.util.Mth
+import net.minecraft.world.DifficultyInstance
+import net.minecraft.world.entity.*
+import net.minecraft.world.level.Level
+import net.minecraft.world.level.ServerLevelAccessor
+import net.minecraft.world.level.material.PushReaction
+import net.minecraft.world.phys.Vec3
 import org.slf4j.Logger
 import org.teamvoided.dusk_debris.data.DuskDamageTypes
 import org.teamvoided.dusk_debris.init.DuskEntities
@@ -27,31 +27,31 @@ import org.teamvoided.dusk_debris.util.Utils
 import java.lang.Integer.max
 import java.util.*
 
-open class LightningCloudEntity(entityType: EntityType<out LightningCloudEntity>, world: World) :
-    Entity(entityType, world), Ownable, Initialize {
+open class LightningCloudEntity(entityType: EntityType<out LightningCloudEntity>, world: Level) :
+    Entity(entityType, world), TraceableEntity, Initialize {
     private var owner: LivingEntity? = null
     private var ownerUuid: UUID? = null
 
-    constructor(world: World, x: Double, y: Double, z: Double) : this(DuskEntities.LIGHTNING_CLOUD, world) {
-        this.setPosition(x, y - radius, z)
+    constructor(world: Level, x: Double, y: Double, z: Double) : this(DuskEntities.LIGHTNING_CLOUD, world) {
+        this.setPos(x, y - radius, z)
     }
 
     init {
-        this.noClip = true
+        this.noPhysics = true
     }
 
-    override fun initDataTracker(builder: DataTracker.Builder) {
-        builder.add(WAIT_TIME, DEFAULT_WAIT_TIME)
-        builder.add(DURATION, DEFAULT_DURATION)
-        builder.add(RADIUS, DEFAULT_RADIUS)
-        builder.add(DAMAGE, DEFAULT_DAMAGE)
-        builder.add(DELAY_BETWEEN_ACTION, DEFAULT_DELAY_BETWEEN)
-        builder.add(PARTICLE_ID, ColoredParticleEffect.create(ParticleTypes.ENTITY_EFFECT, -1))
+    override fun defineSynchedData(builder: SynchedEntityData.Builder) {
+        builder.define(WAIT_TIME, DEFAULT_WAIT_TIME)
+        builder.define(DURATION, DEFAULT_DURATION)
+        builder.define(RADIUS, DEFAULT_RADIUS)
+        builder.define(DAMAGE, DEFAULT_DAMAGE)
+        builder.define(DELAY_BETWEEN_ACTION, DEFAULT_DELAY_BETWEEN)
+        builder.define(PARTICLE_ID, ColorParticleOption.create(ParticleTypes.ENTITY_EFFECT, -1))
     }
 
-    override fun readCustomDataFromNbt(nbt: NbtCompound) {
+    override fun readAdditionalSaveData(nbt: CompoundTag) {
         if (nbt.contains("Age"))
-            this.age = nbt.getInt("Age")
+            this.tickCount = nbt.getInt("Age")
         if (nbt.contains("Duration"))
             this.duration = nbt.getInt("Duration")
         if (nbt.contains("WaitTime"))
@@ -62,69 +62,69 @@ open class LightningCloudEntity(entityType: EntityType<out LightningCloudEntity>
             this.damage = nbt.getFloat("Damage")
         if (nbt.contains("DelayBetweenAction"))
             this.delayBetweenAction = nbt.getInt("DelayBetweenAction")
-        if (nbt.containsUuid("Owner"))
-            this.ownerUuid = nbt.getUuid("Owner")
+        if (nbt.hasUUID("Owner"))
+            this.ownerUuid = nbt.getUUID("Owner")
     }
 
-    override fun writeCustomDataToNbt(nbt: NbtCompound) {
-        nbt.putInt("Age", this.age)
+    override fun addAdditionalSaveData(nbt: CompoundTag) {
+        nbt.putInt("Age", this.tickCount)
         nbt.putInt("Duration", this.duration)
         nbt.putInt("WaitTime", this.waitTime)
         nbt.putFloat("Radius", this.radius)
         nbt.putFloat("Damage", this.damage)
         nbt.putInt("DelayBetweenAction", this.delayBetweenAction)
         if (this.ownerUuid != null) {
-            nbt.putUuid("Owner", this.ownerUuid)
+            nbt.putUUID("Owner", this.ownerUuid)
         }
     }
 
-    override fun calculateDimensions() {
+    override fun refreshDimensions() {
         val x = this.x
         val y = this.y
         val z = this.z
-        super.calculateDimensions()
-        this.setPosition(x, y, z)
+        super.refreshDimensions()
+        this.setPos(x, y, z)
     }
 
     var radius: Float
-        get() = getDataTracker().get(RADIUS) as Float
+        get() = entityData.get(RADIUS) as Float
         set(float) {
             val old = radius
-            val new = MathHelper.clamp(float, MIN_RADIUS, MAX_RADIUS)
-            this.lastRenderY = this.y
-            this.setPosition(this.x, this.y - ((new - old)), this.z)
-            getDataTracker().set(RADIUS, new)
+            val new = Mth.clamp(float, MIN_RADIUS, MAX_RADIUS)
+            this.yOld = this.y
+            this.setPos(this.x, this.y - ((new - old)), this.z)
+            entityData.set(RADIUS, new)
         }
 
 
     var damage: Float
-        get() = getDataTracker().get(DAMAGE) as Float
-        set(float) = getDataTracker().set(DAMAGE, float)
+        get() = entityData.get(DAMAGE) as Float
+        set(float) = entityData.set(DAMAGE, float)
 
     var delayBetweenAction: Int
-        get() = getDataTracker().get(DELAY_BETWEEN_ACTION) as Int
-        set(int) = getDataTracker().set(DELAY_BETWEEN_ACTION, max(1, int))
+        get() = entityData.get(DELAY_BETWEEN_ACTION) as Int
+        set(int) = entityData.set(DELAY_BETWEEN_ACTION, max(1, int))
 
 
     var waitTime: Int
-        get() = getDataTracker().get(WAIT_TIME) as Int
-        set(int) = getDataTracker().set(WAIT_TIME, int)
+        get() = entityData.get(WAIT_TIME) as Int
+        set(int) = entityData.set(WAIT_TIME, int)
 
     var duration: Int
-        get() = getDataTracker().get(DURATION) as Int
-        set(int) = getDataTracker().set(DURATION, int)
+        get() = entityData.get(DURATION) as Int
+        set(int) = entityData.set(DURATION, int)
 
 
-    var particle: ParticleEffect
-        get() = getDataTracker().get(PARTICLE_ID) as ParticleEffect
-        set(particle) = getDataTracker().set(PARTICLE_ID, particle)
+    var particle: ParticleOptions
+        get() = entityData.get(PARTICLE_ID) as ParticleOptions
+        set(particle) = entityData.set(PARTICLE_ID, particle)
 
 
     override fun tick() {
         super.tick()
-        calculateDimensions()
-        val isWaiting = age < waitTime
-        if (world.isClient) {
+        refreshDimensions()
+        val isWaiting = tickCount < waitTime
+        if (level().isClientSide) {
             tickClient(isWaiting)
         } else {
             tickServer(isWaiting)
@@ -141,43 +141,43 @@ open class LightningCloudEntity(entityType: EntityType<out LightningCloudEntity>
         val radius: Float
         if (wait) {
             count = 2
-            radius = standingEyeHeight
+            radius = eyeHeight
         } else {
-            count = MathHelper.ceil((Utils.rotate180 * setRadius * setRadius) / 5)
+            count = Mth.ceil((Utils.rotate180 * setRadius * setRadius) / 5)
             radius = setRadius
         }
 
         for (j in 0 until count) {
-            val randInRadius = MathHelper.sqrt(random.nextFloat()) * radius * 2f
-            val inSphere = Vec3d(
+            val randInRadius = Mth.sqrt(random.nextFloat()) * radius * 2f
+            val inSphere = Vec3(
                 random.nextDouble() - random.nextDouble(),
                 random.nextDouble() - random.nextDouble(),
                 random.nextDouble() - random.nextDouble()
-            ).normalize().multiply(randInRadius.toDouble()).add(x, eyeY, z)
-            world.addParticle(particle, inSphere.x, inSphere.y, inSphere.z, 0.0, 0.0, 0.0)
+            ).normalize().scale(randInRadius.toDouble()).add(x, eyeY, z)
+            level().addParticle(particle, inSphere.x, inSphere.y, inSphere.z, 0.0, 0.0, 0.0)
         }
     }
 
     open fun tickServer(wait: Boolean) {
-        if (this.age >= maxAge()) {
+        if (this.tickCount >= maxAge()) {
             this.discard()
             return
         }
         if (wait) return
-        if ((this.age % delayBetweenAction == 0) && !firstUpdate) doDamage()
+        if ((this.tickCount % delayBetweenAction == 0) && !firstTick) doDamage()
     }
 
     open fun doDamage() {
         val source = if (owner != null) {
-            this.damageSources.create(DuskDamageTypes.INDIRECT_ELECTRICITY, owner)
+            this.damageSources().source(DuskDamageTypes.INDIRECT_ELECTRICITY, owner)
         } else {
-            this.damageSources.create(DuskDamageTypes.ELECTRICITY)
+            this.damageSources().source(DuskDamageTypes.ELECTRICITY)
         }
-        val list2 = world.getNonSpectatingEntities(LivingEntity::class.java, this.bounds)
+        val list2 = level().getEntitiesOfClass(LivingEntity::class.java, this.boundingBox)
         if (list2.isNotEmpty()) {
             list2.forEach {
-                if (it.squaredDistanceTo(pos) <= radius)
-                    it.damage(source, damage)
+                if (it.distanceToSqr(position()) <= radius)
+                    it.hurt(source, damage)
             }
         }
     }
@@ -188,8 +188,8 @@ open class LightningCloudEntity(entityType: EntityType<out LightningCloudEntity>
     }
 
     override fun getOwner(): LivingEntity? {
-        if (this.owner == null && (this.ownerUuid != null) && world is ServerWorld) {
-            val entity = (world as ServerWorld).getEntity(this.ownerUuid)
+        if (this.owner == null && (this.ownerUuid != null) && level() is ServerLevel) {
+            val entity = (level() as ServerLevel).getEntity(this.ownerUuid)
             if (entity is LivingEntity) {
                 this.owner = entity
             }
@@ -201,48 +201,48 @@ open class LightningCloudEntity(entityType: EntityType<out LightningCloudEntity>
     fun maxAge(): Int = this.waitTime + this.duration
 
     override fun initialize(
-        world: ServerWorldAccess,
-        difficulty: LocalDifficulty,
-        spawnReason: SpawnReason,
-        entityData: EntityData
-    ): EntityData? {
+        world: ServerLevelAccessor,
+        difficulty: DifficultyInstance,
+        spawnReason: MobSpawnType,
+        entityData: SpawnGroupData
+    ): SpawnGroupData? {
 
         return entityData
     }
 
-    override fun onTrackedDataSet(data: TrackedData<*>) {
+    override fun onSyncedDataUpdated(data: EntityDataAccessor<*>) {
         if (RADIUS == data) {
-            this.calculateDimensions()
+            this.refreshDimensions()
         }
-        super.onTrackedDataSet(data)
+        super.onSyncedDataUpdated(data)
     }
 
-    override fun getPistonBehavior(): PistonBehavior = PistonBehavior.IGNORE
+    override fun getPistonPushReaction(): PushReaction = PushReaction.IGNORE
 
-    override fun getDimensions(pose: EntityPose): EntityDimensions {
+    override fun getDimensions(pose: Pose): EntityDimensions {
         val dimensions = radius * 2f
-        return EntityDimensions.changing(dimensions, dimensions).withEyeHeight(radius)
+        return EntityDimensions.scalable(dimensions, dimensions).withEyeHeight(radius)
     }
 
     companion object {
         private val LOGGER: Logger = LogUtils.getLogger()
-        private val RADIUS: TrackedData<Float> = DataTracker.registerData(
-            LightningCloudEntity::class.java, TrackedDataHandlerRegistry.FLOAT
+        private val RADIUS: EntityDataAccessor<Float> = SynchedEntityData.defineId(
+            LightningCloudEntity::class.java, EntityDataSerializers.FLOAT
         )
-        private val DAMAGE: TrackedData<Float> = DataTracker.registerData(
-            LightningCloudEntity::class.java, TrackedDataHandlerRegistry.FLOAT
+        private val DAMAGE: EntityDataAccessor<Float> = SynchedEntityData.defineId(
+            LightningCloudEntity::class.java, EntityDataSerializers.FLOAT
         )
-        private val DELAY_BETWEEN_ACTION: TrackedData<Int> = DataTracker.registerData(
-            LightningCloudEntity::class.java, TrackedDataHandlerRegistry.INTEGER
+        private val DELAY_BETWEEN_ACTION: EntityDataAccessor<Int> = SynchedEntityData.defineId(
+            LightningCloudEntity::class.java, EntityDataSerializers.INT
         )
-        private val DURATION: TrackedData<Int> = DataTracker.registerData(
-            LightningCloudEntity::class.java, TrackedDataHandlerRegistry.INTEGER
+        private val DURATION: EntityDataAccessor<Int> = SynchedEntityData.defineId(
+            LightningCloudEntity::class.java, EntityDataSerializers.INT
         )
-        private val WAIT_TIME: TrackedData<Int> = DataTracker.registerData(
-            LightningCloudEntity::class.java, TrackedDataHandlerRegistry.INTEGER
+        private val WAIT_TIME: EntityDataAccessor<Int> = SynchedEntityData.defineId(
+            LightningCloudEntity::class.java, EntityDataSerializers.INT
         )
-        private val PARTICLE_ID: TrackedData<ParticleEffect> = DataTracker.registerData(
-            LightningCloudEntity::class.java, TrackedDataHandlerRegistry.PARTICLE
+        private val PARTICLE_ID: EntityDataAccessor<ParticleOptions> = SynchedEntityData.defineId(
+            LightningCloudEntity::class.java, EntityDataSerializers.PARTICLE
         )
         private const val MAX_RADIUS = 32f
         private const val MIN_RADIUS = 0.25f

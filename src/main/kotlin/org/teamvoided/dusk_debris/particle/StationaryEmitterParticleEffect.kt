@@ -4,24 +4,24 @@ import com.mojang.serialization.Codec
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.fabricmc.fabric.api.particle.v1.FabricParticleTypes
-import net.minecraft.network.RegistryByteBuf
-import net.minecraft.network.codec.PacketCodec
-import net.minecraft.network.codec.PacketCodecs
-import net.minecraft.particle.ParticleEffect
-import net.minecraft.particle.ParticleType
-import net.minecraft.particle.ParticleTypes
+import net.minecraft.core.particles.ParticleOptions
+import net.minecraft.core.particles.ParticleType
+import net.minecraft.core.particles.ParticleTypes
+import net.minecraft.network.RegistryFriendlyByteBuf
+import net.minecraft.network.codec.ByteBufCodecs
+import net.minecraft.network.codec.StreamCodec
 import org.teamvoided.dusk_debris.init.DuskParticles
 
 class StationaryEmitterParticleEffect(
-    private val particle: ParticleEffect,
+    private val particle: ParticleOptions,
     private val maxAge: Int,
     private val delayBetween: Int
-) : ParticleEffect {
+) : ParticleOptions {
     override fun getType(): ParticleType<StationaryEmitterParticleEffect> {
         return DuskParticles.STATIONARY_EMITTER
     }
 
-    fun particle(): ParticleEffect {
+    fun particle(): ParticleOptions {
         if (particle.type == this.type) return ParticleTypes.SMOKE
         else return this.particle
     }
@@ -38,7 +38,7 @@ class StationaryEmitterParticleEffect(
         val CODEC: MapCodec<StationaryEmitterParticleEffect> =
             RecordCodecBuilder.mapCodec { instance: RecordCodecBuilder.Instance<StationaryEmitterParticleEffect> ->
                 instance.group(
-                    ParticleTypes.TYPE_CODEC.fieldOf("particle")
+                    ParticleTypes.CODEC.fieldOf("particle")
                         .forGetter { obj: StationaryEmitterParticleEffect -> obj.particle() },
                     Codec.INT.fieldOf("max_age")
                         .forGetter { obj: StationaryEmitterParticleEffect -> obj.maxAge() },
@@ -46,12 +46,12 @@ class StationaryEmitterParticleEffect(
                         .forGetter { obj: StationaryEmitterParticleEffect -> obj.delayBetween() }
                 ).apply(instance, ::StationaryEmitterParticleEffect)
             }
-        val PACKET_CODEC: PacketCodec<RegistryByteBuf, StationaryEmitterParticleEffect> = PacketCodec.tuple(
-            ParticleTypes.CODEC,
+        val PACKET_CODEC: StreamCodec<RegistryFriendlyByteBuf, StationaryEmitterParticleEffect> = StreamCodec.composite(
+            ParticleTypes.STREAM_CODEC,
             { obj: StationaryEmitterParticleEffect -> obj.particle() },
-            PacketCodecs.VAR_INT,
+            ByteBufCodecs.VAR_INT,
             { obj: StationaryEmitterParticleEffect -> obj.maxAge() },
-            PacketCodecs.VAR_INT,
+            ByteBufCodecs.VAR_INT,
             { obj: StationaryEmitterParticleEffect -> obj.delayBetween() },
             ::StationaryEmitterParticleEffect
         )

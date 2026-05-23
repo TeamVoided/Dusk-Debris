@@ -1,105 +1,104 @@
 package org.teamvoided.dusk_debris.entity
 
-import net.minecraft.entity.*
-import net.minecraft.entity.attribute.DefaultAttributeContainer
-import net.minecraft.entity.attribute.EntityAttributes
-import net.minecraft.entity.effect.StatusEffectInstance
-import net.minecraft.entity.effect.StatusEffects
-import net.minecraft.entity.mob.SkeletonHorseEntity
-import net.minecraft.entity.passive.AnimalEntity
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.random.RandomGenerator
-import net.minecraft.world.EntityView
-import net.minecraft.world.World
-import net.minecraft.world.WorldAccess
+import net.minecraft.core.BlockPos
+import net.minecraft.util.RandomSource
+import net.minecraft.world.effect.MobEffectInstance
+import net.minecraft.world.effect.MobEffects
+import net.minecraft.world.entity.*
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier
+import net.minecraft.world.entity.ai.attributes.Attributes
+import net.minecraft.world.entity.animal.Animal
+import net.minecraft.world.entity.animal.horse.SkeletonHorse
+import net.minecraft.world.level.Level
+import net.minecraft.world.level.LevelAccessor
 import org.teamvoided.dusk_debris.entity.ai.goal.WitherSkeletonHorseTrapTriggerGoal
 import org.teamvoided.dusk_debris.init.DuskEntities
 import java.util.*
 
-class WitherSkeletonHorseEntity : SkeletonHorseEntity {
+class WitherSkeletonHorseEntity : SkeletonHorse {
     constructor(
         entityType: EntityType<out WitherSkeletonHorseEntity>,
-        world: World
+        world: Level
     ) : super(entityType, world)
 
     private val witherTrapTriggerGoal = WitherSkeletonHorseTrapTriggerGoal(this)
-    override fun initAttributes(random: RandomGenerator) {
-        var var10000 = this.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH)
+    override fun randomizeAttributes(random: RandomSource) {
+        var var10000 = this.getAttribute(Attributes.MAX_HEALTH)
         Objects.requireNonNull(random)
-        var10000!!.baseValue = generateMaxHealthBonus(random::nextInt).toDouble()
-        var10000 = this.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED)
+        var10000!!.baseValue = generateMaxHealth(random::nextInt).toDouble()
+        var10000 = this.getAttribute(Attributes.MOVEMENT_SPEED)
         Objects.requireNonNull(random)
-        var10000!!.baseValue = generateSpeedBonus(random::nextDouble)
-        var10000 = this.getAttributeInstance(EntityAttributes.GENERIC_JUMP_STRENGTH)
+        var10000!!.baseValue = generateSpeed(random::nextDouble)
+        var10000 = this.getAttribute(Attributes.JUMP_STRENGTH)
         Objects.requireNonNull(random)
-        var10000!!.baseValue = generateJumpStrengthBonus(random::nextDouble)
+        var10000!!.baseValue = generateJumpStrength(random::nextDouble)
     }
 
-    override fun setTrapped(trapped: Boolean) {
-        if (trapped != this.trapped) {
-            this.trapped = trapped
+    override fun setTrap(trapped: Boolean) {
+        if (trapped != this.isTrap) {
+            this.isTrap = trapped
             if (trapped) {
-                goalSelector.add(1, this.witherTrapTriggerGoal)
+                goalSelector.addGoal(1, this.witherTrapTriggerGoal)
             } else {
-                goalSelector.remove(this.witherTrapTriggerGoal)
+                goalSelector.removeGoal(this.witherTrapTriggerGoal)
             }
         }
     }
 
-    override fun getEntityView(): EntityView = this.world
+//    override fun level(): Level = this.level()
 
-    override fun tryAttack(target: Entity?): Boolean {
-        if (!super.tryAttack(target)) {
+    override fun doHurtTarget(target: Entity?): Boolean {
+        if (!super.doHurtTarget(target)) {
             return false
         } else {
             if (target is LivingEntity) {
-                target.addStatusEffect(StatusEffectInstance(StatusEffects.WITHER, 200), this)
+                target.addEffect(MobEffectInstance(MobEffects.WITHER, 200), this)
             }
             return true
         }
     }
 
 //    override fun getAmbientSound(): SoundEvent {
-//        return if (this.isSubmergedIn(FluidTags.WATER)) SoundEvents.ENTITY_SKELETON_HORSE_AMBIENT_WATER
-//        else SoundEvents.ENTITY_SKELETON_HORSE_AMBIENT
+//        return if (this.isSubmergedIn(FluidTags.WATER)) SoundEvents.SKELETON_HORSE_AMBIENT_WATER
+//        else SoundEvents.SKELETON_HORSE_AMBIENT
 //    }
 //
 //    override fun getDeathSound(): SoundEvent {
-//        return SoundEvents.ENTITY_SKELETON_HORSE_DEATH
+//        return SoundEvents.SKELETON_HORSE_DEATH
 //    }
 //
 //    override fun getHurtSound(source: DamageSource?): SoundEvent {
-//        return SoundEvents.ENTITY_SKELETON_HORSE_HURT
+//        return SoundEvents.SKELETON_HORSE_HURT
 //    }
 //
 //    override fun getSwimSound(): SoundEvent {
 //        if (this.isOnGround) {
 //            if (!this.hasPassengers()) {
-//                return SoundEvents.ENTITY_SKELETON_HORSE_STEP_WATER
+//                return SoundEvents.SKELETON_HORSE_STEP_WATER
 //            }
 //
 //            ++this.soundTicks
 //            if (this.soundTicks > 5 && this.soundTicks % 3 == 0) {
-//                return SoundEvents.ENTITY_SKELETON_HORSE_GALLOP_WATER
+//                return SoundEvents.SKELETON_HORSE_GALLOP_WATER
 //            }
 //
 //            if (this.soundTicks <= 5) {
-//                return SoundEvents.ENTITY_SKELETON_HORSE_STEP_WATER
+//                return SoundEvents.SKELETON_HORSE_STEP_WATER
 //            }
 //        }
 //
-//        return SoundEvents.ENTITY_SKELETON_HORSE_SWIM
+//        return SoundEvents.SKELETON_HORSE_SWIM
 //    }
 //
 //    override fun playJumpSound() {
 //        if (this.isTouchingWater) {
-//            this.playSound(SoundEvents.ENTITY_SKELETON_HORSE_JUMP_WATER, 0.4f, 1.0f)
+//            this.playSound(SoundEvents.SKELETON_HORSE_JUMP_WATER, 0.4f, 1.0f)
 //        } else {
 //            super.playJumpSound()
 //        }
 //    }
 
-    override fun getDefaultDimensions(pose: EntityPose?): EntityDimensions {
+    override fun getDefaultDimensions(pose: Pose?): EntityDimensions {
         return if (this.isBaby) BABY_DIMENSIONS else super.getDefaultDimensions(pose)
     }
 
@@ -108,28 +107,28 @@ class WitherSkeletonHorseEntity : SkeletonHorseEntity {
             .withAttachments(
                 EntityAttachments.builder()
                     .attach(
-                        EntityAttachmentType.PASSENGER,
+                        EntityAttachment.PASSENGER,
                         0.0f,
                         DuskEntities.WITHER_SKELETON_HORSE.height - 0.03125f,
                         0.0f
                     )
-            ).scaled(0.5f)
+            ).scale(0.5f)
 
-        fun createAttributes(): DefaultAttributeContainer.Builder {
-            return createBaseAttributes()
+        fun createAttributes(): AttributeSupplier.Builder {
+            return createBaseHorseAttributes()
         }
 
         fun canSpawn(
-            type: EntityType<out AnimalEntity>,
-            world: WorldAccess,
-            reason: SpawnReason,
+            type: EntityType<out Animal>,
+            world: LevelAccessor,
+            reason: MobSpawnType,
             pos: BlockPos,
-            random: RandomGenerator
+            random: RandomSource
         ): Boolean {
-            return if (!SpawnReason.isSpawner(reason)) {
-                isValidNaturalSpawn(type, world, reason, pos, random)
+            return if (!MobSpawnType.isSpawner(reason)) {
+                checkAnimalSpawnRules(type, world, reason, pos, random)
             } else {
-                SpawnReason.isTrialSpawner(reason) || isBrightEnoughForNaturalSpawn(world, pos)
+                MobSpawnType.ignoresLightRequirements(reason) || isBrightEnoughToSpawn(world, pos)
             }
         }
     }

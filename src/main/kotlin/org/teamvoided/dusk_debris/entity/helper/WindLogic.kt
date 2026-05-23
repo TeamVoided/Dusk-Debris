@@ -1,31 +1,31 @@
 package org.teamvoided.dusk_debris.entity.helper
 
-import net.minecraft.entity.Entity
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Direction
-import net.minecraft.util.math.Vec3d
-import net.minecraft.world.World
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.level.Level
+import net.minecraft.world.phys.Vec3
 import org.teamvoided.dusk_debris.data.tags.DuskBlockTags
 import org.teamvoided.dusk_debris.util.velocityWind
 
 object WindLogic {
-    fun Entity.inFanWind(velocity: Vec3d) {
+    fun Entity.inFanWind(velocity: Vec3) {
         this.inFanWind(velocity.x, velocity.y, velocity.z)
     }
 
     fun Entity.inFanWind(x: Double, y: Double, z: Double) {
         var mult = 1.0
-        if (this is PlayerEntity) {
+        if (this is Player) {
             if (isCreative && abilities.flying) {
                 return
             }
 //            mult = 1.25x
-            this.isOnGround = false
+            this.setOnGround(false)
         }
         this.resetFallDistance()
-        this.velocityModified = true
-        this.velocityWind = Vec3d(
+        this.hurtMarked = true
+        this.velocityWind = Vec3(
             lowerOrCombine(x * mult, this.velocityWind.x),
             lowerOrCombine(y * mult, this.velocityWind.y),
             lowerOrCombine(z * mult, this.velocityWind.z)
@@ -47,16 +47,16 @@ object WindLogic {
     }
 
 
-    fun windLength(world: World, pos: BlockPos, direction: Direction, maxLength: Int): Int {
+    fun windLength(world: Level, pos: BlockPos, direction: Direction, maxLength: Int): Int {
         var retorn = maxLength
         for (it in 0 until maxLength) {
-            val posCheck = pos.offset(direction, it + 1)
-            val worldBlock = world.getBlockState(pos.offset(direction, it + 1))
+            val posCheck = pos.relative(direction, it + 1)
+            val worldBlock = world.getBlockState(pos.relative(direction, it + 1))
             if (
-                !worldBlock.materialReplaceable() &&
-                !worldBlock.isIn(DuskBlockTags.WIND_IGNORE) &&
-                (worldBlock.isSideSolidFullSquare(world, posCheck, direction) ||
-                        worldBlock.isSideSolidFullSquare(world, posCheck, direction.opposite))
+                !worldBlock.canBeReplaced() &&
+                !worldBlock.`is`(DuskBlockTags.WIND_IGNORE) &&
+                (worldBlock.isFaceSturdy(world, posCheck, direction) ||
+                        worldBlock.isFaceSturdy(world, posCheck, direction.opposite))
             ) {
                 retorn = it
                 break

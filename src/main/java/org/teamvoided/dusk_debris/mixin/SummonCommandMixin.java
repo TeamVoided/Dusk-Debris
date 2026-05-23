@@ -1,6 +1,6 @@
 package org.teamvoided.dusk_debris.mixin;
 
-import net.minecraft.server.command.SummonCommand;
+import net.minecraft.server.commands.SummonCommand;
 import org.spongepowered.asm.mixin.Mixin;
 
 @Mixin(SummonCommand.class)

@@ -2,14 +2,14 @@ package org.teamvoided.dusk_debris.world.gen.configured_feature.config
 
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
-import net.minecraft.block.Block
-import net.minecraft.registry.RegistryKeys
-import net.minecraft.registry.tag.TagKey
-import net.minecraft.util.math.float_provider.FloatProvider
-import net.minecraft.util.math.int_provider.IntProvider
-import net.minecraft.util.math.int_provider.UniformIntProvider
-import net.minecraft.world.gen.feature.FeatureConfig
-import net.minecraft.world.gen.stateprovider.BlockStateProvider
+import net.minecraft.core.registries.Registries
+import net.minecraft.tags.TagKey
+import net.minecraft.util.valueproviders.FloatProvider
+import net.minecraft.util.valueproviders.IntProvider
+import net.minecraft.util.valueproviders.UniformInt
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration
+import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider
 
 class TorusFeatureConfig(
     val blockstate: BlockStateProvider,
@@ -20,39 +20,39 @@ class TorusFeatureConfig(
     val pitch: FloatProvider,
     val roll: FloatProvider,
     val noiseMultiplier: FloatProvider,
-) : FeatureConfig {
+) : FeatureConfiguration {
     companion object {
         val CODEC: Codec<TorusFeatureConfig> =
             RecordCodecBuilder.create { instance: RecordCodecBuilder.Instance<TorusFeatureConfig> ->
                 instance.group(
-                    BlockStateProvider.TYPE_CODEC
+                    BlockStateProvider.CODEC
                         .fieldOf("blockstate")
                         .forGetter { it.blockstate },
-                    TagKey.createHashedCodec(RegistryKeys.BLOCK)
+                    TagKey.hashedCodec(Registries.BLOCK)
                         .fieldOf("replaceable")
                         .forGetter { it.replaceable },
                     IntProvider
-                        .method_35004(-20, 20)
+                        .codec(-20, 20)
                         .fieldOf("radius_to_ring_center")
-                        .orElse(UniformIntProvider.create(4, 13))
+                        .orElse(UniformInt.of(4, 13))
                         .forGetter { config: TorusFeatureConfig -> config.radiusToRingCenter },
                     IntProvider
-                        .method_35004(-20, 20)
+                        .codec(-20, 20)
                         .fieldOf("ring_width")
-                        .orElse(UniformIntProvider.create(2, 6))
+                        .orElse(UniformInt.of(2, 6))
                         .forGetter { config: TorusFeatureConfig -> config.ringWidth },
                     IntProvider
-                        .method_35004(1, 20)
+                        .codec(1, 20)
                         .fieldOf("ring_height")
-                        .orElse(UniformIntProvider.create(2, 6))
+                        .orElse(UniformInt.of(2, 6))
                         .forGetter { config: TorusFeatureConfig -> config.ringHeight },
-                    FloatProvider.createValidatedCodec(0f, 1f)
+                    FloatProvider.codec(0f, 1f)
                         .fieldOf("pitch")
                         .forGetter { config: TorusFeatureConfig -> config.pitch },
-                    FloatProvider.createValidatedCodec(0f, 1f)
+                    FloatProvider.codec(0f, 1f)
                         .fieldOf("roll")
                         .forGetter { config: TorusFeatureConfig -> config.roll },
-                    FloatProvider.createValidatedCodec(0f, 10f)
+                    FloatProvider.codec(0f, 10f)
                         .fieldOf("noise_multiplier")
                         .forGetter { config: TorusFeatureConfig -> config.noiseMultiplier }
                 ).apply(instance, ::TorusFeatureConfig)

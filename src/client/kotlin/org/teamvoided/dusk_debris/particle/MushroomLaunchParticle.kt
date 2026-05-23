@@ -1,57 +1,57 @@
 package org.teamvoided.dusk_debris.particle
 
+import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.client.particle.*
-import net.minecraft.client.render.WorldRenderer
-import net.minecraft.client.world.ClientWorld
-import net.minecraft.particle.DefaultParticleType
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.MathHelper.lerp
+import net.minecraft.client.renderer.LevelRenderer
+import net.minecraft.core.BlockPos
+import net.minecraft.core.particles.SimpleParticleType
+import net.minecraft.util.Mth.lerp
 import org.joml.Vector3f
 import java.awt.Color
 
 class MushroomLaunchParticle(
-    world: ClientWorld,
+    world: ClientLevel,
     x: Double, y: Double, z: Double,
     velX: Double, velY: Double, velZ: Double
-) : SpriteBillboardParticle(world, x, y, z, velX, velY, velZ) {
+) : TextureSheetParticle(world, x, y, z, velX, velY, velZ) {
     init {
-        this.velocityX = velX
-        this.velocityY = velY
-        this.velocityZ = velZ
-        this.scale = (this.random.nextFloat() * this.random.nextFloat() * 0.5f + 0.25f)
-        this.maxAge = (this.random.nextFloat() * 80).toInt() + 20
-        this.gravityStrength = -0.01f
-        this.collidesWithWorld = false
-        this.velocityMultiplier = 1.0f
+        this.xd = velX
+        this.yd = velY
+        this.zd = velZ
+        this.quadSize = (this.random.nextFloat() * this.random.nextFloat() * 0.5f + 0.25f)
+        this.lifetime = (this.random.nextFloat() * 80).toInt() + 20
+        this.gravity = -0.01f
+        this.hasPhysics = false
+        this.friction = 1.0f
         val lerp = random.nextFloat()
-        colorRed = lerp(colorOption1.x, colorOption2.x, lerp)
-        colorGreen = lerp(colorOption1.y, colorOption2.y, lerp)
-        colorBlue = lerp(colorOption1.z, colorOption2.z, lerp)
+        rCol = lerp(colorOption1.x, colorOption2.x, lerp)
+        gCol = lerp(colorOption1.y, colorOption2.y, lerp)
+        bCol = lerp(colorOption1.z, colorOption2.z, lerp)
     }
 
-    override fun getType(): ParticleTextureSheet = ParticleTextureSheet.PARTICLE_SHEET_OPAQUE
+    override fun getRenderType(): ParticleRenderType = ParticleRenderType.PARTICLE_SHEET_OPAQUE
 
     override fun tick() {
         super.tick()
-        this.velocityX *= 0.8
-        this.velocityY *= 0.8
-        this.velocityZ *= 0.8
+        this.xd *= 0.8
+        this.yd *= 0.8
+        this.zd *= 0.8
     }
 
-    override fun getBrightness(tint: Float): Int {
-        val blockPos = BlockPos.create(this.x, this.y, this.z)
+    override fun getLightColor(tint: Float): Int {
+        val blockPos = BlockPos.containing(this.x, this.y, this.z)
         var brightness = 200
-        if (world.isChunkLoaded(blockPos)) {
-            val brightness2 = WorldRenderer.getLightmapCoordinates(this.world, blockPos)
+        if (level.hasChunkAt(blockPos)) {
+            val brightness2 = LevelRenderer.getLightColor(this.level, blockPos)
             brightness = Math.max(brightness, brightness2)
         }
         return brightness
     }
 
-    class Factory(private val spriteProvider: SpriteProvider) : ParticleFactory<DefaultParticleType> {
+    class Factory(private val spriteProvider: SpriteSet) : ParticleProvider<SimpleParticleType> {
         override fun createParticle(
-            defaultParticleType: DefaultParticleType,
-            world: ClientWorld,
+            defaultParticleType: SimpleParticleType,
+            world: ClientLevel,
             x: Double,
             y: Double,
             z: Double,
@@ -64,7 +64,7 @@ class MushroomLaunchParticle(
                 x, y, z,
                 velX, velY, velZ
             )
-            mushroomLaunchParticle.setSprite(spriteProvider)
+            mushroomLaunchParticle.pickSprite(spriteProvider)
             return mushroomLaunchParticle
         }
     }

@@ -1,8 +1,8 @@
 package org.teamvoided.dusk_debris.data.worldgen
 
-import net.minecraft.registry.RegistryKey
-import net.minecraft.registry.RegistryKeys
-import net.minecraft.world.gen.feature.PlacedFeature
+import net.minecraft.core.registries.Registries
+import net.minecraft.resources.ResourceKey
+import net.minecraft.world.level.levelgen.placement.PlacedFeature
 import org.teamvoided.dusk_debris.DuskDebris.id
 
 @Suppress("MemberVisibilityCanBePrivate")
@@ -38,6 +38,6 @@ object DuskPlacedFeatures {
 
     val BOREAL_VALLEY_VEGETATION = create("boreal_valley/boreal_valley_vegetation")
 
-    private fun create(id: String): RegistryKey<PlacedFeature> =
-        RegistryKey.of(RegistryKeys.PLACED_FEATURE, id(id))
+    private fun create(id: String): ResourceKey<PlacedFeature> =
+        ResourceKey.create(Registries.PLACED_FEATURE, id(id))
 }

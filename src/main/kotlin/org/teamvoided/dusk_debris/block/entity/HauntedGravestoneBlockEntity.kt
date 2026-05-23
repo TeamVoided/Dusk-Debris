@@ -1,16 +1,16 @@
 package org.teamvoided.dusks_and_dungeons.block.entity
 
-import net.minecraft.block.BlockState
-import net.minecraft.block.entity.BlockEntity
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.particle.ParticleTypes
-import net.minecraft.server.world.ServerWorld
-import net.minecraft.sound.SoundCategory
-import net.minecraft.sound.SoundEvents
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Vec3d
-import net.minecraft.world.EntityDetector
-import net.minecraft.world.World
+import net.minecraft.core.BlockPos
+import net.minecraft.core.particles.ParticleTypes
+import net.minecraft.server.level.ServerLevel
+import net.minecraft.sounds.SoundEvents
+import net.minecraft.sounds.SoundSource
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.level.Level
+import net.minecraft.world.level.block.entity.BlockEntity
+import net.minecraft.world.level.block.entity.trialspawner.PlayerDetector
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.phys.Vec3
 import org.teamvoided.dusk_debris.block.HauntedGravestoneBlock
 import org.teamvoided.dusk_debris.init.DuskBlockEntities
 import kotlin.math.cos
@@ -18,51 +18,51 @@ import kotlin.math.sin
 
 class HauntedGravestoneBlockEntity(pos: BlockPos, state: BlockState) :
     BlockEntity(DuskBlockEntities.HAUNTED_GRAVESTONE_BLOCK, pos, state) {
-    var cursedPlayer: PlayerEntity? = null
-    var cursePos: Vec3d = pos.ofCenter()
+    var cursedPlayer: Player? = null
+    var cursePos: Vec3 = pos.center
     var curseTime = 0
-    var curseVelocity: Vec3d = Vec3d(0.0, 0.0, 0.0)
+    var curseVelocity: Vec3 = Vec3(0.0, 0.0, 0.0)
 
-    override fun onSyncedBlockEvent(type: Int, data: Int): Boolean {
+    override fun triggerEvent(type: Int, data: Int): Boolean {
         when (type) {
             0 -> {
                 cursedPlayer = null
-                cursePos = Vec3d.ZERO
+                cursePos = Vec3.ZERO
                 curseTime = 0
-                curseVelocity = Vec3d(0.0, 0.0, 0.0)
+                curseVelocity = Vec3(0.0, 0.0, 0.0)
                 return true
             }
 
             1 -> {
                 cursedPlayer =
-                    world?.getClosestPlayer(pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble(), RANGE, false)
-                cursePos = pos.ofCenter()
+                    level?.getNearestPlayer(worldPosition.x.toDouble(), worldPosition.y.toDouble(), worldPosition.z.toDouble(), RANGE, false)
+                cursePos = worldPosition.center
                 return true
             }
         }
-        return super.onSyncedBlockEvent(type, data)
+        return super.triggerEvent(type, data)
     }
 
     companion object {
         var RANGE = 9.0
 
-        fun serverTick(world: World, pos: BlockPos, state: BlockState, blockEntity: HauntedGravestoneBlockEntity) {
-            if (world.isClient) {
+        fun serverTick(world: Level, pos: BlockPos, state: BlockState, blockEntity: HauntedGravestoneBlockEntity) {
+            if (world.isClientSide) {
                 if (blockEntity.cursedPlayer == null) {
                     return
                 }
-                val oldPos: Vec3d = blockEntity.cursePos
-                val playerPos: Vec3d = blockEntity.cursedPlayer!!.pos.add(0.0, 1.0, 0.0)
-                val distanceVec = Vec3d(
+                val oldPos: Vec3 = blockEntity.cursePos
+                val playerPos: Vec3 = blockEntity.cursedPlayer!!.position().add(0.0, 1.0, 0.0)
+                val distanceVec = Vec3(
                     playerPos.x - oldPos.x,
                     playerPos.y - oldPos.y,
                     playerPos.z - oldPos.z
                 )
                 val distance = distanceVec.length()
                 blockEntity.curseVelocity = if (distance < 0.5) {
-                    blockEntity.curseVelocity.multiply(0.8)
+                    blockEntity.curseVelocity.scale(0.8)
                 } else {
-                    blockEntity.curseVelocity.add(distanceVec.multiply((0.075 / distance)))
+                    blockEntity.curseVelocity.add(distanceVec.scale((0.075 / distance)))
                 }
                 blockEntity.cursePos = blockEntity.cursePos.add(blockEntity.curseVelocity)
                 blockEntity.curseTime++
@@ -83,33 +83,33 @@ class HauntedGravestoneBlockEntity(pos: BlockPos, state: BlockState) :
                 return
             }
 
-            if ((pos.asLong() + world.time) % 20L != 0L) {
-                val players = EntityDetector.NON_SPECTATING_PLAYERS.detect(
-                    world as ServerWorld?,
-                    EntityDetector.EntitySelector.WORLD_ENTITY_SELECTOR,
+            if ((pos.asLong() + world.gameTime) % 20L != 0L) {
+                val players = PlayerDetector.INCLUDING_CREATIVE_PLAYERS.detect(
+                    world as ServerLevel?,
+                    PlayerDetector.EntitySelector.SELECT_FROM_LEVEL,
                     pos,
                     RANGE,
                     true
                 )
 
-                val isActive = state.get(HauntedGravestoneBlock.IS_ACTIVE)
+                val isActive = state.getValue(HauntedGravestoneBlock.IS_ACTIVE)
                 if (isActive && world.random.nextInt(1000) == 0) {
-                    world.addSyncedBlockEvent(pos, state.block, 1, 0)
-                    world.playSound(
+                    world.blockEvent(pos, state.block, 1, 0)
+                    world.playLocalSound(
                         pos.x + 0.5,
                         pos.y + 0.5,
                         pos.z + 0.5,
-                        SoundEvents.ENTITY_VEX_CHARGE,
-                        SoundCategory.BLOCKS,
+                        SoundEvents.VEX_CHARGE,
+                        SoundSource.BLOCKS,
                         1f,
                         world.random.nextFloat() * 0.3f,
                         false
                     )
                 }
                 if ((isActive && players.isEmpty()) || (!isActive && players.isNotEmpty())) {
-                    world.setBlockState(pos, state.with(HauntedGravestoneBlock.IS_ACTIVE, !isActive))
+                    world.setBlockAndUpdate(pos, state.setValue(HauntedGravestoneBlock.IS_ACTIVE, !isActive))
                     if (isActive)
-                        world.addSyncedBlockEvent(pos, state.block, 0, 0)
+                        world.blockEvent(pos, state.block, 0, 0)
                 }
             }
         }

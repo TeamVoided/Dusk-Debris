@@ -1,15 +1,15 @@
 package org.teamvoided.dusk_debris.entity
 
-import net.minecraft.entity.Entity
-import net.minecraft.entity.EntityType
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.Ownable
-import net.minecraft.entity.data.DataTracker
-import net.minecraft.nbt.NbtCompound
-import net.minecraft.server.world.ServerWorld
-import net.minecraft.util.math.MathHelper
-import net.minecraft.util.math.Vec3d
-import net.minecraft.world.World
+import net.minecraft.nbt.CompoundTag
+import net.minecraft.network.syncher.SynchedEntityData
+import net.minecraft.server.level.ServerLevel
+import net.minecraft.util.Mth
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.EntityType
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.TraceableEntity
+import net.minecraft.world.level.Level
+import net.minecraft.world.phys.Vec3
 import org.teamvoided.dusk_debris.init.DuskEntities
 import org.teamvoided.dusk_debris.init.DuskParticles
 import org.teamvoided.dusk_debris.util.addParticle
@@ -18,51 +18,51 @@ import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
 
-class TwistingSoulChargeEntity : Entity, Ownable {
-    constructor (entityType: EntityType<out TwistingSoulChargeEntity>, world: World) : super(entityType, world)
-    constructor(world: World, owner: LivingEntity) : super(DuskEntities.TWISTING_SOUL_CHARGE, world) {
+class TwistingSoulChargeEntity : Entity, TraceableEntity {
+    constructor (entityType: EntityType<out TwistingSoulChargeEntity>, world: Level) : super(entityType, world)
+    constructor(world: Level, owner: LivingEntity) : super(DuskEntities.TWISTING_SOUL_CHARGE, world) {
         this.setOwner(owner)
     }
 
     private var ownerUuid: UUID? = null
     private var owner: Entity? = null
     private var targetUuid: UUID? = null
-    override fun initDataTracker(builder: DataTracker.Builder) {}
+    override fun defineSynchedData(builder: SynchedEntityData.Builder) {}
 
-    override fun readCustomDataFromNbt(nbt: NbtCompound) {
-        if (nbt.containsUuid("Owner")) {
-            this.ownerUuid = nbt.getUuid("Owner")
+    override fun readAdditionalSaveData(nbt: CompoundTag) {
+        if (nbt.hasUUID("Owner")) {
+            this.ownerUuid = nbt.getUUID("Owner")
             this.owner = null
         }
     }
 
-    override fun writeCustomDataToNbt(nbt: NbtCompound) {
+    override fun addAdditionalSaveData(nbt: CompoundTag) {
         if (this.ownerUuid != null) {
-            nbt.putUuid("Owner", this.ownerUuid)
+            nbt.putUUID("Owner", this.ownerUuid)
         }
     }
 
     override fun tick() {
         super.tick()
-        if (world.isClient) {
+        if (level().isClientSide) {
             this.spawnParticles()
         }
         if (this.owner != null) {
-            val orbitOffset = (owner!!.width) + 2
-            val targetPos = Vec3d(
-                orbitOffset * sin(age.toDouble() / 20),
-                owner!!.height / 2.0,
-                orbitOffset * cos(age.toDouble() / 20)
-            ).add(this.owner!!.pos).subtract(pos)
-            val vel2 = velocity.add(targetPos).multiply(0.1)
-            setVelocityClient(vel2.x, vel2.y, vel2.z)
+            val orbitOffset = (owner!!.bbWidth) + 2
+            val targetPos = Vec3(
+                orbitOffset * sin(tickCount.toDouble() / 20),
+                owner!!.bbHeight / 2.0,
+                orbitOffset * cos(tickCount.toDouble() / 20)
+            ).add(this.owner!!.position()).subtract(position())
+            val vel2 = deltaMovement.add(targetPos).scale(0.1)
+            lerpMotion(vel2.x, vel2.y, vel2.z)
 
-            val h = this.x + this.velocity.x
-            val j = this.y + this.velocity.y
-            val k = this.z + this.velocity.z
+            val h = this.x + this.deltaMovement.x
+            val j = this.y + this.deltaMovement.y
+            val k = this.z + this.deltaMovement.z
 
-            this.setPosition(h, j, k)
-            this.checkBlockCollision()
+            this.setPos(h, j, k)
+            this.checkInsideBlocks()
         }
     }
 
@@ -110,14 +110,14 @@ class TwistingSoulChargeEntity : Entity, Ownable {
 
 
     private fun spawnParticles(velocity: Double = 0.1) {
-        world.addParticle(
+        level().addParticle(
             DuskParticles.DRAINED_SOUL,
-            pos.add(
+            position().add(
                 (random.nextDouble() - 0.5) * 0.6,
                 (random.nextDouble() - 0.5) * 0.6,
                 (random.nextDouble() - 0.5) * 0.6
             ),
-            Vec3d(
+            Vec3(
                 (random.nextDouble() - 0.5) * velocity,
                 (random.nextDouble() - 0.5) * velocity,
                 (random.nextDouble() - 0.5) * velocity
@@ -125,15 +125,15 @@ class TwistingSoulChargeEntity : Entity, Ownable {
         )
     }
 
-    override fun setVelocityClient(x: Double, y: Double, z: Double) {
-        this.setVelocity(x, y, z)
-        if (this.prevPitch == 0.0f && this.prevYaw == 0.0f) {
+    override fun lerpMotion(x: Double, y: Double, z: Double) {
+        this.setDeltaMovement(x, y, z)
+        if (this.xRotO == 0.0f && this.yRotO == 0.0f) {
             val d = sqrt(x * x + z * z)
-            this.pitch = (MathHelper.atan2(y, d) * 57.2957763671875).toFloat()
-            this.yaw = (MathHelper.atan2(x, z) * 57.2957763671875).toFloat()
-            this.prevPitch = this.pitch
-            this.prevYaw = this.yaw
-            this.refreshPositionAndAngles(this.x, this.y, this.z, this.yaw, this.pitch)
+            this.setXRot((Mth.atan2(y, d) * 57.2957763671875).toFloat())
+            this.setYRot((Mth.atan2(x, z) * 57.2957763671875).toFloat())
+            this.xRotO = this.xRot
+            this.yRotO = this.yRot
+            this.moveTo(this.x, this.y, this.z, this.yRot, this.xRot)
         }
     }
 
@@ -149,9 +149,9 @@ class TwistingSoulChargeEntity : Entity, Ownable {
             return this.owner
         } else {
             if (this.ownerUuid != null) {
-                val world: World = this.world
-                if (world is ServerWorld) {
-                    val serverWorld: ServerWorld = world
+                val world: Level = this.level()
+                if (world is ServerLevel) {
+                    val serverWorld: ServerLevel = world
                     this.owner = serverWorld.getEntity(this.ownerUuid)
                     return this.owner
                 }

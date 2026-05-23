@@ -1,16 +1,16 @@
 package org.teamvoided.dusk_debris.block
 
-import net.minecraft.util.StringIdentifiable
-import net.minecraft.util.math.Direction
+import net.minecraft.core.Direction
+import net.minecraft.util.StringRepresentable
 
-enum class TripleBlockSection(val direction: Direction) : StringIdentifiable {
+enum class TripleBlockSection(val direction: Direction) : StringRepresentable {
     TOP(Direction.DOWN),
     MIDDLE(Direction.UP),
     BOTTOM(Direction.UP);
 
-    override fun toString(): String = this.asString()
+    override fun toString(): String = this.serializedName
 
-    override fun asString(): String {
+    override fun getSerializedName(): String {
         return if (this == TOP) "top" else if (this == MIDDLE) "middle" else "bottom"
     }
 

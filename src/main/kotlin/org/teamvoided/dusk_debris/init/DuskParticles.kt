@@ -2,10 +2,9 @@ package org.teamvoided.dusk_debris.init
 
 import net.fabricmc.fabric.api.particle.v1.FabricParticleTypes.complex
 import net.fabricmc.fabric.api.particle.v1.FabricParticleTypes.simple
-import net.minecraft.particle.DefaultParticleType
-import net.minecraft.particle.ParticleType
-import net.minecraft.registry.Registries
-import net.minecraft.registry.Registry
+import net.minecraft.core.Registry
+import net.minecraft.core.particles.ParticleType
+import net.minecraft.core.registries.BuiltInRegistries
 import org.teamvoided.dusk_debris.DuskDebris.id
 import org.teamvoided.dusk_debris.particle.*
 import org.teamvoided.dusk_debris.particle.color.*
@@ -111,5 +110,5 @@ object DuskParticles {
     }
 
     fun register(id: String, particleType: ParticleType<*>) =
-        Registry.register(Registries.PARTICLE_TYPE, id(id), particleType)
+        Registry.register(BuiltInRegistries.PARTICLE_TYPE, id(id), particleType)
 }

@@ -2,9 +2,8 @@ package org.teamvoided.dusk_debris.data.gen
 
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricDynamicRegistryProvider
-import net.minecraft.registry.HolderLookup
-import net.minecraft.registry.RegistryKeys
-import org.teamvoided.dusk_debris.data.worldgen.DuskDensityFunctions
+import net.minecraft.core.HolderLookup
+import net.minecraft.core.registries.Registries
 import org.teamvoided.dusk_debris.init.DuskRegistryKeys
 import java.util.concurrent.CompletableFuture
 
@@ -14,26 +13,26 @@ class DynamicRegistryProvider(o: FabricDataOutput, r: CompletableFuture<HolderLo
     override fun getName(): String = "dusk-debris"
 
     override fun configure(reg: HolderLookup.Provider, e: Entries) {
-        e.addAll(reg.getLookupOrThrow(RegistryKeys.BIOME))
-        e.addAll(reg.getLookupOrThrow(RegistryKeys.PLACED_FEATURE))
-        e.addAll(reg.getLookupOrThrow(RegistryKeys.CONFIGURED_FEATURE))
-        e.addAll(reg.getLookupOrThrow(RegistryKeys.CONFIGURED_CARVER))
+        e.addAll(reg.lookupOrThrow(Registries.BIOME))
+        e.addAll(reg.lookupOrThrow(Registries.PLACED_FEATURE))
+        e.addAll(reg.lookupOrThrow(Registries.CONFIGURED_FEATURE))
+        e.addAll(reg.lookupOrThrow(Registries.CONFIGURED_CARVER))
 
-        e.addAll(reg.getLookupOrThrow(RegistryKeys.NOISE_PARAMETERS))
-        e.addAll(reg.getLookupOrThrow(RegistryKeys.DENSITY_FUNCTION))
-        e.addAll(reg.getLookupOrThrow(RegistryKeys.CHUNK_GENERATOR_SETTINGS))
-        e.addAll(reg.getLookupOrThrow(RegistryKeys.DIMENSION))
+        e.addAll(reg.lookupOrThrow(Registries.NOISE))
+        e.addAll(reg.lookupOrThrow(Registries.DENSITY_FUNCTION))
+        e.addAll(reg.lookupOrThrow(Registries.NOISE_SETTINGS))
+        e.addAll(reg.lookupOrThrow(Registries.LEVEL_STEM))
 
-        e.addAll(reg.getLookupOrThrow(RegistryKeys.STRUCTURE_POOL))
-        e.addAll(reg.getLookupOrThrow(RegistryKeys.STRUCTURE_FEATURE))
-        e.addAll(reg.getLookupOrThrow(RegistryKeys.STRUCTURE_SET))
+        e.addAll(reg.lookupOrThrow(Registries.TEMPLATE_POOL))
+        e.addAll(reg.lookupOrThrow(Registries.STRUCTURE))
+        e.addAll(reg.lookupOrThrow(Registries.STRUCTURE_SET))
 
-        e.addAll(reg.getLookupOrThrow(RegistryKeys.DAMAGE_TYPE))
-        e.addAll(reg.getLookupOrThrow(RegistryKeys.ENCHANTMENT))
+        e.addAll(reg.lookupOrThrow(Registries.DAMAGE_TYPE))
+        e.addAll(reg.lookupOrThrow(Registries.ENCHANTMENT))
 
-        e.addAll(reg.getLookupOrThrow(RegistryKeys.PAINTING_VARIANT))
-        e.addAll(reg.getLookupOrThrow(DuskRegistryKeys.SNIFFER_VARIANT))
-        e.addAll(reg.getLookupOrThrow(DuskRegistryKeys.FOG_MODIFIER))
-        e.addAll(reg.getLookupOrThrow(DuskRegistryKeys.SPELL))
+        e.addAll(reg.lookupOrThrow(Registries.PAINTING_VARIANT))
+        e.addAll(reg.lookupOrThrow(DuskRegistryKeys.SNIFFER_VARIANT))
+        e.addAll(reg.lookupOrThrow(DuskRegistryKeys.FOG_MODIFIER))
+        e.addAll(reg.lookupOrThrow(DuskRegistryKeys.SPELL))
     }
 }

@@ -1,125 +1,133 @@
 package org.teamvoided.dusk_debris.block
 
 import com.mojang.serialization.MapCodec
-import net.minecraft.block.*
-import net.minecraft.block.DecoratedPotBlock
-import net.minecraft.block.entity.BlockEntity
-import net.minecraft.block.entity.DecoratedPotBlockEntity
-import net.minecraft.block.entity.Sherds
-import net.minecraft.client.item.TooltipConfig
-import net.minecraft.component.DataComponentTypes
-import net.minecraft.enchantment.EnchantmentHelper
-import net.minecraft.entity.ai.pathing.NavigationType
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.entity.projectile.ProjectileEntity
-import net.minecraft.fluid.FluidState
-import net.minecraft.fluid.Fluids
-import net.minecraft.item.Item
-import net.minecraft.item.ItemPlacementContext
-import net.minecraft.item.ItemStack
-import net.minecraft.item.Items
-import net.minecraft.loot.context.LootContextParameterSet
-import net.minecraft.loot.context.LootContextParameters
-import net.minecraft.particle.ParticleTypes
-import net.minecraft.registry.tag.EnchantmentTags
-import net.minecraft.registry.tag.ItemTags
-import net.minecraft.screen.ScreenHandler
-import net.minecraft.server.world.ServerWorld
-import net.minecraft.sound.BlockSoundGroup
-import net.minecraft.sound.SoundCategory
-import net.minecraft.sound.SoundEvents
-import net.minecraft.stat.Stats
-import net.minecraft.state.StateManager
-import net.minecraft.state.property.BooleanProperty
-import net.minecraft.state.property.DirectionProperty
-import net.minecraft.state.property.Properties
-import net.minecraft.text.CommonTexts
-import net.minecraft.text.Text
-import net.minecraft.util.*
-import net.minecraft.util.hit.BlockHitResult
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Direction
-import net.minecraft.util.shape.VoxelShape
-import net.minecraft.world.BlockView
-import net.minecraft.world.World
-import net.minecraft.world.WorldAccess
-import net.minecraft.world.WorldView
-import net.minecraft.world.event.GameEvent
+import net.minecraft.ChatFormatting
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
+import net.minecraft.core.component.DataComponents
+import net.minecraft.core.particles.ParticleTypes
+import net.minecraft.network.chat.CommonComponents
+import net.minecraft.network.chat.Component
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.server.level.ServerLevel
+import net.minecraft.sounds.SoundEvents
+import net.minecraft.sounds.SoundSource
+import net.minecraft.stats.Stats
+import net.minecraft.tags.EnchantmentTags
+import net.minecraft.tags.ItemTags
+import net.minecraft.world.Containers
+import net.minecraft.world.InteractionHand
+import net.minecraft.world.InteractionResult
+import net.minecraft.world.ItemInteractionResult
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.entity.projectile.Projectile
+import net.minecraft.world.inventory.AbstractContainerMenu
+import net.minecraft.world.item.Item
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.Items
+import net.minecraft.world.item.TooltipFlag
+import net.minecraft.world.item.context.BlockPlaceContext
+import net.minecraft.world.item.enchantment.EnchantmentHelper
+import net.minecraft.world.level.BlockGetter
+import net.minecraft.world.level.Level
+import net.minecraft.world.level.LevelAccessor
+import net.minecraft.world.level.LevelReader
+import net.minecraft.world.level.block.*
+import net.minecraft.world.level.block.DecoratedPotBlock
+import net.minecraft.world.level.block.entity.BlockEntity
+import net.minecraft.world.level.block.entity.DecoratedPotBlockEntity
+import net.minecraft.world.level.block.entity.PotDecorations
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.block.state.StateDefinition
+import net.minecraft.world.level.block.state.properties.BlockStateProperties
+import net.minecraft.world.level.block.state.properties.BooleanProperty
+import net.minecraft.world.level.block.state.properties.DirectionProperty
+import net.minecraft.world.level.gameevent.GameEvent
+import net.minecraft.world.level.material.FluidState
+import net.minecraft.world.level.material.Fluids
+import net.minecraft.world.level.pathfinder.PathComputationType
+import net.minecraft.world.level.storage.loot.LootParams
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams
+import net.minecraft.world.phys.BlockHitResult
+import net.minecraft.world.phys.shapes.CollisionContext
+import net.minecraft.world.phys.shapes.VoxelShape
 import java.util.stream.Stream
 
-class DecoratedPotBlock(settings: Settings) : BlockWithEntity(settings), Waterloggable {
+class DecoratedPotBlock(settings: Properties) : BaseEntityBlock(settings), SimpleWaterloggedBlock {
     init {
-        this.defaultState = stateManager.defaultState
-            .with(FACING, Direction.NORTH)
-            .with(WATERLOGGED, false)
-            .with(CRACKED, false)
+        this.registerDefaultState(
+            stateDefinition.any()
+                .setValue(FACING, Direction.NORTH)
+                .setValue(WATERLOGGED, false)
+                .setValue(CRACKED, false)
+        )
     }
 
-    public override fun getCodec(): MapCodec<DecoratedPotBlock> = CODEC
+    public override fun codec(): MapCodec<DecoratedPotBlock> = CODEC
 
-    override fun getStateForNeighborUpdate(
+    override fun updateShape(
         state: BlockState,
         direction: Direction,
         neighborState: BlockState,
-        world: WorldAccess,
+        world: LevelAccessor,
         pos: BlockPos,
         neighborPos: BlockPos
     ): BlockState {
-        if (state.get(WATERLOGGED)) {
-            world.scheduleFluidTick(pos, Fluids.WATER, Fluids.WATER.getTickRate(world))
+        if (state.getValue(WATERLOGGED)) {
+            world.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(world))
         }
 
-        return super.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos)
+        return super.updateShape(state, direction, neighborState, world, pos, neighborPos)
     }
 
-    override fun getPlacementState(ctx: ItemPlacementContext): BlockState? {
-        val fluidState = ctx.world.getFluidState(ctx.blockPos)
-        return defaultState.with(FACING, ctx.playerFacing)
-            .with(WATERLOGGED, fluidState.fluid == Fluids.WATER)
-            .with(CRACKED, false)
+    override fun getStateForPlacement(ctx: BlockPlaceContext): BlockState? {
+        val fluidState = ctx.level.getFluidState(ctx.clickedPos)
+        return defaultBlockState().setValue(FACING, ctx.horizontalDirection)
+            .setValue(WATERLOGGED, fluidState.type == Fluids.WATER)
+            .setValue(CRACKED, false)
     }
 
-    override fun onInteract(
+    override fun useItemOn(
         stack: ItemStack,
         state: BlockState,
-        world: World,
+        world: Level,
         pos: BlockPos,
-        entity: PlayerEntity,
-        hand: Hand,
+        entity: Player,
+        hand: InteractionHand,
         hitResult: BlockHitResult
     ): ItemInteractionResult {
         val blockEntity = world.getBlockEntity(pos)
         if (blockEntity is DecoratedPotBlockEntity) {
-            if (world.isClient) {
+            if (world.isClientSide) {
                 return ItemInteractionResult.CONSUME
             } else {
-                val itemStack: ItemStack = blockEntity.stack
+                val itemStack: ItemStack = blockEntity.theItem
                 if (!stack.isEmpty &&
-                    (itemStack.isEmpty || ItemStack.itemsAndComponentsMatch(itemStack, stack)
-                            && itemStack.count < itemStack.maxCount)
+                    (itemStack.isEmpty || ItemStack.isSameItemSameComponents(itemStack, stack)
+                            && itemStack.count < itemStack.maxStackSize)
                 ) {
-                    blockEntity.wobble(DecoratedPotBlockEntity.WobbleType.POSITIVE)
-                    entity.incrementStat(Stats.USED.getOrCreateStat(stack.item))
-                    val itemStack2 = stack.copyAndConsume(1, entity)
+                    blockEntity.wobble(DecoratedPotBlockEntity.WobbleStyle.POSITIVE)
+                    entity.awardStat(Stats.ITEM_USED.get(stack.item))
+                    val itemStack2 = stack.consumeAndReturn(1, entity)
                     val ratio: Float
                     if (blockEntity.isEmpty) {
-                        blockEntity.stack = itemStack2
-                        ratio = itemStack2.count.toFloat() / itemStack2.maxCount.toFloat()
+                        blockEntity.theItem = itemStack2
+                        ratio = itemStack2.count.toFloat() / itemStack2.maxStackSize.toFloat()
                     } else {
-                        itemStack.increment(1)
-                        ratio = itemStack.count.toFloat() / itemStack.maxCount.toFloat()
+                        itemStack.grow(1)
+                        ratio = itemStack.count.toFloat() / itemStack.maxStackSize.toFloat()
                     }
 
                     world.playSound(
-                        null as PlayerEntity?,
+                        null as Player?,
                         pos,
-                        SoundEvents.BLOCK_DECORATED_POT_INSERT,
-                        SoundCategory.BLOCKS,
+                        SoundEvents.DECORATED_POT_INSERT,
+                        SoundSource.BLOCKS,
                         1.0f,
                         0.7f + 0.5f * ratio
                     )
-                    if (world is ServerWorld) {
-                        world.spawnParticles(
+                    if (world is ServerLevel) {
+                        world.sendParticles(
                             ParticleTypes.DUST_PLUME,
                             pos.x.toDouble() + 0.5,
                             pos.y.toDouble() + 1.2,
@@ -132,8 +140,8 @@ class DecoratedPotBlock(settings: Settings) : BlockWithEntity(settings), Waterlo
                         )
                     }
 
-                    blockEntity.markDirty()
-                    world.emitGameEvent(entity, GameEvent.BLOCK_CHANGE, pos)
+                    blockEntity.setChanged()
+                    world.gameEvent(entity, GameEvent.BLOCK_CHANGE, pos)
                     return ItemInteractionResult.SUCCESS
                 } else {
                     return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION
@@ -144,150 +152,150 @@ class DecoratedPotBlock(settings: Settings) : BlockWithEntity(settings), Waterlo
         }
     }
 
-    override fun onUse(
+    override fun useWithoutItem(
         state: BlockState,
-        world: World,
+        world: Level,
         pos: BlockPos,
-        entity: PlayerEntity,
+        entity: Player,
         hitResult: BlockHitResult
-    ): ActionResult {
+    ): InteractionResult {
         val blockEntity = world.getBlockEntity(pos)
         if (blockEntity is DecoratedPotBlockEntity) {
             world.playSound(
-                null as PlayerEntity?,
+                null as Player?,
                 pos,
-                SoundEvents.BLOCK_DECORATED_POT_INSERT_FAIL,
-                SoundCategory.BLOCKS,
+                SoundEvents.DECORATED_POT_INSERT_FAIL,
+                SoundSource.BLOCKS,
                 1.0f,
                 1.0f
             )
-            blockEntity.wobble(DecoratedPotBlockEntity.WobbleType.NEGATIVE)
-            world.emitGameEvent(entity, GameEvent.BLOCK_CHANGE, pos)
-            return ActionResult.SUCCESS
+            blockEntity.wobble(DecoratedPotBlockEntity.WobbleStyle.NEGATIVE)
+            world.gameEvent(entity, GameEvent.BLOCK_CHANGE, pos)
+            return InteractionResult.SUCCESS
         } else {
-            return ActionResult.PASS
+            return InteractionResult.PASS
         }
     }
 
-    override fun canPathfindThrough(state: BlockState, navigationType: NavigationType): Boolean = false
+    override fun isPathfindable(state: BlockState, navigationType: PathComputationType): Boolean = false
 
-    override fun getOutlineShape(
+    override fun getShape(
         state: BlockState,
-        world: BlockView,
+        world: BlockGetter,
         pos: BlockPos,
-        context: ShapeContext
+        context: CollisionContext
     ): VoxelShape = SHAPE
 
-    override fun appendProperties(builder: StateManager.Builder<Block, BlockState>) {
+    override fun createBlockStateDefinition(builder: StateDefinition.Builder<Block, BlockState>) {
         builder.add(FACING, WATERLOGGED, CRACKED)
     }
 
-    override fun createBlockEntity(pos: BlockPos, state: BlockState): BlockEntity = DecoratedPotBlockEntity(pos, state)
+    override fun newBlockEntity(pos: BlockPos, state: BlockState): BlockEntity = DecoratedPotBlockEntity(pos, state)
 
-    override fun onStateReplaced(state: BlockState, world: World, pos: BlockPos, newState: BlockState, moved: Boolean) {
-        ItemScatterer.scatterInventory(state, newState, world, pos)
-        super.onStateReplaced(state, world, pos, newState, moved)
+    override fun onRemove(state: BlockState, world: Level, pos: BlockPos, newState: BlockState, moved: Boolean) {
+        Containers.dropContentsOnDestroy(state, newState, world, pos)
+        super.onRemove(state, world, pos, newState, moved)
     }
 
-    override fun getDroppedStacks(
+    override fun getDrops(
         state: BlockState,
-        lootParameterBuilder: LootContextParameterSet.Builder
+        lootParameterBuilder: LootParams.Builder
     ): List<ItemStack> {
-        val blockEntity = lootParameterBuilder.getOptionalParameter(LootContextParameters.BLOCK_ENTITY)
+        val blockEntity = lootParameterBuilder.getOptionalParameter(LootContextParams.BLOCK_ENTITY)
         if (blockEntity is DecoratedPotBlockEntity) {
 
             lootParameterBuilder.withDynamicDrop(SHERDS) { consumer ->
-                blockEntity.sherds.ordered().forEach { sherd ->
-                    consumer.accept(sherd.defaultStack)
+                blockEntity.decorations.ordered().forEach { sherd ->
+                    consumer.accept(sherd.defaultInstance)
                 }
             }
         }
 
-        return super.getDroppedStacks(state, lootParameterBuilder)
+        return super.getDrops(state, lootParameterBuilder)
     }
 
-    override fun onBreak(world: World, pos: BlockPos, state: BlockState, player: PlayerEntity): BlockState {
-        val itemStack = player.mainHandStack
+    override fun playerWillDestroy(world: Level, pos: BlockPos, state: BlockState, player: Player): BlockState {
+        val itemStack = player.mainHandItem
         var blockState = state
-        if (itemStack.isIn(ItemTags.BREAKS_DECORATED_POTS) &&
+        if (itemStack.`is`(ItemTags.BREAKS_DECORATED_POTS) &&
             !EnchantmentHelper.hasTag(itemStack, EnchantmentTags.PREVENTS_DECORATED_POT_SHATTERING)
         ) {
-            blockState = state.with(CRACKED, true)
-            world.setBlockState(pos, blockState, 4)
+            blockState = state.setValue(CRACKED, true)
+            world.setBlock(pos, blockState, 4)
         }
 
-        return super.onBreak(world, pos, blockState, player)
+        return super.playerWillDestroy(world, pos, blockState, player)
     }
 
     override fun getFluidState(state: BlockState): FluidState {
-        return if (state.get(WATERLOGGED)) Fluids.WATER.getStill(false)
+        return if (state.getValue(WATERLOGGED)) Fluids.WATER.getSource(false)
         else super.getFluidState(state)
     }
 
-    override fun getSoundGroup(state: BlockState): BlockSoundGroup {
-        return if (state.get(CRACKED)) BlockSoundGroup.CRACKED_DECORATED_POT
-        else BlockSoundGroup.DECORATED_POT
+    override fun getSoundType(state: BlockState): SoundType {
+        return if (state.getValue(CRACKED)) SoundType.DECORATED_POT_CRACKED
+        else SoundType.DECORATED_POT
     }
 
-    override fun appendTooltip(
+    override fun appendHoverText(
         stack: ItemStack,
         tooltipContext: Item.TooltipContext,
-        tooltip: MutableList<Text>,
-        options: TooltipConfig
+        tooltip: MutableList<Component>,
+        options: TooltipFlag
     ) {
-        super.appendTooltip(stack, tooltipContext, tooltip, options)
-        val sherds = stack.getOrDefault(DataComponentTypes.POT_DECORATIONS, Sherds.DEFAULT)
-        if (sherds != Sherds.DEFAULT) {
-            tooltip.add(CommonTexts.EMPTY)
+        super.appendHoverText(stack, tooltipContext, tooltip, options)
+        val sherds = stack.getOrDefault(DataComponents.POT_DECORATIONS, PotDecorations.EMPTY)
+        if (sherds != PotDecorations.EMPTY) {
+            tooltip.add(CommonComponents.EMPTY)
             Stream.of(sherds.front(), sherds.left(), sherds.right(), sherds.back()).forEach {
                 tooltip.add(
-                    ItemStack(it.orElse(defaultBrick()), 1).name
-                        .copyContentOnly().formatted(Formatting.GRAY)
+                    ItemStack(it.orElse(defaultBrick()), 1).hoverName
+                        .plainCopy().withStyle(ChatFormatting.GRAY)
                 )
             }
         }
     }
 
 
-    override fun onProjectileHit(world: World, state: BlockState, hit: BlockHitResult, projectile: ProjectileEntity) {
+    override fun onProjectileHit(world: Level, state: BlockState, hit: BlockHitResult, projectile: Projectile) {
         val blockPos = hit.blockPos
-        if (!world.isClient && projectile.canModifyAt(world, blockPos) && projectile.canBreakBlocks(world)) {
-            world.setBlockState(blockPos, state.with(CRACKED, true), 4)
-            world.breakBlock(blockPos, true, projectile)
+        if (!world.isClientSide && projectile.mayInteract(world, blockPos) && projectile.mayBreak(world)) {
+            world.setBlock(blockPos, state.setValue(CRACKED, true), 4)
+            world.destroyBlock(blockPos, true, projectile)
         }
     }
 
-    override fun getPickStack(world: WorldView, pos: BlockPos, state: BlockState): ItemStack {
+    override fun getCloneItemStack(world: LevelReader, pos: BlockPos, state: BlockState): ItemStack {
         val var5 = world.getBlockEntity(pos)
         return if (var5 is DecoratedPotBlockEntity) {
-            var5.asStack()
+            var5.potAsItem
         } else {
-            super.getPickStack(world, pos, state)
+            super.getCloneItemStack(world, pos, state)
         }
     }
 
-    override fun hasComparatorOutput(state: BlockState): Boolean = true
+    override fun hasAnalogOutputSignal(state: BlockState): Boolean = true
 
-    override fun getComparatorOutput(state: BlockState, world: World, pos: BlockPos): Int {
-        return ScreenHandler.calculateComparatorOutput(world.getBlockEntity(pos))
+    override fun getAnalogOutputSignal(state: BlockState, world: Level, pos: BlockPos): Int {
+        return AbstractContainerMenu.getRedstoneSignalFromBlockEntity(world.getBlockEntity(pos))
     }
 
-    override fun rotate(state: BlockState, rotation: BlockRotation): BlockState {
-        return state.with(FACING, rotation.rotate(state.get(FACING)))
+    override fun rotate(state: BlockState, rotation: Rotation): BlockState {
+        return state.setValue(FACING, rotation.rotate(state.getValue(FACING)))
     }
 
-    override fun mirror(state: BlockState, mirror: BlockMirror): BlockState {
-        return state.rotate(mirror.getRotation(state.get(FACING)))
+    override fun mirror(state: BlockState, mirror: Mirror): BlockState {
+        return state.rotate(mirror.getRotation(state.getValue(FACING)))
     }
 
     fun defaultBrick(): Item = Items.BRICK
 
     companion object {
-        val CODEC: MapCodec<DecoratedPotBlock> = createCodec(::DecoratedPotBlock)
-        val SHERDS: Identifier = Identifier.ofDefault("sherds")
-        private val SHAPE: VoxelShape = createCuboidShape(1.0, 0.0, 1.0, 15.0, 16.0, 15.0)
-        private val FACING: DirectionProperty = Properties.HORIZONTAL_FACING
-        val CRACKED: BooleanProperty = Properties.CRACKED
-        private val WATERLOGGED: BooleanProperty = Properties.WATERLOGGED
+        val CODEC: MapCodec<DecoratedPotBlock> = simpleCodec(::DecoratedPotBlock)
+        val SHERDS: ResourceLocation = ResourceLocation.withDefaultNamespace("sherds")
+        private val SHAPE: VoxelShape = box(1.0, 0.0, 1.0, 15.0, 16.0, 15.0)
+        private val FACING: DirectionProperty = BlockStateProperties.HORIZONTAL_FACING
+        val CRACKED: BooleanProperty = BlockStateProperties.CRACKED
+        private val WATERLOGGED: BooleanProperty = BlockStateProperties.WATERLOGGED
     }
 }

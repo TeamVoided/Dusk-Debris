@@ -1,24 +1,24 @@
 package org.teamvoided.dusk_debris.entity.tuff_golem.render
 
-import net.minecraft.client.render.VertexConsumerProvider
-import net.minecraft.client.render.entity.feature.FeatureRenderer
-import net.minecraft.client.render.entity.feature.FeatureRendererContext
-import net.minecraft.client.render.item.HeldItemRenderer
-import net.minecraft.client.render.model.json.ModelTransformationMode
-import net.minecraft.client.util.math.MatrixStack
-import net.minecraft.entity.EquipmentSlot
-import net.minecraft.item.ItemStack
+import com.mojang.blaze3d.vertex.PoseStack
+import net.minecraft.client.renderer.ItemInHandRenderer
+import net.minecraft.client.renderer.MultiBufferSource
+import net.minecraft.client.renderer.entity.RenderLayerParent
+import net.minecraft.client.renderer.entity.layers.RenderLayer
+import net.minecraft.world.entity.EquipmentSlot
+import net.minecraft.world.item.ItemDisplayContext
+import net.minecraft.world.item.ItemStack
 import org.teamvoided.dusk_debris.entity.TuffGolemEntity
 import org.teamvoided.dusk_debris.entity.tuff_golem.model.TuffGolemEntityModel
 
 class TuffGolemHeldItemFeatureRenderer(
-    context: FeatureRendererContext<TuffGolemEntity, TuffGolemEntityModel>,
-    private val heldItemRenderer: HeldItemRenderer
-) : FeatureRenderer<TuffGolemEntity, TuffGolemEntityModel>(context) {
+    context: RenderLayerParent<TuffGolemEntity, TuffGolemEntityModel>,
+    private val heldItemRenderer: ItemInHandRenderer
+) : RenderLayer<TuffGolemEntity, TuffGolemEntityModel>(context) {
     val scale = 0.625f
     override fun render(
-        matrices: MatrixStack,
-        vertexConsumers: VertexConsumerProvider,
+        matrices: PoseStack,
+        vertexConsumers: MultiBufferSource,
         light: Int,
         tuffGolemEntity: TuffGolemEntity,
         f: Float,
@@ -28,10 +28,10 @@ class TuffGolemHeldItemFeatureRenderer(
         k: Float,
         l: Float
     ) {
-        val itemStack = tuffGolemEntity.getEquippedStack(EquipmentSlot.MAINHAND)
+        val itemStack = tuffGolemEntity.getItemBySlot(EquipmentSlot.MAINHAND)
         if (!itemStack.isEmpty) {
-            matrices.push()
-            (this.contextModel as TuffGolemEntityModel).body.rotate(matrices)
+            matrices.pushPose()
+            (this.parentModel as TuffGolemEntityModel).body.translateAndRotate(matrices)
             val scale = 0.625f
             matrices.translate(0.0f, -0.50001f, -0.55f)
 //            matrices.rotate(Axis.Y_POSITIVE.rotationDegrees(180.0f))
@@ -39,13 +39,13 @@ class TuffGolemHeldItemFeatureRenderer(
             heldItemRenderer.renderItem(
                 tuffGolemEntity,
                 ItemStack(itemStack.item),
-                ModelTransformationMode.FIXED,
+                ItemDisplayContext.FIXED,
                 false,
                 matrices,
                 vertexConsumers,
                 light
             )
-            matrices.pop()
+            matrices.popPose()
         }
 
 //        val itemStack = tuffGolemEntity.getEquippedStack(EquipmentSlot.MAINHAND)

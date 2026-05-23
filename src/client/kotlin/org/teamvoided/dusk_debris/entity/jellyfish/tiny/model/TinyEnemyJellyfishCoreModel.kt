@@ -1,21 +1,25 @@
 package org.teamvoided.dusk_debris.entity.jellyfish.tiny.model
 
-import net.minecraft.client.model.*
-import net.minecraft.client.render.RenderLayer
-import net.minecraft.client.render.entity.model.SinglePartEntityModel
+import net.minecraft.client.model.HierarchicalModel
+import net.minecraft.client.model.geom.ModelPart
+import net.minecraft.client.model.geom.PartPose
+import net.minecraft.client.model.geom.builders.CubeListBuilder
+import net.minecraft.client.model.geom.builders.LayerDefinition
+import net.minecraft.client.model.geom.builders.MeshDefinition
+import net.minecraft.client.renderer.RenderType
 import org.teamvoided.dusk_debris.entity.TinyEnemyJellyfishEntity
 import org.teamvoided.dusk_debris.entity.jellyfish.tiny.animation.TinyEnemyJellyfishAnimations
 
 class TinyEnemyJellyfishCoreModel(private val root: ModelPart) :
-    SinglePartEntityModel<TinyEnemyJellyfishEntity>(RenderLayer::getEntityTranslucent) {
+    HierarchicalModel<TinyEnemyJellyfishEntity>(RenderType::entityTranslucent) {
     val jellyfish = root.getChild("jellyfish")
     val core = jellyfish.getChild("core")
 
-    override fun getPart(): ModelPart {
+    override fun root(): ModelPart {
         return this.root
     }
 
-    override fun setAngles(
+    override fun setupAnim(
         entity: TinyEnemyJellyfishEntity,
         limbAngle: Float,
         limbDistance: Float,
@@ -23,29 +27,29 @@ class TinyEnemyJellyfishCoreModel(private val root: ModelPart) :
         headYaw: Float,
         headPitch: Float
     ) {
-        this.part.traverse().forEach(ModelPart::resetTransform)
+        this.root().allParts.forEach(ModelPart::resetPose)
         this.animate(entity.idleAnimationState, TinyEnemyJellyfishAnimations.IDLE, animationProgress, 1.0f)
     }
 
     companion object {
-        val texturedModelData: TexturedModelData
+        val texturedModelData: LayerDefinition
             get() {
-                val modelData = ModelData()
+                val modelData = MeshDefinition()
                 val modelPartData = modelData.root
-                val jellyfish = modelPartData.addChild(
-                    "jellyfish", ModelPartBuilder.create(),
-                    ModelTransform.pivot(0.0F, 24.0F, 0.0F)
+                val jellyfish = modelPartData.addOrReplaceChild(
+                    "jellyfish", CubeListBuilder.create(),
+                    PartPose.offset(0.0F, 24.0F, 0.0F)
                 )
-                val core = jellyfish.addChild(
-                    "core", ModelPartBuilder.create()
-                        .uv(0, 0)
-                        .cuboid(
+                val core = jellyfish.addOrReplaceChild(
+                    "core", CubeListBuilder.create()
+                        .texOffs(0, 0)
+                        .addBox(
                             -2.0F, -6.0F, -2.0F,
                             4.0F, 4.0F, 4.0F
                         ),
-                    ModelTransform.pivot(0.0F, 0.0F, 0.0F)
+                    PartPose.offset(0.0F, 0.0F, 0.0F)
                 )
-                return TexturedModelData.of(modelData, 16, 16)
+                return LayerDefinition.create(modelData, 16, 16)
             }
     }
 }

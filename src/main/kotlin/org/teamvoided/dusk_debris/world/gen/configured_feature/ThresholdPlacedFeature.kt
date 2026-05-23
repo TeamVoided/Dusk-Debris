@@ -2,18 +2,18 @@ package org.teamvoided.dusk_debris.world.gen.configured_feature
 
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
-import net.minecraft.registry.Holder
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.random.RandomGenerator
-import net.minecraft.world.StructureWorldAccess
-import net.minecraft.world.gen.chunk.ChunkGenerator
-import net.minecraft.world.gen.feature.PlacedFeature
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Holder
+import net.minecraft.util.RandomSource
+import net.minecraft.world.level.WorldGenLevel
+import net.minecraft.world.level.chunk.ChunkGenerator
+import net.minecraft.world.level.levelgen.placement.PlacedFeature
 
 class ThresholdPlacedFeature(val feature: Holder<PlacedFeature>, val threshold: Float) {
     fun generate(
-        world: StructureWorldAccess,
+        world: WorldGenLevel,
         chunkGenerator: ChunkGenerator,
-        random: RandomGenerator,
+        random: RandomSource,
         pos: BlockPos
     ): Boolean {
         return (feature.value() as PlacedFeature).place(world, chunkGenerator, random, pos)
@@ -23,7 +23,7 @@ class ThresholdPlacedFeature(val feature: Holder<PlacedFeature>, val threshold: 
         val CODEC: Codec<ThresholdPlacedFeature> =
             RecordCodecBuilder.create { instance: RecordCodecBuilder.Instance<ThresholdPlacedFeature> ->
                 instance.group(
-                    PlacedFeature.REGISTRY_CODEC.fieldOf("feature").forGetter { it.feature },
+                    PlacedFeature.CODEC.fieldOf("feature").forGetter { it.feature },
                     Codec.floatRange(-2f, 2f).fieldOf("threshold").forGetter { it.threshold })
                     .apply(instance, ::ThresholdPlacedFeature)
             }

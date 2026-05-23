@@ -1,37 +1,41 @@
 package org.teamvoided.dusk_debris.block
 
 import com.mojang.serialization.MapCodec
-import net.minecraft.block.*
-import net.minecraft.entity.projectile.ProjectileEntity
-import net.minecraft.fluid.Fluids
-import net.minecraft.registry.tag.FluidTags
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.shape.VoxelShape
-import net.minecraft.util.shape.VoxelShapes
-import net.minecraft.world.BlockView
+import net.minecraft.core.BlockPos
+import net.minecraft.tags.FluidTags
+import net.minecraft.world.entity.projectile.Projectile
+import net.minecraft.world.level.BlockGetter
+import net.minecraft.world.level.block.BushBlock
+import net.minecraft.world.level.block.IceBlock
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.material.Fluids
+import net.minecraft.world.phys.shapes.CollisionContext
+import net.minecraft.world.phys.shapes.EntityCollisionContext
+import net.minecraft.world.phys.shapes.Shapes
+import net.minecraft.world.phys.shapes.VoxelShape
 
-class WaterFernBlock(settings: Settings) : AbstractPlantBlock(settings) {
-    override fun getCodec(): MapCodec<out AbstractPlantBlock> = CODEC
+class WaterFernBlock(settings: Properties) : BushBlock(settings) {
+    override fun codec(): MapCodec<out BushBlock> = CODEC
 
     override fun getCollisionShape(
-        state: BlockState, world: BlockView, pos: BlockPos, context: ShapeContext
+        state: BlockState, world: BlockGetter, pos: BlockPos, context: CollisionContext
     ): VoxelShape {
-        val entity = (context as EntityShapeContext).entity
-        return if (entity != null && (/*entity.type.isIn(DuskEntityTypeTags.NO_COLLIDE_WATER_FERN) ||*/ entity is ProjectileEntity)) VoxelShapes.empty()
+        val entity = (context as EntityCollisionContext).entity
+        return if (entity != null && (/*entity.type.isIn(DuskEntityTypeTags.NO_COLLIDE_WATER_FERN) ||*/ entity is Projectile)) Shapes.empty()
         else super.getCollisionShape(state, world, pos, context)
     }
 
-    override fun canPlantOnTop(floor: BlockState, world: BlockView, pos: BlockPos): Boolean {
+    override fun mayPlaceOn(floor: BlockState, world: BlockGetter, pos: BlockPos): Boolean {
         val fluidState = world.getFluidState(pos)
-        val fluidState2 = world.getFluidState(pos.up())
-        return (fluidState.isIn(FluidTags.WATER) || floor.block is IceBlock) && fluidState2.fluid == Fluids.EMPTY
+        val fluidState2 = world.getFluidState(pos.above())
+        return (fluidState.`is`(FluidTags.WATER) || floor.block is IceBlock) && fluidState2.type == Fluids.EMPTY
     }
 
-    override fun getOutlineShape(state: BlockState, world: BlockView, pos: BlockPos, context: ShapeContext):
+    override fun getShape(state: BlockState, world: BlockGetter, pos: BlockPos, context: CollisionContext):
             VoxelShape = SHAPE
 
     companion object {
-        val CODEC: MapCodec<WaterFernBlock> = createCodec(::WaterFernBlock)
-        val SHAPE: VoxelShape = createCuboidShape(1.0, -2.0, 1.0, 15.0, 2.0, 15.0)
+        val CODEC: MapCodec<WaterFernBlock> = simpleCodec(::WaterFernBlock)
+        val SHAPE: VoxelShape = box(1.0, -2.0, 1.0, 15.0, 2.0, 15.0)
     }
 }

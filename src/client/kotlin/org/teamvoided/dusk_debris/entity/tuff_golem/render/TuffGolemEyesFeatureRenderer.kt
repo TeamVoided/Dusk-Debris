@@ -1,24 +1,24 @@
 package org.teamvoided.dusk_debris.entity.tuff_golem.render
 
+import com.mojang.blaze3d.vertex.PoseStack
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
-import net.minecraft.client.render.OverlayTexture
-import net.minecraft.client.render.RenderLayer
-import net.minecraft.client.render.VertexConsumerProvider
-import net.minecraft.client.render.entity.feature.EyesFeatureRenderer
-import net.minecraft.client.render.entity.feature.FeatureRendererContext
-import net.minecraft.client.util.math.MatrixStack
+import net.minecraft.client.renderer.MultiBufferSource
+import net.minecraft.client.renderer.RenderType
+import net.minecraft.client.renderer.entity.RenderLayerParent
+import net.minecraft.client.renderer.entity.layers.EyesLayer
+import net.minecraft.client.renderer.texture.OverlayTexture
 import org.teamvoided.dusk_debris.DuskDebris.id
 import org.teamvoided.dusk_debris.entity.TuffGolemEntity
 import org.teamvoided.dusk_debris.entity.tuff_golem.model.TuffGolemEntityModel
 
 @Environment(EnvType.CLIENT)
-open class TuffGolemEyesFeatureRenderer(featureRendererContext: FeatureRendererContext<TuffGolemEntity, TuffGolemEntityModel>) :
-    EyesFeatureRenderer<TuffGolemEntity, TuffGolemEntityModel>(featureRendererContext) {
+open class TuffGolemEyesFeatureRenderer(featureRendererContext: RenderLayerParent<TuffGolemEntity, TuffGolemEntityModel>) :
+    EyesLayer<TuffGolemEntity, TuffGolemEntityModel>(featureRendererContext) {
 
     override fun render(
-        matrices: MatrixStack,
-        vertexConsumers: VertexConsumerProvider,
+        matrices: PoseStack,
+        vertexConsumers: MultiBufferSource,
         light: Int,
         tuffGolemEntity: TuffGolemEntity,
         limbAngle: Float,
@@ -30,16 +30,16 @@ open class TuffGolemEyesFeatureRenderer(featureRendererContext: FeatureRendererC
     ) {
         if (tuffGolemEntity.state < 2) {
             val vertexConsumer = vertexConsumers.getBuffer(this.getEyesLayer(tuffGolemEntity))
-            this.contextModel.method_60879(matrices, vertexConsumer, 15728640, OverlayTexture.DEFAULT_UV)
+            this.parentModel.renderToBuffer(matrices, vertexConsumer, 15728640, OverlayTexture.NO_OVERLAY)
         }
     }
 
-    override fun getEyesLayer(): RenderLayer? {
+    override fun renderType(): RenderType? {
         return null
     }
 
-    open fun getEyesLayer(tuffGolemEntity: TuffGolemEntity): RenderLayer {
-        return RenderLayer.getEyes(
+    open fun getEyesLayer(tuffGolemEntity: TuffGolemEntity): RenderType {
+        return RenderType.eyes(
             id("textures/entity/tuff_golem/eyes/" + tuffGolemEntity.eyeBlock + ".png")
         )
     }

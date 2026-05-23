@@ -1,29 +1,29 @@
 package org.teamvoided.dusk_debris.entity.piffling.render
 
-import net.minecraft.client.MinecraftClient
-import net.minecraft.client.model.ModelPart
-import net.minecraft.client.render.VertexConsumerProvider
-import net.minecraft.client.render.entity.LivingEntityRenderer
-import net.minecraft.client.render.entity.feature.FeatureRenderer
-import net.minecraft.client.render.entity.feature.FeatureRendererContext
-import net.minecraft.client.render.item.ItemRenderer
-import net.minecraft.client.render.model.json.ModelTransformationMode
-import net.minecraft.client.util.math.MatrixStack
-import net.minecraft.entity.EquipmentSlot
-import net.minecraft.item.ItemStack
-import net.minecraft.item.Items
-import net.minecraft.util.math.Axis
+import com.mojang.blaze3d.vertex.PoseStack
+import com.mojang.math.Axis
+import net.minecraft.client.Minecraft
+import net.minecraft.client.model.geom.ModelPart
+import net.minecraft.client.renderer.MultiBufferSource
+import net.minecraft.client.renderer.entity.ItemRenderer
+import net.minecraft.client.renderer.entity.LivingEntityRenderer
+import net.minecraft.client.renderer.entity.RenderLayerParent
+import net.minecraft.client.renderer.entity.layers.RenderLayer
+import net.minecraft.world.entity.EquipmentSlot
+import net.minecraft.world.item.ItemDisplayContext
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.Items
 import org.joml.Quaternionf
 import org.teamvoided.dusk_debris.entity.PifflingPumpkinEntity
 import org.teamvoided.dusk_debris.entity.piffling.model.PifflingPumpkinModel
 
 class PifflingPumpkinHeadFeatureRenderer(
-    context: FeatureRendererContext<PifflingPumpkinEntity, PifflingPumpkinModel>,
+    context: RenderLayerParent<PifflingPumpkinEntity, PifflingPumpkinModel>,
     private val itemRenderer: ItemRenderer
-) : FeatureRenderer<PifflingPumpkinEntity, PifflingPumpkinModel>(context) {
+) : RenderLayer<PifflingPumpkinEntity, PifflingPumpkinModel>(context) {
     override fun render(
-        matrices: MatrixStack,
-        vertexConsumers: VertexConsumerProvider,
+        matrices: PoseStack,
+        vertexConsumers: MultiBufferSource,
         i: Int,
         entity: PifflingPumpkinEntity,
         f: Float,
@@ -33,50 +33,50 @@ class PifflingPumpkinHeadFeatureRenderer(
         k: Float,
         l: Float
     ) {
-        var headStack = entity.getEquippedStack(EquipmentSlot.HEAD)
+        var headStack = entity.getItemBySlot(EquipmentSlot.HEAD)
         if (headStack.isEmpty) {
-            headStack = Items.HEAVY_CORE.defaultStack //DnDBlocks.SMALL_CARVED_PUMPKIN.asItem().defaultStack
+            headStack = Items.HEAVY_CORE.defaultInstance //DnDBlocks.SMALL_CARVED_PUMPKIN.asItem().defaultStack
         }
-        if ((!entity.isInvisible || (MinecraftClient.getInstance().hasOutline(entity) && entity.isInvisible))) {
-            matrices.push()
-            val model = (this.contextModel as PifflingPumpkinModel)
+        if ((!entity.isInvisible || (Minecraft.getInstance().shouldEntityAppearGlowing(entity) && entity.isInvisible))) {
+            matrices.pushPose()
+            val model = (this.parentModel as PifflingPumpkinModel)
             model.head.moveRelativeTo(matrices, model)
 //            moveRelativeToHead(matrices, model)
             val scale = 1f
             matrices.translate(0.0f, -0.5f, 0.0f)
-            matrices.rotate(Axis.Y_POSITIVE.rotationDegrees(180.0f))
+            matrices.mulPose(Axis.YP.rotationDegrees(180.0f))
             matrices.scale(scale, -scale, -scale)
-            itemRenderer.renderItem(
+            itemRenderer.renderStatic(
                 entity,
                 ItemStack(headStack.item),
-                ModelTransformationMode.NONE,
+                ItemDisplayContext.NONE,
                 false,
                 matrices,
                 vertexConsumers,
-                entity.world,
+                entity.level(),
                 i,
-                LivingEntityRenderer.getOverlay(entity, 0.0f),
+                LivingEntityRenderer.getOverlayCoords(entity, 0.0f),
                 entity.id
             )
-            matrices.pop()
+            matrices.popPose()
         }
     }
     companion object{
-        fun ModelPart.moveRelativeTo(matrix: MatrixStack, model: PifflingPumpkinModel) {
+        fun ModelPart.moveRelativeTo(matrix: PoseStack, model: PifflingPumpkinModel) {
             val bone = model.bone
             val body = model.body
 
-            matrix.translate(bone.pivotX / 16.0f, bone.pivotY / 16.0f, bone.pivotZ / 16.0f)
-            matrix.rotate(Quaternionf().rotationZYX(bone.roll, bone.yaw, bone.pitch))
+            matrix.translate(bone.x / 16.0f, bone.y / 16.0f, bone.z / 16.0f)
+            matrix.mulPose(Quaternionf().rotationZYX(bone.zRot, bone.yRot, bone.xRot))
 
-            matrix.translate(body.pivotX / 16.0f, body.pivotY / 16.0f, body.pivotZ / 16.0f)
-            matrix.rotate(Quaternionf().rotationZYX(body.roll, body.yaw, body.pitch))
+            matrix.translate(body.x / 16.0f, body.y / 16.0f, body.z / 16.0f)
+            matrix.mulPose(Quaternionf().rotationZYX(body.zRot, body.yRot, body.xRot))
 
-            matrix.translate(this.pivotX / 16.0f, this.pivotY / 16.0f, this.pivotZ / 16.0f)
-            matrix.rotate(Quaternionf().rotationZYX(this.roll, this.yaw, this.pitch))
+            matrix.translate(this.x / 16.0f, this.y / 16.0f, this.z / 16.0f)
+            matrix.mulPose(Quaternionf().rotationZYX(this.zRot, this.yRot, this.xRot))
 
-            if (this.scaleX != 1.0f || (this.scaleY != 1.0f) || (this.scaleZ != 1.0f)) {
-                matrix.scale(this.scaleX, this.scaleY, this.scaleZ)
+            if (this.xScale != 1.0f || (this.yScale != 1.0f) || (this.zScale != 1.0f)) {
+                matrix.scale(this.xScale, this.yScale, this.zScale)
             }
         }
     }

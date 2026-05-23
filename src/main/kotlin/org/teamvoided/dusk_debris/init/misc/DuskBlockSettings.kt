@@ -1,36 +1,36 @@
 package org.teamvoided.dusk_debris.init.misc
 
-import net.minecraft.block.AbstractBlock.OffsetType
-import net.minecraft.block.AbstractBlock.Settings
-import net.minecraft.block.MapColor
-import net.minecraft.block.piston.PistonBehavior
-import net.minecraft.sound.BlockSoundGroup
+import net.minecraft.world.level.block.SoundType
+import net.minecraft.world.level.block.state.BlockBehaviour.OffsetType
+import net.minecraft.world.level.block.state.BlockBehaviour.Properties
+import net.minecraft.world.level.material.MapColor
+import net.minecraft.world.level.material.PushReaction
 import org.teamvoided.dusk_debris.util.luminance
 
 object DuskBlockSettings {
-    val MOONCORE: Settings = Settings.create()
-        .mapColor(MapColor.LIGHT_BLUE)
-        .solid().nonOpaque()
-        .sounds(BlockSoundGroup.AMETHYST_CLUSTER)
+    val MOONCORE: Properties = Properties.of()
+        .mapColor(MapColor.COLOR_LIGHT_BLUE)
+        .forceSolidOn().noOcclusion()
+        .sound(SoundType.AMETHYST_CLUSTER)
         .strength(1.5f)
-        .ticksRandomly()
+        .randomTicks()
         .luminance(15)
-        .pistonBehavior(PistonBehavior.DESTROY)
-    val REDSTONE_CRYSTAL: Settings = Settings.create()
-        .mapColor(MapColor.RED)
-        .solid().nonOpaque()
-        .sounds(BlockSoundGroup.AMETHYST_CLUSTER)
+        .pushReaction(PushReaction.DESTROY)
+    val REDSTONE_CRYSTAL: Properties = Properties.of()
+        .mapColor(MapColor.COLOR_RED)
+        .forceSolidOn().noOcclusion()
+        .sound(SoundType.AMETHYST_CLUSTER)
         .strength(1.5f)
-        .ticksRandomly()
+        .randomTicks()
         .luminance(9)
-        .pistonBehavior(PistonBehavior.DESTROY)
-    val PAINTED_ROSE: Settings = Settings.create()
-        .mapColor(MapColor.BLUE)
-        .noCollision()
-        .ticksRandomly()
-        .breakInstantly()
+        .pushReaction(PushReaction.DESTROY)
+    val PAINTED_ROSE: Properties = Properties.of()
+        .mapColor(MapColor.COLOR_BLUE)
+        .noCollission()
+        .randomTicks()
+        .instabreak()
         .offsetType(OffsetType.XZ)
-        .sounds(BlockSoundGroup.GRASS)
-        .pistonBehavior(PistonBehavior.DESTROY)
+        .sound(SoundType.GRASS)
+        .pushReaction(PushReaction.DESTROY)
 
 }

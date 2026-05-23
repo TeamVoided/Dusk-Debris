@@ -1,8 +1,8 @@
 package org.teamvoided.dusk_debris.data.worldgen
 
-import net.minecraft.registry.RegistryKey
-import net.minecraft.registry.RegistryKeys
-import net.minecraft.world.biome.Biome
+import net.minecraft.core.registries.Registries
+import net.minecraft.resources.ResourceKey
+import net.minecraft.world.level.biome.Biome
 import org.teamvoided.dusk_debris.DuskDebris.id
 
 object DuskBiomes {
@@ -22,5 +22,5 @@ object DuskBiomes {
 
     fun init() {}
 
-    private fun create(id: String): RegistryKey<Biome> = RegistryKey.of(RegistryKeys.BIOME, id(id))
+    private fun create(id: String): ResourceKey<Biome> = ResourceKey.create(Registries.BIOME, id(id))
 }

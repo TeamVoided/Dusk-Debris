@@ -1,15 +1,15 @@
 package org.teamvoided.dusk_debris.block
 
-import net.minecraft.block.SkullBlock
+import net.minecraft.world.level.block.SkullBlock
 
-enum class DuskSkullType(private val type: String) : SkullBlock.SkullType {
+enum class DuskSkullType(private val type: String) : SkullBlock.Type {
     STRAY("stray"),
     BOGGED("bogged"),
     GLOOM("gloomed");
 
     init {
-        SkullBlock.SkullType.TYPES[type] = this
+        SkullBlock.Type.TYPES[type] = this
     }
 
-    override fun asString(): String = this.type
+    override fun getSerializedName(): String = this.type
 }

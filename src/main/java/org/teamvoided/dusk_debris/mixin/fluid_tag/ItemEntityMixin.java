@@ -1,9 +1,9 @@
 package org.teamvoided.dusk_debris.mixin.fluid_tag;
 
 
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.registry.tag.FluidTags;
-import net.minecraft.registry.tag.TagKey;
+import net.minecraft.tags.FluidTags;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.entity.item.ItemEntity;
 import org.spongepowered.asm.mixin.Debug;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -13,7 +13,7 @@ import org.teamvoided.dusk_debris.data.tags.DuskFluidTags;
 @Debug(export = true)
 @Mixin(ItemEntity.class)
 public class ItemEntityMixin {
-    @Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/ItemEntity;getFluidHeight(Lnet/minecraft/registry/tag/TagKey;)D"))
+    @Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/item/ItemEntity;getFluidHeight(Lnet/minecraft/tags/TagKey;)D"))
     private double fluidTag(ItemEntity instance, TagKey tagKey) {
         if (tagKey == FluidTags.WATER)
             return instance.getFluidHeight(DuskFluidTags.INSTANCE.getITEMS_AND_EXPERIENCE_ORBS_WATER_LOGIC());

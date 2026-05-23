@@ -3,52 +3,52 @@ package org.teamvoided.dusk_debris.data.gen.providers.loot_table
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.SimpleFabricLootTableProvider
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalBiomeTags
-import net.minecraft.item.Item
-import net.minecraft.item.Items
-import net.minecraft.loot.LootPool
-import net.minecraft.loot.LootTable
-import net.minecraft.loot.condition.EntityPropertiesLootCondition
-import net.minecraft.loot.condition.LocationCheckLootCondition
-import net.minecraft.loot.context.LootContext
-import net.minecraft.loot.context.LootContextTypes
-import net.minecraft.loot.entry.EmptyEntry
-import net.minecraft.loot.entry.ItemEntry
-import net.minecraft.loot.entry.LootTableEntry
-import net.minecraft.loot.function.SetCountLootFunction
-import net.minecraft.loot.function.SetOminousBottleLootFunction
-import net.minecraft.loot.provider.number.ConstantLootNumberProvider
-import net.minecraft.loot.provider.number.UniformLootNumberProvider
-import net.minecraft.predicate.entity.EntityPredicate
-import net.minecraft.predicate.entity.LocationPredicate
-import net.minecraft.predicate.entity.RaiderPredicate
-import net.minecraft.registry.HolderLookup
-import net.minecraft.registry.RegistryKey
-import net.minecraft.registry.RegistryKeys
-import net.minecraft.registry.tag.TagKey
-import net.minecraft.world.biome.Biome
+import net.minecraft.advancements.critereon.EntityPredicate
+import net.minecraft.advancements.critereon.LocationPredicate
+import net.minecraft.advancements.critereon.RaiderPredicate
+import net.minecraft.core.HolderLookup
+import net.minecraft.core.registries.Registries
+import net.minecraft.resources.ResourceKey
+import net.minecraft.tags.TagKey
+import net.minecraft.world.item.Item
+import net.minecraft.world.item.Items
+import net.minecraft.world.level.biome.Biome
+import net.minecraft.world.level.storage.loot.LootContext
+import net.minecraft.world.level.storage.loot.LootPool
+import net.minecraft.world.level.storage.loot.LootTable
+import net.minecraft.world.level.storage.loot.entries.EmptyLootItem
+import net.minecraft.world.level.storage.loot.entries.LootItem
+import net.minecraft.world.level.storage.loot.entries.NestedLootTable
+import net.minecraft.world.level.storage.loot.functions.SetItemCountFunction
+import net.minecraft.world.level.storage.loot.functions.SetOminousBottleAmplifierFunction
+import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets
+import net.minecraft.world.level.storage.loot.predicates.LocationCheck
+import net.minecraft.world.level.storage.loot.predicates.LootItemEntityPropertyCondition
+import net.minecraft.world.level.storage.loot.providers.number.ConstantValue
+import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator
 import org.teamvoided.dusk_debris.data.DuskLootTables
 import org.teamvoided.dusk_debris.util.Utils
 import java.util.concurrent.CompletableFuture
 import java.util.function.BiConsumer
 
 class EntityLootTableProvider(o: FabricDataOutput, val r: CompletableFuture<HolderLookup.Provider>) :
-    SimpleFabricLootTableProvider(o, r, LootContextTypes.CHEST) {
+    SimpleFabricLootTableProvider(o, r, LootContextParamSets.CHEST) {
 
 
 //    val dropsItSelf = listOf()
 
-    override fun generate(gen: BiConsumer<RegistryKey<LootTable>, LootTable.Builder>) {
+    override fun generate(gen: BiConsumer<ResourceKey<LootTable>, LootTable.Builder>) {
         gen.accept(
             DuskLootTables.RAIDER_BAD_OMEN_BOTTLE,
-            LootTable.builder().pool(
-                LootPool.builder().rolls(ConstantLootNumberProvider.create(1.0f)).with(
-                    ItemEntry.builder(Items.OMINOUS_BOTTLE)
-                        .apply(SetCountLootFunction.builder(ConstantLootNumberProvider.create(1.0f)))
-                        .apply(SetOminousBottleLootFunction.method_58737(UniformLootNumberProvider.create(0.0f, 4.0f)))
-                ).conditionally(
-                    EntityPropertiesLootCondition.builder(
+            LootTable.lootTable().withPool(
+                LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f)).add(
+                    LootItem.lootTableItem(Items.OMINOUS_BOTTLE)
+                        .apply(SetItemCountFunction.setCount(ConstantValue.exactly(1.0f)))
+                        .apply(SetOminousBottleAmplifierFunction.setAmplifier(UniformGenerator.between(0.0f, 4.0f)))
+                ).`when`(
+                    LootItemEntityPropertyCondition.hasProperties(
                         LootContext.EntityTarget.THIS,
-                        EntityPredicate.Builder.create().typeSpecific(RaiderPredicate.field_50163)
+                        EntityPredicate.Builder.entity().subPredicate(RaiderPredicate.CAPTAIN_WITHOUT_RAID)
                     )
                 )
             )
@@ -56,13 +56,13 @@ class EntityLootTableProvider(o: FabricDataOutput, val r: CompletableFuture<Hold
         gen.endermanHolds()
     }
 
-    private fun BiConsumer<RegistryKey<LootTable>, LootTable.Builder>.endermanHolds() {
+    private fun BiConsumer<ResourceKey<LootTable>, LootTable.Builder>.endermanHolds() {
         this.accept(
             DuskLootTables.ENDERMAN_HOLDS,
-            LootTable.builder().pool(
-                LootPool.builder().rolls(Utils.constantNum(1))
-                    .with(EmptyEntry.builder().weight(1000))
-                    .with(LootTableEntry.method_428(DuskLootTables.ENDERMAN_OVERWORLD_GENERIC).weight(5))
+            LootTable.lootTable().withPool(
+                LootPool.lootPool().setRolls(Utils.constantNum(1))
+                    .add(EmptyLootItem.emptyItem().setWeight(1000))
+                    .add(NestedLootTable.lootTableReference(DuskLootTables.ENDERMAN_OVERWORLD_GENERIC).setWeight(5))
                     .with(DuskLootTables.ENDERMAN_NETHER_GENERIC, ConventionalBiomeTags.IS_NETHER)
                     .with(DuskLootTables.ENDERMAN_END_GENERIC, ConventionalBiomeTags.IS_END)
                     .with(DuskLootTables.ENDERMAN_OVERWORLD_FLOWER, ConventionalBiomeTags.IS_FLORAL, 2)
@@ -97,12 +97,12 @@ class EntityLootTableProvider(o: FabricDataOutput, val r: CompletableFuture<Hold
         )
         this.accept(
             DuskLootTables.ENDERMAN_END_GENERIC,
-            LootTable.builder().pool(
-                LootPool.builder().rolls(Utils.constantNum(1))
-                    .with(EmptyEntry.builder().weight(250))
-                    .with(ItemEntry.builder(Items.END_STONE).weight(250))
-                    .with(ItemEntry.builder(Items.CHORUS_FLOWER).weight(50))
-                    .with(ItemEntry.builder(Items.OBSIDIAN))
+            LootTable.lootTable().withPool(
+                LootPool.lootPool().setRolls(Utils.constantNum(1))
+                    .add(EmptyLootItem.emptyItem().setWeight(250))
+                    .add(LootItem.lootTableItem(Items.END_STONE).setWeight(250))
+                    .add(LootItem.lootTableItem(Items.CHORUS_FLOWER).setWeight(50))
+                    .add(LootItem.lootTableItem(Items.OBSIDIAN))
             )
         )
         this.endermanHolding(
@@ -153,39 +153,39 @@ class EntityLootTableProvider(o: FabricDataOutput, val r: CompletableFuture<Hold
     }
 
     fun LootPool.Builder.with(
-        lootTable: RegistryKey<LootTable>,
+        lootTable: ResourceKey<LootTable>,
         biomeTag: TagKey<Biome>,
         weight: Int = 1
     ): LootPool.Builder {
-        val biomes = r.get().getLookupOrThrow(RegistryKeys.BIOME)
+        val biomes = r.get().lookupOrThrow(Registries.BIOME)
         val retorn =
-            LootTableEntry.method_428(lootTable).conditionally(
-                LocationCheckLootCondition.builder(
-                    LocationPredicate.Builder.create().biomes(
-                        biomes.getTagOrThrow(biomeTag)
+            NestedLootTable.lootTableReference(lootTable).`when`(
+                LocationCheck.checkLocation(
+                    LocationPredicate.Builder.location().setBiomes(
+                        biomes.getOrThrow(biomeTag)
                     )
                 )
             )
         if (weight > 1)
-            retorn.weight(weight)
-        return this.with(retorn)
+            retorn.setWeight(weight)
+        return this.add(retorn)
     }
 
     private fun item(item: Item, weight: Int = 1): Pair<Item, Int> = (item to weight)
 
-    fun BiConsumer<RegistryKey<LootTable>, LootTable.Builder>.endermanHolding(
-        lootTable: RegistryKey<LootTable>,
+    fun BiConsumer<ResourceKey<LootTable>, LootTable.Builder>.endermanHolding(
+        lootTable: ResourceKey<LootTable>,
         vararg items: Pair<Item, Int>
     ) {
-        val pool = LootPool.builder().rolls(Utils.constantNum(1))
+        val pool = LootPool.lootPool().setRolls(Utils.constantNum(1))
 
         items.forEach {
-            val builder = ItemEntry.builder(it.first)
+            val builder = LootItem.lootTableItem(it.first)
             if (it.second > 1)
-                builder.weight(it.second)
-            pool.with(builder)
+                builder.setWeight(it.second)
+            pool.add(builder)
         }
 
-        return this.accept(lootTable, LootTable.builder().pool(pool))
+        return this.accept(lootTable, LootTable.lootTable().withPool(pool))
     }
 }

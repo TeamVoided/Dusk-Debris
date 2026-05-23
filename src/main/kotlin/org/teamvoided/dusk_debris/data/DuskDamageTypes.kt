@@ -1,8 +1,8 @@
 package org.teamvoided.dusk_debris.data
 
-import net.minecraft.entity.damage.DamageType
-import net.minecraft.registry.RegistryKey
-import net.minecraft.registry.RegistryKeys
+import net.minecraft.core.registries.Registries
+import net.minecraft.resources.ResourceKey
+import net.minecraft.world.damagesource.DamageType
 import org.teamvoided.dusk_debris.DuskDebris
 
 object DuskDamageTypes {
@@ -11,7 +11,7 @@ object DuskDamageTypes {
     val ELECTRICITY = create("electricity")
     val INDIRECT_ELECTRICITY = create("indirect_electricity")
 
-    fun create(id: String): RegistryKey<DamageType> {
-        return RegistryKey.of(RegistryKeys.DAMAGE_TYPE, DuskDebris.id(id))
+    fun create(id: String): ResourceKey<DamageType> {
+        return ResourceKey.create(Registries.DAMAGE_TYPE, DuskDebris.id(id))
     }
 }

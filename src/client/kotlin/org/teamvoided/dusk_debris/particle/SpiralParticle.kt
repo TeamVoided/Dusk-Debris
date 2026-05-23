@@ -2,8 +2,8 @@ package org.teamvoided.dusk_debris.particle
 
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
+import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.client.particle.*
-import net.minecraft.client.world.ClientWorld
 import org.joml.Vector3f
 import org.teamvoided.dusk_debris.particle.color.SpiralParticleEffect
 import java.awt.Color
@@ -12,49 +12,49 @@ import kotlin.math.sin
 
 @Environment(EnvType.CLIENT)
 class SpiralParticle internal constructor(
-    world: ClientWorld,
+    world: ClientLevel,
     xPos: Double, yPos: Double, zPos: Double,
     xVel: Double, yVel: Double, zVel: Double,
     val color1: Color, val color2: Color
-) : SpriteBillboardParticle(world, xPos, yPos, zPos) {
+) : TextureSheetParticle(world, xPos, yPos, zPos) {
     val scaleBase: Float
     val offsetterXZ: Float
     val yVelocity2: Double
 
     init {
-        velocityX = xVel
-        velocityY = yVel
-        velocityZ = zVel
+        xd = xVel
+        yd = yVel
+        zd = zVel
         yVelocity2 = 0.0001 + (random.nextFloat() - random.nextFloat()) * 0.0000075
         x = xPos
         y = yPos
         z = zPos
-        colorRed = 1f
-        colorGreen = 1f
-        colorBlue = 1f
-        colorAlpha = 0.01f
+        rCol = 1f
+        gCol = 1f
+        bCol = 1f
+        alpha = 0.01f
         scaleBase = (random.nextFloat() * 0.2f + 0.1f)
         offsetterXZ = (random.nextFloat()) * 0.005f
-        scale = scaleBase
-        prevAngle = random.nextFloat()
-        angle = prevAngle
-        collidesWithWorld = false
+        quadSize = scaleBase
+        oRoll = random.nextFloat()
+        roll = oRoll
+        hasPhysics = false
         val age2 = 2500
-        maxAge = age2 + (random.nextFloat() * (age2 / 3f)).toInt()
+        lifetime = age2 + (random.nextFloat() * (age2 / 3f)).toInt()
     }
 
     override fun tick() {
-        prevPosX = x
-        prevPosY = y
-        prevPosZ = z
-        if (age++ >= maxAge) {
-            colorAlpha += -0.01f
-            if (colorAlpha < 0)
-                markDead()
-        } else if (colorAlpha < 1) {
-            colorAlpha += 0.002f
+        xo = x
+        yo = y
+        zo = z
+        if (age++ >= lifetime) {
+            alpha += -0.01f
+            if (alpha < 0)
+                remove()
+        } else if (alpha < 1) {
+            alpha += 0.002f
         }
-        val frac = (age.toFloat() / maxAge)
+        val frac = (age.toFloat() / lifetime)
         val speed = 50.0
         val strength = (frac + offsetterXZ) / speed
         val amplitude = age / (speed * 2.5)
@@ -62,10 +62,10 @@ class SpiralParticle internal constructor(
         //val fhte = age / (speed * 1.5)
         //val width = (fhte / 2) * 0.4
         //velocityY = sin(fhte * 0.35) this i think did something cool?
-        x += (cos(amplitude) * width * strength) * velocityX
-        y += (sin(amplitude * 3.5) * 0.5 * strength + yVelocity2 * speed) * velocityY
-        z += (sin(amplitude) * width * strength) * velocityZ
-        scale += 0.0001f
+        x += (cos(amplitude) * width * strength) * xd
+        y += (sin(amplitude * 3.5) * 0.5 * strength + yVelocity2 * speed) * yd
+        z += (sin(amplitude) * width * strength) * zd
+        quadSize += 0.0001f
         colorLerp(frac)
     }
 
@@ -80,18 +80,18 @@ class SpiralParticle internal constructor(
             else if (frac < 0.4f) colorOption2
             else if (frac < 0.8f) colorOption2.lerp(colorOption3, 2.5f * (frac - 0.4f))
         else colorOption3
-        colorRed = colorChoice.x()
-        colorGreen = colorChoice.y()
-        colorBlue = colorChoice.z()
+        rCol = colorChoice.x()
+        gCol = colorChoice.y()
+        bCol = colorChoice.z()
     }
 
-    override fun getType(): ParticleTextureSheet {
-        return ParticleTextureSheet.PARTICLE_SHEET_TRANSLUCENT
+    override fun getRenderType(): ParticleRenderType {
+        return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT
     }
 
     override fun move(dx: Double, dy: Double, dz: Double) {}
 
-    public override fun getBrightness(tint: Float): Int {
+    public override fun getLightColor(tint: Float): Int {
         return 240
     }
 
@@ -107,14 +107,14 @@ class SpiralParticle internal constructor(
 //    }
 
     @Environment(EnvType.CLIENT)
-    class Factory(private val spriteProvider: SpriteProvider) : ParticleFactory<SpiralParticleEffect> {
+    class Factory(private val spriteProvider: SpriteSet) : ParticleProvider<SpiralParticleEffect> {
         override fun createParticle(
-            type: SpiralParticleEffect, world: ClientWorld,
+            type: SpiralParticleEffect, world: ClientLevel,
             xPos: Double, yPos: Double, zPos: Double,
             xVel: Double, yVel: Double, zVel: Double
         ): Particle {
             val particle = SpiralParticle(world, xPos, yPos, zPos, xVel, yVel, zVel, type.color1, type.color2)
-            particle.setSprite(this.spriteProvider)
+            particle.pickSprite(this.spriteProvider)
             return particle
         }
     }

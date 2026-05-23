@@ -1,30 +1,26 @@
 package org.teamvoided.dusk_debris.mixin.directional_sculk.blockstates;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ShapeContext;
-import net.minecraft.block.Waterloggable;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.SculkSensorBlockEntity;
-import net.minecraft.block.enums.SculkSensorPhase;
-import net.minecraft.block.sculk.SculkSensorBlock;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.particle.DustColorTransitionParticleEffect;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.BlockMirror;
-import net.minecraft.util.BlockRotation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.random.RandomGenerator;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
-import net.minecraft.world.event.GameEvent;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.particles.DustColorTransitionOptions;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.SculkSensorBlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.SculkSensorPhase;
+import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -32,75 +28,75 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.teamvoided.dusk_debris.block.mixin.SculkDirectionalStuff;
 
-import static net.minecraft.block.sculk.SculkSensorBlock.isInactive;
+import static net.minecraft.world.level.block.SculkSensorBlock.canActivate;
 import static org.teamvoided.dusk_debris.util.UtilsHelperFunctionsKt.toVec3d;
 
 @Mixin(SculkSensorBlock.class)
-public class SculkSensorBlockMixin extends Block implements Waterloggable {
+public class SculkSensorBlockMixin extends Block implements SimpleWaterloggedBlock {
 
-    public SculkSensorBlockMixin(Settings settings) {
+    public SculkSensorBlockMixin(Properties settings) {
         super(settings);
     }
 
     @Inject(method = "<init>", at = @At("TAIL"))
-    public void addDefaultState(Settings settings, CallbackInfo ci) {
+    public void addDefaultState(Properties settings, CallbackInfo ci) {
         if (SculkDirectionalStuff.isNotCalibrated(this.asBlock())) {
-            this.setDefaultState(this.getDefaultState().with(Properties.FACING, Direction.UP));
+            this.registerDefaultState(this.defaultBlockState().setValue(BlockStateProperties.FACING, Direction.UP));
         }
     }
 
-    @Inject(method = "onSteppedOn", at = @At("HEAD"), cancellable = true)
-    public void onSteppedOnIfUp(World world, BlockPos pos, BlockState state, Entity entity, CallbackInfo ci) {
+    @Inject(method = "stepOn", at = @At("HEAD"), cancellable = true)
+    public void onSteppedOnIfUp(Level world, BlockPos pos, BlockState state, Entity entity, CallbackInfo ci) {
         if (SculkDirectionalStuff.isNotUpCalibrated(state)) {
-            super.onSteppedOn(world, pos, state, entity);
+            super.stepOn(world, pos, state, entity);
             ci.cancel();
         }
     }
 
     @Override
-    protected void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity) {
-        if (SculkDirectionalStuff.isNotUpCalibrated(state) && !world.isClient() && isInactive(state) && entity.getType() != EntityType.WARDEN && SculkDirectionalStuff.noCreativeFlightAnnoyance(entity)) {
+    protected void entityInside(BlockState state, Level world, BlockPos pos, Entity entity) {
+        if (SculkDirectionalStuff.isNotUpCalibrated(state) && !world.isClientSide() && canActivate(state) && entity.getType() != EntityType.WARDEN && SculkDirectionalStuff.noCreativeFlightAnnoyance(entity)) {
             BlockEntity blockEntity = world.getBlockEntity(pos);
             if (blockEntity instanceof SculkSensorBlockEntity sculkSensorBlockEntity) {
-                if (world instanceof ServerWorld serverWorld) {
-                    if (sculkSensorBlockEntity.getVibrationCallback().accepts(serverWorld, pos, GameEvent.STEP, GameEvent.Context.create(state))) {
-                        sculkSensorBlockEntity.getListener().forceScheduleVibration(serverWorld, GameEvent.STEP, GameEvent.Context.create(entity), entity.getPos());
+                if (world instanceof ServerLevel serverWorld) {
+                    if (sculkSensorBlockEntity.getVibrationUser().canReceiveVibration(serverWorld, pos, GameEvent.STEP, GameEvent.Context.of(state))) {
+                        sculkSensorBlockEntity.getListener().forceScheduleVibration(serverWorld, GameEvent.STEP, GameEvent.Context.of(entity), entity.position());
                     }
                 }
             }
         }
-        super.onEntityCollision(state, world, pos, entity);
+        super.entityInside(state, world, pos, entity);
     }
 
-    @Inject(method = "getStrongRedstonePower", at = @At("HEAD"), cancellable = true)
-    public void addDirectionalRedstone(BlockState state, BlockView world, BlockPos pos, Direction direction, CallbackInfoReturnable<Integer> cir) {
+    @Inject(method = "getDirectSignal", at = @At("HEAD"), cancellable = true)
+    public void addDirectionalRedstone(BlockState state, BlockGetter world, BlockPos pos, Direction direction, CallbackInfoReturnable<Integer> cir) {
         if (SculkDirectionalStuff.isNotCalibrated(this.asBlock())) {
-            var facing = state.get(Properties.FACING);
+            var facing = state.getValue(BlockStateProperties.FACING);
             if (facing != Direction.UP)
-                cir.setReturnValue(direction == facing ? state.getWeakRedstonePower(world, pos, direction) : 0);
+                cir.setReturnValue(direction == facing ? state.getSignal(world, pos, direction) : 0);
         }
     }
 
-    @Inject(method = "getOutlineShape", at = @At("HEAD"), cancellable = true)
-    public void getDirectionalShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context, CallbackInfoReturnable<VoxelShape> cir) {
+    @Inject(method = "getShape", at = @At("HEAD"), cancellable = true)
+    public void getDirectionalShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context, CallbackInfoReturnable<VoxelShape> cir) {
         if (SculkDirectionalStuff.isNotCalibrated(this.asBlock())) {
             SculkDirectionalStuff.getDirectionalSlabShape(state, cir);
         }
     }
 
-    @Inject(method = "randomDisplayTick", at = @At("HEAD"), cancellable = true)
-    public void addDirectionalRandomDisplayTick(BlockState state, World world, BlockPos pos, RandomGenerator random, CallbackInfo ci) {
+    @Inject(method = "animateTick", at = @At("HEAD"), cancellable = true)
+    public void addDirectionalRandomDisplayTick(BlockState state, Level world, BlockPos pos, RandomSource random, CallbackInfo ci) {
         if (SculkDirectionalStuff.isNotCalibrated(this.asBlock())) {
-            var facing = state.get(Properties.FACING);
+            var facing = state.getValue(BlockStateProperties.FACING);
             if (facing != Direction.UP) {
                 if (SculkSensorBlock.getPhase(state) == SculkSensorPhase.ACTIVE) {
-                    Direction direction = Direction.random(random);
+                    Direction direction = Direction.getRandom(random);
                     if (direction != facing && direction != facing.getOpposite()) {
-                        Vec3d posFacing = toVec3d(pos);
-                        Vec3d velFacing = Vec3d.ZERO;
-                        double x = 0.5 + (direction.getOffsetX() == 0 ? 0.5 - random.nextDouble() : (double) direction.getOffsetX() * 0.6);
+                        Vec3 posFacing = toVec3d(pos);
+                        Vec3 velFacing = Vec3.ZERO;
+                        double x = 0.5 + (direction.getStepX() == 0 ? 0.5 - random.nextDouble() : (double) direction.getStepX() * 0.6);
                         double y = 0.25;
-                        double z = 0.5 + (direction.getOffsetZ() == 0 ? 0.5 - random.nextDouble() : (double) direction.getOffsetZ() * 0.6);
+                        double z = 0.5 + (direction.getStepZ() == 0 ? 0.5 - random.nextDouble() : (double) direction.getStepZ() * 0.6);
                         double yVel = (double) random.nextFloat() * 0.04;
                         switch (facing) {
                             case Direction.DOWN:
@@ -125,7 +121,7 @@ public class SculkSensorBlockMixin extends Block implements Waterloggable {
                                 break;
                         }
                         world.addParticle(
-                                DustColorTransitionParticleEffect.DEFAULT,
+                                DustColorTransitionOptions.SCULK_TO_REDSTONE,
                                 posFacing.x, posFacing.y, posFacing.z,
                                 velFacing.x, velFacing.y, velFacing.z
                         );
@@ -136,15 +132,15 @@ public class SculkSensorBlockMixin extends Block implements Waterloggable {
         }
     }
 
-    @Inject(method = "getPlacementState", at = @At("RETURN"), cancellable = true)
-    public void addDirectionalPlacement(ItemPlacementContext ctx, CallbackInfoReturnable<BlockState> cir) {
+    @Inject(method = "getStateForPlacement", at = @At("RETURN"), cancellable = true)
+    public void addDirectionalPlacement(BlockPlaceContext ctx, CallbackInfoReturnable<BlockState> cir) {
         if (SculkDirectionalStuff.isNotCalibrated(this.asBlock())) {
             cir.setReturnValue(SculkDirectionalStuff.getPlacementState(cir.getReturnValue(), ctx));
         }
     }
 
     @Override
-    protected BlockState rotate(BlockState state, BlockRotation rotation) {
+    protected BlockState rotate(BlockState state, Rotation rotation) {
         if (SculkDirectionalStuff.isNotCalibrated(this.asBlock())) {
             return SculkDirectionalStuff.spin(state, rotation);
         } else {
@@ -153,7 +149,7 @@ public class SculkSensorBlockMixin extends Block implements Waterloggable {
     }
 
     @Override
-    protected BlockState mirror(BlockState state, BlockMirror mirror) {
+    protected BlockState mirror(BlockState state, Mirror mirror) {
         if (SculkDirectionalStuff.isNotCalibrated(this.asBlock())) {
             return SculkDirectionalStuff.spin(state, mirror);
         } else {
@@ -161,10 +157,10 @@ public class SculkSensorBlockMixin extends Block implements Waterloggable {
         }
     }
 
-    @Inject(method = "appendProperties", at = @At("TAIL"))
-    public void addDirectionalProperties(StateManager.Builder<Block, BlockState> builder, CallbackInfo ci) {
+    @Inject(method = "createBlockStateDefinition", at = @At("TAIL"))
+    public void addDirectionalProperties(StateDefinition.Builder<Block, BlockState> builder, CallbackInfo ci) {
         if (SculkDirectionalStuff.isNotCalibrated(this.asBlock())) {
-            builder.add(Properties.FACING);
+            builder.add(BlockStateProperties.FACING);
         }
     }
 }

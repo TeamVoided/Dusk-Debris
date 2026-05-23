@@ -1,26 +1,26 @@
 package org.teamvoided.dusk_debris.block
 
-import net.minecraft.block.BlockState
-import net.minecraft.block.DecoratedPotBlock
-import net.minecraft.block.entity.BlockEntity
-import net.minecraft.block.entity.DecoratedPotBlockEntity
-import net.minecraft.client.item.TooltipConfig
-import net.minecraft.item.Item
-import net.minecraft.item.ItemStack
-import net.minecraft.text.Text
-import net.minecraft.util.math.BlockPos
+import net.minecraft.core.BlockPos
+import net.minecraft.network.chat.Component
+import net.minecraft.world.item.Item
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.TooltipFlag
+import net.minecraft.world.level.block.DecoratedPotBlock
+import net.minecraft.world.level.block.entity.BlockEntity
+import net.minecraft.world.level.block.entity.DecoratedPotBlockEntity
+import net.minecraft.world.level.block.state.BlockState
 
-class DecoratedNetherBrickPotBlock(settings: Settings) : DecoratedPotBlock(settings) {
-    override fun createBlockEntity(pos: BlockPos, state: BlockState): BlockEntity {
+class DecoratedNetherBrickPotBlock(settings: Properties) : DecoratedPotBlock(settings) {
+    override fun newBlockEntity(pos: BlockPos, state: BlockState): BlockEntity {
         return DecoratedPotBlockEntity(pos, state)
     }
 
-    override fun appendTooltip(
+    override fun appendHoverText(
         stack: ItemStack,
         tooltipContext: Item.TooltipContext,
-        tooltip: MutableList<Text>,
-        options: TooltipConfig
+        tooltip: MutableList<Component>,
+        options: TooltipFlag
     ) {
-        super.appendTooltip(stack, tooltipContext, tooltip, options)
+        super.appendHoverText(stack, tooltipContext, tooltip, options)
     }
 }

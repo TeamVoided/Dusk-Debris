@@ -2,17 +2,17 @@ package org.teamvoided.dusk_debris.world.gen.configured_feature.config
 
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
-import net.minecraft.block.Block
-import net.minecraft.registry.RegistryKeys
-import net.minecraft.registry.tag.TagKey
-import net.minecraft.world.gen.feature.FeatureConfig
-import net.minecraft.world.gen.stateprovider.BlockStateProvider
+import net.minecraft.core.registries.Registries
+import net.minecraft.tags.TagKey
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration
+import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider
 
 class NoiseSurfaceFeatureConfig(
     val blockstate: BlockStateProvider,
     var replaceable: TagKey<Block>,
     val threshold: Float,
-) : FeatureConfig {
+) : FeatureConfiguration {
 //    init {
 //        if (thresholdUp < thresholdDown) {
 //            error("NoiseSurfaceFeatureConfig datagen error: threshold_up is the max range, threshold_down is the min range. Feature's min: $thresholdDown, Feature's max: $thresholdUp.")
@@ -24,8 +24,8 @@ class NoiseSurfaceFeatureConfig(
         val CODEC: Codec<NoiseSurfaceFeatureConfig> =
             RecordCodecBuilder.create { instance ->
                 instance.group(
-                    BlockStateProvider.TYPE_CODEC.fieldOf("blockstate").forGetter { it.blockstate },
-                    TagKey.createHashedCodec(RegistryKeys.BLOCK).fieldOf("replaceable").forGetter { it.replaceable },
+                    BlockStateProvider.CODEC.fieldOf("blockstate").forGetter { it.blockstate },
+                    TagKey.hashedCodec(Registries.BLOCK).fieldOf("replaceable").forGetter { it.replaceable },
                     NOISE_RANGE.fieldOf("threshold").forGetter { it.threshold }
                 ).apply(instance, ::NoiseSurfaceFeatureConfig)
             }

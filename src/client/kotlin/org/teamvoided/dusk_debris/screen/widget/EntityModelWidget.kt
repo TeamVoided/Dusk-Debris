@@ -1,19 +1,19 @@
 package org.teamvoided.dusk_debris.screen.widget
 
-import com.mojang.blaze3d.lighting.DiffuseLighting
-import net.minecraft.client.MinecraftClient
-import net.minecraft.client.gui.ElementPath
+import com.mojang.blaze3d.platform.Lighting
+import com.mojang.math.Axis
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.ComponentPath
 import net.minecraft.client.gui.GuiGraphics
-import net.minecraft.client.gui.navigation.GuiNavigationEvent
-import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder
-import net.minecraft.client.gui.widget.ClickableWidget
-import net.minecraft.client.sound.SoundManager
-import net.minecraft.entity.Entity
-import net.minecraft.entity.EntityType
-import net.minecraft.text.CommonTexts
-import net.minecraft.util.math.Axis
-import net.minecraft.util.math.MathHelper
-import net.minecraft.util.math.MathHelper.lerp
+import net.minecraft.client.gui.components.AbstractWidget
+import net.minecraft.client.gui.narration.NarrationElementOutput
+import net.minecraft.client.gui.navigation.FocusNavigationEvent
+import net.minecraft.client.sounds.SoundManager
+import net.minecraft.network.chat.CommonComponents
+import net.minecraft.util.Mth
+import net.minecraft.util.Mth.lerp
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.EntityType
 import org.teamvoided.dusk_debris.util.text
 import kotlin.math.min
 
@@ -21,14 +21,14 @@ class EntityModelWidget(
     width: Int, height: Int,
     var entity: Entity?,
     val fixed: Boolean = false,
-) : ClickableWidget(0, 0, width, height, CommonTexts.EMPTY) {
+) : AbstractWidget(0, 0, width, height, CommonComponents.EMPTY) {
     var name: Boolean = false
     var sound: Boolean = false
     var clickAction: (EntityModelWidget) -> Unit = {}
     var scaleModifier: Float = 1f
 
     constructor(width: Int, height: Int, type: EntityType<*>, fixed: Boolean = false)
-            : this(width, height, type.create(MinecraftClient.getInstance().world), fixed)
+            : this(width, height, type.create(Minecraft.getInstance().level), fixed)
 
     companion object {
         const val Z_OFFSET = 100.0f
@@ -45,45 +45,45 @@ class EntityModelWidget(
     var sizeScaler: Float = DEFAULT_SALER
     var lastSizeScaler: Float = DEFAULT_SALER
 
-    override fun drawWidget(graphics: GuiGraphics, mouseX: Int, mouseY: Int, delta: Float) {
+    override fun renderWidget(graphics: GuiGraphics, mouseX: Int, mouseY: Int, delta: Float) {
         if (entity == null) return
-        val entityHeight = (entity!!.height * scaleModifier * lerp(delta, lastSizeScaler, sizeScaler))
-        graphics.matrices.push()
-        graphics.matrices.translate(
+        val entityHeight = (entity!!.bbHeight * scaleModifier * lerp(delta, lastSizeScaler, sizeScaler))
+        graphics.pose().pushPose()
+        graphics.pose().translate(
             this.x.toFloat() + this.getWidth().toFloat() / 2.0f,
             (this.y + this.getHeight()).toFloat(),
             Z_OFFSET
         )
         val scale: Float = this.getHeight().toFloat() / min(entityHeight, -1f)
-        graphics.matrices.rotateAround(Axis.X_POSITIVE.rotationDegrees(this.pitch), 0f, scale, 0f)
-        graphics.matrices.rotate(Axis.Y_POSITIVE.rotationDegrees(this.yaw))
-        graphics.matrices.scale(scale, scale, scale)
+        graphics.pose().rotateAround(Axis.XP.rotationDegrees(this.pitch), 0f, scale, 0f)
+        graphics.pose().mulPose(Axis.YP.rotationDegrees(this.yaw))
+        graphics.pose().scale(scale, scale, scale)
 
-        graphics.draw()
-        DiffuseLighting.setupInventoryShaderLighting(Axis.X_POSITIVE.rotationDegrees(this.pitch))
-        MinecraftClient.getInstance().entityRenderDispatcher.render(
+        graphics.flush()
+        Lighting.setupForEntityInInventory(Axis.XP.rotationDegrees(this.pitch))
+        Minecraft.getInstance().entityRenderDispatcher.render(
             entity!!,
             0.0, 0.0, 0.0,
             0f, 1f,
-            graphics.matrices, graphics.vertexConsumers,
+            graphics.pose(), graphics.bufferSource(),
             255
         )
-        graphics.draw()
-        DiffuseLighting.setup3DGuiLighting()
-        graphics.matrices.pop()
+        graphics.flush()
+        Lighting.setupFor3DItems()
+        graphics.pose().popPose()
         if (name) {
-            graphics.matrices.push()
-            graphics.matrices.translate(0f, 0f, Z_OFFSET * 10)
+            graphics.pose().pushPose()
+            graphics.pose().translate(0f, 0f, Z_OFFSET * 10)
 //            graphics.text("Height: $entityHeight", x, y)
-            graphics.text(entity!!.type.name, x, y + height - (MinecraftClient.getInstance().textRenderer.fontHeight))
-            graphics.matrices.pop()
+            graphics.text(entity!!.type.description, x, y + height - (Minecraft.getInstance().font.lineHeight))
+            graphics.pose().popPose()
         }
         lastSizeScaler = sizeScaler
     }
 
     override fun onDrag(mouseX: Double, mouseY: Double, deltaX: Double, deltaY: Double) {
         if (fixed) return
-        this.pitch = MathHelper.clamp(this.pitch - deltaY.toFloat() * ROTATION_SENSITIVITY, -PITCH_LIMIT, PITCH_LIMIT)
+        this.pitch = Mth.clamp(this.pitch - deltaY.toFloat() * ROTATION_SENSITIVITY, -PITCH_LIMIT, PITCH_LIMIT)
         this.yaw += deltaX.toFloat() * ROTATION_SENSITIVITY
     }
 
@@ -109,7 +109,7 @@ class EntityModelWidget(
         clickAction(this)
     }
 
-    override fun updateNarration(builder: NarrationMessageBuilder) = Unit
-    override fun isNarratable(): Boolean = false
-    override fun nextFocusPath(event: GuiNavigationEvent): ElementPath? = null
+    override fun updateWidgetNarration(builder: NarrationElementOutput) = Unit
+    override fun isActive(): Boolean = false
+    override fun nextFocusPath(event: FocusNavigationEvent): ComponentPath? = null
 }

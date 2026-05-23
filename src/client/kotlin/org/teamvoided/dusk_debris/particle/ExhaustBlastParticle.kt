@@ -3,45 +3,41 @@ package org.teamvoided.dusk_debris.particle
 import com.mojang.blaze3d.vertex.VertexConsumer
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
+import net.minecraft.client.Camera
+import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.client.particle.*
-import net.minecraft.client.render.Camera
-import net.minecraft.client.world.ClientWorld
-import net.minecraft.entity.Entity
-import net.minecraft.particle.DefaultParticleType
-import net.minecraft.util.math.Direction
-import net.minecraft.util.math.MathHelper.lerp
-import net.minecraft.util.math.Vec3d
+import net.minecraft.core.Direction
+import net.minecraft.core.particles.SimpleParticleType
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.phys.Vec3
 import org.joml.Vector2d
 import org.teamvoided.dusk_debris.block.ExhaustBlock
 import org.teamvoided.dusk_debris.util.ParticleHelper
-import org.teamvoided.dusk_debris.util.Utils
-import org.teamvoided.dusk_debris.util.Utils.PI
-import voidlib.devin.world.gen.max
 import java.awt.Color
 import kotlin.math.max
 
 class ExhaustBlastParticle(
-    world: ClientWorld,
+    world: ClientLevel,
     posX: Double,
     posY: Double,
     posZ: Double,
     velX: Double,
     velY: Double,
     velZ: Double,
-    private val spriteProvider: SpriteProvider,
+    private val spriteProvider: SpriteSet,
     private val isWarmup: Boolean = false
-) : SpriteBillboardParticle(world, posX, posY, posZ, velX, velY, velZ) {
+) : TextureSheetParticle(world, posX, posY, posZ, velX, velY, velZ) {
 
     init {
-        if (!isWarmup) this.setSpriteForAge(this.spriteProvider) else this.setSprite(this.spriteProvider)
-        this.maxAge =
+        if (!isWarmup) this.setSpriteFromAge(this.spriteProvider) else this.pickSprite(this.spriteProvider)
+        this.lifetime =
             if (isWarmup) ExhaustBlock.WORLD_TIME_MOD * ExhaustBlock.WARMUP_DURATION + 10 + random.nextInt(25)
             else 15 + random.nextInt(15)
-        this.scale = if (isWarmup) random.nextFloat() * 0.3f + 0.2f else random.nextFloat() * 0.5f + 0.3f
-        this.velocityMultiplier = 0.8f
-        this.velocityX = velX
-        this.velocityY = velY
-        this.velocityZ = velZ
+        this.quadSize = if (isWarmup) random.nextFloat() * 0.3f + 0.2f else random.nextFloat() * 0.5f + 0.3f
+        this.friction = 0.8f
+        this.xd = velX
+        this.yd = velY
+        this.zd = velZ
         this.onGround = this.isWarmup
 
         val color = ParticleHelper.chooseColor(
@@ -49,52 +45,52 @@ class ExhaustBlastParticle(
             Color(0xF1C9AD),
             random
         )
-        colorRed = color.x
-        colorGreen = color.y
-        colorBlue = color.z
+        rCol = color.x
+        gCol = color.y
+        bCol = color.z
     }
 
-    override fun getType(): ParticleTextureSheet = ParticleTextureSheet.PARTICLE_SHEET_TRANSLUCENT
+    override fun getRenderType(): ParticleRenderType = ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT
 
 
-    public override fun getBrightness(tickDelta: Float): Int {
-        val upper = if (isWarmup) (15728880 * (age + tickDelta) / (maxAge - 1)).toInt() else 15728880 / 2
-        return max(super.getBrightness(tickDelta), upper)
+    public override fun getLightColor(tickDelta: Float): Int {
+        val upper = if (isWarmup) (15728880 * (age + tickDelta) / (lifetime - 1)).toInt() else 15728880 / 2
+        return max(super.getLightColor(tickDelta), upper)
     }
 
     override fun tick() {
-        if (age++ >= this.maxAge) {
-            this.markDead()
+        if (age++ >= this.lifetime) {
+            this.remove()
         } else {
-            if (!isWarmup) this.setSpriteForAge(this.spriteProvider)
-            this.prevPosX = this.x
-            this.prevPosY = this.y
-            this.prevPosZ = this.z
-            if (!this.isWarmup && maxAge - 5 < age) {
-                velocityX *= velocityMultiplier
-                velocityY *= velocityMultiplier
-                velocityZ *= velocityMultiplier
+            if (!isWarmup) this.setSpriteFromAge(this.spriteProvider)
+            this.xo = this.x
+            this.yo = this.y
+            this.zo = this.z
+            if (!this.isWarmup && lifetime - 5 < age) {
+                xd *= friction
+                yd *= friction
+                zd *= friction
             }
             if (this.isWarmup) {
-                val mult = ((age + 5) / (maxAge + 5.0))
-                this.move(this.velocityX * mult, this.velocityY * mult, this.velocityZ * mult)
+                val mult = ((age + 5) / (lifetime + 5.0))
+                this.move(this.xd * mult, this.yd * mult, this.zd * mult)
             } else if (!this.onGround) {
-                this.move(this.velocityX, this.velocityY, this.velocityZ)
+                this.move(this.xd, this.yd, this.zd)
             } else {
-                this.x += velocityX
-                this.y += velocityY
-                this.z += velocityZ
+                this.x += xd
+                this.y += yd
+                this.z += zd
             }
         }
     }
 
-    override fun buildGeometry(vertexConsumer: VertexConsumer, camera: Camera, tickDelta: Float) {
-        super.buildGeometry(vertexConsumer, camera, tickDelta)
+    override fun render(vertexConsumer: VertexConsumer, camera: Camera, tickDelta: Float) {
+        super.render(vertexConsumer, camera, tickDelta)
     }
 
-    override fun getSize(tickDelta: Float): Float {
-        val supr = super.getSize(tickDelta)
-        if (isWarmup) return ((age + tickDelta + maxAge) / (2 * maxAge)) * supr
+    override fun getQuadSize(tickDelta: Float): Float {
+        val supr = super.getQuadSize(tickDelta)
+        if (isWarmup) return ((age + tickDelta + lifetime) / (2 * lifetime)) * supr
         return supr
     }
 
@@ -106,11 +102,11 @@ class ExhaustBlastParticle(
             var dy = y
             var dz = z
             if ((dx != 0.0 || dy != 0.0 || dz != 0.0) && (dx * dx + dy * dy + dz * dz < 10000)) {
-                val vec3d = Entity.adjustSingleAxisMovementForCollisions(
+                val vec3d = Entity.collideBoundingBox(
                     null as Entity?,
-                    Vec3d(dx, dy, dz),
+                    Vec3(dx, dy, dz),
                     this.boundingBox,
-                    this.world,
+                    this.level,
                     listOf()
                 )
                 dx = vec3d.x
@@ -119,8 +115,8 @@ class ExhaustBlastParticle(
             }
 
             if (dx != 0.0 || dy != 0.0 || dz != 0.0) {
-                this.boundingBox = boundingBox.offset(dx, dy, dz)
-                this.repositionFromBoundingBox()
+                this.boundingBox = boundingBox.move(dx, dy, dz)
+                this.setLocationFromBoundingbox()
             }
 
             if (x != dx) {
@@ -141,24 +137,24 @@ class ExhaustBlastParticle(
         this.onGround = true
         val vel = Vector2d(random.nextDouble() - 0.5, random.nextDouble() - 0.5).normalize()
         val velocity = when (direction) {
-            Direction.DOWN -> Vec3d(vel.x, -1.0, vel.y)
-            Direction.UP -> Vec3d(vel.x, 1.0, vel.y)
-            Direction.NORTH -> Vec3d(vel.x, vel.y, -1.0)
-            Direction.SOUTH -> Vec3d(vel.x, vel.y, 1.0)
-            Direction.WEST -> Vec3d(-1.0, vel.x, vel.y)
-            Direction.EAST -> Vec3d(1.0, vel.x, vel.y)
-        }.multiply(0.2)
-        this.velocityX = velocity.x
-        this.velocityY = velocity.y
-        this.velocityZ = velocity.z
-        this.age = this.maxAge - random.nextInt(15) + 5
+            Direction.DOWN -> Vec3(vel.x, -1.0, vel.y)
+            Direction.UP -> Vec3(vel.x, 1.0, vel.y)
+            Direction.NORTH -> Vec3(vel.x, vel.y, -1.0)
+            Direction.SOUTH -> Vec3(vel.x, vel.y, 1.0)
+            Direction.WEST -> Vec3(-1.0, vel.x, vel.y)
+            Direction.EAST -> Vec3(1.0, vel.x, vel.y)
+        }.scale(0.2)
+        this.xd = velocity.x
+        this.yd = velocity.y
+        this.zd = velocity.z
+        this.age = this.lifetime - random.nextInt(15) + 5
     }
 
     @Environment(EnvType.CLIENT)
-    class WarmUpFactory(private val spriteProvider: SpriteProvider) : ParticleFactory<DefaultParticleType> {
+    class WarmUpFactory(private val spriteProvider: SpriteSet) : ParticleProvider<SimpleParticleType> {
         override fun createParticle(
-            defaultParticleType: DefaultParticleType,
-            world: ClientWorld,
+            defaultParticleType: SimpleParticleType,
+            world: ClientLevel,
             posX: Double,
             posY: Double,
             posZ: Double,
@@ -167,16 +163,16 @@ class ExhaustBlastParticle(
             velZ: Double,
         ): Particle {
             val particle = ExhaustBlastParticle(world, posX, posY, posZ, velX, velY, velZ, this.spriteProvider, true)
-            particle.setSprite(spriteProvider)
+            particle.pickSprite(spriteProvider)
             return particle
         }
     }
 
     @Environment(EnvType.CLIENT)
-    class Factory(private val spriteProvider: SpriteProvider) : ParticleFactory<DefaultParticleType> {
+    class Factory(private val spriteProvider: SpriteSet) : ParticleProvider<SimpleParticleType> {
         override fun createParticle(
-            defaultParticleType: DefaultParticleType,
-            world: ClientWorld,
+            defaultParticleType: SimpleParticleType,
+            world: ClientLevel,
             posX: Double,
             posY: Double,
             posZ: Double,
@@ -185,7 +181,7 @@ class ExhaustBlastParticle(
             velZ: Double,
         ): Particle {
             val particle = ExhaustBlastParticle(world, posX, posY, posZ, velX, velY, velZ, this.spriteProvider)
-            particle.setSprite(spriteProvider)
+            particle.pickSprite(spriteProvider)
             return particle
         }
     }

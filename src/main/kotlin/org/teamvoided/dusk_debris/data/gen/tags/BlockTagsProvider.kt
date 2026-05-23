@@ -3,9 +3,9 @@ package org.teamvoided.dusk_debris.data.gen.tags
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalBlockTags
-import net.minecraft.block.Blocks
-import net.minecraft.registry.HolderLookup
-import net.minecraft.registry.tag.BlockTags
+import net.minecraft.core.HolderLookup
+import net.minecraft.tags.BlockTags
+import net.minecraft.world.level.block.Blocks
 import org.teamvoided.dusk_debris.block.DuskBlockLists.GUNPOWDER_BARREL_BLOCK_LIST
 import org.teamvoided.dusk_debris.block.DuskBlockLists.RIBBON_BLOCKS_LIST
 import org.teamvoided.dusk_debris.block.DuskBlockLists.THROWABLE_BOMB_BLOCK_LIST
@@ -15,7 +15,7 @@ import java.util.concurrent.CompletableFuture
 
 class BlockTagsProvider(output: FabricDataOutput, registriesFuture: CompletableFuture<HolderLookup.Provider>) :
     FabricTagProvider.BlockTagProvider(output, registriesFuture) {
-    override fun configure(arg: HolderLookup.Provider) {
+    override fun addTags(arg: HolderLookup.Provider) {
         duskTags()
         vanillaTags()
         conventionTags()

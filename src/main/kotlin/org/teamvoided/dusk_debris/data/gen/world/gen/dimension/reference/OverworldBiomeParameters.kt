@@ -2,83 +2,80 @@ package org.teamvoided.dusk_debris.data.gen.world.gen.dimension.reference
 
 import com.mojang.datafixers.util.Pair
 import net.minecraft.SharedConstants
-import net.minecraft.registry.HolderProvider
-import net.minecraft.registry.RegistryKey
-import net.minecraft.registry.RegistryKeys
-import net.minecraft.registry.VanillaDynamicRegistries
-import net.minecraft.util.annotation.Debug
-import net.minecraft.util.function.ToFloatFunction
-import net.minecraft.util.math.Spline
-import net.minecraft.world.biome.Biome
-import net.minecraft.world.biome.Biomes
-import net.minecraft.world.biome.source.util.MultiNoiseUtil
-import net.minecraft.world.biome.source.util.VanillaTerrainParametersCreator
-import net.minecraft.world.gen.DensityFunction
-import net.minecraft.world.gen.DensityFunctions
-import net.minecraft.world.gen.noise.NoiseRouterData
+import net.minecraft.core.HolderGetter
+import net.minecraft.core.registries.Registries
+import net.minecraft.data.registries.VanillaRegistries
+import net.minecraft.resources.ResourceKey
+import net.minecraft.util.VisibleForDebug
+import net.minecraft.world.level.biome.Biome
+import net.minecraft.world.level.biome.Biomes
+import net.minecraft.world.level.biome.Climate
+import net.minecraft.world.level.levelgen.DensityFunction
+import net.minecraft.world.level.levelgen.DensityFunctions
+import net.minecraft.world.level.levelgen.NoiseRouterData
 import java.util.function.Consumer
 
 class OverworldBiomeParameters {
-    private val fullRange: MultiNoiseUtil.ParameterRange = MultiNoiseUtil.ParameterRange.of(-1.0f, 1.0f)
+    private val fullRange: Climate.Parameter = Climate.Parameter.span(-1.0f, 1.0f)
 
-    @get:Debug
-    val temperatureThresholds: Array<MultiNoiseUtil.ParameterRange> = arrayOf(
-        MultiNoiseUtil.ParameterRange.of(-1.0f, -0.45f),
-        MultiNoiseUtil.ParameterRange.of(-0.45f, -0.15f),
-        MultiNoiseUtil.ParameterRange.of(-0.15f, 0.2f),
-        MultiNoiseUtil.ParameterRange.of(0.2f, 0.55f),
-        MultiNoiseUtil.ParameterRange.of(0.55f, 1.0f)
+    @get:VisibleForDebug
+    val temperatureThresholds: Array<Climate.Parameter> = arrayOf(
+        Climate.Parameter.span(-1.0f, -0.45f),
+        Climate.Parameter.span(-0.45f, -0.15f),
+        Climate.Parameter.span(-0.15f, 0.2f),
+        Climate.Parameter.span(0.2f, 0.55f),
+        Climate.Parameter.span(0.55f, 1.0f)
     )
 
-    @get:Debug
-    val humidityThresholds: Array<MultiNoiseUtil.ParameterRange> = arrayOf(
-        MultiNoiseUtil.ParameterRange.of(-1.0f, -0.35f),
-        MultiNoiseUtil.ParameterRange.of(-0.35f, -0.1f),
-        MultiNoiseUtil.ParameterRange.of(-0.1f, 0.1f),
-        MultiNoiseUtil.ParameterRange.of(0.1f, 0.3f),
-        MultiNoiseUtil.ParameterRange.of(0.3f, 1.0f)
+    @get:VisibleForDebug
+    val humidityThresholds: Array<Climate.Parameter> = arrayOf(
+        Climate.Parameter.span(-1.0f, -0.35f),
+        Climate.Parameter.span(-0.35f, -0.1f),
+        Climate.Parameter.span(-0.1f, 0.1f),
+        Climate.Parameter.span(0.1f, 0.3f),
+        Climate.Parameter.span(0.3f, 1.0f)
     )
 
-    @get:Debug
-    val erosionThresholds: Array<MultiNoiseUtil.ParameterRange> = arrayOf(
-        MultiNoiseUtil.ParameterRange.of(-1.0f, -0.78f),
-        MultiNoiseUtil.ParameterRange.of(-0.78f, -0.375f),
-        MultiNoiseUtil.ParameterRange.of(-0.375f, -0.2225f),
-        MultiNoiseUtil.ParameterRange.of(-0.2225f, 0.05f),
-        MultiNoiseUtil.ParameterRange.of(0.05f, 0.45f),
-        MultiNoiseUtil.ParameterRange.of(0.45f, 0.55f),
-        MultiNoiseUtil.ParameterRange.of(0.55f, 1.0f)
+    @get:VisibleForDebug
+    val erosionThresholds: Array<Climate.Parameter> = arrayOf(
+        Climate.Parameter.span(-1.0f, -0.78f),
+        Climate.Parameter.span(-0.78f, -0.375f),
+        Climate.Parameter.span(-0.375f, -0.2225f),
+        Climate.Parameter.span(-0.2225f, 0.05f),
+        Climate.Parameter.span(0.05f, 0.45f),
+        Climate.Parameter.span(0.45f, 0.55f),
+        Climate.Parameter.span(0.55f, 1.0f)
     )
     private val frozenTemperature = temperatureThresholds[0]
-    private val unfrozenTemperature: MultiNoiseUtil.ParameterRange = MultiNoiseUtil.ParameterRange.combine(
+    private val unfrozenTemperature: Climate.Parameter = Climate.Parameter.span(
         temperatureThresholds[1],
         temperatureThresholds[4]
     )
-    private val mushroomFieldsContinentalness: MultiNoiseUtil.ParameterRange =
-        MultiNoiseUtil.ParameterRange.of(-1.2f, -1.05f)
-    private val deepOceanContinentalness: MultiNoiseUtil.ParameterRange =
-        MultiNoiseUtil.ParameterRange.of(-1.05f, -0.455f)
-    private val oceanContinentalness: MultiNoiseUtil.ParameterRange =
-        MultiNoiseUtil.ParameterRange.of(-0.455f, -0.19f)
-    private val coastContinentalness: MultiNoiseUtil.ParameterRange =
-        MultiNoiseUtil.ParameterRange.of(-0.19f, -0.11f)
-    private val inlandContinentalness: MultiNoiseUtil.ParameterRange =
-        MultiNoiseUtil.ParameterRange.of(-0.11f, 0.55f)
-    private val nearInlandContinentalness: MultiNoiseUtil.ParameterRange =
-        MultiNoiseUtil.ParameterRange.of(-0.11f, 0.03f)
-    private val midInlandContinentalness: MultiNoiseUtil.ParameterRange =
-        MultiNoiseUtil.ParameterRange.of(0.03f, 0.3f)
-    private val farInlandContinentalness: MultiNoiseUtil.ParameterRange =
-        MultiNoiseUtil.ParameterRange.of(0.3f, 1.0f)
-    private val oceanBiomes: Array<Array<RegistryKey<Biome>>>
-    private val middleBiomes: Array<Array<RegistryKey<Biome>>>
-    private val middleBiomesVariant: Array<Array<RegistryKey<Biome>?>>
-    private val plateauBiomes: Array<Array<RegistryKey<Biome>>>
-    private val plateauBiomesVariant: Array<Array<RegistryKey<Biome>?>>
-    private val shatteredBiomes: Array<Array<RegistryKey<Biome>?>>
+    private val mushroomFieldsContinentalness: Climate.Parameter =
+        Climate.Parameter.span(-1.2f, -1.05f)
+    private val deepOceanContinentalness: Climate.Parameter =
+        Climate.Parameter.span(-1.05f, -0.455f)
+    private val oceanContinentalness: Climate.Parameter =
+        Climate.Parameter.span(-0.455f, -0.19f)
+    private val coastContinentalness: Climate.Parameter =
+        Climate.Parameter.span(-0.19f, -0.11f)
+    private val inlandContinentalness: Climate.Parameter =
+        Climate.Parameter.span(-0.11f, 0.55f)
+    private val nearInlandContinentalness: Climate.Parameter =
+        Climate.Parameter.span(-0.11f, 0.03f)
+    private val midInlandContinentalness: Climate.Parameter =
+        Climate.Parameter.span(0.03f, 0.3f)
+    private val farInlandContinentalness: Climate.Parameter =
+        Climate.Parameter.span(0.3f, 1.0f)
+    private val oceanBiomes: Array<Array<ResourceKey<Biome>>>
+    private val middleBiomes: Array<Array<ResourceKey<Biome>>>
+    private val middleBiomesVariant: Array<Array<ResourceKey<Biome>?>>
+    private val plateauBiomes: Array<Array<ResourceKey<Biome>>>
+    private val plateauBiomesVariant: Array<Array<ResourceKey<Biome>?>>
+    private val shatteredBiomes: Array<Array<ResourceKey<Biome>?>>
 
     init {
-        this.oceanBiomes = arrayOf<Array<RegistryKey<Biome>>>(
+        this.oceanBiomes = arrayOf<Array<ResourceKey<Biome>>>(
             arrayOf(
                 Biomes.DEEP_FROZEN_OCEAN,
                 Biomes.DEEP_COLD_OCEAN,
@@ -88,21 +85,21 @@ class OverworldBiomeParameters {
             ),
             arrayOf(Biomes.FROZEN_OCEAN, Biomes.COLD_OCEAN, Biomes.OCEAN, Biomes.LUKEWARM_OCEAN, Biomes.WARM_OCEAN)
         )
-        this.middleBiomes = arrayOf<Array<RegistryKey<Biome>>>(
+        this.middleBiomes = arrayOf<Array<ResourceKey<Biome>>>(
             arrayOf(Biomes.SNOWY_PLAINS, Biomes.SNOWY_PLAINS, Biomes.SNOWY_PLAINS, Biomes.SNOWY_TAIGA, Biomes.TAIGA),
             arrayOf(Biomes.PLAINS, Biomes.PLAINS, Biomes.FOREST, Biomes.TAIGA, Biomes.OLD_GROWTH_SPRUCE_TAIGA),
             arrayOf(Biomes.FLOWER_FOREST, Biomes.PLAINS, Biomes.FOREST, Biomes.BIRCH_FOREST, Biomes.DARK_FOREST),
             arrayOf(Biomes.SAVANNA, Biomes.SAVANNA, Biomes.FOREST, Biomes.JUNGLE, Biomes.JUNGLE),
             arrayOf(Biomes.DESERT, Biomes.DESERT, Biomes.DESERT, Biomes.DESERT, Biomes.DESERT)
         )
-        this.middleBiomesVariant = arrayOf<Array<RegistryKey<Biome>?>>(
+        this.middleBiomesVariant = arrayOf<Array<ResourceKey<Biome>?>>(
             arrayOf(Biomes.ICE_SPIKES, null, Biomes.SNOWY_TAIGA, null, null),
             arrayOf(null, null, null, null, Biomes.OLD_GROWTH_PINE_TAIGA),
             arrayOf(Biomes.SUNFLOWER_PLAINS, null, null, Biomes.OLD_GROWTH_BIRCH_FOREST, null),
             arrayOf(null, null, Biomes.PLAINS, Biomes.SPARSE_JUNGLE, Biomes.BAMBOO_JUNGLE),
             arrayOf(null, null, null, null, null)
         )
-        this.plateauBiomes = arrayOf<Array<RegistryKey<Biome>>>(
+        this.plateauBiomes = arrayOf<Array<ResourceKey<Biome>>>(
             arrayOf(
                 Biomes.SNOWY_PLAINS,
                 Biomes.SNOWY_PLAINS,
@@ -115,14 +112,14 @@ class OverworldBiomeParameters {
             arrayOf(Biomes.SAVANNA_PLATEAU, Biomes.SAVANNA_PLATEAU, Biomes.FOREST, Biomes.FOREST, Biomes.JUNGLE),
             arrayOf(Biomes.BADLANDS, Biomes.BADLANDS, Biomes.BADLANDS, Biomes.WOODED_BADLANDS, Biomes.WOODED_BADLANDS)
         )
-        this.plateauBiomesVariant = arrayOf<Array<RegistryKey<Biome>?>>(
+        this.plateauBiomesVariant = arrayOf<Array<ResourceKey<Biome>?>>(
             arrayOf(Biomes.ICE_SPIKES, null, null, null, null),
             arrayOf(Biomes.CHERRY_GROVE, null, Biomes.MEADOW, Biomes.MEADOW, Biomes.OLD_GROWTH_PINE_TAIGA),
             arrayOf(Biomes.CHERRY_GROVE, Biomes.CHERRY_GROVE, Biomes.FOREST, Biomes.BIRCH_FOREST, null),
             arrayOf(null, null, null, null, null),
             arrayOf(Biomes.ERODED_BADLANDS, Biomes.ERODED_BADLANDS, null, null, null)
         )
-        this.shatteredBiomes = arrayOf<Array<RegistryKey<Biome>?>>(
+        this.shatteredBiomes = arrayOf<Array<ResourceKey<Biome>?>>(
             arrayOf(
                 Biomes.WINDSWEPT_GRAVELLY_HILLS,
                 Biomes.WINDSWEPT_GRAVELLY_HILLS,
@@ -147,25 +144,25 @@ class OverworldBiomeParameters {
         )
     }
 
-    val spawnSuitabilityNoises: List<MultiNoiseUtil.NoiseHypercube>
+    val spawnSuitabilityNoises: List<Climate.ParameterPoint>
         get() {
-            val parameterRange = MultiNoiseUtil.ParameterRange.of(0.0f)
+            val parameterRange = Climate.Parameter.point(0.0f)
             val f = 0.16f
             return java.util.List.of(
-                MultiNoiseUtil.NoiseHypercube(
-                    this.fullRange, this.fullRange, MultiNoiseUtil.ParameterRange.combine(
+                Climate.ParameterPoint(
+                    this.fullRange, this.fullRange, Climate.Parameter.span(
                         this.inlandContinentalness, this.fullRange
-                    ), this.fullRange, parameterRange, MultiNoiseUtil.ParameterRange.of(-1.0f, -0.16f), 0L
-                ), MultiNoiseUtil.NoiseHypercube(
-                    this.fullRange, this.fullRange, MultiNoiseUtil.ParameterRange.combine(
+                    ), this.fullRange, parameterRange, Climate.Parameter.span(-1.0f, -0.16f), 0L
+                ), Climate.ParameterPoint(
+                    this.fullRange, this.fullRange, Climate.Parameter.span(
                         this.inlandContinentalness, this.fullRange
-                    ), this.fullRange, parameterRange, MultiNoiseUtil.ParameterRange.of(0.16f, 1.0f), 0L
+                    ), this.fullRange, parameterRange, Climate.Parameter.span(0.16f, 1.0f), 0L
                 )
             )
         }
 
-    protected fun addBiomesTo(biomeEntryConsumer: Consumer<Pair<MultiNoiseUtil.NoiseHypercube, RegistryKey<Biome>>>) {
-        if (SharedConstants.generateSquareTerrainWithoutNoise) {
+    protected fun addBiomesTo(biomeEntryConsumer: Consumer<Pair<Climate.ParameterPoint, ResourceKey<Biome>>>) {
+        if (SharedConstants.debugGenerateSquareTerrainWithoutNoise) {
             this.addDebugBiomesTo(biomeEntryConsumer)
         } else {
             this.addOffCoastBiomesTo(biomeEntryConsumer)
@@ -174,30 +171,31 @@ class OverworldBiomeParameters {
         }
     }
 
-    private fun HolderProvider<DensityFunction>.get(key: RegistryKey<DensityFunction>): DensityFunctions.Spline.FunctionWrapper =
-        DensityFunctions.Spline.FunctionWrapper(this.getHolderOrThrow(key))
+    private fun HolderGetter<DensityFunction>.get(key: ResourceKey<DensityFunction>): DensityFunctions.Spline.Coordinate =
+        DensityFunctions.Spline.Coordinate(this.getOrThrow(key))
 
-    private fun addDebugBiomesTo(biomeEntryConsumer: Consumer<Pair<MultiNoiseUtil.NoiseHypercube, RegistryKey<Biome>>>) {
-        val provider = VanillaDynamicRegistries.createLookup()
-        val dense: HolderProvider<DensityFunction> = provider.getLookupOrThrow(RegistryKeys.DENSITY_FUNCTION)
-        val continents = dense.get(NoiseRouterData.CONTINENTS_OVERWORLD)
-        val erosion = dense.get(NoiseRouterData.EROSION_OVERWORLD)
-        val ridgesFolded = dense.get(NoiseRouterData.RIDGES_FOLDED_OVERWORLD)
+    private fun addDebugBiomesTo(biomeEntryConsumer: Consumer<Pair<Climate.ParameterPoint, ResourceKey<Biome>>>) {
+        val provider = VanillaRegistries.createLookup()
+        val dense: HolderGetter<DensityFunction> = provider.lookupOrThrow(Registries.DENSITY_FUNCTION)
+        val continents = dense.getOrThrow(NoiseRouterData.CONTINENTS)
+        val erosion = dense.getOrThrow(NoiseRouterData.EROSION)
+        val ridgesFolded = dense.getOrThrow(NoiseRouterData.RIDGES_FOLDED)
         biomeEntryConsumer.accept(
             Pair.of(
-                MultiNoiseUtil.createNoiseHypercube(
+                Climate.parameters(
                     this.fullRange,
                     this.fullRange,
                     this.fullRange,
                     this.fullRange,
-                    MultiNoiseUtil.ParameterRange.of(0.0f),
+                    Climate.Parameter.point(0.0f),
                     this.fullRange,
                     0.01f
                 ),
                 Biomes.PLAINS
             )
         )
-        val splineEros: Spline<*, *> = VanillaTerrainParametersCreator.method_42051(
+        // TODO this breaks and i dont want to fix it
+       /* val splineEros: CubicSpline<*, *> = TerrainProvider.buildErosionOffsetSpline(
             erosion,
             ridgesFolded,
             -0.15f,
@@ -210,17 +208,17 @@ class OverworldBiomeParameters {
             false,
             ToFloatFunction.IDENTITY
         )
-        if (splineEros is Spline.Multipoint<*, *>) {
+        if (splineEros is CubicSpline.Multipoint<*, *>) {
             var registryKey = Biomes.DESERT
             splineEros.locations().forEach {
                 biomeEntryConsumer.accept(
                     Pair.of(
-                        MultiNoiseUtil.createNoiseHypercube(
+                        Climate.parameters(
                             this.fullRange,
                             this.fullRange,
                             this.fullRange,
-                            MultiNoiseUtil.ParameterRange.of(it),
-                            MultiNoiseUtil.ParameterRange.of(0.0f),
+                            Climate.Parameter.point(it),
+                            Climate.Parameter.point(0.0f),
                             this.fullRange,
                             0.0f
                         ),
@@ -231,18 +229,18 @@ class OverworldBiomeParameters {
             }
         }
 
-        val splineCont: Spline<*, *> =
-            VanillaTerrainParametersCreator.method_42056(continents, erosion, ridgesFolded, false)
-        if (splineCont is Spline.Multipoint<*, *>) {
+        val splineCont: CubicSpline<*, *> =
+            TerrainProvider.overworldOffset(continents, erosion, ridgesFolded, false)
+        if (splineCont is CubicSpline.Multipoint<*, *>) {
             splineCont.locations().forEach {
                 biomeEntryConsumer.accept(
                     Pair.of(
-                        MultiNoiseUtil.createNoiseHypercube(
+                        Climate.parameters(
                             this.fullRange,
                             this.fullRange,
-                            MultiNoiseUtil.ParameterRange.of(it),
+                            Climate.Parameter.point(it),
                             this.fullRange,
-                            MultiNoiseUtil.ParameterRange.of(0.0f),
+                            Climate.Parameter.point(0.0f),
                             this.fullRange,
                             0.0f
                         ),
@@ -250,10 +248,10 @@ class OverworldBiomeParameters {
                     )
                 )
             }
-        }
+        }*/
     }
 
-    private fun addOffCoastBiomesTo(parameters: Consumer<Pair<MultiNoiseUtil.NoiseHypercube, RegistryKey<Biome>>>) {
+    private fun addOffCoastBiomesTo(parameters: Consumer<Pair<Climate.ParameterPoint, ResourceKey<Biome>>>) {
         this.addSurfaceBiomeTo(
             parameters,
             this.fullRange,
@@ -290,25 +288,25 @@ class OverworldBiomeParameters {
         }
     }
 
-    private fun addInlandBiomesTo(parameters: Consumer<Pair<MultiNoiseUtil.NoiseHypercube, RegistryKey<Biome>>>) {
-        this.addMidBiomesTo(parameters, MultiNoiseUtil.ParameterRange.of(-1.0f, -0.93333334f))
-        this.addHighBiomesTo(parameters, MultiNoiseUtil.ParameterRange.of(-0.93333334f, -0.7666667f))
-        this.addPeaksTo(parameters, MultiNoiseUtil.ParameterRange.of(-0.7666667f, -0.56666666f))
-        this.addHighBiomesTo(parameters, MultiNoiseUtil.ParameterRange.of(-0.56666666f, -0.4f))
-        this.addMidBiomesTo(parameters, MultiNoiseUtil.ParameterRange.of(-0.4f, -0.26666668f))
-        this.addLowBiomesTo(parameters, MultiNoiseUtil.ParameterRange.of(-0.26666668f, -0.05f))
-        this.addValleysTo(parameters, MultiNoiseUtil.ParameterRange.of(-0.05f, 0.05f))
-        this.addLowBiomesTo(parameters, MultiNoiseUtil.ParameterRange.of(0.05f, 0.26666668f))
-        this.addMidBiomesTo(parameters, MultiNoiseUtil.ParameterRange.of(0.26666668f, 0.4f))
-        this.addHighBiomesTo(parameters, MultiNoiseUtil.ParameterRange.of(0.4f, 0.56666666f))
-        this.addPeaksTo(parameters, MultiNoiseUtil.ParameterRange.of(0.56666666f, 0.7666667f))
-        this.addHighBiomesTo(parameters, MultiNoiseUtil.ParameterRange.of(0.7666667f, 0.93333334f))
-        this.addMidBiomesTo(parameters, MultiNoiseUtil.ParameterRange.of(0.93333334f, 1.0f))
+    private fun addInlandBiomesTo(parameters: Consumer<Pair<Climate.ParameterPoint, ResourceKey<Biome>>>) {
+        this.addMidBiomesTo(parameters, Climate.Parameter.span(-1.0f, -0.93333334f))
+        this.addHighBiomesTo(parameters, Climate.Parameter.span(-0.93333334f, -0.7666667f))
+        this.addPeaksTo(parameters, Climate.Parameter.span(-0.7666667f, -0.56666666f))
+        this.addHighBiomesTo(parameters, Climate.Parameter.span(-0.56666666f, -0.4f))
+        this.addMidBiomesTo(parameters, Climate.Parameter.span(-0.4f, -0.26666668f))
+        this.addLowBiomesTo(parameters, Climate.Parameter.span(-0.26666668f, -0.05f))
+        this.addValleysTo(parameters, Climate.Parameter.span(-0.05f, 0.05f))
+        this.addLowBiomesTo(parameters, Climate.Parameter.span(0.05f, 0.26666668f))
+        this.addMidBiomesTo(parameters, Climate.Parameter.span(0.26666668f, 0.4f))
+        this.addHighBiomesTo(parameters, Climate.Parameter.span(0.4f, 0.56666666f))
+        this.addPeaksTo(parameters, Climate.Parameter.span(0.56666666f, 0.7666667f))
+        this.addHighBiomesTo(parameters, Climate.Parameter.span(0.7666667f, 0.93333334f))
+        this.addMidBiomesTo(parameters, Climate.Parameter.span(0.93333334f, 1.0f))
     }
 
     private fun addPeaksTo(
-        parameters: Consumer<Pair<MultiNoiseUtil.NoiseHypercube, RegistryKey<Biome>>>,
-        weirdness: MultiNoiseUtil.ParameterRange
+        parameters: Consumer<Pair<Climate.ParameterPoint, ResourceKey<Biome>>>,
+        weirdness: Climate.Parameter
     ) {
         for (i in temperatureThresholds.indices) {
             val parameterRange = temperatureThresholds[i]
@@ -323,33 +321,33 @@ class OverworldBiomeParameters {
                 val registryKey6 = this.maybePickWindsweptSavanna(i, j, weirdness, registryKey5)
                 val registryKey7 = this.pickPeakBiome(i, j, weirdness)
                 this.addSurfaceBiomeTo(
-                    parameters, parameterRange, parameterRange2, MultiNoiseUtil.ParameterRange.combine(
+                    parameters, parameterRange, parameterRange2, Climate.Parameter.span(
                         this.coastContinentalness, this.farInlandContinentalness
                     ),
                     erosionThresholds[0], weirdness, 0.0f, registryKey7
                 )
                 this.addSurfaceBiomeTo(
-                    parameters, parameterRange, parameterRange2, MultiNoiseUtil.ParameterRange.combine(
+                    parameters, parameterRange, parameterRange2, Climate.Parameter.span(
                         this.coastContinentalness, this.nearInlandContinentalness
                     ),
                     erosionThresholds[1], weirdness, 0.0f, registryKey3
                 )
                 this.addSurfaceBiomeTo(
-                    parameters, parameterRange, parameterRange2, MultiNoiseUtil.ParameterRange.combine(
+                    parameters, parameterRange, parameterRange2, Climate.Parameter.span(
                         this.midInlandContinentalness, this.farInlandContinentalness
                     ),
                     erosionThresholds[1], weirdness, 0.0f, registryKey7
                 )
                 this.addSurfaceBiomeTo(
-                    parameters, parameterRange, parameterRange2, MultiNoiseUtil.ParameterRange.combine(
+                    parameters, parameterRange, parameterRange2, Climate.Parameter.span(
                         this.coastContinentalness, this.nearInlandContinentalness
-                    ), MultiNoiseUtil.ParameterRange.combine(
+                    ), Climate.Parameter.span(
                         erosionThresholds[2],
                         erosionThresholds[3]
                     ), weirdness, 0.0f, registryKey
                 )
                 this.addSurfaceBiomeTo(
-                    parameters, parameterRange, parameterRange2, MultiNoiseUtil.ParameterRange.combine(
+                    parameters, parameterRange, parameterRange2, Climate.Parameter.span(
                         this.midInlandContinentalness, this.farInlandContinentalness
                     ),
                     erosionThresholds[2], weirdness, 0.0f, registryKey4
@@ -363,25 +361,25 @@ class OverworldBiomeParameters {
                     erosionThresholds[3], weirdness, 0.0f, registryKey4
                 )
                 this.addSurfaceBiomeTo(
-                    parameters, parameterRange, parameterRange2, MultiNoiseUtil.ParameterRange.combine(
+                    parameters, parameterRange, parameterRange2, Climate.Parameter.span(
                         this.coastContinentalness, this.farInlandContinentalness
                     ),
                     erosionThresholds[4], weirdness, 0.0f, registryKey
                 )
                 this.addSurfaceBiomeTo(
-                    parameters, parameterRange, parameterRange2, MultiNoiseUtil.ParameterRange.combine(
+                    parameters, parameterRange, parameterRange2, Climate.Parameter.span(
                         this.coastContinentalness, this.nearInlandContinentalness
                     ),
                     erosionThresholds[5], weirdness, 0.0f, registryKey6
                 )
                 this.addSurfaceBiomeTo(
-                    parameters, parameterRange, parameterRange2, MultiNoiseUtil.ParameterRange.combine(
+                    parameters, parameterRange, parameterRange2, Climate.Parameter.span(
                         this.midInlandContinentalness, this.farInlandContinentalness
                     ),
                     erosionThresholds[5], weirdness, 0.0f, registryKey5
                 )
                 this.addSurfaceBiomeTo(
-                    parameters, parameterRange, parameterRange2, MultiNoiseUtil.ParameterRange.combine(
+                    parameters, parameterRange, parameterRange2, Climate.Parameter.span(
                         this.coastContinentalness, this.farInlandContinentalness
                     ),
                     erosionThresholds[6], weirdness, 0.0f, registryKey
@@ -391,8 +389,8 @@ class OverworldBiomeParameters {
     }
 
     private fun addHighBiomesTo(
-        parameters: Consumer<Pair<MultiNoiseUtil.NoiseHypercube, RegistryKey<Biome>>>,
-        weirdness: MultiNoiseUtil.ParameterRange
+        parameters: Consumer<Pair<Climate.ParameterPoint, ResourceKey<Biome>>>,
+        weirdness: Climate.Parameter
     ) {
         for (i in temperatureThresholds.indices) {
             val parameterRange = temperatureThresholds[i]
@@ -412,7 +410,7 @@ class OverworldBiomeParameters {
                     parameterRange,
                     parameterRange2,
                     this.coastContinentalness,
-                    MultiNoiseUtil.ParameterRange.combine(
+                    Climate.Parameter.span(
                         erosionThresholds[0],
                         erosionThresholds[1]
                     ),
@@ -425,7 +423,7 @@ class OverworldBiomeParameters {
                     erosionThresholds[0], weirdness, 0.0f, registryKey7
                 )
                 this.addSurfaceBiomeTo(
-                    parameters, parameterRange, parameterRange2, MultiNoiseUtil.ParameterRange.combine(
+                    parameters, parameterRange, parameterRange2, Climate.Parameter.span(
                         this.midInlandContinentalness, this.farInlandContinentalness
                     ),
                     erosionThresholds[0], weirdness, 0.0f, registryKey8
@@ -435,21 +433,21 @@ class OverworldBiomeParameters {
                     erosionThresholds[1], weirdness, 0.0f, registryKey3
                 )
                 this.addSurfaceBiomeTo(
-                    parameters, parameterRange, parameterRange2, MultiNoiseUtil.ParameterRange.combine(
+                    parameters, parameterRange, parameterRange2, Climate.Parameter.span(
                         this.midInlandContinentalness, this.farInlandContinentalness
                     ),
                     erosionThresholds[1], weirdness, 0.0f, registryKey7
                 )
                 this.addSurfaceBiomeTo(
-                    parameters, parameterRange, parameterRange2, MultiNoiseUtil.ParameterRange.combine(
+                    parameters, parameterRange, parameterRange2, Climate.Parameter.span(
                         this.coastContinentalness, this.nearInlandContinentalness
-                    ), MultiNoiseUtil.ParameterRange.combine(
+                    ), Climate.Parameter.span(
                         erosionThresholds[2],
                         erosionThresholds[3]
                     ), weirdness, 0.0f, registryKey
                 )
                 this.addSurfaceBiomeTo(
-                    parameters, parameterRange, parameterRange2, MultiNoiseUtil.ParameterRange.combine(
+                    parameters, parameterRange, parameterRange2, Climate.Parameter.span(
                         this.midInlandContinentalness, this.farInlandContinentalness
                     ),
                     erosionThresholds[2], weirdness, 0.0f, registryKey4
@@ -463,25 +461,25 @@ class OverworldBiomeParameters {
                     erosionThresholds[3], weirdness, 0.0f, registryKey4
                 )
                 this.addSurfaceBiomeTo(
-                    parameters, parameterRange, parameterRange2, MultiNoiseUtil.ParameterRange.combine(
+                    parameters, parameterRange, parameterRange2, Climate.Parameter.span(
                         this.coastContinentalness, this.farInlandContinentalness
                     ),
                     erosionThresholds[4], weirdness, 0.0f, registryKey
                 )
                 this.addSurfaceBiomeTo(
-                    parameters, parameterRange, parameterRange2, MultiNoiseUtil.ParameterRange.combine(
+                    parameters, parameterRange, parameterRange2, Climate.Parameter.span(
                         this.coastContinentalness, this.nearInlandContinentalness
                     ),
                     erosionThresholds[5], weirdness, 0.0f, registryKey6
                 )
                 this.addSurfaceBiomeTo(
-                    parameters, parameterRange, parameterRange2, MultiNoiseUtil.ParameterRange.combine(
+                    parameters, parameterRange, parameterRange2, Climate.Parameter.span(
                         this.midInlandContinentalness, this.farInlandContinentalness
                     ),
                     erosionThresholds[5], weirdness, 0.0f, registryKey5
                 )
                 this.addSurfaceBiomeTo(
-                    parameters, parameterRange, parameterRange2, MultiNoiseUtil.ParameterRange.combine(
+                    parameters, parameterRange, parameterRange2, Climate.Parameter.span(
                         this.coastContinentalness, this.farInlandContinentalness
                     ),
                     erosionThresholds[6], weirdness, 0.0f, registryKey
@@ -491,15 +489,15 @@ class OverworldBiomeParameters {
     }
 
     private fun addMidBiomesTo(
-        parameters: Consumer<Pair<MultiNoiseUtil.NoiseHypercube, RegistryKey<Biome>>>,
-        weirdness: MultiNoiseUtil.ParameterRange
+        parameters: Consumer<Pair<Climate.ParameterPoint, ResourceKey<Biome>>>,
+        weirdness: Climate.Parameter
     ) {
         this.addSurfaceBiomeTo(
             parameters,
             this.fullRange,
             this.fullRange,
             this.coastContinentalness,
-            MultiNoiseUtil.ParameterRange.combine(
+            Climate.Parameter.span(
                 erosionThresholds[0],
                 erosionThresholds[2]
             ),
@@ -509,12 +507,12 @@ class OverworldBiomeParameters {
         )
         this.addSurfaceBiomeTo(
             parameters,
-            MultiNoiseUtil.ParameterRange.combine(
+            Climate.Parameter.span(
                 temperatureThresholds[1],
                 temperatureThresholds[2]
             ),
             this.fullRange,
-            MultiNoiseUtil.ParameterRange.combine(this.nearInlandContinentalness, this.farInlandContinentalness),
+            Climate.Parameter.span(this.nearInlandContinentalness, this.farInlandContinentalness),
             erosionThresholds[6],
             weirdness,
             0.0f,
@@ -522,12 +520,12 @@ class OverworldBiomeParameters {
         )
         this.addSurfaceBiomeTo(
             parameters,
-            MultiNoiseUtil.ParameterRange.combine(
+            Climate.Parameter.span(
                 temperatureThresholds[3],
                 temperatureThresholds[4]
             ),
             this.fullRange,
-            MultiNoiseUtil.ParameterRange.combine(this.nearInlandContinentalness, this.farInlandContinentalness),
+            Climate.Parameter.span(this.nearInlandContinentalness, this.farInlandContinentalness),
             erosionThresholds[6],
             weirdness,
             0.0f,
@@ -549,13 +547,13 @@ class OverworldBiomeParameters {
                 val registryKey8 = this.pickShatteredCoastBiome(i, j, weirdness)
                 val registryKey9 = this.pickSlopeBiome(i, j, weirdness)
                 this.addSurfaceBiomeTo(
-                    parameters, parameterRange, parameterRange2, MultiNoiseUtil.ParameterRange.combine(
+                    parameters, parameterRange, parameterRange2, Climate.Parameter.span(
                         this.nearInlandContinentalness, this.farInlandContinentalness
                     ),
                     erosionThresholds[0], weirdness, 0.0f, registryKey9
                 )
                 this.addSurfaceBiomeTo(
-                    parameters, parameterRange, parameterRange2, MultiNoiseUtil.ParameterRange.combine(
+                    parameters, parameterRange, parameterRange2, Climate.Parameter.span(
                         this.nearInlandContinentalness, this.midInlandContinentalness
                     ),
                     erosionThresholds[1], weirdness, 0.0f, registryKey3
@@ -577,13 +575,13 @@ class OverworldBiomeParameters {
                     erosionThresholds[2], weirdness, 0.0f, registryKey5
                 )
                 this.addSurfaceBiomeTo(
-                    parameters, parameterRange, parameterRange2, MultiNoiseUtil.ParameterRange.combine(
+                    parameters, parameterRange, parameterRange2, Climate.Parameter.span(
                         this.coastContinentalness, this.nearInlandContinentalness
                     ),
                     erosionThresholds[3], weirdness, 0.0f, registryKey
                 )
                 this.addSurfaceBiomeTo(
-                    parameters, parameterRange, parameterRange2, MultiNoiseUtil.ParameterRange.combine(
+                    parameters, parameterRange, parameterRange2, Climate.Parameter.span(
                         this.midInlandContinentalness, this.farInlandContinentalness
                     ),
                     erosionThresholds[3], weirdness, 0.0f, registryKey2
@@ -594,14 +592,14 @@ class OverworldBiomeParameters {
                         erosionThresholds[4], weirdness, 0.0f, registryKey6
                     )
                     this.addSurfaceBiomeTo(
-                        parameters, parameterRange, parameterRange2, MultiNoiseUtil.ParameterRange.combine(
+                        parameters, parameterRange, parameterRange2, Climate.Parameter.span(
                             this.nearInlandContinentalness, this.farInlandContinentalness
                         ),
                         erosionThresholds[4], weirdness, 0.0f, registryKey
                     )
                 } else {
                     this.addSurfaceBiomeTo(
-                        parameters, parameterRange, parameterRange2, MultiNoiseUtil.ParameterRange.combine(
+                        parameters, parameterRange, parameterRange2, Climate.Parameter.span(
                             this.coastContinentalness, this.farInlandContinentalness
                         ),
                         erosionThresholds[4], weirdness, 0.0f, registryKey
@@ -617,7 +615,7 @@ class OverworldBiomeParameters {
                     erosionThresholds[5], weirdness, 0.0f, registryKey7
                 )
                 this.addSurfaceBiomeTo(
-                    parameters, parameterRange, parameterRange2, MultiNoiseUtil.ParameterRange.combine(
+                    parameters, parameterRange, parameterRange2, Climate.Parameter.span(
                         this.midInlandContinentalness, this.farInlandContinentalness
                     ),
                     erosionThresholds[5], weirdness, 0.0f, registryKey4
@@ -636,7 +634,7 @@ class OverworldBiomeParameters {
 
                 if (i == 0) {
                     this.addSurfaceBiomeTo(
-                        parameters, parameterRange, parameterRange2, MultiNoiseUtil.ParameterRange.combine(
+                        parameters, parameterRange, parameterRange2, Climate.Parameter.span(
                             this.nearInlandContinentalness, this.farInlandContinentalness
                         ),
                         erosionThresholds[6], weirdness, 0.0f, registryKey
@@ -647,15 +645,15 @@ class OverworldBiomeParameters {
     }
 
     private fun addLowBiomesTo(
-        parameters: Consumer<Pair<MultiNoiseUtil.NoiseHypercube, RegistryKey<Biome>>>,
-        weirdness: MultiNoiseUtil.ParameterRange
+        parameters: Consumer<Pair<Climate.ParameterPoint, ResourceKey<Biome>>>,
+        weirdness: Climate.Parameter
     ) {
         this.addSurfaceBiomeTo(
             parameters,
             this.fullRange,
             this.fullRange,
             this.coastContinentalness,
-            MultiNoiseUtil.ParameterRange.combine(
+            Climate.Parameter.span(
                 erosionThresholds[0],
                 erosionThresholds[2]
             ),
@@ -665,12 +663,12 @@ class OverworldBiomeParameters {
         )
         this.addSurfaceBiomeTo(
             parameters,
-            MultiNoiseUtil.ParameterRange.combine(
+            Climate.Parameter.span(
                 temperatureThresholds[1],
                 temperatureThresholds[2]
             ),
             this.fullRange,
-            MultiNoiseUtil.ParameterRange.combine(this.nearInlandContinentalness, this.farInlandContinentalness),
+            Climate.Parameter.span(this.nearInlandContinentalness, this.farInlandContinentalness),
             erosionThresholds[6],
             weirdness,
             0.0f,
@@ -678,12 +676,12 @@ class OverworldBiomeParameters {
         )
         this.addSurfaceBiomeTo(
             parameters,
-            MultiNoiseUtil.ParameterRange.combine(
+            Climate.Parameter.span(
                 temperatureThresholds[3],
                 temperatureThresholds[4]
             ),
             this.fullRange,
-            MultiNoiseUtil.ParameterRange.combine(this.nearInlandContinentalness, this.farInlandContinentalness),
+            Climate.Parameter.span(this.nearInlandContinentalness, this.farInlandContinentalness),
             erosionThresholds[6],
             weirdness,
             0.0f,
@@ -706,7 +704,7 @@ class OverworldBiomeParameters {
                     parameterRange,
                     parameterRange2,
                     this.nearInlandContinentalness,
-                    MultiNoiseUtil.ParameterRange.combine(
+                    Climate.Parameter.span(
                         erosionThresholds[0],
                         erosionThresholds[1]
                     ),
@@ -715,9 +713,9 @@ class OverworldBiomeParameters {
                     registryKey2
                 )
                 this.addSurfaceBiomeTo(
-                    parameters, parameterRange, parameterRange2, MultiNoiseUtil.ParameterRange.combine(
+                    parameters, parameterRange, parameterRange2, Climate.Parameter.span(
                         this.midInlandContinentalness, this.farInlandContinentalness
-                    ), MultiNoiseUtil.ParameterRange.combine(
+                    ), Climate.Parameter.span(
                         erosionThresholds[0],
                         erosionThresholds[1]
                     ), weirdness, 0.0f, registryKey3
@@ -727,7 +725,7 @@ class OverworldBiomeParameters {
                     parameterRange,
                     parameterRange2,
                     this.nearInlandContinentalness,
-                    MultiNoiseUtil.ParameterRange.combine(
+                    Climate.Parameter.span(
                         erosionThresholds[2],
                         erosionThresholds[3]
                     ),
@@ -736,9 +734,9 @@ class OverworldBiomeParameters {
                     registryKey
                 )
                 this.addSurfaceBiomeTo(
-                    parameters, parameterRange, parameterRange2, MultiNoiseUtil.ParameterRange.combine(
+                    parameters, parameterRange, parameterRange2, Climate.Parameter.span(
                         this.midInlandContinentalness, this.farInlandContinentalness
-                    ), MultiNoiseUtil.ParameterRange.combine(
+                    ), Climate.Parameter.span(
                         erosionThresholds[2],
                         erosionThresholds[3]
                     ), weirdness, 0.0f, registryKey2
@@ -748,7 +746,7 @@ class OverworldBiomeParameters {
                     parameterRange,
                     parameterRange2,
                     this.coastContinentalness,
-                    MultiNoiseUtil.ParameterRange.combine(
+                    Climate.Parameter.span(
                         erosionThresholds[3],
                         erosionThresholds[4]
                     ),
@@ -757,7 +755,7 @@ class OverworldBiomeParameters {
                     registryKey4
                 )
                 this.addSurfaceBiomeTo(
-                    parameters, parameterRange, parameterRange2, MultiNoiseUtil.ParameterRange.combine(
+                    parameters, parameterRange, parameterRange2, Climate.Parameter.span(
                         this.nearInlandContinentalness, this.farInlandContinentalness
                     ),
                     erosionThresholds[4], weirdness, 0.0f, registryKey
@@ -771,7 +769,7 @@ class OverworldBiomeParameters {
                     erosionThresholds[5], weirdness, 0.0f, registryKey5
                 )
                 this.addSurfaceBiomeTo(
-                    parameters, parameterRange, parameterRange2, MultiNoiseUtil.ParameterRange.combine(
+                    parameters, parameterRange, parameterRange2, Climate.Parameter.span(
                         this.midInlandContinentalness, this.farInlandContinentalness
                     ),
                     erosionThresholds[5], weirdness, 0.0f, registryKey
@@ -782,7 +780,7 @@ class OverworldBiomeParameters {
                 )
                 if (i == 0) {
                     this.addSurfaceBiomeTo(
-                        parameters, parameterRange, parameterRange2, MultiNoiseUtil.ParameterRange.combine(
+                        parameters, parameterRange, parameterRange2, Climate.Parameter.span(
                             this.nearInlandContinentalness, this.farInlandContinentalness
                         ),
                         erosionThresholds[6], weirdness, 0.0f, registryKey
@@ -793,15 +791,15 @@ class OverworldBiomeParameters {
     }
 
     private fun addValleysTo(
-        parameters: Consumer<Pair<MultiNoiseUtil.NoiseHypercube, RegistryKey<Biome>>>,
-        weirdness: MultiNoiseUtil.ParameterRange
+        parameters: Consumer<Pair<Climate.ParameterPoint, ResourceKey<Biome>>>,
+        weirdness: Climate.Parameter
     ) {
         this.addSurfaceBiomeTo(
             parameters,
             this.frozenTemperature,
             this.fullRange,
             this.coastContinentalness,
-            MultiNoiseUtil.ParameterRange.combine(
+            Climate.Parameter.span(
                 erosionThresholds[0],
                 erosionThresholds[1]
             ),
@@ -814,7 +812,7 @@ class OverworldBiomeParameters {
             this.unfrozenTemperature,
             this.fullRange,
             this.coastContinentalness,
-            MultiNoiseUtil.ParameterRange.combine(
+            Climate.Parameter.span(
                 erosionThresholds[0],
                 erosionThresholds[1]
             ),
@@ -827,7 +825,7 @@ class OverworldBiomeParameters {
             this.frozenTemperature,
             this.fullRange,
             this.nearInlandContinentalness,
-            MultiNoiseUtil.ParameterRange.combine(
+            Climate.Parameter.span(
                 erosionThresholds[0],
                 erosionThresholds[1]
             ),
@@ -840,7 +838,7 @@ class OverworldBiomeParameters {
             this.unfrozenTemperature,
             this.fullRange,
             this.nearInlandContinentalness,
-            MultiNoiseUtil.ParameterRange.combine(
+            Climate.Parameter.span(
                 erosionThresholds[0],
                 erosionThresholds[1]
             ),
@@ -849,17 +847,17 @@ class OverworldBiomeParameters {
             Biomes.RIVER
         )
         this.addSurfaceBiomeTo(
-            parameters, this.frozenTemperature, this.fullRange, MultiNoiseUtil.ParameterRange.combine(
+            parameters, this.frozenTemperature, this.fullRange, Climate.Parameter.span(
                 this.coastContinentalness, this.farInlandContinentalness
-            ), MultiNoiseUtil.ParameterRange.combine(
+            ), Climate.Parameter.span(
                 erosionThresholds[2],
                 erosionThresholds[5]
             ), weirdness, 0.0f, Biomes.FROZEN_RIVER
         )
         this.addSurfaceBiomeTo(
-            parameters, this.unfrozenTemperature, this.fullRange, MultiNoiseUtil.ParameterRange.combine(
+            parameters, this.unfrozenTemperature, this.fullRange, Climate.Parameter.span(
                 this.coastContinentalness, this.farInlandContinentalness
-            ), MultiNoiseUtil.ParameterRange.combine(
+            ), Climate.Parameter.span(
                 erosionThresholds[2],
                 erosionThresholds[5]
             ), weirdness, 0.0f, Biomes.RIVER
@@ -874,12 +872,12 @@ class OverworldBiomeParameters {
         )
         this.addSurfaceBiomeTo(
             parameters,
-            MultiNoiseUtil.ParameterRange.combine(
+            Climate.Parameter.span(
                 temperatureThresholds[1],
                 temperatureThresholds[2]
             ),
             this.fullRange,
-            MultiNoiseUtil.ParameterRange.combine(this.inlandContinentalness, this.farInlandContinentalness),
+            Climate.Parameter.span(this.inlandContinentalness, this.farInlandContinentalness),
             erosionThresholds[6],
             weirdness,
             0.0f,
@@ -887,19 +885,19 @@ class OverworldBiomeParameters {
         )
         this.addSurfaceBiomeTo(
             parameters,
-            MultiNoiseUtil.ParameterRange.combine(
+            Climate.Parameter.span(
                 temperatureThresholds[3],
                 temperatureThresholds[4]
             ),
             this.fullRange,
-            MultiNoiseUtil.ParameterRange.combine(this.inlandContinentalness, this.farInlandContinentalness),
+            Climate.Parameter.span(this.inlandContinentalness, this.farInlandContinentalness),
             erosionThresholds[6],
             weirdness,
             0.0f,
             Biomes.MANGROVE_SWAMP
         )
         this.addSurfaceBiomeTo(
-            parameters, this.frozenTemperature, this.fullRange, MultiNoiseUtil.ParameterRange.combine(
+            parameters, this.frozenTemperature, this.fullRange, Climate.Parameter.span(
                 this.inlandContinentalness, this.farInlandContinentalness
             ),
             erosionThresholds[6], weirdness, 0.0f, Biomes.FROZEN_RIVER
@@ -912,9 +910,9 @@ class OverworldBiomeParameters {
                 val parameterRange2 = humidityThresholds[j]
                 val registryKey = this.pickRegularBiomeOrBadlandsIfHot(i, j, weirdness)
                 this.addSurfaceBiomeTo(
-                    parameters, parameterRange, parameterRange2, MultiNoiseUtil.ParameterRange.combine(
+                    parameters, parameterRange, parameterRange2, Climate.Parameter.span(
                         this.midInlandContinentalness, this.farInlandContinentalness
-                    ), MultiNoiseUtil.ParameterRange.combine(
+                    ), Climate.Parameter.span(
                         erosionThresholds[0],
                         erosionThresholds[1]
                     ), weirdness, 0.0f, registryKey
@@ -923,12 +921,12 @@ class OverworldBiomeParameters {
         }
     }
 
-    private fun addUndergroundBiomesTo(parameters: Consumer<Pair<MultiNoiseUtil.NoiseHypercube, RegistryKey<Biome>>>) {
+    private fun addUndergroundBiomesTo(parameters: Consumer<Pair<Climate.ParameterPoint, ResourceKey<Biome>>>) {
         this.addUndergroundBiomeTo(
             parameters,
             this.fullRange,
             this.fullRange,
-            MultiNoiseUtil.ParameterRange.of(0.8f, 1.0f),
+            Climate.Parameter.span(0.8f, 1.0f),
             this.fullRange,
             this.fullRange,
             0.0f,
@@ -937,7 +935,7 @@ class OverworldBiomeParameters {
         this.addUndergroundBiomeTo(
             parameters,
             this.fullRange,
-            MultiNoiseUtil.ParameterRange.of(0.7f, 1.0f),
+            Climate.Parameter.span(0.7f, 1.0f),
             this.fullRange,
             this.fullRange,
             this.fullRange,
@@ -945,7 +943,7 @@ class OverworldBiomeParameters {
             Biomes.LUSH_CAVES
         )
         this.addBottomBiomeTo(
-            parameters, this.fullRange, this.fullRange, this.fullRange, MultiNoiseUtil.ParameterRange.combine(
+            parameters, this.fullRange, this.fullRange, this.fullRange, Climate.Parameter.span(
                 erosionThresholds[0],
                 erosionThresholds[1]
             ), this.fullRange, 0.0f, Biomes.DEEP_DARK
@@ -955,8 +953,8 @@ class OverworldBiomeParameters {
     private fun pickRegularBiome(
         temperature: Int,
         humidity: Int,
-        weirdness: MultiNoiseUtil.ParameterRange
-    ): RegistryKey<Biome> {
+        weirdness: Climate.Parameter
+    ): ResourceKey<Biome> {
         if (weirdness.max() < 0L) {
             return middleBiomes[temperature][humidity]
         } else {
@@ -968,8 +966,8 @@ class OverworldBiomeParameters {
     private fun pickRegularBiomeOrBadlandsIfHot(
         temperature: Int,
         humidity: Int,
-        weirdness: MultiNoiseUtil.ParameterRange
-    ): RegistryKey<Biome> {
+        weirdness: Climate.Parameter
+    ): ResourceKey<Biome> {
         return if (temperature == 4) this.pickBadlandsBiome(humidity, weirdness) else this.pickRegularBiome(
             temperature,
             humidity,
@@ -980,8 +978,8 @@ class OverworldBiomeParameters {
     private fun pickRegularBiomeOrBadlandsIfHotOrSlopeIfCold(
         temperature: Int,
         humidity: Int,
-        weirdness: MultiNoiseUtil.ParameterRange
-    ): RegistryKey<Biome> {
+        weirdness: Climate.Parameter
+    ): ResourceKey<Biome> {
         return if (temperature == 0) this.pickSlopeBiome(
             temperature,
             humidity,
@@ -992,17 +990,17 @@ class OverworldBiomeParameters {
     private fun maybePickWindsweptSavanna(
         temperature: Int,
         humidity: Int,
-        weirdness: MultiNoiseUtil.ParameterRange,
-        fallback: RegistryKey<Biome>
-    ): RegistryKey<Biome> {
+        weirdness: Climate.Parameter,
+        fallback: ResourceKey<Biome>
+    ): ResourceKey<Biome> {
         return if (temperature > 1 && humidity < 4 && weirdness.max() >= 0L) Biomes.WINDSWEPT_SAVANNA else fallback
     }
 
     private fun pickShatteredCoastBiome(
         temperature: Int,
         humidity: Int,
-        weirdness: MultiNoiseUtil.ParameterRange
-    ): RegistryKey<Biome> {
+        weirdness: Climate.Parameter
+    ): ResourceKey<Biome> {
         val registryKey =
             if (weirdness.max() >= 0L) this.pickRegularBiome(temperature, humidity, weirdness) else this.pickBeachBiome(
                 temperature,
@@ -1011,7 +1009,7 @@ class OverworldBiomeParameters {
         return this.maybePickWindsweptSavanna(temperature, humidity, weirdness, registryKey)
     }
 
-    private fun pickBeachBiome(temperature: Int, humidity: Int): RegistryKey<Biome> {
+    private fun pickBeachBiome(temperature: Int, humidity: Int): ResourceKey<Biome> {
         return if (temperature == 0) {
             Biomes.SNOWY_BEACH
         } else {
@@ -1019,7 +1017,7 @@ class OverworldBiomeParameters {
         }
     }
 
-    private fun pickBadlandsBiome(humidity: Int, weirdness: MultiNoiseUtil.ParameterRange): RegistryKey<Biome> {
+    private fun pickBadlandsBiome(humidity: Int, weirdness: Climate.Parameter): ResourceKey<Biome> {
         return if (humidity < 2) {
             if (weirdness.max() < 0L) Biomes.BADLANDS else Biomes.ERODED_BADLANDS
         } else {
@@ -1030,8 +1028,8 @@ class OverworldBiomeParameters {
     private fun pickPlateauBiome(
         temperature: Int,
         humidity: Int,
-        weirdness: MultiNoiseUtil.ParameterRange
-    ): RegistryKey<Biome> {
+        weirdness: Climate.Parameter
+    ): ResourceKey<Biome> {
         if (weirdness.max() >= 0L) {
             val registryKey = plateauBiomesVariant[temperature][humidity]
             if (registryKey != null) {
@@ -1045,8 +1043,8 @@ class OverworldBiomeParameters {
     private fun pickPeakBiome(
         temperature: Int,
         humidity: Int,
-        weirdness: MultiNoiseUtil.ParameterRange
-    ): RegistryKey<Biome> {
+        weirdness: Climate.Parameter
+    ): ResourceKey<Biome> {
         return if (temperature <= 2) {
             if (weirdness.max() < 0L) Biomes.JAGGED_PEAKS else Biomes.FROZEN_PEAKS
         } else {
@@ -1060,8 +1058,8 @@ class OverworldBiomeParameters {
     private fun pickSlopeBiome(
         temperature: Int,
         humidity: Int,
-        weirdness: MultiNoiseUtil.ParameterRange
-    ): RegistryKey<Biome> {
+        weirdness: Climate.Parameter
+    ): ResourceKey<Biome> {
         return if (temperature >= 3) {
             pickPlateauBiome(temperature, humidity, weirdness)
         } else {
@@ -1072,30 +1070,30 @@ class OverworldBiomeParameters {
     private fun pickShatteredBiome(
         temperature: Int,
         humidity: Int,
-        weirdness: MultiNoiseUtil.ParameterRange
-    ): RegistryKey<Biome> {
+        weirdness: Climate.Parameter
+    ): ResourceKey<Biome> {
         val registryKey = shatteredBiomes[temperature][humidity]
         return registryKey ?: this.pickRegularBiome(temperature, humidity, weirdness)
     }
 
     private fun addSurfaceBiomeTo(
-        parameters: Consumer<Pair<MultiNoiseUtil.NoiseHypercube, RegistryKey<Biome>>>,
-        temperature: MultiNoiseUtil.ParameterRange,
-        humidity: MultiNoiseUtil.ParameterRange,
-        continentalness: MultiNoiseUtil.ParameterRange,
-        erosion: MultiNoiseUtil.ParameterRange,
-        weirdness: MultiNoiseUtil.ParameterRange,
+        parameters: Consumer<Pair<Climate.ParameterPoint, ResourceKey<Biome>>>,
+        temperature: Climate.Parameter,
+        humidity: Climate.Parameter,
+        continentalness: Climate.Parameter,
+        erosion: Climate.Parameter,
+        weirdness: Climate.Parameter,
         offset: Float,
-        biome: RegistryKey<Biome>
+        biome: ResourceKey<Biome>
     ) {
         parameters.accept(
             Pair.of(
-                MultiNoiseUtil.createNoiseHypercube(
+                Climate.parameters(
                     temperature,
                     humidity,
                     continentalness,
                     erosion,
-                    MultiNoiseUtil.ParameterRange.of(0.0f),
+                    Climate.Parameter.point(0.0f),
                     weirdness,
                     offset
                 ), biome
@@ -1103,12 +1101,12 @@ class OverworldBiomeParameters {
         )
         parameters.accept(
             Pair.of(
-                MultiNoiseUtil.createNoiseHypercube(
+                Climate.parameters(
                     temperature,
                     humidity,
                     continentalness,
                     erosion,
-                    MultiNoiseUtil.ParameterRange.of(1.0f),
+                    Climate.Parameter.point(1.0f),
                     weirdness,
                     offset
                 ), biome
@@ -1117,23 +1115,23 @@ class OverworldBiomeParameters {
     }
 
     private fun addUndergroundBiomeTo(
-        parameters: Consumer<Pair<MultiNoiseUtil.NoiseHypercube, RegistryKey<Biome>>>,
-        temperature: MultiNoiseUtil.ParameterRange,
-        humidity: MultiNoiseUtil.ParameterRange,
-        continentalness: MultiNoiseUtil.ParameterRange,
-        erosion: MultiNoiseUtil.ParameterRange,
-        weirdness: MultiNoiseUtil.ParameterRange,
+        parameters: Consumer<Pair<Climate.ParameterPoint, ResourceKey<Biome>>>,
+        temperature: Climate.Parameter,
+        humidity: Climate.Parameter,
+        continentalness: Climate.Parameter,
+        erosion: Climate.Parameter,
+        weirdness: Climate.Parameter,
         offset: Float,
-        biome: RegistryKey<Biome>
+        biome: ResourceKey<Biome>
     ) {
         parameters.accept(
             Pair.of(
-                MultiNoiseUtil.createNoiseHypercube(
+                Climate.parameters(
                     temperature,
                     humidity,
                     continentalness,
                     erosion,
-                    MultiNoiseUtil.ParameterRange.of(0.2f, 0.9f),
+                    Climate.Parameter.span(0.2f, 0.9f),
                     weirdness,
                     offset
                 ), biome
@@ -1142,23 +1140,23 @@ class OverworldBiomeParameters {
     }
 
     private fun addBottomBiomeTo(
-        parameters: Consumer<Pair<MultiNoiseUtil.NoiseHypercube, RegistryKey<Biome>>>,
-        temperature: MultiNoiseUtil.ParameterRange,
-        humidity: MultiNoiseUtil.ParameterRange,
-        continentialness: MultiNoiseUtil.ParameterRange,
-        erosion: MultiNoiseUtil.ParameterRange,
-        depth: MultiNoiseUtil.ParameterRange,
+        parameters: Consumer<Pair<Climate.ParameterPoint, ResourceKey<Biome>>>,
+        temperature: Climate.Parameter,
+        humidity: Climate.Parameter,
+        continentialness: Climate.Parameter,
+        erosion: Climate.Parameter,
+        depth: Climate.Parameter,
         weirdness: Float,
-        registryKey: RegistryKey<Biome>
+        registryKey: ResourceKey<Biome>
     ) {
         parameters.accept(
             Pair.of(
-                MultiNoiseUtil.createNoiseHypercube(
+                Climate.parameters(
                     temperature,
                     humidity,
                     continentialness,
                     erosion,
-                    MultiNoiseUtil.ParameterRange.of(1.1f),
+                    Climate.Parameter.point(1.1f),
                     depth,
                     weirdness
                 ), registryKey
@@ -1167,7 +1165,7 @@ class OverworldBiomeParameters {
     }
 
     fun getContinentalnessDescription(continentalness: Double): String {
-        val d = MultiNoiseUtil.quantizeCoord(continentalness.toFloat()).toDouble()
+        val d = Climate.quantizeCoord(continentalness.toFloat()).toDouble()
         return if (d < mushroomFieldsContinentalness.max().toDouble()) {
             "Mushroom fields"
         } else if (d < deepOceanContinentalness.max().toDouble()) {
@@ -1196,8 +1194,8 @@ class OverworldBiomeParameters {
         return getNoiseValueDescription(humidity, this.humidityThresholds)
     }
 
-    @get:Debug
-    val continentalnessThresholds: Array<MultiNoiseUtil.ParameterRange>
+    @get:VisibleForDebug
+    val continentalnessThresholds: Array<Climate.Parameter>
         get() = arrayOf(
             this.mushroomFieldsContinentalness,
             this.deepOceanContinentalness,
@@ -1208,27 +1206,27 @@ class OverworldBiomeParameters {
             this.farInlandContinentalness
         )
 
-    @get:Debug
-    val peaksAndValleysThresholds: Array<MultiNoiseUtil.ParameterRange>
+    @get:VisibleForDebug
+    val peaksAndValleysThresholds: Array<Climate.Parameter>
         get() = arrayOf(
-            MultiNoiseUtil.ParameterRange.of(-2.0f, NoiseRouterData.getPeaksAndValleys(0.05f)),
-            MultiNoiseUtil.ParameterRange.of(
-                NoiseRouterData.getPeaksAndValleys(0.05f), NoiseRouterData.getPeaksAndValleys(0.26666668f)
+            Climate.Parameter.span(-2.0f, NoiseRouterData.peaksAndValleys(0.05f)),
+            Climate.Parameter.span(
+                NoiseRouterData.peaksAndValleys(0.05f), NoiseRouterData.peaksAndValleys(0.26666668f)
             ),
-            MultiNoiseUtil.ParameterRange.of(
-                NoiseRouterData.getPeaksAndValleys(0.26666668f), NoiseRouterData.getPeaksAndValleys(0.4f)
+            Climate.Parameter.span(
+                NoiseRouterData.peaksAndValleys(0.26666668f), NoiseRouterData.peaksAndValleys(0.4f)
             ),
-            MultiNoiseUtil.ParameterRange.of(
-                NoiseRouterData.getPeaksAndValleys(0.4f), NoiseRouterData.getPeaksAndValleys(0.56666666f)
+            Climate.Parameter.span(
+                NoiseRouterData.peaksAndValleys(0.4f), NoiseRouterData.peaksAndValleys(0.56666666f)
             ),
-            MultiNoiseUtil.ParameterRange.of(
-                NoiseRouterData.getPeaksAndValleys(0.56666666f), 2.0f
+            Climate.Parameter.span(
+                NoiseRouterData.peaksAndValleys(0.56666666f), 2.0f
             )
         )
 
-    @get:Debug
-    val weirdnessThresholds: Array<MultiNoiseUtil.ParameterRange>
-        get() = arrayOf(MultiNoiseUtil.ParameterRange.of(-2.0f, 0.0f), MultiNoiseUtil.ParameterRange.of(0.0f, 2.0f))
+    @get:VisibleForDebug
+    val weirdnessThresholds: Array<Climate.Parameter>
+        get() = arrayOf(Climate.Parameter.span(-2.0f, 0.0f), Climate.Parameter.span(0.0f, 2.0f))
 
     companion object {
         private const val VALLEY_SIZE = 0.05f
@@ -1254,21 +1252,21 @@ class OverworldBiomeParameters {
         }
 
         fun getPeaksAndValleysDescription(erosion: Double): String {
-            return if (erosion < NoiseRouterData.getPeaksAndValleys(0.05f).toDouble()) {
+            return if (erosion < NoiseRouterData.peaksAndValleys(0.05f).toDouble()) {
                 "Valley"
-            } else if (erosion < NoiseRouterData.getPeaksAndValleys(0.26666668f).toDouble()) {
+            } else if (erosion < NoiseRouterData.peaksAndValleys(0.26666668f).toDouble()) {
                 "Low"
-            } else if (erosion < NoiseRouterData.getPeaksAndValleys(0.4f).toDouble()) {
+            } else if (erosion < NoiseRouterData.peaksAndValleys(0.4f).toDouble()) {
                 "Mid"
             } else {
-                if (erosion < NoiseRouterData.getPeaksAndValleys(0.56666666f)
+                if (erosion < NoiseRouterData.peaksAndValleys(0.56666666f)
                         .toDouble()
                 ) "High" else "Peak"
             }
         }
 
-        private fun getNoiseValueDescription(value: Double, parameters: Array<MultiNoiseUtil.ParameterRange>): String {
-            val d = MultiNoiseUtil.quantizeCoord(value.toFloat()).toDouble()
+        private fun getNoiseValueDescription(value: Double, parameters: Array<Climate.Parameter>): String {
+            val d = Climate.quantizeCoord(value.toFloat()).toDouble()
 
             for (i in parameters.indices) {
                 if (d < parameters[i].max().toDouble()) {

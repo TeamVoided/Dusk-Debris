@@ -1,101 +1,108 @@
 package org.teamvoided.dusk_debris.block
 
-import net.minecraft.block.*
-import net.minecraft.block.enums.BlockHalf
-import net.minecraft.block.enums.StairShape
-import net.minecraft.item.ItemPlacementContext
-import net.minecraft.state.StateManager
-import net.minecraft.state.property.Properties
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Direction
-import net.minecraft.util.shape.VoxelShape
-import net.minecraft.util.shape.VoxelShapes
-import net.minecraft.world.BlockView
-import net.minecraft.world.WorldAccess
-import net.minecraft.world.WorldView
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
+import net.minecraft.world.item.context.BlockPlaceContext
+import net.minecraft.world.level.BlockGetter
+import net.minecraft.world.level.LevelAccessor
+import net.minecraft.world.level.LevelReader
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.block.CarpetBlock
+import net.minecraft.world.level.block.StairBlock
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.block.state.StateDefinition
+import net.minecraft.world.level.block.state.properties.BlockStateProperties
+import net.minecraft.world.level.block.state.properties.Half
+import net.minecraft.world.level.block.state.properties.StairsShape
+import net.minecraft.world.phys.shapes.CollisionContext
+import net.minecraft.world.phys.shapes.Shapes
+import net.minecraft.world.phys.shapes.VoxelShape
 import org.teamvoided.dusk_debris.util.rotate
 
-class CarpetStairBlock(settings: Settings) : CarpetBlock(settings) {
+class CarpetStairBlock(settings: Properties) : CarpetBlock(settings) {
     init {
-        this.defaultState = stateManager.defaultState
-            .with(Properties.HORIZONTAL_FACING, Direction.NORTH)
-            .with(Properties.STAIR_SHAPE, StairShape.STRAIGHT)
+        this.registerDefaultState(
+            stateDefinition.any()
+                .setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.NORTH)
+                .setValue(BlockStateProperties.STAIRS_SHAPE, StairsShape.STRAIGHT)
+        )
     }
 
-    override fun getPlacementState(ctx: ItemPlacementContext): BlockState? {
-        val downState = ctx.world.getBlockState(ctx.blockPos.down())
-        val supr = super.getPlacementState(ctx)
-        return if (supr != null && canPlaceAt(supr, ctx.world, ctx.blockPos)) stateFromBelowStair(supr, downState)
+    override fun getStateForPlacement(ctx: BlockPlaceContext): BlockState? {
+        val downState = ctx.level.getBlockState(ctx.clickedPos.below())
+        val supr = super.getStateForPlacement(ctx)
+        return if (supr != null && canSurvive(supr, ctx.level, ctx.clickedPos)) stateFromBelowStair(supr, downState)
         else null
     }
 
-    override fun getStateForNeighborUpdate(
+    override fun updateShape(
         state: BlockState,
         direction: Direction,
         neighborState: BlockState,
-        world: WorldAccess,
+        world: LevelAccessor,
         pos: BlockPos,
         neighborPos: BlockPos
     ): BlockState {
-        return if (!state.canPlaceAt(world, pos)) Blocks.AIR.defaultState
+        return if (!state.canSurvive(world, pos)) Blocks.AIR.defaultBlockState()
         else if (direction == Direction.DOWN) {
-            val downState = world.getBlockState(pos.down())
-            val supr = super.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos)
+            val downState = world.getBlockState(pos.below())
+            val supr = super.updateShape(state, direction, neighborState, world, pos, neighborPos)
             stateFromBelowStair(supr, downState)
         } else state
     }
 
-    override fun canPlaceAt(state: BlockState, world: WorldView, pos: BlockPos): Boolean {
-        val downState = world.getBlockState(pos.down())
-        return StairsBlock.isStairs(downState) && downState.get(Properties.BLOCK_HALF) == BlockHalf.BOTTOM
+    override fun canSurvive(state: BlockState, world: LevelReader, pos: BlockPos): Boolean {
+        val downState = world.getBlockState(pos.below())
+        return StairBlock.isStairs(downState) && downState.getValue(BlockStateProperties.HALF) == Half.BOTTOM
     }
 
     fun stateFromBelowStair(state: BlockState, downState: BlockState): BlockState {
         return state
-            .with(Properties.HORIZONTAL_FACING, downState.get(Properties.HORIZONTAL_FACING))
-            .with(Properties.STAIR_SHAPE, downState.get(Properties.STAIR_SHAPE))
+            .setValue(BlockStateProperties.HORIZONTAL_FACING, downState.getValue(BlockStateProperties.HORIZONTAL_FACING))
+            .setValue(BlockStateProperties.STAIRS_SHAPE, downState.getValue(BlockStateProperties.STAIRS_SHAPE))
     }
 
-    override fun getOutlineShape(
+    override fun getShape(
         state: BlockState,
-        world: BlockView,
+        world: BlockGetter,
         pos: BlockPos,
-        context: ShapeContext
+        context: CollisionContext
     ): VoxelShape {
-        return when (state.get(Properties.STAIR_SHAPE)) {
-            StairShape.STRAIGHT -> STRAIGHT_SHAPE
-            StairShape.INNER_LEFT -> INNER_SHAPE
-            StairShape.INNER_RIGHT -> INNER_SHAPE.rotate(1)
-            StairShape.OUTER_LEFT -> OUTER_SHAPE
-            StairShape.OUTER_RIGHT -> OUTER_SHAPE.rotate(1)
-            else -> super.getOutlineShape(state, world, pos, context)
-        }.rotate(state.get(Properties.HORIZONTAL_FACING).horizontal)
+        return when (state.getValue(BlockStateProperties.STAIRS_SHAPE)) {
+            StairsShape.STRAIGHT -> STRAIGHT_SHAPE
+            StairsShape.INNER_LEFT -> INNER_SHAPE
+            StairsShape.INNER_RIGHT -> INNER_SHAPE.rotate(1)
+            StairsShape.OUTER_LEFT -> OUTER_SHAPE
+            StairsShape.OUTER_RIGHT -> OUTER_SHAPE.rotate(1)
+            else -> super.getShape(state, world, pos, context)
+        }.rotate(state.getValue(BlockStateProperties.HORIZONTAL_FACING).get2DDataValue())
     }
 
-    override fun appendProperties(builder: StateManager.Builder<Block, BlockState>) {
-        builder.add(Properties.HORIZONTAL_FACING, Properties.STAIR_SHAPE)
+    override fun createBlockStateDefinition(builder: StateDefinition.Builder<Block, BlockState>) {
+        builder.add(BlockStateProperties.HORIZONTAL_FACING, BlockStateProperties.STAIRS_SHAPE)
     }
 
     companion object {
-        val STRAIGHT_SHAPE: VoxelShape = VoxelShapes.union(
-            createCuboidShape(0.0, 0.0, 7.0, 16.0, 1.0, 16.0),
-            createCuboidShape(0.0, -7.0, 7.0, 16.0, 0.0, 8.0),
-            createCuboidShape(0.0, -8.0, 0.0, 16.0, -7.0, 8.0),
-            createCuboidShape(0.0, -15.0, -1.0, 16.0, -7.0, 0.0)
+        val STRAIGHT_SHAPE: VoxelShape = Shapes.or(
+            box(0.0, 0.0, 7.0, 16.0, 1.0, 16.0),
+            box(0.0, -7.0, 7.0, 16.0, 0.0, 8.0),
+            box(0.0, -8.0, 0.0, 16.0, -7.0, 8.0),
+            box(0.0, -15.0, -1.0, 16.0, -7.0, 0.0)
         )
-        val INNER_SHAPE: VoxelShape = VoxelShapes.union(
-            createCuboidShape(0.0, 0.0, 7.0, 16.0, 1.0, 16.0),
-            createCuboidShape(7.0, 0.0, 0.0, 16.0, 1.0, 7.0),
-            createCuboidShape(0.0, -8.0, 7.0, 7.0, 0.0, 8.0),
-            createCuboidShape(7.0, -8.0, 0.0, 8.0, 0.0, 7.0),
-            createCuboidShape(0.0, -8.0, 0.0, 7.0, -7.0, 7.0)
+        val INNER_SHAPE: VoxelShape = Shapes.or(
+            box(0.0, 0.0, 7.0, 16.0, 1.0, 16.0),
+            box(7.0, 0.0, 0.0, 16.0, 1.0, 7.0),
+            box(0.0, -8.0, 7.0, 7.0, 0.0, 8.0),
+            box(7.0, -8.0, 0.0, 8.0, 0.0, 7.0),
+            box(0.0, -8.0, 0.0, 7.0, -7.0, 7.0)
         )
-        val OUTER_SHAPE: VoxelShape = VoxelShapes.union(
-            createCuboidShape(0.0, 0.0, 7.0, 16.0, 1.0, 16.0),
-            createCuboidShape(7.0, 0.0, 0.0, 16.0, 1.0, 7.0),
-            createCuboidShape(0.0, -8.0, 7.0, 7.0, 0.0, 8.0),
-            createCuboidShape(7.0, -8.0, 0.0, 8.0, 0.0, 7.0),
-            createCuboidShape(0.0, -8.0, 0.0, 7.0, -7.0, 7.0),
+        val OUTER_SHAPE: VoxelShape = Shapes.or(
+            box(0.0, 0.0, 7.0, 16.0, 1.0, 16.0),
+            box(7.0, 0.0, 0.0, 16.0, 1.0, 7.0),
+            box(0.0, -8.0, 7.0, 7.0, 0.0, 8.0),
+            box(7.0, -8.0, 0.0, 8.0, 0.0, 7.0),
+            box(0.0, -8.0, 0.0, 7.0, -7.0, 7.0),
         )
     }
 }

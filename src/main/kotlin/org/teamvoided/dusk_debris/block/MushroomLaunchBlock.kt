@@ -1,169 +1,169 @@
 package org.teamvoided.dusk_debris.block
 
-import net.minecraft.block.Block
-import net.minecraft.block.BlockState
-import net.minecraft.block.EntityShapeContext
-import net.minecraft.block.ShapeContext
-import net.minecraft.component.DataComponentTypes
-import net.minecraft.component.type.AttributeModifiersComponent
-import net.minecraft.entity.Entity
-import net.minecraft.entity.EquipmentSlot
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.attribute.EntityAttributes
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.entity.projectile.PersistentProjectileEntity
-import net.minecraft.item.BlockItem
-import net.minecraft.item.ItemStack
-import net.minecraft.item.ProjectileItem
-import net.minecraft.registry.tag.ItemTags
-import net.minecraft.sound.SoundCategory
-import net.minecraft.sound.SoundEvents
-import net.minecraft.util.Hand
-import net.minecraft.util.ItemInteractionResult
-import net.minecraft.util.hit.BlockHitResult
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.MathHelper
-import net.minecraft.util.math.Vec3d
-import net.minecraft.util.shape.VoxelShape
-import net.minecraft.util.shape.VoxelShapes
-import net.minecraft.world.BlockView
-import net.minecraft.world.World
+import net.minecraft.core.BlockPos
+import net.minecraft.core.component.DataComponents
+import net.minecraft.sounds.SoundEvents
+import net.minecraft.sounds.SoundSource
+import net.minecraft.tags.ItemTags
+import net.minecraft.util.Mth
+import net.minecraft.world.InteractionHand
+import net.minecraft.world.ItemInteractionResult
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.EquipmentSlot
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.ai.attributes.Attributes
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.entity.projectile.AbstractArrow
+import net.minecraft.world.item.BlockItem
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.ProjectileItem
+import net.minecraft.world.item.component.ItemAttributeModifiers
+import net.minecraft.world.level.BlockGetter
+import net.minecraft.world.level.Level
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.phys.BlockHitResult
+import net.minecraft.world.phys.Vec3
+import net.minecraft.world.phys.shapes.CollisionContext
+import net.minecraft.world.phys.shapes.EntityCollisionContext
+import net.minecraft.world.phys.shapes.Shapes
+import net.minecraft.world.phys.shapes.VoxelShape
 import org.teamvoided.dusk_debris.init.DuskParticles
-import org.teamvoided.dusk_debris.mixin.PersistentProjectileEntityAccessor
+import org.teamvoided.dusk_debris.mixin.AbstractArrowAccessor
 import org.teamvoided.dusk_debris.util.Utils.DEG_TO_RAD
 
-class MushroomLaunchBlock(settings: Settings) : Block(settings) {
-    override fun onLandedUpon(world: World, state: BlockState, pos: BlockPos, entity: Entity, fallDistance: Float) {
-        if (entity.bypassesLandingEffects() && !entity.isSneaking) {
-            super.onLandedUpon(world, state, pos, entity, fallDistance)
+class MushroomLaunchBlock(settings: Properties) : Block(settings) {
+    override fun fallOn(world: Level, state: BlockState, pos: BlockPos, entity: Entity, fallDistance: Float) {
+        if (entity.isSuppressingBounce && !entity.isShiftKeyDown) {
+            super.fallOn(world, state, pos, entity, fallDistance)
         } else {
-            entity.handleFallDamage(fallDistance, 0f, world.damageSources.fall())
-            playBounce(entity.velocity.y.toFloat(), world, entity.blockPos)
+            entity.causeFallDamage(fallDistance, 0f, world.damageSources().fall())
+            playBounce(entity.deltaMovement.y.toFloat(), world, entity.blockPosition())
         }
     }
 
-    override fun onEntityLand(world: BlockView, entity: Entity) {
-        if (entity.bypassesLandingEffects() && !entity.isSneaking) {
-            super.onEntityLand(world, entity)
+    override fun updateEntityAfterFallOn(world: BlockGetter, entity: Entity) {
+        if (entity.isSuppressingBounce && !entity.isShiftKeyDown) {
+            super.updateEntityAfterFallOn(world, entity)
         } else {
             this.bounce(entity)
-            if (entity is PlayerEntity && !entity.mainHandStack.isEmpty && entity.getAttackCooldownProgress(0f) >= 1) {
-                entity.resetLastAttackedTicks()
+            if (entity is Player && !entity.mainHandItem.isEmpty && entity.getAttackStrengthScale(0f) >= 1) {
+                entity.resetAttackStrengthTicker()
             }
         }
     }
 
     override fun getCollisionShape(
         state: BlockState,
-        world: BlockView,
+        world: BlockGetter,
         pos: BlockPos,
-        context: ShapeContext
+        context: CollisionContext
     ): VoxelShape {
-        val entity = (context as EntityShapeContext).entity
-        return if (entity != null && (entity is PersistentProjectileEntity)) {
-            VoxelShapes.empty()
+        val entity = (context as EntityCollisionContext).entity
+        return if (entity != null && (entity is AbstractArrow)) {
+            Shapes.empty()
         } else {
-            VoxelShapes.fullCube()
+            Shapes.block()
 //            COLLISION_SHAPE
         }
     }
 
-    override fun onEntityCollision(state: BlockState, world: World, pos: BlockPos, entity: Entity) {
-        if ((entity is PersistentProjectileEntity)) {
-            entity.isOnGround = false
-            (entity as PersistentProjectileEntityAccessor).setInGround(false)
-            entity.setVelocity(0.0,1.0,0.0)
-            entity.addVelocity(0.0, 1.0, 0.0)
-        } else super.onEntityCollision(state, world, pos, entity)
+    override fun entityInside(state: BlockState, world: Level, pos: BlockPos, entity: Entity) {
+        if ((entity is AbstractArrow)) {
+            entity.setOnGround(false)
+            (entity as AbstractArrowAccessor).setInGround(false)
+            entity.setDeltaMovement(0.0,1.0,0.0)
+            entity.push(0.0, 1.0, 0.0)
+        } else super.entityInside(state, world, pos, entity)
     }
 
-    override fun onInteract(
+    override fun useItemOn(
         stack: ItemStack,
         state: BlockState,
-        world: World,
+        world: Level,
         pos: BlockPos,
-        entity: PlayerEntity,
-        hand: Hand,
+        entity: Player,
+        hand: InteractionHand,
         hitResult: BlockHitResult
     ): ItemInteractionResult {
         if (stack.item !is BlockItem && stack.item !is ProjectileItem) {
-            if (entity.velocity.y < 0.1) {
+            if (entity.deltaMovement.y < 0.1) {
                 launch(stack, state, world, pos, entity)
                 return ItemInteractionResult.SUCCESS
             }
-            entity.resetLastAttackedTicks()
+            entity.resetAttackStrengthTicker()
         }
-        return super.onInteract(stack, state, world, pos, entity, hand, hitResult)
+        return super.useItemOn(stack, state, world, pos, entity, hand, hitResult)
     }
 
-    override fun onBlockBreakStart(state: BlockState, world: World, pos: BlockPos, player: PlayerEntity) {
-        val stack = player.mainHandStack
-        if (stack.isIn(ItemTags.WEAPON_ENCHANTABLE) || stack.isEmpty) {
+    override fun attack(state: BlockState, world: Level, pos: BlockPos, player: Player) {
+        val stack = player.mainHandItem
+        if (stack.`is`(ItemTags.WEAPON_ENCHANTABLE) || stack.isEmpty) {
             launch(stack, state, world, pos, player)
-            player.resetLastAttackedTicks()
+            player.resetAttackStrengthTicker()
         }
-        super.onBlockBreakStart(state, world, pos, player)
+        super.attack(state, world, pos, player)
     }
 
-    fun launch(stack: ItemStack, state: BlockState, world: World, pos: BlockPos, entity: PlayerEntity) {
-        val cooldown = entity.getAttackCooldownProgress(0.5f)
+    fun launch(stack: ItemStack, state: BlockState, world: Level, pos: BlockPos, entity: Player) {
+        val cooldown = entity.getAttackStrengthScale(0.5f)
         val mult: Float = if (cooldown > 0.9f) getAttackDamageWith(entity, stack).toFloat() * 0.2f
         else 0.001f
         playBounce(mult - 0.1f, world, pos)
         launchFromFacing(entity, -(mult + 0.5))
-        onLandedUpon(world, state, pos, entity, entity.fallDistance)
+        fallOn(world, state, pos, entity, entity.fallDistance)
         if (mult > 3) {
             explodeBlock(world, pos)
         } else if (mult > 0.75) {
             launchParticles(world, pos, world.random.nextInt((mult * 50).toInt()), mult.toDouble())
         }
-        entity.resetLastAttackedTicks()
+        entity.resetAttackStrengthTicker()
     }
 
     private fun getAttackDamageWith(entity: LivingEntity, weapon: ItemStack): Double {
         val attributeModifiersComponent = weapon.getOrDefault(
-            DataComponentTypes.ATTRIBUTE_MODIFIERS,
-            AttributeModifiersComponent.DEFAULT
+            DataComponents.ATTRIBUTE_MODIFIERS,
+            ItemAttributeModifiers.EMPTY
         )
         val extra = //literally just the mace
-            weapon.item.getAttackDamage(entity, 0f, entity.damageSources.mobAttack(entity)) // .playerAttack(entity)
+            weapon.item.getAttackDamageBonus(entity, 0f, entity.damageSources().mobAttack(entity)) // .playerAttack(entity)
         return attributeModifiersComponent.compute(
-            entity.getAttributeBaseValue(EntityAttributes.GENERIC_ATTACK_DAMAGE),
+            entity.getAttributeBaseValue(Attributes.ATTACK_DAMAGE),
             EquipmentSlot.MAINHAND
         ) + extra
     }
 
     private fun bounce(entity: Entity) {
-        val vec3d = entity.velocity
+        val vec3d = entity.deltaMovement
         if (vec3d.y < 0.0) {
             val mult = if (entity is LivingEntity) 1.0 else 0.8
-            entity.setVelocity(vec3d.x, -vec3d.y * mult, vec3d.z)
+            entity.setDeltaMovement(vec3d.x, -vec3d.y * mult, vec3d.z)
         }
     }
 
     private fun launchFromFacing(entity: Entity, mult: Double) {
-        val pitchSin: Double = MathHelper.sin(entity.pitch * DEG_TO_RAD).toDouble()
-        val pitchCos: Double = MathHelper.cos(entity.pitch * DEG_TO_RAD).toDouble()
-        val yawSin: Double = MathHelper.sin(entity.yaw * DEG_TO_RAD).toDouble()
-        val yawCos: Double = MathHelper.cos(entity.yaw * DEG_TO_RAD).toDouble()
-        entity.addVelocity(
+        val pitchSin: Double = Mth.sin(entity.xRot * DEG_TO_RAD).toDouble()
+        val pitchCos: Double = Mth.cos(entity.xRot * DEG_TO_RAD).toDouble()
+        val yawSin: Double = Mth.sin(entity.yRot * DEG_TO_RAD).toDouble()
+        val yawCos: Double = Mth.cos(entity.yRot * DEG_TO_RAD).toDouble()
+        entity.push(
             -yawSin * pitchCos * mult,
             -pitchSin * mult,
             yawCos * pitchCos * mult
         )
     }
 
-    fun explodeBlock(world: World, pos: BlockPos) {
+    fun explodeBlock(world: Level, pos: BlockPos) {
         val rand = world.random
-        if (rand.nextInt(5) == 0) world.breakBlock(pos, rand.nextInt(5) != 0)
+        if (rand.nextInt(5) == 0) world.destroyBlock(pos, rand.nextInt(5) != 0)
         launchParticles(world, pos, rand.nextInt(50) + 50)
     }
 
-    fun launchParticles(world: World, pos: BlockPos, count: Int, multiplier: Double = 1.0) {
+    fun launchParticles(world: Level, pos: BlockPos, count: Int, multiplier: Double = 1.0) {
         val rand = world.random
-        val centerBlock: Vec3d = pos.ofCenter()
+        val centerBlock: Vec3 = pos.center
         repeat(count) {
-            val velocity = Vec3d(
+            val velocity = Vec3(
                 (rand.nextDouble() - rand.nextDouble()) * multiplier,
                 (rand.nextDouble() - rand.nextDouble()) * multiplier,
                 (rand.nextDouble() - rand.nextDouble()) * multiplier,
@@ -180,17 +180,17 @@ class MushroomLaunchBlock(settings: Settings) : Block(settings) {
         }
     }
 
-    fun playBounce(pitch: Float, world: World, pos: BlockPos) {
+    fun playBounce(pitch: Float, world: Level, pos: BlockPos) {
         world.playSound(
-            null as PlayerEntity?,
+            null as Player?,
             pos,
-            SoundEvents.BLOCK_SHROOMLIGHT_BREAK,
-            SoundCategory.BLOCKS,
+            SoundEvents.SHROOMLIGHT_BREAK,
+            SoundSource.BLOCKS,
             1.0f,
             pitch
         )
     }
     companion object{
-        val COLLISION_SHAPE = createCuboidShape(4.0, 4.0, 4.0, 12.0, 12.0, 12.0)
+        val COLLISION_SHAPE = box(4.0, 4.0, 4.0, 12.0, 12.0, 12.0)
     }
 }

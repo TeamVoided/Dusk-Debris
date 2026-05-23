@@ -2,14 +2,14 @@ package org.teamvoided.dusk_debris.world.gen.configured_feature.config.rock_spir
 
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
-import net.minecraft.block.Block
-import net.minecraft.block.Blocks
-import net.minecraft.registry.tag.TagKey
-import net.minecraft.util.math.float_provider.ConstantFloatProvider
-import net.minecraft.util.math.float_provider.FloatProvider
-import net.minecraft.util.math.int_provider.IntProvider
-import net.minecraft.world.gen.stateprovider.BlockStateProvider
-import net.minecraft.world.gen.stateprovider.SimpleBlockStateProvider
+import net.minecraft.tags.TagKey
+import net.minecraft.util.valueproviders.ConstantFloat
+import net.minecraft.util.valueproviders.FloatProvider
+import net.minecraft.util.valueproviders.IntProvider
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider
+import net.minecraft.world.level.levelgen.feature.stateproviders.SimpleStateProvider
 
 class SurfaceFormationFeatureConfig(
     val topState: BlockStateProvider,
@@ -18,7 +18,7 @@ class SurfaceFormationFeatureConfig(
     replaceable: TagKey<Block>,
     sizeY: IntProvider,
     sizeXZ: IntProvider,
-    exponent: FloatProvider = ConstantFloatProvider.create(2f)
+    exponent: FloatProvider = ConstantFloat.of(2f)
 ) : RockFormationFeatureConfig(rockState, replaceable, sizeY, sizeXZ, exponent) {
     constructor(
         topState: BlockStateProvider,
@@ -26,11 +26,11 @@ class SurfaceFormationFeatureConfig(
         replaceable: TagKey<Block>,
         sizeY: IntProvider,
         sizeXZ: IntProvider,
-        exponent: FloatProvider = ConstantFloatProvider.create(2f)
+        exponent: FloatProvider = ConstantFloat.of(2f)
     ) : this(
         topState,
         underState,
-        SimpleBlockStateProvider.of(Blocks.STONE.defaultState),
+        SimpleStateProvider.simple(Blocks.STONE.defaultBlockState()),
         replaceable,
         sizeY,
         sizeXZ,
@@ -55,13 +55,13 @@ class SurfaceFormationFeatureConfig(
         val CODEC: Codec<SurfaceFormationFeatureConfig> =
             RecordCodecBuilder.create { instance ->
                 instance.group(
-                    BlockStateProvider.TYPE_CODEC
+                    BlockStateProvider.CODEC
                         .fieldOf("top_layer")
-                        .orElse(SimpleBlockStateProvider.of(Blocks.GRASS_BLOCK.defaultState))
+                        .orElse(SimpleStateProvider.simple(Blocks.GRASS_BLOCK.defaultBlockState()))
                         .forGetter { it.topState },
-                    BlockStateProvider.TYPE_CODEC
+                    BlockStateProvider.CODEC
                         .fieldOf("under_layer")
-                        .orElse(SimpleBlockStateProvider.of(Blocks.DIRT.defaultState))
+                        .orElse(SimpleStateProvider.simple(Blocks.DIRT.defaultBlockState()))
                         .forGetter { it.underState },
                     RockFormationFeatureConfig.MAP_CODEC.forGetter { it }
                 ).apply(instance, ::SurfaceFormationFeatureConfig)

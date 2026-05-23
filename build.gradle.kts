@@ -49,7 +49,7 @@ modSettings {
 dependencies {
     //val geckolib_version = "4.5.1"
     // Dusks And Dungeons
-    modImplementation("org.teamvoided:dusks_and_dungeons:1.0.0-beta.1")
+    modImplementation("org.teamvoided:dusks_and_dungeons:1.0.0-beta.8")
 
     modImplementation(fileTree("libs"))
     modImplementation(libs.modmenu)

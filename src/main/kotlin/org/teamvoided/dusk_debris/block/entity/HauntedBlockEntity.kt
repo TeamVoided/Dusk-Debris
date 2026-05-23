@@ -1,11 +1,11 @@
 package org.teamvoided.dusks_and_dungeons.block.entity
 
-import net.minecraft.block.BlockState
-import net.minecraft.block.entity.BlockEntity
-import net.minecraft.server.world.ServerWorld
-import net.minecraft.util.math.BlockPos
-import net.minecraft.world.EntityDetector
-import net.minecraft.world.World
+import net.minecraft.core.BlockPos
+import net.minecraft.server.level.ServerLevel
+import net.minecraft.world.level.Level
+import net.minecraft.world.level.block.entity.BlockEntity
+import net.minecraft.world.level.block.entity.trialspawner.PlayerDetector
+import net.minecraft.world.level.block.state.BlockState
 import org.teamvoided.dusk_debris.block.HauntedGravestoneBlock
 import org.teamvoided.dusk_debris.init.DuskBlockEntities
 
@@ -13,19 +13,19 @@ open class HauntedBlockEntity(pos: BlockPos, state: BlockState) :
     BlockEntity(DuskBlockEntities.HAUNTED_BLOCK, pos, state) {
 
     companion object {
-        fun serverTick(world: World, pos: BlockPos, state: BlockState, blockEntity: HauntedBlockEntity) {
-            if ((pos.asLong() + world.time) % 20L != 0L) {
-                val players = EntityDetector.NON_SPECTATING_PLAYERS.detect(
-                    world as ServerWorld?,
-                    EntityDetector.EntitySelector.WORLD_ENTITY_SELECTOR,
+        fun serverTick(world: Level, pos: BlockPos, state: BlockState, blockEntity: HauntedBlockEntity) {
+            if ((pos.asLong() + world.gameTime) % 20L != 0L) {
+                val players = PlayerDetector.INCLUDING_CREATIVE_PLAYERS.detect(
+                    world as ServerLevel?,
+                    PlayerDetector.EntitySelector.SELECT_FROM_LEVEL,
                     pos,
                     9.0,
                     true
                 )
 
-                val isActive = state.get(HauntedGravestoneBlock.IS_ACTIVE)
+                val isActive = state.getValue(HauntedGravestoneBlock.IS_ACTIVE)
                 if ((isActive && players.isEmpty()) || (!isActive && players.isNotEmpty())) {
-                    world.setBlockState(pos, state.with(HauntedGravestoneBlock.IS_ACTIVE, !isActive))
+                    world.setBlockAndUpdate(pos, state.setValue(HauntedGravestoneBlock.IS_ACTIVE, !isActive))
                 }
             }
         }

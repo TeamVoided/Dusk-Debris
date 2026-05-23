@@ -1,18 +1,18 @@
 package org.teamvoided.dusk_debris.block
 
-import net.minecraft.block.AmethystClusterBlock
-import net.minecraft.block.BlockState
-import net.minecraft.particle.ParticleTypes
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Direction
-import net.minecraft.util.math.Vec3d
-import net.minecraft.util.random.RandomGenerator
-import net.minecraft.world.World
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
+import net.minecraft.core.particles.ParticleTypes
+import net.minecraft.util.RandomSource
+import net.minecraft.world.level.Level
+import net.minecraft.world.level.block.AmethystClusterBlock
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.phys.Vec3
 
-class CrytalClusterWithParticlesBlock(height: Float, aabbOffset: Float, settings: Settings) :
+class CrytalClusterWithParticlesBlock(height: Float, aabbOffset: Float, settings: Properties) :
     AmethystClusterBlock(height, aabbOffset, settings) {
-    override fun randomDisplayTick(state: BlockState, world: World, pos: BlockPos, random: RandomGenerator) {
-        val velocity = getParticleDirections(state.get(FACING), random)
+    override fun animateTick(state: BlockState, world: Level, pos: BlockPos, random: RandomSource) {
+        val velocity = getParticleDirections(state.getValue(FACING), random)
         world.addParticle(
             ParticleTypes.OMINOUS_SPAWNING,
             true,
@@ -23,21 +23,21 @@ class CrytalClusterWithParticlesBlock(height: Float, aabbOffset: Float, settings
             velocity.y,
             velocity.z
         )
-        super.randomDisplayTick(state, world, pos, random)
+        super.animateTick(state, world, pos, random)
     }
 
     companion object {
-        fun getParticleDirections(direction: Direction, random: RandomGenerator): Vec3d {
+        fun getParticleDirections(direction: Direction, random: RandomSource): Vec3 {
             val velMain = (random.nextDouble() * 0.4) + 0.2
             val velSec = (random.nextDouble() - random.nextDouble()) * 0.125
             return (when (direction) {
-                Direction.UP -> Vec3d(velSec, -velMain, velSec)
-                Direction.DOWN -> Vec3d(velSec, velMain, velSec)
-                Direction.NORTH -> Vec3d(velSec, velSec, velMain)
-                Direction.SOUTH -> Vec3d(velSec, velSec,-velMain)
-                Direction.WEST -> Vec3d(velMain, velSec, velSec)
-                Direction.EAST -> Vec3d(-velMain, velSec, velSec)
-                else -> Vec3d(velSec, velMain, velSec)
+                Direction.UP -> Vec3(velSec, -velMain, velSec)
+                Direction.DOWN -> Vec3(velSec, velMain, velSec)
+                Direction.NORTH -> Vec3(velSec, velSec, velMain)
+                Direction.SOUTH -> Vec3(velSec, velSec,-velMain)
+                Direction.WEST -> Vec3(velMain, velSec, velSec)
+                Direction.EAST -> Vec3(-velMain, velSec, velSec)
+                else -> Vec3(velSec, velMain, velSec)
             })
         }
     }

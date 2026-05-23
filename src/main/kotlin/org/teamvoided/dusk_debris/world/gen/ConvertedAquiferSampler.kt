@@ -1,17 +1,17 @@
 package org.teamvoided.dusk_debris.world.gen
 
-import net.minecraft.block.BlockState
-import net.minecraft.block.Blocks
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.ChunkPos
-import net.minecraft.util.math.ChunkSectionPos
-import net.minecraft.util.math.MathHelper
-import net.minecraft.util.random.PositionalRandomFactory
-import net.minecraft.world.biome.source.util.OverworldBiomeParameters
-import net.minecraft.world.dimension.DimensionType
-import net.minecraft.world.gen.DensityFunction
-import net.minecraft.world.gen.chunk.ChunkNoiseSampler
-import net.minecraft.world.gen.noise.NoiseRouter
+import net.minecraft.core.BlockPos
+import net.minecraft.core.SectionPos
+import net.minecraft.util.Mth
+import net.minecraft.world.level.ChunkPos
+import net.minecraft.world.level.biome.OverworldBiomeBuilder
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.dimension.DimensionType
+import net.minecraft.world.level.levelgen.DensityFunction
+import net.minecraft.world.level.levelgen.NoiseChunk
+import net.minecraft.world.level.levelgen.NoiseRouter
+import net.minecraft.world.level.levelgen.PositionalRandomFactory
 import org.apache.commons.lang3.mutable.MutableDouble
 import java.util.*
 import kotlin.math.abs
@@ -23,7 +23,7 @@ interface ConvertedAquiferSampler {
     fun needsFluidTick(): Boolean
 
     class Impl internal constructor(
-        private val chunkNoiseSampler: ChunkNoiseSampler,
+        private val chunkNoiseSampler: NoiseChunk,
         pos: ChunkPos,
         noise: NoiseRouter,
         private val positionalRandomFactory: PositionalRandomFactory,
@@ -47,14 +47,14 @@ interface ConvertedAquiferSampler {
         private val sizeZ: Int
 
         init {
-            this.startX = this.getLocalX(pos.startX) - 1
-            val i = this.getLocalX(pos.endX) + 1
+            this.startX = this.getLocalX(pos.minBlockX) - 1
+            val i = this.getLocalX(pos.maxBlockX) + 1
             this.sizeX = i - this.startX + 1
             this.startY = this.getLocalY(startY) - 1
             val j = this.getLocalY(startY + endY) + 1
             val k = j - this.startY + 1
-            this.startZ = this.getLocalZ(pos.startZ) - 1
-            val l = this.getLocalZ(pos.endZ) + 1
+            this.startZ = this.getLocalZ(pos.minBlockZ) - 1
+            val l = this.getLocalZ(pos.maxBlockZ) + 1
             this.sizeZ = l - this.startZ + 1
             val m = this.sizeX * k * this.sizeZ
             this.aquiferCache = arrayOfNulls(m)
@@ -78,9 +78,9 @@ interface ConvertedAquiferSampler {
                 return null
             } else {
                 val fluidStatus = globalFluidPicker.computeFluid(posX, posY, posz)
-                if (fluidStatus.getBlockState(posY).isOf(Blocks.LAVA)) {
+                if (fluidStatus.getBlockState(posY).`is`(Blocks.LAVA)) {
                     this.needsFluidTick = false
-                    return Blocks.LAVA.defaultState
+                    return Blocks.LAVA.defaultBlockState()
                 } else {
                     val l = Math.floorDiv(posX - 5, 16)
                     val m = Math.floorDiv(posY + 1, 12)
@@ -104,7 +104,7 @@ interface ConvertedAquiferSampler {
                                 if (ab != Long.MAX_VALUE) {
                                     ac = ab
                                 } else {
-                                    val randomGenerator = positionalRandomFactory.create(x, y, z)
+                                    val randomGenerator = positionalRandomFactory.at(x, y, z)
                                     ac = BlockPos.asLong(
                                         x * 16 + randomGenerator.nextInt(10),
                                         y * 12 + randomGenerator.nextInt(9),
@@ -113,9 +113,9 @@ interface ConvertedAquiferSampler {
                                     aquiferLocationCache[aa] = ac
                                 }
 
-                                val ad = BlockPos.unpackLongX(ac) - posX
-                                val ae = BlockPos.unpackLongY(ac) - posY
-                                val af = BlockPos.unpackLongZ(ac) - posz
+                                val ad = BlockPos.getX(ac) - posX
+                                val ae = BlockPos.getY(ac) - posY
+                                val af = BlockPos.getZ(ac) - posz
                                 val ag = ad * ad + ae * ae + af * af
                                 if (o >= ag) {
                                     t = s
@@ -143,8 +143,8 @@ interface ConvertedAquiferSampler {
                     if (d <= 0.0) {
                         this.needsFluidTick = d >= FLOWING_UPDATE_SIMILARITY
                         return blockState
-                    } else if (blockState.isOf(Blocks.WATER) &&
-                        globalFluidPicker.computeFluid(posX, posY - 1, posz).getBlockState(posY - 1).isOf(Blocks.LAVA)
+                    } else if (blockState.`is`(Blocks.WATER) &&
+                        globalFluidPicker.computeFluid(posX, posY - 1, posz).getBlockState(posY - 1).`is`(Blocks.LAVA)
                     ) {
                         this.needsFluidTick = true
                         return blockState
@@ -208,8 +208,8 @@ interface ConvertedAquiferSampler {
             val i = context.blockY()
             val blockState = firstFluidStatus.getBlockState(i)
             val blockState2 = secondFluidStatus.getBlockState(i)
-            if ((!blockState.isOf(Blocks.LAVA) || !blockState2.isOf(Blocks.WATER)) &&
-                (!blockState.isOf(Blocks.WATER) || !blockState2.isOf(Blocks.LAVA))
+            if ((!blockState.`is`(Blocks.LAVA) || !blockState2.`is`(Blocks.WATER)) &&
+                (!blockState.`is`(Blocks.WATER) || !blockState2.`is`(Blocks.LAVA))
             ) {
                 val j = abs((firstFluidStatus.fluidLevel - secondFluidStatus.fluidLevel).toDouble()).toInt()
                 if (j == 0) {
@@ -278,9 +278,9 @@ interface ConvertedAquiferSampler {
         }
 
         private fun getWaterLevel(pos: Long): FluidStatus {
-            val i = BlockPos.unpackLongX(pos)
-            val j = BlockPos.unpackLongY(pos)
-            val k = BlockPos.unpackLongZ(pos)
+            val i = BlockPos.getX(pos)
+            val j = BlockPos.getY(pos)
+            val k = BlockPos.getZ(pos)
             val l = this.getLocalX(i)
             val m = this.getLocalY(j)
             val n = this.getLocalZ(k)
@@ -304,9 +304,9 @@ interface ConvertedAquiferSampler {
             val offsetInChunks = SURFACE_SAMPLING_OFFSETS_IN_CHUNKS
 
             for (element in offsetInChunks) {
-                val l = x + ChunkSectionPos.getBlockCoord(element[0])
-                val m = z + ChunkSectionPos.getBlockCoord(element[1])
-                val n = chunkNoiseSampler.getPreliminarySurfaceLevel(l, m)
+                val l = x + SectionPos.sectionToBlockCoord(element[0])
+                val m = z + SectionPos.sectionToBlockCoord(element[1])
+                val n = chunkNoiseSampler.preliminarySurfaceLevel(l, m)
                 val o = n + 8
                 val bl2 = element[0] == 0 && element[1] == 0
                 if (bl2 && k > o) {
@@ -346,15 +346,15 @@ interface ConvertedAquiferSampler {
             val d: Double
             val e: Double
             var i: Int
-            if (OverworldBiomeParameters.deepDarkRegion(this.erosion, this.depth, singlePointContext)) {
+            if (OverworldBiomeBuilder.isDeepDarkRegion(this.erosion, this.depth, singlePointContext)) {
                 d = -1.0
                 e = -1.0
             } else {
                 i = defaultFluidLevel + 8 - blockY
-                val f = if (surfaceHeightEstimate) MathHelper.clampedMap(i.toDouble(), 0.0, 64.0, 1.0, 0.0) else 0.0
-                val g = MathHelper.clamp(fluidLevelFloodednessNoise.compute(singlePointContext), -1.0, 1.0)
-                val h = MathHelper.map(f, 1.0, 0.0, -0.3, 0.8)
-                val k = MathHelper.map(f, 1.0, 0.0, -0.8, 0.4)
+                val f = if (surfaceHeightEstimate) Mth.clampedMap(i.toDouble(), 0.0, 64.0, 1.0, 0.0) else 0.0
+                val g = Mth.clamp(fluidLevelFloodednessNoise.compute(singlePointContext), -1.0, 1.0)
+                val h = Mth.map(f, 1.0, 0.0, -0.3, 0.8)
+                val k = Mth.map(f, 1.0, 0.0, -0.8, 0.4)
                 d = g - k
                 e = g - h
             }
@@ -364,7 +364,7 @@ interface ConvertedAquiferSampler {
             } else if (d > 0.0) {
                 computeRandomFluidLevel(blockX, blockY, blockZ, defaultFluidLevel)
             } else {
-                DimensionType.FAR_BELOW_MIN_Y
+                DimensionType.WAY_BELOW_MIN_Y
             }
 
             return i
@@ -377,20 +377,20 @@ interface ConvertedAquiferSampler {
             val n = l * 40 + 20
             val d =
                 fluidLevelSpreadNoise.compute(DensityFunction.SinglePointContext(k, l, m)) * 10.0
-            val p = MathHelper.quantize(d, 3)
+            val p = Mth.quantize(d, 3)
             val q = n + p
             return min(defaultFluidLevel.toDouble(), q.toDouble()).toInt()
         }
 
         private fun computeFluidType(x: Int, y: Int, z: Int, status: FluidStatus, fluidLevel: Int): BlockState {
             var blockState = status.state
-            if (fluidLevel <= -10 && fluidLevel != DimensionType.FAR_BELOW_MIN_Y && status.state !== Blocks.LAVA.defaultState) {
+            if (fluidLevel <= -10 && fluidLevel != DimensionType.WAY_BELOW_MIN_Y && status.state !== Blocks.LAVA.defaultBlockState()) {
                 val k = Math.floorDiv(x, 64)
                 val l = Math.floorDiv(y, 40)
                 val m = Math.floorDiv(z, 64)
                 val computedLavaNoise = lavaNoise.compute(DensityFunction.SinglePointContext(k, l, m))
                 if (abs(computedLavaNoise) > 0.3) {
-                    blockState = Blocks.LAVA.defaultState
+                    blockState = Blocks.LAVA.defaultBlockState()
                 }
             }
 
@@ -408,7 +408,7 @@ interface ConvertedAquiferSampler {
             private const val Y_SPACING = 12
             private const val Z_SPACING = 16
             private const val MAX_REASONABLE_DISTANCE_TO_AQUIFER_CENTER = 11
-            private val FLOWING_UPDATE_SIMILARITY = maxDistance(MathHelper.square(10), MathHelper.square(12))
+            private val FLOWING_UPDATE_SIMILARITY = maxDistance(Mth.square(10), Mth.square(12))
             private val SURFACE_SAMPLING_OFFSETS_IN_CHUNKS = arrayOf(
                 intArrayOf(0, 0),
                 intArrayOf(-2, -1),
@@ -438,13 +438,13 @@ interface ConvertedAquiferSampler {
 
     class FluidStatus(val fluidLevel: Int, val state: BlockState) {
         fun getBlockState(y: Int): BlockState {
-            return if (y < this.fluidLevel) this.state else Blocks.AIR.defaultState
+            return if (y < this.fluidLevel) this.state else Blocks.AIR.defaultBlockState()
         }
     }
 
     companion object {
         fun aquifer(
-            chunkNoiseSampler: ChunkNoiseSampler,
+            chunkNoiseSampler: NoiseChunk,
             pos: ChunkPos,
             noiseRouter: NoiseRouter,
             positionalRandomFactory: PositionalRandomFactory,

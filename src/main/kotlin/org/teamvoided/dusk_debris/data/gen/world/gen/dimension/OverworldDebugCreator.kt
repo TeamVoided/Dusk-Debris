@@ -2,10 +2,10 @@ package org.teamvoided.dusk_debris.data.gen.world.gen.dimension
 
 import com.google.common.collect.ImmutableList
 import com.mojang.datafixers.util.Pair
-import net.minecraft.registry.RegistryKey
-import net.minecraft.world.biome.Biome
-import net.minecraft.world.biome.Biomes
-import net.minecraft.world.biome.source.util.MultiNoiseUtil.*
+import net.minecraft.resources.ResourceKey
+import net.minecraft.world.level.biome.Biome
+import net.minecraft.world.level.biome.Biomes
+import net.minecraft.world.level.biome.Climate.*
 import org.teamvoided.dusk_debris.util.world_helper.NoiseHyper3
 import org.teamvoided.dusk_debris.util.world_helper.range
 import org.teamvoided.dusk_debris.world.gen.terrain_parameters.OverworldTerrainCreator
@@ -24,14 +24,14 @@ class OverworldDebugCreator {
     private val splitterEros = false
     private val splitterCons = false
 
-    private fun addDebugBiomesTo(biomeEntryConsumer: Consumer<Pair<NoiseHypercube, RegistryKey<Biome>>>) {
+    private fun addDebugBiomesTo(biomeEntryConsumer: Consumer<Pair<ParameterPoint, ResourceKey<Biome>>>) {
         val plains = NoiseHyper3(
             Biomes.THE_VOID,
             fullRange,
             fullRange,
             nonOcean,
             fullRange,
-            ParameterRange.of(0f),
+            Parameter.point(0f),
             fullRange,
             0.01f
         )
@@ -79,10 +79,10 @@ class OverworldDebugCreator {
     }
 
     companion object {
-        fun <T> addBiomesTo(function: Function<RegistryKey<Biome>, T>): ParameterRangeList<T> {
-            val builder = ImmutableList.builder<Pair<NoiseHypercube, T>>()
+        fun <T> addBiomesTo(function: Function<ResourceKey<Biome>, T>): ParameterList<T> {
+            val builder = ImmutableList.builder<Pair<ParameterPoint, T>>()
             OverworldDebugCreator().addDebugBiomesTo { builder.add(it.mapSecond(function)) }
-            return ParameterRangeList(builder.build())
+            return ParameterList(builder.build())
         }
     }
 }

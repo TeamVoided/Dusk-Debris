@@ -1,13 +1,17 @@
 package org.teamvoided.dusk_debris.entity.jellyfish.tiny.model
 
-import net.minecraft.client.model.*
-import net.minecraft.client.render.RenderLayer
-import net.minecraft.client.render.entity.model.SinglePartEntityModel
+import net.minecraft.client.model.HierarchicalModel
+import net.minecraft.client.model.geom.ModelPart
+import net.minecraft.client.model.geom.PartPose
+import net.minecraft.client.model.geom.builders.CubeListBuilder
+import net.minecraft.client.model.geom.builders.LayerDefinition
+import net.minecraft.client.model.geom.builders.MeshDefinition
+import net.minecraft.client.renderer.RenderType
 import org.teamvoided.dusk_debris.entity.TinyEnemyJellyfishEntity
 import org.teamvoided.dusk_debris.entity.jellyfish.tiny.animation.TinyEnemyJellyfishAnimations
 
 class TinyEnemyJellyfishModel(private val root: ModelPart) :
-    SinglePartEntityModel<TinyEnemyJellyfishEntity>(RenderLayer::getEntityTranslucent) {
+    HierarchicalModel<TinyEnemyJellyfishEntity>(RenderType::entityTranslucent) {
     val jellyfish = root.getChild("jellyfish")
     val membrane = jellyfish.getChild("membrane")
     val membraneExtra = membrane.getChild("membrane_extra")
@@ -16,11 +20,11 @@ class TinyEnemyJellyfishModel(private val root: ModelPart) :
     val tendrilsSouth = jellyfish.getChild("tendrils_south")
     val tendrilsEast = jellyfish.getChild("tendrils_east")
 
-    override fun getPart(): ModelPart {
+    override fun root(): ModelPart {
         return this.root
     }
 
-    override fun setAngles(
+    override fun setupAnim(
         entity: TinyEnemyJellyfishEntity,
         limbAngle: Float,
         limbDistance: Float,
@@ -28,74 +32,74 @@ class TinyEnemyJellyfishModel(private val root: ModelPart) :
         headYaw: Float,
         headPitch: Float
     ) {
-        this.part.traverse().forEach(ModelPart::resetTransform)
+        this.root().allParts.forEach(ModelPart::resetPose)
         this.animate(entity.idleAnimationState, TinyEnemyJellyfishAnimations.IDLE, animationProgress, 1.0f)
     }
 
     companion object {
-        val texturedModelData: TexturedModelData
+        val texturedModelData: LayerDefinition
             get() {
-                val modelData = ModelData()
+                val modelData = MeshDefinition()
                 val modelPartData = modelData.root
-                val jellyfish = modelPartData.addChild(
-                    "jellyfish", ModelPartBuilder.create(),
-                    ModelTransform.pivot(0.0F, 24.0F, 0.0F)
+                val jellyfish = modelPartData.addOrReplaceChild(
+                    "jellyfish", CubeListBuilder.create(),
+                    PartPose.offset(0.0F, 24.0F, 0.0F)
                 )
-                val membrane = jellyfish.addChild(
-                    "membrane", ModelPartBuilder.create()
-                        .uv(0, 0)
-                        .cuboid(
+                val membrane = jellyfish.addOrReplaceChild(
+                    "membrane", CubeListBuilder.create()
+                        .texOffs(0, 0)
+                        .addBox(
                             -4.0F, -8.0F, -4.0F,
                             8.0F, 8.0F, 8.0F
                         ),
-                    ModelTransform.pivot(0.0F, 0.0F, 0.0F)
+                    PartPose.offset(0.0F, 0.0F, 0.0F)
                 )
-                val membraneExtra = membrane.addChild(
-                    "membrane_extra", ModelPartBuilder.create()
-                        .uv(1, 16)
-                        .cuboid(
+                val membraneExtra = membrane.addOrReplaceChild(
+                    "membrane_extra", CubeListBuilder.create()
+                        .texOffs(1, 16)
+                        .addBox(
                             -3.0F, 0.0F, -3.0F,
                             6.0F, 2.0F, 6.0F
                         ),
-                    ModelTransform.pivot(0.0F, 0.0F, 0.0F)
+                    PartPose.offset(0.0F, 0.0F, 0.0F)
                 )
-                val tendrilsNorth = jellyfish.addChild(
-                    "tendrils_north", ModelPartBuilder.create()
-                        .uv(13, 24)
-                        .cuboid(
+                val tendrilsNorth = jellyfish.addOrReplaceChild(
+                    "tendrils_north", CubeListBuilder.create()
+                        .texOffs(13, 24)
+                        .addBox(
                             -3.0F, 0.0F, 2.0F,
                             6.0F, 6.0F, 0.0F
                         ),
-                    ModelTransform.pivot(0.0F, 0.0F, -4.0F)
+                    PartPose.offset(0.0F, 0.0F, -4.0F)
                 )
-                val tendrilsWest = jellyfish.addChild(
-                    "tendrils_west", ModelPartBuilder.create()
-                        .uv(13, 18)
-                        .cuboid(
+                val tendrilsWest = jellyfish.addOrReplaceChild(
+                    "tendrils_west", CubeListBuilder.create()
+                        .texOffs(13, 18)
+                        .addBox(
                             -2.0F, 0.0F, -3.0F,
                             0.0F, 6.0F, 6.0F
                         ),
-                    ModelTransform.pivot(4.0F, 0.0F, 0.0F)
+                    PartPose.offset(4.0F, 0.0F, 0.0F)
                 )
-                val tendrilsSouth = jellyfish.addChild(
-                    "tendrils_south", ModelPartBuilder.create()
-                        .uv(1, 24)
-                        .cuboid(
+                val tendrilsSouth = jellyfish.addOrReplaceChild(
+                    "tendrils_south", CubeListBuilder.create()
+                        .texOffs(1, 24)
+                        .addBox(
                             -3.0F, 0.0F, -2.0F,
                             6.0F, 6.0F, 0.0F
                         ),
-                    ModelTransform.pivot(0.0F, 0.0F, 4.0F)
+                    PartPose.offset(0.0F, 0.0F, 4.0F)
                 )
-                val tendrilsEast = jellyfish.addChild(
-                    "tendrils_east", ModelPartBuilder.create()
-                        .uv(1, 18)
-                        .cuboid(
+                val tendrilsEast = jellyfish.addOrReplaceChild(
+                    "tendrils_east", CubeListBuilder.create()
+                        .texOffs(1, 18)
+                        .addBox(
                             2.0F, 0.0F, -3.0F,
                             0.0F, 6.0F, 6.0F
                         ),
-                    ModelTransform.pivot(-4.0F, 0.0F, 0.0F)
+                    PartPose.offset(-4.0F, 0.0F, 0.0F)
                 )
-                return TexturedModelData.of(modelData, 32, 32)
+                return LayerDefinition.create(modelData, 32, 32)
             }
     }
 }

@@ -3,18 +3,18 @@ package org.teamvoided.dusk_debris.world.gen.tree.trunk
 import com.google.common.collect.Lists
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
-import net.minecraft.block.BlockState
-import net.minecraft.util.dynamic.Codecs
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Direction
-import net.minecraft.util.math.int_provider.IntProvider
-import net.minecraft.util.random.RandomGenerator
-import net.minecraft.world.TestableWorld
-import net.minecraft.world.gen.feature.TreeFeature
-import net.minecraft.world.gen.feature.TreeFeatureConfig
-import net.minecraft.world.gen.foliage.FoliagePlacer
-import net.minecraft.world.gen.trunk.TrunkPlacer
-import net.minecraft.world.gen.trunk.TrunkPlacerType
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
+import net.minecraft.util.ExtraCodecs
+import net.minecraft.util.RandomSource
+import net.minecraft.util.valueproviders.IntProvider
+import net.minecraft.world.level.LevelSimulatedReader
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.levelgen.feature.TreeFeature
+import net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration
+import net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacer
+import net.minecraft.world.level.levelgen.feature.trunkplacers.TrunkPlacer
+import net.minecraft.world.level.levelgen.feature.trunkplacers.TrunkPlacerType
 import java.util.function.BiConsumer
 
 class BlueTrunkPlacer(
@@ -24,50 +24,50 @@ class BlueTrunkPlacer(
     private val minHeightForLeaves: Int,
     private val bendLength: IntProvider
 ) : TrunkPlacer(baseHeight, firstRandomHeight, secondRandomHeight) {
-    override fun getType(): TrunkPlacerType<*> {
+    override fun type(): TrunkPlacerType<*> {
         return TrunkPlacerType.BENDING_TRUNK_PLACER
     }
 
-    override fun generate(
-        world: TestableWorld,
+    override fun placeTrunk(
+        world: LevelSimulatedReader,
         replacer: BiConsumer<BlockPos, BlockState>,
-        random: RandomGenerator,
+        random: RandomSource,
         height: Int,
         startPos: BlockPos,
-        config: TreeFeatureConfig
-    ): List<FoliagePlacer.TreeNode> {
-        val direction = Direction.Type.HORIZONTAL.random(random)
+        config: TreeConfiguration
+    ): List<FoliagePlacer.FoliageAttachment> {
+        val direction = Direction.Plane.HORIZONTAL.getRandomDirection(random)
         val treeHeight = height - 1
-        val mutable = startPos.mutableCopy()
-        val downPos = mutable.down()
-        setToDirt(world, replacer, random, downPos, config)
-        val list: MutableList<FoliagePlacer.TreeNode> = Lists.newArrayList()
+        val mutable = startPos.mutable()
+        val downPos = mutable.below()
+        setDirtAt(world, replacer, random, downPos, config)
+        val list: MutableList<FoliagePlacer.FoliageAttachment> = Lists.newArrayList()
         var loop = 0
         while (loop <= treeHeight) {
             if (loop + 1 >= treeHeight + random.nextInt(2)) {
                 mutable.move(direction)
             }
 
-            if (TreeFeature.canReplace(world, mutable)) {
-                this.placeTrunkBlock(world, replacer, random, mutable, config)
+            if (TreeFeature.validTreePos(world, mutable)) {
+                this.placeLog(world, replacer, random, mutable, config)
             }
 
             if (loop >= this.minHeightForLeaves) {
-                list.add(FoliagePlacer.TreeNode(mutable.toImmutable(), 0, false))
+                list.add(FoliagePlacer.FoliageAttachment(mutable.immutable(), 0, false))
             }
 
             mutable.move(Direction.UP)
             ++loop
         }
 
-        loop = bendLength[random]
+        loop = bendLength.sample(random)
 
         for (k in 0..loop) {
-            if (TreeFeature.canReplace(world, mutable)) {
-                this.placeTrunkBlock(world, replacer, random, mutable, config)
+            if (TreeFeature.validTreePos(world, mutable)) {
+                this.placeLog(world, replacer, random, mutable, config)
             }
 
-            list.add(FoliagePlacer.TreeNode(mutable.toImmutable(), 0, false))
+            list.add(FoliagePlacer.FoliageAttachment(mutable.immutable(), 0, false))
             mutable.move(direction)
         }
 
@@ -77,11 +77,11 @@ class BlueTrunkPlacer(
     companion object {
         val CODEC: MapCodec<BlueTrunkPlacer> =
             RecordCodecBuilder.mapCodec { instance: RecordCodecBuilder.Instance<BlueTrunkPlacer> ->
-                fillTrunkPlacerFields(instance).and(
+                trunkPlacerParts(instance).and(
                     instance.group(
-                        Codecs.POSITIVE_INT.optionalFieldOf("min_height_for_leaves", 1)
+                        ExtraCodecs.POSITIVE_INT.optionalFieldOf("min_height_for_leaves", 1)
                             .forGetter { placer: BlueTrunkPlacer -> placer.minHeightForLeaves },
-                        IntProvider.method_35004(1, 64).fieldOf("bend_length")
+                        IntProvider.codec(1, 64).fieldOf("bend_length")
                             .forGetter { placer: BlueTrunkPlacer -> placer.bendLength })
                 ).apply(instance, ::BlueTrunkPlacer)
             }

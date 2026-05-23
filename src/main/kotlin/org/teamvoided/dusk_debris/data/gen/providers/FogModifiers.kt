@@ -1,9 +1,13 @@
 package org.teamvoided.dusk_debris.data.gen.providers
 
-import net.minecraft.registry.*
-import net.minecraft.registry.tag.TagKey
-import net.minecraft.util.Identifier
-import net.minecraft.world.biome.Biome
+import net.minecraft.core.Holder
+import net.minecraft.core.RegistryAccess
+import net.minecraft.core.registries.Registries
+import net.minecraft.data.worldgen.BootstrapContext
+import net.minecraft.resources.ResourceKey
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.tags.TagKey
+import net.minecraft.world.level.biome.Biome
 import org.teamvoided.dusk_debris.DuskDebris
 import org.teamvoided.dusk_debris.data.DuskFogModifiers
 import org.teamvoided.dusk_debris.data.tags.DuskBiomeTags
@@ -27,9 +31,9 @@ object FogModifiers {
     }
 
     private fun BootstrapContext<FogModifier>.register(
-        registryKey: RegistryKey<FogModifier>,
+        registryKey: ResourceKey<FogModifier>,
         biomes: TagKey<Biome>,
-        modifier: Identifier? = null
+        modifier: ResourceLocation? = null
     ): Holder.Reference<FogModifier> {
         return this.register(
             registryKey,
@@ -41,16 +45,16 @@ object FogModifiers {
     }
 
     private fun BootstrapContext<FogModifier>.register(
-        registryKey: RegistryKey<FogModifier>,
+        registryKey: ResourceKey<FogModifier>,
         biomes: TagKey<Biome>,
         start: Double,
         end: Double,
-        modifier: Identifier? = null
+        modifier: ResourceLocation? = null
     ): Holder.Reference<FogModifier> {
         return this.register(
             registryKey,
             FogModifier(
-                getRegistryLookup(RegistryKeys.BIOME).getTagOrThrow(biomes),
+                lookup(Registries.BIOME).getOrThrow(biomes),
                 10,
                 start,
                 end,
@@ -59,8 +63,8 @@ object FogModifiers {
         )
     }
 
-    fun fogFromBiome(registryManager: DynamicRegistryManager, biome: Holder<Biome>): Holder<FogModifier> {
-        val registry = registryManager.get(FOG_MODIFIER)
+    fun fogFromBiome(registryManager: RegistryAccess, biome: Holder<Biome>): Holder<FogModifier> {
+        val registry = registryManager.registryOrThrow(FOG_MODIFIER)
         val mmodifier = registry.holders()
             .filter { it.value().biomes.contains(biome) }.findFirst()
             .or { registry.getHolder(DuskFogModifiers.DEFAULT) }

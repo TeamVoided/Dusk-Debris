@@ -1,13 +1,12 @@
 package org.teamvoided.dusk_debris.data.gen.providers.models
 
-import net.minecraft.block.Blocks
-import net.minecraft.data.client.model.BlockStateModelGenerator
+import net.minecraft.data.models.BlockModelGenerators
+import net.minecraft.world.level.block.Blocks
 import org.teamvoided.dusk_debris.DuskDebris.id
-import org.teamvoided.dusk_debris.util.model
 import org.teamvoided.dusk_debris.util.model_helper.*
 
 object MinecraftModelProvider {
-    fun BlockStateModelGenerator.generateAlternativeMinecraftModels() {
+    fun BlockModelGenerators.generateAlternativeMinecraftModels() {
         this.addAxis(Blocks.MANGROVE_ROOTS)
         this.sculkCatalystRotate(Blocks.SCULK_CATALYST)
         this.sculkShriekerRotate(Blocks.SCULK_SHRIEKER)

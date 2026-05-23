@@ -11,7 +11,7 @@ object DuskNetClient {
 
     fun openStatueScreen(payload: StatueScreenPayload, ctx: ClientPlayNetworking.Context) {
         val client = ctx.client() ?: return
-        val world = ctx.player().world ?: return
+        val world = ctx.player().level() ?: return
         val statue = world.getBlockEntity(payload.pos) ?: return
         if (statue !is StatueBlockEntity) return
 

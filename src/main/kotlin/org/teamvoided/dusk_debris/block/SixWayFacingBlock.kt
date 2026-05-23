@@ -1,42 +1,42 @@
 package org.teamvoided.dusk_debris.block
 
 import com.mojang.serialization.MapCodec
-import net.minecraft.block.Block
-import net.minecraft.block.BlockState
-import net.minecraft.item.ItemPlacementContext
-import net.minecraft.state.StateManager
-import net.minecraft.state.property.DirectionProperty
-import net.minecraft.state.property.Properties
-import net.minecraft.util.BlockMirror
-import net.minecraft.util.BlockRotation
-import net.minecraft.util.math.Direction
+import net.minecraft.core.Direction
+import net.minecraft.world.item.context.BlockPlaceContext
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.Mirror
+import net.minecraft.world.level.block.Rotation
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.block.state.StateDefinition
+import net.minecraft.world.level.block.state.properties.BlockStateProperties
+import net.minecraft.world.level.block.state.properties.DirectionProperty
 
-open class SixWayFacingBlock(settings: Settings) : Block(settings) {
-    public override fun getCodec(): MapCodec<out SixWayFacingBlock> {
+open class SixWayFacingBlock(settings: Properties) : Block(settings) {
+    public override fun codec(): MapCodec<out SixWayFacingBlock> {
         return CODEC
     }
 
     init {
-        this.defaultState = defaultState.with(FACING, Direction.UP)
+        this.registerDefaultState(defaultBlockState().setValue(FACING, Direction.UP))
     }
 
-    override fun getPlacementState(ctx: ItemPlacementContext): BlockState {
-        return defaultState.with(FACING, ctx.side)
+    override fun getStateForPlacement(ctx: BlockPlaceContext): BlockState {
+        return defaultBlockState().setValue(FACING, ctx.clickedFace)
     }
-    override fun rotate(state: BlockState, rotation: BlockRotation): BlockState {
-        return state.with(FACING, rotation.rotate(state.get(FACING)))
-    }
-
-    override fun mirror(state: BlockState, mirror: BlockMirror): BlockState {
-        return state.rotate(mirror.getRotation(state.get(FACING)))
+    override fun rotate(state: BlockState, rotation: Rotation): BlockState {
+        return state.setValue(FACING, rotation.rotate(state.getValue(FACING)))
     }
 
-    override fun appendProperties(builder: StateManager.Builder<Block, BlockState>) {
+    override fun mirror(state: BlockState, mirror: Mirror): BlockState {
+        return state.rotate(mirror.getRotation(state.getValue(FACING)))
+    }
+
+    override fun createBlockStateDefinition(builder: StateDefinition.Builder<Block, BlockState>) {
         builder.add(FACING)
     }
 
     companion object {
-        val CODEC: MapCodec<SixWayFacingBlock> = createCodec(::SixWayFacingBlock)
-        val FACING: DirectionProperty = Properties.FACING
+        val CODEC: MapCodec<SixWayFacingBlock> = simpleCodec(::SixWayFacingBlock)
+        val FACING: DirectionProperty = BlockStateProperties.FACING
     }
 }

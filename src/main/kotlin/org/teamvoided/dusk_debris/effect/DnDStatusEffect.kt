@@ -1,12 +1,12 @@
 package org.teamvoided.dusk_debris.effect
 
-import net.minecraft.entity.effect.StatusEffect
-import net.minecraft.entity.effect.StatusEffectType
-import net.minecraft.particle.ParticleEffect
+import net.minecraft.core.particles.ParticleOptions
+import net.minecraft.world.effect.MobEffect
+import net.minecraft.world.effect.MobEffectCategory
 
-open class DnDStatusEffect : StatusEffect {
-    constructor(type: StatusEffectType, color: Int) : super(type, color)
-    constructor(type: StatusEffectType, color: Int, particle: ParticleEffect) : super(type, color, particle)
+open class DnDStatusEffect : MobEffect {
+    constructor(type: MobEffectCategory, color: Int) : super(type, color)
+    constructor(type: MobEffectCategory, color: Int, particle: ParticleOptions) : super(type, color, particle)
 
 
 }

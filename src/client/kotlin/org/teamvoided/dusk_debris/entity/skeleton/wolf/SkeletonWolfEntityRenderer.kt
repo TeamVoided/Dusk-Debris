@@ -1,29 +1,29 @@
 package org.teamvoided.dusk_debris.entity.skeleton.wolf
 
-import net.minecraft.client.render.entity.EntityRendererFactory
-import net.minecraft.client.render.entity.MobEntityRenderer
-import net.minecraft.util.Identifier
+import net.minecraft.client.renderer.entity.EntityRendererProvider
+import net.minecraft.client.renderer.entity.MobRenderer
+import net.minecraft.resources.ResourceLocation
 import org.teamvoided.dusk_debris.DuskDebris
 import org.teamvoided.dusk_debris.entity.DuskEntityModelLayers
 import org.teamvoided.dusk_debris.entity.SkeletonWolfEntity
 import org.teamvoided.dusk_debris.entity.skeleton.wolf.render.SkeletonWolfEntityModel
 
-class SkeletonWolfEntityRenderer(context: EntityRendererFactory.Context) :
-    MobEntityRenderer<SkeletonWolfEntity, SkeletonWolfEntityModel<SkeletonWolfEntity>>(
+class SkeletonWolfEntityRenderer(context: EntityRendererProvider.Context) :
+    MobRenderer<SkeletonWolfEntity, SkeletonWolfEntityModel<SkeletonWolfEntity>>(
         context,
-        SkeletonWolfEntityModel(context.getPart(DuskEntityModelLayers.SKELETON_WOLF)),
+        SkeletonWolfEntityModel(context.bakeLayer(DuskEntityModelLayers.SKELETON_WOLF)),
         0.5f
     ) {
 
-    override fun getAnimationProgress(wolfEntity: SkeletonWolfEntity, f: Float): Float {
+    override fun getBob(wolfEntity: SkeletonWolfEntity, f: Float): Float {
         return wolfEntity.getTailAngle()
     }
 
-    override fun getTexture(wolfEntity: SkeletonWolfEntity): Identifier {
+    override fun getTextureLocation(wolfEntity: SkeletonWolfEntity): ResourceLocation {
         return TEXTURE
     }
 
     companion object {
-        private val TEXTURE: Identifier = DuskDebris.id("textures/entity/skeleton/wolf.png")
+        private val TEXTURE: ResourceLocation = DuskDebris.id("textures/entity/skeleton/wolf.png")
     }
 }

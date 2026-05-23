@@ -4,15 +4,15 @@ import com.mojang.serialization.Codec
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.fabricmc.fabric.api.particle.v1.FabricParticleTypes
-import net.minecraft.network.RegistryByteBuf
-import net.minecraft.network.codec.PacketCodec
-import net.minecraft.network.codec.PacketCodecs
-import net.minecraft.particle.ParticleEffect
-import net.minecraft.particle.ParticleType
-import net.minecraft.util.math.Direction
+import net.minecraft.core.Direction
+import net.minecraft.core.particles.ParticleOptions
+import net.minecraft.core.particles.ParticleType
+import net.minecraft.network.RegistryFriendlyByteBuf
+import net.minecraft.network.codec.ByteBufCodecs
+import net.minecraft.network.codec.StreamCodec
 import org.teamvoided.dusk_debris.init.DuskParticles
 
-class ShriekDirectionalParticleEffect(val direction: Direction = Direction.UP, val delay: Int = 0) : ParticleEffect {
+class ShriekDirectionalParticleEffect(val direction: Direction = Direction.UP, val delay: Int = 0) : ParticleOptions {
 
     override fun getType(): ParticleType<ShriekDirectionalParticleEffect> = DuskParticles.SHRIEK_DIRECTIONAL
 
@@ -24,10 +24,10 @@ class ShriekDirectionalParticleEffect(val direction: Direction = Direction.UP, v
                     Codec.INT.fieldOf("delay").orElse(0).forGetter { it.delay }
                 ).apply(instance, ::ShriekDirectionalParticleEffect)
             }
-        val PACKET_CODEC: PacketCodec<RegistryByteBuf, ShriekDirectionalParticleEffect> = PacketCodec.tuple(
-            Direction.PACKET_CODEC,
+        val PACKET_CODEC: StreamCodec<RegistryFriendlyByteBuf, ShriekDirectionalParticleEffect> = StreamCodec.composite(
+            Direction.STREAM_CODEC,
             { it.direction },
-            PacketCodecs.VAR_INT,
+            ByteBufCodecs.VAR_INT,
             { it.delay },
             ::ShriekDirectionalParticleEffect
         )

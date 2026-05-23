@@ -1,76 +1,76 @@
 package org.teamvoided.dusk_debris.item
 
-import net.minecraft.block.BlockRenderType
-import net.minecraft.block.BlockState
-import net.minecraft.block.BrushableBlock
-import net.minecraft.block.entity.BrushableBlockEntity
-import net.minecraft.entity.Entity
-import net.minecraft.entity.EquipmentSlot
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.entity.projectile.ProjectileUtil
-import net.minecraft.item.Item
-import net.minecraft.item.ItemStack
-import net.minecraft.item.ItemUsageContext
-import net.minecraft.particle.BlockStateParticleEffect
-import net.minecraft.particle.ParticleTypes
-import net.minecraft.sound.SoundCategory
-import net.minecraft.sound.SoundEvent
-import net.minecraft.sound.SoundEvents
-import net.minecraft.util.ActionResult
-import net.minecraft.util.Arm
-import net.minecraft.util.Hand
-import net.minecraft.util.UseAction
-import net.minecraft.util.hit.BlockHitResult
-import net.minecraft.util.hit.HitResult
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Direction
-import net.minecraft.util.math.Vec3d
-import net.minecraft.world.World
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
+import net.minecraft.core.particles.BlockParticleOption
+import net.minecraft.core.particles.ParticleTypes
+import net.minecraft.sounds.SoundEvent
+import net.minecraft.sounds.SoundEvents
+import net.minecraft.sounds.SoundSource
+import net.minecraft.world.InteractionHand
+import net.minecraft.world.InteractionResult
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.EquipmentSlot
+import net.minecraft.world.entity.HumanoidArm
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.entity.projectile.ProjectileUtil
+import net.minecraft.world.item.Item
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.UseAnim
+import net.minecraft.world.item.context.UseOnContext
+import net.minecraft.world.level.Level
+import net.minecraft.world.level.block.BrushableBlock
+import net.minecraft.world.level.block.RenderShape
+import net.minecraft.world.level.block.entity.BrushableBlockEntity
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.phys.BlockHitResult
+import net.minecraft.world.phys.HitResult
+import net.minecraft.world.phys.Vec3
 
-class BroomItem(settings: Settings?) : Item(settings) {
-    override fun useOnBlock(context: ItemUsageContext): ActionResult {
+class BroomItem(settings: Properties?) : Item(settings) {
+    override fun useOn(context: UseOnContext): InteractionResult {
         val playerEntity = context.player
         if (playerEntity != null && getHitResult(playerEntity).type == HitResult.Type.BLOCK) {
-            playerEntity.setCurrentHand(context.hand)
+            playerEntity.startUsingItem(context.hand)
         }
 
-        return ActionResult.CONSUME
+        return InteractionResult.CONSUME
     }
 
-    override fun getUseAction(stack: ItemStack): UseAction = UseAction.BRUSH
-    override fun getUseTicks(stack: ItemStack, livingEntity: LivingEntity): Int = USE_DURATION
+    override fun getUseAnimation(stack: ItemStack): UseAnim = UseAnim.BRUSH
+    override fun getUseDuration(stack: ItemStack, livingEntity: LivingEntity): Int = USE_DURATION
 
-    override fun usageTick(world: World, user: LivingEntity, stack: ItemStack, remainingUseTicks: Int) {
-        if (remainingUseTicks >= 0 && user is PlayerEntity) {
+    override fun onUseTick(world: Level, user: LivingEntity, stack: ItemStack, remainingUseTicks: Int) {
+        if (remainingUseTicks >= 0 && user is Player) {
             val hitResult = this.getHitResult(user)
             if (hitResult is BlockHitResult) {
                 if (hitResult.getType() == HitResult.Type.BLOCK) {
-                    val ticks = this.getUseTicks(stack, user) - remainingUseTicks + 1
+                    val ticks = this.getUseDuration(stack, user) - remainingUseTicks + 1
                     if (ticks % ANIMATION_DURATION == ANIMATION_INTERVAL) {
                         val blockPos: BlockPos = hitResult.blockPos
                         val blockState = world.getBlockState(blockPos)
                         val arm =
-                            if (user.getActiveHand() == Hand.MAIN_HAND) user.getMainArm() else user.getMainArm().opposite
-                        if (blockState.spawnsDustParticles() && blockState.renderType != BlockRenderType.INVISIBLE) {
-                            this.spawnDustParticles(world, hitResult, blockState, user.getRotationVec(0.0f), arm)
+                            if (user.usedItemHand == InteractionHand.MAIN_HAND) user.getMainArm() else user.getMainArm().opposite
+                        if (blockState.shouldSpawnTerrainParticles() && blockState.renderShape != RenderShape.INVISIBLE) {
+                            this.spawnDustParticles(world, hitResult, blockState, user.getViewVector(0.0f), arm)
                         }
 
                         val block = blockState.block
                         val soundEvent: SoundEvent = if (block is BrushableBlock) {
-                            block.brushingSound
+                            block.brushSound
                         } else {
-                            SoundEvents.ITEM_BRUSH_BRUSHING_GENERIC
+                            SoundEvents.BRUSH_GENERIC
                         }
 
-                        world.playSound(user, blockPos, soundEvent, SoundCategory.BLOCKS)
-                        if (!world.isClient()) {
+                        world.playSound(user, blockPos, soundEvent, SoundSource.BLOCKS)
+                        if (!world.isClientSide) {
                             val blockEntity = world.getBlockEntity(blockPos)
                             if (blockEntity is BrushableBlockEntity) {
-                                if (blockEntity.brush(world.time, user, hitResult.side)) {
+                                if (blockEntity.brush(world.gameTime, user, hitResult.direction)) {
                                     val equipmentSlot =
-                                        if (stack == user.getEquippedStack(EquipmentSlot.OFFHAND)) EquipmentSlot.OFFHAND else EquipmentSlot.MAINHAND
-                                    stack.damageEquipment(1, user, equipmentSlot)
+                                        if (stack == user.getItemBySlot(EquipmentSlot.OFFHAND)) EquipmentSlot.OFFHAND else EquipmentSlot.MAINHAND
+                                    stack.hurtAndBreak(1, user, equipmentSlot)
                                 }
                             }
                         }
@@ -79,33 +79,33 @@ class BroomItem(settings: Settings?) : Item(settings) {
                     return
                 }
             }
-            user.stopUsingItem()
+            user.releaseUsingItem()
         } else {
-            user.stopUsingItem()
+            user.releaseUsingItem()
         }
     }
 
-    private fun getHitResult(player: PlayerEntity): HitResult {
-        return ProjectileUtil.getCollision(
+    private fun getHitResult(player: Player): HitResult {
+        return ProjectileUtil.getHitResultOnViewVector(
             player,
-            { entity: Entity -> !entity.isSpectator && entity.collides() }, player.blockInteractionRange
+            { entity: Entity -> !entity.isSpectator && entity.isPickable }, player.blockInteractionRange()
         )
     }
 
     private fun spawnDustParticles(
-        world: World,
+        world: Level,
         blockHitResult: BlockHitResult,
         state: BlockState,
-        pos: Vec3d,
-        arm: Arm
+        pos: Vec3,
+        arm: HumanoidArm
     ) {
         val velMult = 3.0
-        val armDir = if (arm == Arm.RIGHT) 1 else -1
-        val count = world.getRandom().range(7, 12)
-        val blockStateParticleEffect = BlockStateParticleEffect(ParticleTypes.BLOCK, state)
-        val direction = blockHitResult.side
+        val armDir = if (arm == HumanoidArm.RIGHT) 1 else -1
+        val count = world.getRandom().nextInt(7, 12)
+        val blockStateParticleEffect = BlockParticleOption(ParticleTypes.BLOCK, state)
+        val direction = blockHitResult.direction
         val dustParticleDelta = DustParticleDelta.create(pos, direction)
-        val hitPos = blockHitResult.pos
+        val hitPos = blockHitResult.location
 
         for (k in 0 until count) {
             world.addParticle(
@@ -125,10 +125,10 @@ class BroomItem(settings: Settings?) : Item(settings) {
             private const val ALONG_SIDE_DELTA = 1.0
             private const val OUT_FROM_SIDE_DELTA = 0.1
 
-            fun create(pos: Vec3d, direction: Direction?): DustParticleDelta {
+            fun create(pos: Vec3, direction: Direction?): DustParticleDelta {
                 val d = 0.0
                 val var10000 = when (direction) {
-                    Direction.DOWN, Direction.UP -> DustParticleDelta(pos.getZ(), 0.0, -pos.getX())
+                    Direction.DOWN, Direction.UP -> DustParticleDelta(pos.z(), 0.0, -pos.x())
                     Direction.NORTH -> DustParticleDelta(1.0, 0.0, -0.1)
                     Direction.SOUTH -> DustParticleDelta(-1.0, 0.0, 0.1)
                     Direction.WEST -> DustParticleDelta(-0.1, 0.0, -1.0)

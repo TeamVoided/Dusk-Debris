@@ -2,10 +2,10 @@ package org.teamvoided.dusk_debris.entity.helper
 
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.registry.Holder
-import net.minecraft.text.Text
+import net.minecraft.core.Holder
+import net.minecraft.network.chat.Component
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.player.Player
 import org.teamvoided.dusk_debris.spell.Spell
 import java.util.*
 import kotlin.jvm.optionals.getOrNull
@@ -29,7 +29,7 @@ data class SpellController(
             } else {
                 spellTicksLeft--
             }
-            (entity as? PlayerEntity)?.sendMessage(Text.literal("ticks left: $spellTicksLeft"), true)
+            (entity as? Player)?.displayClientMessage(Component.literal("ticks left: $spellTicksLeft"), true)
         }
     }
 

@@ -1,95 +1,95 @@
 package org.teamvoided.dusk_debris.block
 
 import com.mojang.serialization.MapCodec
-import net.minecraft.block.*
-import net.minecraft.block.DoubleBlockProperties.PropertySource
-import net.minecraft.block.entity.BlockEntity
-import net.minecraft.block.entity.BlockEntityTicker
-import net.minecraft.block.entity.BlockEntityType
-import net.minecraft.block.entity.ChestBlockEntity
-import net.minecraft.entity.ai.pathing.NavigationType
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.item.ItemPlacementContext
-import net.minecraft.server.world.ServerWorld
-import net.minecraft.state.StateManager
-import net.minecraft.state.property.DirectionProperty
-import net.minecraft.util.ActionResult
-import net.minecraft.util.BlockMirror
-import net.minecraft.util.BlockRotation
-import net.minecraft.util.hit.BlockHitResult
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Direction
-import net.minecraft.util.random.RandomGenerator
-import net.minecraft.util.shape.VoxelShape
-import net.minecraft.world.BlockView
-import net.minecraft.world.World
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
+import net.minecraft.server.level.ServerLevel
+import net.minecraft.util.RandomSource
+import net.minecraft.world.InteractionResult
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.item.context.BlockPlaceContext
+import net.minecraft.world.level.BlockGetter
+import net.minecraft.world.level.Level
+import net.minecraft.world.level.block.*
+import net.minecraft.world.level.block.DoubleBlockCombiner.NeighborCombineResult
+import net.minecraft.world.level.block.entity.BlockEntity
+import net.minecraft.world.level.block.entity.BlockEntityTicker
+import net.minecraft.world.level.block.entity.BlockEntityType
+import net.minecraft.world.level.block.entity.ChestBlockEntity
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.block.state.StateDefinition
+import net.minecraft.world.level.block.state.properties.DirectionProperty
+import net.minecraft.world.level.pathfinder.PathComputationType
+import net.minecraft.world.phys.BlockHitResult
+import net.minecraft.world.phys.shapes.CollisionContext
+import net.minecraft.world.phys.shapes.VoxelShape
 import org.teamvoided.dusk_debris.init.DuskBlockEntities
 import org.teamvoided.dusks_and_dungeons.block.entity.ChestOSoulsBlockEntity
 
 class ChestOSoulsBlock(
-    settings: Settings?,
+    settings: Properties?,
 ) : AbstractChestBlock<ChestOSoulsBlockEntity>(settings, { DuskBlockEntities.CHEST_O_SOULS }) {
 
     init {
-        defaultState = stateManager.defaultState.with(FACING, Direction.NORTH)
+        registerDefaultState(stateDefinition.any().setValue(FACING, Direction.NORTH))
     }
 
-    override fun getCodec(): MapCodec<out AbstractChestBlock<ChestOSoulsBlockEntity>> = CODEC
+    override fun codec(): MapCodec<out AbstractChestBlock<ChestOSoulsBlockEntity>> = CODEC
 
-    override fun getOutlineShape(
+    override fun getShape(
         state: BlockState?,
-        world: BlockView?,
+        world: BlockGetter?,
         pos: BlockPos?,
-        context: ShapeContext?
+        context: CollisionContext?
     ): VoxelShape = SHAPE
 
-    override fun getPlacementState(ctx: ItemPlacementContext): BlockState =
-        defaultState.with(EnderChestBlock.FACING, ctx.playerFacing.opposite)
+    override fun getStateForPlacement(ctx: BlockPlaceContext): BlockState =
+        defaultBlockState().setValue(EnderChestBlock.FACING, ctx.horizontalDirection.opposite)
 
-    override fun onUse(
+    override fun useWithoutItem(
         state: BlockState?,
-        world: World,
+        world: Level,
         pos: BlockPos?,
-        player: PlayerEntity,
+        player: Player,
         hitResult: BlockHitResult?
-    ): ActionResult {
+    ): InteractionResult {
         val blockEntity = world.getBlockEntity(pos)
         if (blockEntity is ChestOSoulsBlockEntity) {
             if (blockEntity.isOpen()) {
-                return ActionResult.PASS
+                return InteractionResult.PASS
             }
 
-            if (world.isClient) {
-                return ActionResult.CONSUME
+            if (world.isClientSide) {
+                return InteractionResult.CONSUME
             }
 
             blockEntity.open(player)
-            return ActionResult.SUCCESS
+            return InteractionResult.SUCCESS
         }
-        return super.onUse(state, world, pos, player, hitResult)
+        return super.useWithoutItem(state, world, pos, player, hitResult)
     }
 
-    override fun createBlockEntity(pos: BlockPos?, state: BlockState?): BlockEntity = ChestOSoulsBlockEntity(pos, state)
+    override fun newBlockEntity(pos: BlockPos?, state: BlockState?): BlockEntity = ChestOSoulsBlockEntity(pos, state)
 
     override fun <T : BlockEntity?> getTicker(
-        world: World,
+        world: Level,
         state: BlockState?,
         type: BlockEntityType<T>?
     ): BlockEntityTicker<T>? =
-        checkType(type, DuskBlockEntities.CHEST_O_SOULS, ChestOSoulsBlockEntity::tick)
+        createTickerHelper(type, DuskBlockEntities.CHEST_O_SOULS, ChestOSoulsBlockEntity::tick)
 
-    override fun getBlockEntitySource(
-        state: BlockState, world: World, pos: BlockPos, ignoreBlocked: Boolean
-    ): PropertySource<out ChestBlockEntity>? {
-        return object : PropertySource<ChestBlockEntity> {
+    override fun combine(
+        state: BlockState, world: Level, pos: BlockPos, ignoreBlocked: Boolean
+    ): NeighborCombineResult<out ChestBlockEntity>? {
+        return object : NeighborCombineResult<ChestBlockEntity> {
 
-            override fun <T : Any?> apply(propertyRetriever: DoubleBlockProperties.PropertyRetriever<in ChestBlockEntity, T>): T {
-                return propertyRetriever.fallback
+            override fun <T : Any?> apply(propertyRetriever: DoubleBlockCombiner.Combiner<in ChestBlockEntity, T>): T {
+                return propertyRetriever.acceptNone()
             }
         }
     }
 
-    override fun scheduledTick(state: BlockState?, world: ServerWorld, pos: BlockPos?, random: RandomGenerator?) {
+    override fun tick(state: BlockState?, world: ServerLevel, pos: BlockPos?, random: RandomSource?) {
         val blockEntity = world.getBlockEntity(pos)
 
         if (blockEntity is ChestOSoulsBlockEntity) {
@@ -97,23 +97,23 @@ class ChestOSoulsBlock(
         }
     }
 
-    override fun getRenderType(state: BlockState?): BlockRenderType = BlockRenderType.ANIMATED
+    override fun getRenderShape(state: BlockState?): RenderShape = RenderShape.ENTITYBLOCK_ANIMATED
 
-    override fun rotate(state: BlockState, rotation: BlockRotation): BlockState =
-        state.with(FACING, rotation.rotate(state.get(FACING)))
+    override fun rotate(state: BlockState, rotation: Rotation): BlockState =
+        state.setValue(FACING, rotation.rotate(state.getValue(FACING)))
 
-    override fun mirror(state: BlockState, mirror: BlockMirror): BlockState =
-        state.rotate(mirror.getRotation(state.get(FACING)))
+    override fun mirror(state: BlockState, mirror: Mirror): BlockState =
+        state.rotate(mirror.getRotation(state.getValue(FACING)))
 
-    override fun appendProperties(builder: StateManager.Builder<Block?, BlockState?>) {
+    override fun createBlockStateDefinition(builder: StateDefinition.Builder<Block?, BlockState?>) {
         builder.add(FACING)
     }
 
-    override fun canPathfindThrough(state: BlockState?, navigationType: NavigationType?): Boolean = false
+    override fun isPathfindable(state: BlockState?, navigationType: PathComputationType?): Boolean = false
 
     companion object {
-        val FACING: DirectionProperty = HorizontalFacingBlock.FACING;
-        val CODEC: MapCodec<ChestOSoulsBlock> = createCodec(::ChestOSoulsBlock)
-        val SHAPE: VoxelShape = createCuboidShape(1.0, 0.0, 1.0, 15.0, 14.0, 15.0)
+        val FACING: DirectionProperty = HorizontalDirectionalBlock.FACING;
+        val CODEC: MapCodec<ChestOSoulsBlock> = simpleCodec(::ChestOSoulsBlock)
+        val SHAPE: VoxelShape = box(1.0, 0.0, 1.0, 15.0, 14.0, 15.0)
     }
 }

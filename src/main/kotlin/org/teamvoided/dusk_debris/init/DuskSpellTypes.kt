@@ -1,11 +1,11 @@
 package org.teamvoided.dusk_debris.init
 
-import net.minecraft.registry.Registry
+import net.minecraft.core.Registry
 import org.teamvoided.dusk_debris.DuskDebris.id
-import org.teamvoided.dusk_debris.spell.type.DesolateDiveSpell
-import org.teamvoided.dusk_debris.spell.settings.GenericSpellSettings
 import org.teamvoided.dusk_debris.spell.SpellSettings
 import org.teamvoided.dusk_debris.spell.SpellType
+import org.teamvoided.dusk_debris.spell.settings.GenericSpellSettings
+import org.teamvoided.dusk_debris.spell.type.DesolateDiveSpell
 import org.teamvoided.dusk_debris.spell.type.VengefulSpiritSpell
 
 object DuskSpellTypes {

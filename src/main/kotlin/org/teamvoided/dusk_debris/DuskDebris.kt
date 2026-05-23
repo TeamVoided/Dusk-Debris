@@ -2,7 +2,7 @@ package org.teamvoided.dusk_debris
 
 
 import net.fabricmc.loader.api.FabricLoader
-import net.minecraft.util.Identifier
+import net.minecraft.resources.ResourceLocation
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.teamvoided.dusk_debris.block.DuskBlockFamilies
@@ -48,9 +48,9 @@ object DuskDebris {
         InitializeFabricEvents()
     }
 
-    fun id(path: String) = Identifier.of(MODID, path)
-    fun mc(path: String) = Identifier.ofDefault(path)
-    fun id(modId: String, path: String) = Identifier.of(modId, path)
+    fun id(path: String) = ResourceLocation.fromNamespaceAndPath(MODID, path)
+    fun mc(path: String) = ResourceLocation.withDefaultNamespace(path)
+    fun id(modId: String, path: String) = ResourceLocation.fromNamespaceAndPath(modId, path)
 
     @JvmStatic
     fun isDev() = FabricLoader.getInstance().isDevelopmentEnvironment

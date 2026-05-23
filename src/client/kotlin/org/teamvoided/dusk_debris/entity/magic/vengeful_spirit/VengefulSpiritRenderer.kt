@@ -1,22 +1,22 @@
 package org.teamvoided.dusk_debris.entity.magic.vengeful_spirit
 
-import net.minecraft.client.render.OverlayTexture
-import net.minecraft.client.render.RenderLayer
-import net.minecraft.client.render.VertexConsumerProvider
-import net.minecraft.client.render.entity.EntityRenderer
-import net.minecraft.client.render.entity.EntityRendererFactory
-import net.minecraft.client.util.math.MatrixStack
-import net.minecraft.util.Identifier
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.MathHelper
+import com.mojang.blaze3d.vertex.PoseStack
+import net.minecraft.client.renderer.MultiBufferSource
+import net.minecraft.client.renderer.RenderType
+import net.minecraft.client.renderer.entity.EntityRenderer
+import net.minecraft.client.renderer.entity.EntityRendererProvider
+import net.minecraft.client.renderer.texture.OverlayTexture
+import net.minecraft.core.BlockPos
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.util.Mth
 import org.teamvoided.dusk_debris.DuskDebris
 import org.teamvoided.dusk_debris.entity.DuskEntityModelLayers
 import org.teamvoided.dusk_debris.entity.spell.VengefulSpiritEntity
 import org.teamvoided.dusk_debris.util.Utils
 
 
-class VengefulSpiritRenderer(context: EntityRendererFactory.Context) : EntityRenderer<VengefulSpiritEntity>(context) {
-    private val model = VengefulSpiritModel(context.getPart(DuskEntityModelLayers.VENGEFUL_SPIRIT))
+class VengefulSpiritRenderer(context: EntityRendererProvider.Context) : EntityRenderer<VengefulSpiritEntity>(context) {
+    private val model = VengefulSpiritModel(context.bakeLayer(DuskEntityModelLayers.VENGEFUL_SPIRIT))
 
     init {}
 
@@ -24,34 +24,34 @@ class VengefulSpiritRenderer(context: EntityRendererFactory.Context) : EntityRen
         entity: VengefulSpiritEntity,
         yaw: Float,
         tickDelta: Float,
-        matrices: MatrixStack,
-        vertexConsumers: VertexConsumerProvider,
+        matrices: PoseStack,
+        vertexConsumers: MultiBufferSource,
         light: Int
     ) {
-        if (entity.age >= 4 || dispatcher.camera.focusedEntity.squaredDistanceTo(entity) > entity.size * entity.size) {
-            val vertexConsumer = vertexConsumers.getBuffer(RenderLayer.getEntityCutoutNoCull(TEXTURE))
+        if (entity.tickCount >= 4 || entityRenderDispatcher.camera.entity.distanceToSqr(entity) > entity.size * entity.size) {
+            val vertexConsumer = vertexConsumers.getBuffer(RenderType.entityCutoutNoCull(TEXTURE))
             val yawStuff =
-                MathHelper.wrapDegrees(MathHelper.lerpDegrees(tickDelta, entity.prevYaw, entity.yaw)) * Utils.DEG_TO_RAD
-            val pitchStuff = MathHelper.wrapDegrees(
-                MathHelper.lerpDegrees(
+                Mth.wrapDegrees(Mth.rotLerp(tickDelta, entity.yRotO, entity.yRot)) * Utils.DEG_TO_RAD
+            val pitchStuff = Mth.wrapDegrees(
+                Mth.rotLerp(
                     tickDelta,
-                    entity.prevPitch,
-                    entity.pitch
+                    entity.xRotO,
+                    entity.xRot
                 )
             ) * Utils.DEG_TO_RAD
-            model.setAngles(entity, 0f, 0f, entity.age + tickDelta, yawStuff, pitchStuff)
-            model.method_60879(matrices, vertexConsumer, light, OverlayTexture.DEFAULT_UV)
+            model.setupAnim(entity, 0f, 0f, entity.tickCount + tickDelta, yawStuff, pitchStuff)
+            model.renderToBuffer(matrices, vertexConsumer, light, OverlayTexture.NO_OVERLAY)
             super.render(entity, yaw, tickDelta, matrices, vertexConsumers, light)
         }
     }
 
-    override fun getTexture(entity: VengefulSpiritEntity): Identifier {
+    override fun getTextureLocation(entity: VengefulSpiritEntity): ResourceLocation {
         return TEXTURE
     }
 
-    override fun getBlockLight(entity: VengefulSpiritEntity, pos: BlockPos): Int = 15
+    override fun getBlockLightLevel(entity: VengefulSpiritEntity, pos: BlockPos): Int = 15
 
     companion object {
-        private val TEXTURE: Identifier = DuskDebris.id("textures/entity/vengeful_spirit/vengeful_spirit.png")
+        private val TEXTURE: ResourceLocation = DuskDebris.id("textures/entity/vengeful_spirit/vengeful_spirit.png")
     }
 }

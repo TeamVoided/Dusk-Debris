@@ -1,26 +1,26 @@
 package org.teamvoided.dusk_debris.entity.ai.goal
 
-import net.minecraft.entity.ai.goal.Goal
-import net.minecraft.entity.mob.PathAwareEntity
-import net.minecraft.util.math.Vec3d
-import net.minecraft.world.World
+import net.minecraft.world.entity.PathfinderMob
+import net.minecraft.world.entity.ai.goal.Goal
+import net.minecraft.world.level.Level
+import net.minecraft.world.phys.Vec3
 import java.util.*
 
 
-open class EnterDarknessGoal(protected val mob: PathAwareEntity, private val speed: Double, private val lightThreshold: Int) : Goal() {
+open class EnterDarknessGoal(protected val mob: PathfinderMob, private val speed: Double, private val lightThreshold: Int) : Goal() {
     private var targetX = 0.0
     private var targetY = 0.0
     private var targetZ = 0.0
-    private val world: World = mob.world
+    private val world: Level = mob.level()
 
     init {
-        this.controls = EnumSet.of(Control.MOVE)
+        this.setFlags(EnumSet.of(Flag.MOVE))
     }
 
-    override fun canStart(): Boolean {
+    override fun canUse(): Boolean {
         return if (mob.target != null) {
             false
-        } else if (world.getLightLevel(mob.blockPos) < lightThreshold) {
+        } else if (world.getMaxLocalRawBrightness(mob.blockPosition()) < lightThreshold) {
             false
         } else {
             this.targetDarkPos()
@@ -39,26 +39,26 @@ open class EnterDarknessGoal(protected val mob: PathAwareEntity, private val spe
         }
     }
 
-    override fun shouldContinue(): Boolean {
-        return !mob.navigation.isIdle
+    override fun canContinueToUse(): Boolean {
+        return !mob.navigation.isDone
     }
 
     override fun start() {
-        mob.navigation.startMovingTo(this.targetX, this.targetY, this.targetZ, this.speed)
+        mob.navigation.moveTo(this.targetX, this.targetY, this.targetZ, this.speed)
     }
 
-    protected fun locateDarkPos(): Vec3d? {
+    protected fun locateDarkPos(): Vec3? {
         val randomGenerator = mob.getRandom()
-        val blockPos = mob.blockPos
+        val blockPos = mob.blockPosition()
 
         for (i in 0..9) {
-            val blockPos2 = blockPos.add(
+            val blockPos2 = blockPos.offset(
                 randomGenerator.nextInt(20) - 10,
                 randomGenerator.nextInt(6) - 3,
                 randomGenerator.nextInt(20) - 10
             )
-            if (world.getLightLevel(blockPos2) < lightThreshold && mob.getPathfindingFavor(blockPos2) < 0.0f) {
-                return Vec3d.ofBottomCenter(blockPos2)
+            if (world.getMaxLocalRawBrightness(blockPos2) < lightThreshold && mob.getWalkTargetValue(blockPos2) < 0.0f) {
+                return Vec3.atBottomCenterOf(blockPos2)
             }
         }
 

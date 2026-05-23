@@ -2,85 +2,85 @@ package org.teamvoided.dusk_debris.entity.ai.brain.task
 
 import com.google.common.annotations.VisibleForTesting
 import com.google.common.collect.ImmutableMap
-import net.minecraft.command.argument.EntityAnchorArgumentType
-import net.minecraft.entity.EntityPose
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.ai.brain.MemoryModuleState
-import net.minecraft.entity.ai.brain.MemoryModuleType
-import net.minecraft.entity.ai.brain.task.Task
-import net.minecraft.server.world.ServerWorld
-import net.minecraft.sound.SoundEvents
+import net.minecraft.commands.arguments.EntityAnchorArgument
+import net.minecraft.server.level.ServerLevel
+import net.minecraft.sounds.SoundEvents
 import net.minecraft.util.Unit
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.Pose
+import net.minecraft.world.entity.ai.behavior.Behavior
+import net.minecraft.world.entity.ai.memory.MemoryModuleType
+import net.minecraft.world.entity.ai.memory.MemoryStatus
 import org.teamvoided.dusk_debris.entity.GiantEnemyJellyfishEntity
 import org.teamvoided.dusk_debris.entity.LightningCloudEntity
 import org.teamvoided.dusk_debris.init.DuskParticles
 
-class JellyfishElectricChaseTask @VisibleForTesting constructor(runTime: Int) : Task<GiantEnemyJellyfishEntity>(
+class JellyfishElectricChaseTask @VisibleForTesting constructor(runTime: Int) : Behavior<GiantEnemyJellyfishEntity>(
     ImmutableMap.of(
         MemoryModuleType.ATTACK_TARGET,
-        MemoryModuleState.VALUE_PRESENT,
+        MemoryStatus.VALUE_PRESENT,
         MemoryModuleType.BREEZE_SHOOT_COOLDOWN,
-        MemoryModuleState.VALUE_ABSENT,
+        MemoryStatus.VALUE_ABSENT,
         MemoryModuleType.BREEZE_SHOOT_CHARGING,
-        MemoryModuleState.VALUE_ABSENT,
-        MemoryModuleType.BREEZE_SHOOT_RECOVER,
-        MemoryModuleState.VALUE_ABSENT,
+        MemoryStatus.VALUE_ABSENT,
+        MemoryModuleType.BREEZE_SHOOT_RECOVERING,
+        MemoryStatus.VALUE_ABSENT,
         MemoryModuleType.BREEZE_SHOOT,
-        MemoryModuleState.VALUE_PRESENT,
+        MemoryStatus.VALUE_PRESENT,
         MemoryModuleType.WALK_TARGET,
-        MemoryModuleState.VALUE_ABSENT,
+        MemoryStatus.VALUE_ABSENT,
         MemoryModuleType.BREEZE_JUMP_TARGET,
-        MemoryModuleState.VALUE_ABSENT
+        MemoryStatus.VALUE_ABSENT
     ),
     runTime
 ) {
     //standing == idle
     //roaring == active
 
-    override fun shouldRun(world: ServerWorld, jellyfish: GiantEnemyJellyfishEntity): Boolean {
-        return if (jellyfish.pose != EntityPose.STANDING) false
-        else (jellyfish.brain.getOptionalMemory(
+    override fun checkExtraStartConditions(world: ServerLevel, jellyfish: GiantEnemyJellyfishEntity): Boolean {
+        return if (jellyfish.pose != Pose.STANDING) false
+        else (jellyfish.brain.getMemory(
             MemoryModuleType.ATTACK_TARGET
         ).map { livingEntity: LivingEntity -> isTargetWithinRange(jellyfish, livingEntity) }
             .map { boolean: Boolean ->
                 if (!boolean) {
-                    jellyfish.brain.forget(MemoryModuleType.BREEZE_SHOOT)
+                    jellyfish.brain.eraseMemory(MemoryModuleType.BREEZE_SHOOT)
                 }
                 boolean
             }.orElse(false))
     }
 
-    override fun shouldKeepRunning(world: ServerWorld, jellyfish: GiantEnemyJellyfishEntity, time: Long): Boolean {
-        return jellyfish.brain.hasMemoryModule(MemoryModuleType.ATTACK_TARGET) &&
-                jellyfish.brain.hasMemoryModule(MemoryModuleType.BREEZE_SHOOT)
+    override fun canStillUse(world: ServerLevel, jellyfish: GiantEnemyJellyfishEntity, time: Long): Boolean {
+        return jellyfish.brain.hasMemoryValue(MemoryModuleType.ATTACK_TARGET) &&
+                jellyfish.brain.hasMemoryValue(MemoryModuleType.BREEZE_SHOOT)
     }
 
-    override fun run(world: ServerWorld, jellyfish: GiantEnemyJellyfishEntity, time: Long) {
-        jellyfish.brain.getOptionalMemory(MemoryModuleType.ATTACK_TARGET)
-            .ifPresent { jellyfish.pose = EntityPose.ROARING }
-        jellyfish.brain.remember(MemoryModuleType.BREEZE_SHOOT_CHARGING, Unit.INSTANCE, INHALING_TICKS.toLong())
-        jellyfish.playSound(SoundEvents.ENTITY_BREEZE_INHALE, 1.0f, 0.0f)
+    override fun start(world: ServerLevel, jellyfish: GiantEnemyJellyfishEntity, time: Long) {
+        jellyfish.brain.getMemory(MemoryModuleType.ATTACK_TARGET)
+            .ifPresent { jellyfish.pose = Pose.ROARING }
+        jellyfish.brain.setMemoryWithExpiry(MemoryModuleType.BREEZE_SHOOT_CHARGING, Unit.INSTANCE, INHALING_TICKS.toLong())
+        jellyfish.playSound(SoundEvents.BREEZE_INHALE, 1.0f, 0.0f)
     }
 
-    override fun finishRunning(world: ServerWorld, jellyfish: GiantEnemyJellyfishEntity, time: Long) {
-        if (jellyfish.pose == EntityPose.ROARING) {
-            jellyfish.pose = EntityPose.STANDING
+    override fun stop(world: ServerLevel, jellyfish: GiantEnemyJellyfishEntity, time: Long) {
+        if (jellyfish.pose == Pose.ROARING) {
+            jellyfish.pose = Pose.STANDING
         }
 
-        jellyfish.brain.remember(MemoryModuleType.BREEZE_SHOOT_COOLDOWN, Unit.INSTANCE, COOLDOWN_TICKS.toLong())
-        jellyfish.brain.forget(MemoryModuleType.BREEZE_SHOOT)
+        jellyfish.brain.setMemoryWithExpiry(MemoryModuleType.BREEZE_SHOOT_COOLDOWN, Unit.INSTANCE, COOLDOWN_TICKS.toLong())
+        jellyfish.brain.eraseMemory(MemoryModuleType.BREEZE_SHOOT)
     }
 
-    override fun keepRunning(world: ServerWorld, jellyfish: GiantEnemyJellyfishEntity, time: Long) {
+    override fun tick(world: ServerLevel, jellyfish: GiantEnemyJellyfishEntity, time: Long) {
         val brain = jellyfish.brain
-        val target = brain.getOptionalMemory(MemoryModuleType.ATTACK_TARGET).orElse(null) as LivingEntity
+        val target = brain.getMemory(MemoryModuleType.ATTACK_TARGET).orElse(null) as LivingEntity
         if (target != null) {
-            jellyfish.lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, target.pos)
+            jellyfish.lookAt(EntityAnchorArgument.Anchor.EYES, target.position())
             if (time.toInt() % 20 == 0) {
                 val cloudEntity = LightningCloudEntity(world, target.x, target.y, target.z)
                 cloudEntity.particle = DuskParticles.SPARK
-                jellyfish.playSound(SoundEvents.ENTITY_BREEZE_SHOOT, 1.5f, 0.0f)
-                world.spawnEntity(cloudEntity)
+                jellyfish.playSound(SoundEvents.BREEZE_SHOOT, 1.5f, 0.0f)
+                world.addFreshEntity(cloudEntity)
             }
         }
     }
@@ -92,7 +92,7 @@ class JellyfishElectricChaseTask @VisibleForTesting constructor(runTime: Int) : 
         private val COOLDOWN_TICKS = Math.round(10.0f)
 
         private fun isTargetWithinRange(jellyfish: GiantEnemyJellyfishEntity, target: LivingEntity): Boolean {
-            val d = jellyfish.pos.squaredDistanceTo(target.pos)
+            val d = jellyfish.position().distanceToSqr(target.position())
             return d < MAX_ATTACK_RANGE
         }
     }

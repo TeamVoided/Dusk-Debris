@@ -3,12 +3,12 @@ package org.teamvoided.dusk_debris.particle
 import com.mojang.serialization.Codec
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
-import net.minecraft.network.RegistryByteBuf
-import net.minecraft.network.codec.PacketCodec
-import net.minecraft.network.codec.PacketCodecs
-import net.minecraft.particle.ParticleEffect
-import net.minecraft.particle.ParticleType
-import net.minecraft.util.math.Direction
+import net.minecraft.core.Direction
+import net.minecraft.core.particles.ParticleOptions
+import net.minecraft.core.particles.ParticleType
+import net.minecraft.network.RegistryFriendlyByteBuf
+import net.minecraft.network.codec.ByteBufCodecs
+import net.minecraft.network.codec.StreamCodec
 import org.teamvoided.dusk_debris.init.DuskParticles
 
 class WindParticleEffect(
@@ -16,7 +16,7 @@ class WindParticleEffect(
     val direction: Direction,
     val arrivalTicks: Int
 ) :
-    ParticleEffect {
+    ParticleOptions {
     override fun getType(): ParticleType<WindParticleEffect> {
         return DuskParticles.WIND
     }
@@ -30,12 +30,12 @@ class WindParticleEffect(
                     Codec.INT.fieldOf("arrival_in_ticks").forGetter { it.arrivalTicks }
                 ).apply(instance, ::WindParticleEffect)
             }
-        val PACKET_CODEC: PacketCodec<RegistryByteBuf, WindParticleEffect> = PacketCodec.tuple(
-            PacketCodecs.DOUBLE,
+        val PACKET_CODEC: StreamCodec<RegistryFriendlyByteBuf, WindParticleEffect> = StreamCodec.composite(
+            ByteBufCodecs.DOUBLE,
             { it.distance },
-            Direction.PACKET_CODEC,
+            Direction.STREAM_CODEC,
             { it.direction },
-            PacketCodecs.VAR_INT,
+            ByteBufCodecs.VAR_INT,
             { it.arrivalTicks },
             ::WindParticleEffect
         )

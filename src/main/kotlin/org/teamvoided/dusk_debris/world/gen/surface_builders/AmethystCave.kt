@@ -1,15 +1,15 @@
 package org.teamvoided.dusk_debris.world.gen.surface_builders
 
-import net.minecraft.block.Blocks
-import net.minecraft.registry.tag.TagKey
-import net.minecraft.util.math.BlockPos
-import net.minecraft.world.Heightmap
-import net.minecraft.world.biome.Biome
-import net.minecraft.world.biome.source.BiomeAccess
-import net.minecraft.world.chunk.Chunk
-import net.minecraft.world.gen.DensityFunction
-import net.minecraft.world.gen.RandomState
-import net.minecraft.world.gen.chunk.BlockColumn
+import net.minecraft.core.BlockPos
+import net.minecraft.tags.TagKey
+import net.minecraft.world.level.biome.Biome
+import net.minecraft.world.level.biome.BiomeManager
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.chunk.BlockColumn
+import net.minecraft.world.level.chunk.ChunkAccess
+import net.minecraft.world.level.levelgen.DensityFunction
+import net.minecraft.world.level.levelgen.Heightmap
+import net.minecraft.world.level.levelgen.RandomState
 
 object AmethystCave {
     //    var glacierIce: DoublePerlinNoiseSampler? = null
@@ -18,8 +18,8 @@ object AmethystCave {
     fun createAmethystCave(
         random: RandomState,
         seaLevel: Int,
-        biome: BiomeAccess,
-        chunk: Chunk,
+        biome: BiomeManager,
+        chunk: ChunkAccess,
         blockColumn: BlockColumn,
         x: Int,
         z: Int,
@@ -28,8 +28,8 @@ object AmethystCave {
 //        if (glacierIce == null) glacierIce = random.getOrCreateNoiseSampler(DnDNoise.GLACIER_ICE_PICKER)
 //        if (finalDensity == null) finalDensity = chunk.settings
 
-        val y = chunk.sampleHeightmap(Heightmap.Type.OCEAN_FLOOR_WG, x, z) + 1
-        if (biome.getBiome(BlockPos(x, y, z)).isIn(biomeTag)) {
+        val y = chunk.getHeight(Heightmap.Types.OCEAN_FLOOR_WG, x, z) + 1
+        if (biome.getBiome(BlockPos(x, y, z)).`is`(biomeTag)) {
 
         }
     }
@@ -42,6 +42,6 @@ object AmethystCave {
             else null
 
         if (block != null)
-            blockColumn.setState(yLevel, block.defaultState)
+            blockColumn.setBlock(yLevel, block.defaultBlockState())
     }
 }

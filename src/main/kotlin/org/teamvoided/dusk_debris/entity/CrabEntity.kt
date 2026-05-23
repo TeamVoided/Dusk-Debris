@@ -124,7 +124,7 @@
 ////                } else if (this.getRandom().nextInt(toGoalTicks(10)) != 0) {
 ////                    return false
 ////                } else {
-////                    val list: List<ItemEntity> = this.getWorld().getEntitiesByClass<ItemEntity>(
+////                    val list: List<ItemEntity> = this.getLevel().getEntitiesByClass<ItemEntity>(
 ////                        ItemEntity::class.java,
 ////                        this.getBounds().expand(8.0, 8.0, 8.0),
 ////                        PICKABLE_DROP_FILTER
@@ -137,7 +137,7 @@
 ////        }
 ////
 ////        override fun tick() {
-////            val list: List<ItemEntity> = this.getWorld().getEntitiesByClass<ItemEntity>(
+////            val list: List<ItemEntity> = this.getLevel().getEntitiesByClass<ItemEntity>(
 ////                ItemEntity::class.java, this.getBounds().expand(8.0, 8.0, 8.0), PICKABLE_DROP_FILTER
 ////            )
 ////            val itemStack: ItemStack = this.getEquippedStack(EquipmentSlot.MAINHAND)
@@ -147,7 +147,7 @@
 ////        }
 ////
 ////        override fun start() {
-////            val list: List<ItemEntity> = this.getWorld().getEntitiesByClass<ItemEntity>(
+////            val list: List<ItemEntity> = this.getLevel().getEntitiesByClass<ItemEntity>(
 ////                ItemEntity::class.java, this.getBounds().expand(8.0, 8.0, 8.0), PICKABLE_DROP_FILTER
 ////            )
 ////            if (list.isNotEmpty()) {
@@ -229,7 +229,7 @@
 //            )
 //            itemEntity.setPickupDelay(40)
 //            itemEntity.setThrower(this)
-//            this.playSound(SoundEvents.ENTITY_FOX_SPIT, 1.0f, 1.0f)
+//            this.playSound(SoundEvents.FOX_SPIT, 1.0f, 1.0f)
 //            world.spawnEntity(itemEntity)
 //        }
 //    }
@@ -251,13 +251,13 @@
 //        return super.initialize(world, difficulty, spawnReason, entityData)
 //    }
 //
-//    override fun getAmbientSound(): SoundEvent = SoundEvents.ENTITY_WITHER_SKELETON_AMBIENT
+//    override fun getAmbientSound(): SoundEvent = SoundEvents.WITHER_SKELETON_AMBIENT
 //    override fun playStepSound(pos: BlockPos, state: BlockState) {
-//        this.playSound(SoundEvents.ENTITY_SPIDER_STEP, 0.15f, 1.0f)
+//        this.playSound(SoundEvents.SPIDER_STEP, 0.15f, 1.0f)
 //    }
 //
-//    override fun getHurtSound(source: DamageSource): SoundEvent = SoundEvents.ENTITY_WITHER_SKELETON_HURT
-//    override fun getDeathSound(): SoundEvent = SoundEvents.ENTITY_WITHER_SKELETON_DEATH
+//    override fun getHurtSound(source: DamageSource): SoundEvent = SoundEvents.WITHER_SKELETON_HURT
+//    override fun getDeathSound(): SoundEvent = SoundEvents.WITHER_SKELETON_DEATH
 //
 //    override fun isPushedByFluids(): Boolean = false
 //    override fun getAnimatableInstanceCache(): AnimatableInstanceCache = cache
@@ -284,10 +284,10 @@
 //    companion object {
 //        fun createAttributes(): DefaultAttributeContainer.Builder {
 //            return MobEntity.createAttributes()
-//                .add(EntityAttributes.GENERIC_ARMOR, 4.0)
-//                .add(EntityAttributes.GENERIC_MAX_HEALTH, 7.0)
-//                .add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 4.0)
-//                .add(EntityAttributes.GENERIC_STEP_HEIGHT, 1.0)
+//                .add(EntityAttributes.ARMOR, 4.0)
+//                .add(EntityAttributes.MAX_HEALTH, 7.0)
+//                .add(EntityAttributes.ATTACK_DAMAGE, 4.0)
+//                .add(EntityAttributes.STEP_HEIGHT, 1.0)
 //        }
 //
 //        private val landSpeed = 0.6f

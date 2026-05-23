@@ -1,32 +1,34 @@
 package org.teamvoided.dusk_debris.util.model_helper
 
-import com.google.gson.JsonElement
-import net.minecraft.block.Block
-import net.minecraft.data.client.model.*
-import net.minecraft.state.property.Properties
-import net.minecraft.util.Identifier
-import net.minecraft.util.math.Direction
+import net.minecraft.core.Direction
+import net.minecraft.data.models.BlockModelGenerators
+import net.minecraft.data.models.blockstates.*
+import net.minecraft.data.models.model.ModelLocationUtils
+import net.minecraft.data.models.model.ModelTemplates
+import net.minecraft.data.models.model.TextureMapping
+import net.minecraft.data.models.model.TextureSlot
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.state.properties.BlockStateProperties
 import org.teamvoided.dusk_debris.block.ExhaustBlock
 import org.teamvoided.dusk_debris.block.FanBlock
 import org.teamvoided.dusk_debris.util.model
 import org.teamvoided.dusk_debris.util.suffix
-import java.util.function.BiConsumer
-import java.util.function.Supplier
 
-fun BlockStateModelGenerator.registerCopperFan(fan: Block, waxedFan: Block? = null) {
-    val default: Identifier = Models.CUBE_BOTTOM_TOP.upload(fan, Texture.sideTopBottom(fan), this.modelCollector)
-    val power: Identifier =
-        this.createSubModel(fan, "_powered", Models.CUBE_BOTTOM_TOP, ::topSideBottomTexture) // this is the bulb way
-    val active: Identifier =
-        Models.CUBE_BOTTOM_TOP.upload(fan, "_active", topSideBottomTexture(fan, "_active"), this.modelCollector)
-    val activePower: Identifier =
-        Models.CUBE_BOTTOM_TOP.upload(
+fun BlockModelGenerators.registerCopperFan(fan: Block, waxedFan: Block? = null) {
+    val default: ResourceLocation = ModelTemplates.CUBE_BOTTOM_TOP.create(fan, TextureMapping.cubeBottomTop(fan), this.modelOutput)
+    val power: ResourceLocation =
+        this.createSuffixedVariant(fan, "_powered", ModelTemplates.CUBE_BOTTOM_TOP, ::topSideBottomTexture) // this is the bulb way
+    val active: ResourceLocation =
+        ModelTemplates.CUBE_BOTTOM_TOP.createWithSuffix(fan, "_active", topSideBottomTexture(fan, "_active"), this.modelOutput)
+    val activePower: ResourceLocation =
+        ModelTemplates.CUBE_BOTTOM_TOP.createWithSuffix(
             fan,
             "_active_powered",
             topSideBottomTexture(fan, "_active", "_powered"),
-            this.modelCollector
+            this.modelOutput
         )
-    this.blockStateCollector.accept(
+    this.blockStateOutput.accept(
         this.createCopperFanBlockState(
             fan,
             default,
@@ -36,8 +38,8 @@ fun BlockStateModelGenerator.registerCopperFan(fan: Block, waxedFan: Block? = nu
         )
     )
     if (waxedFan != null) {
-        this.registerParentedItemModel(waxedFan, ModelIds.getItemModelId(fan.asItem()))
-        this.blockStateCollector.accept(
+        this.delegateItemModel(waxedFan, ModelLocationUtils.getModelLocation(fan.asItem()))
+        this.blockStateOutput.accept(
             this.createCopperFanBlockState(
                 waxedFan,
                 default,
@@ -50,42 +52,42 @@ fun BlockStateModelGenerator.registerCopperFan(fan: Block, waxedFan: Block? = nu
 }
 
 
-fun topSideBottomTexture(id: Identifier): Texture {
-    return Texture()
-        .put(TextureKey.TOP, id.suffix("_top"))
-        .put(TextureKey.SIDE, id.suffix("_side"))
-        .put(TextureKey.BOTTOM, id.suffix("_bottom"))
+fun topSideBottomTexture(id: ResourceLocation): TextureMapping {
+    return TextureMapping()
+        .put(TextureSlot.TOP, id.suffix("_top"))
+        .put(TextureSlot.SIDE, id.suffix("_side"))
+        .put(TextureSlot.BOTTOM, id.suffix("_bottom"))
 }
 
-fun topSideBottomTexture(block: Block, suffix: String, powered: String = ""): Texture {
-    return Texture()
-        .put(TextureKey.TOP, block.model(suffix + powered + "_top"))
-        .put(TextureKey.SIDE, block.model(powered + "_side"))
-        .put(TextureKey.BOTTOM, block.model(powered + "_bottom"))
+fun topSideBottomTexture(block: Block, suffix: String, powered: String = ""): TextureMapping {
+    return TextureMapping()
+        .put(TextureSlot.TOP, block.model(suffix + powered + "_top"))
+        .put(TextureSlot.SIDE, block.model(powered + "_side"))
+        .put(TextureSlot.BOTTOM, block.model(powered + "_bottom"))
 }
 
 
-fun BlockStateModelGenerator.createCopperFanBlockState(
+fun BlockModelGenerators.createCopperFanBlockState(
     block: Block,
-    base: Identifier,
-    active: Identifier,
-    powered: Identifier,
-    activeAndPowered: Identifier
-): BlockStateSupplier {
-    return VariantsBlockStateSupplier.create(block).coordinate(
-        BlockStateVariantMap.create(FanBlock.ACTIVE, Properties.POWERED)
-            .register { activex: Boolean, poweredx: Boolean ->
-                if (activex) BlockStateVariant.create()
-                    .put(VariantSettings.MODEL, if (poweredx) activeAndPowered else active)
-                else BlockStateVariant.create()
-                    .put(VariantSettings.MODEL, if (poweredx) powered else base)
-            }).coordinate(this.createUpDefaultFacingVariantMap())
+    base: ResourceLocation,
+    active: ResourceLocation,
+    powered: ResourceLocation,
+    activeAndPowered: ResourceLocation
+): BlockStateGenerator {
+    return MultiVariantGenerator.multiVariant(block).with(
+        PropertyDispatch.properties(FanBlock.ACTIVE, BlockStateProperties.POWERED)
+            .generate { activex: Boolean, poweredx: Boolean ->
+                if (activex) Variant.variant()
+                    .with(VariantProperties.MODEL, if (poweredx) activeAndPowered else active)
+                else Variant.variant()
+                    .with(VariantProperties.MODEL, if (poweredx) powered else base)
+            }).with(this.createColumnWithFacing())
 }
 
-fun BlockStateModelGenerator.registerExhaust(block: Block) {
-    val item = Models.CUBE_COLUMN.upload(block, exhaustBlockTexture(block), modelCollector)
+fun BlockModelGenerators.registerExhaust(block: Block) {
+    val item = ModelTemplates.CUBE_COLUMN.create(block, exhaustBlockTexture(block), modelOutput)
 
-    val bsvMap = BlockStateVariantMap.create(Properties.FACING, ExhaustBlock.POWERED, ExhaustBlock.ACTIVE)
+    val bsvMap = PropertyDispatch.properties(BlockStateProperties.FACING, ExhaustBlock.POWERED, ExhaustBlock.ACTIVE)
 
     listOf(false, true).forEach { powered ->
         repeat(3) { active ->
@@ -100,10 +102,10 @@ fun BlockStateModelGenerator.registerExhaust(block: Block) {
             val modelZ = exhaustBlockModel(block, Direction.Axis.Z, powered, activity)
 
             Direction.entries.forEach { direction ->
-                bsvMap.register(
+                bsvMap.select(
                     direction, powered, active,
-                    BlockStateVariant.create().put(
-                        VariantSettings.MODEL, when (direction.axis) {
+                    Variant.variant().with(
+                        VariantProperties.MODEL, when (direction.axis) {
                             Direction.Axis.X -> modelX
                             Direction.Axis.Y -> modelY
                             Direction.Axis.Z -> modelZ
@@ -114,9 +116,9 @@ fun BlockStateModelGenerator.registerExhaust(block: Block) {
         }
     }
 
-    this.blockStateCollector.accept(
-        VariantsBlockStateSupplier.create(block, BlockStateVariant.create().put(VariantSettings.MODEL, item))
-            .coordinate(bsvMap)
+    this.blockStateOutput.accept(
+        MultiVariantGenerator.multiVariant(block, Variant.variant().with(VariantProperties.MODEL, item))
+            .with(bsvMap)
     )
 }
 
@@ -125,24 +127,24 @@ private fun exhaustBlockTexture(
     block: Block,
     powered: Boolean = false,
     activity: String = "_idle"
-): Texture {
+): TextureMapping {
     val powr = if (powered) "_powered" else ""
-    return Texture()
-        .put(TextureKey.END, block.model(activity))
-        .put(TextureKey.SIDE, block.model("_side$powr"))
+    return TextureMapping()
+        .put(TextureSlot.END, block.model(activity))
+        .put(TextureSlot.SIDE, block.model("_side$powr"))
 }
 
-private fun BlockStateModelGenerator.exhaustBlockModel(
+private fun BlockModelGenerators.exhaustBlockModel(
     block: Block,
     direction: Direction.Axis = Direction.Axis.Y,
     powered: Boolean = false,
     activity: String = "_idle"
-): Identifier {
+): ResourceLocation {
     val texture = exhaustBlockTexture(block, powered, activity)
     val suffix = activity + if (powered) "_powered" else ""
     return when (direction) {
-        Direction.Axis.X -> Models.CUBE_COLUMN_UV_LOCKED_X.upload(block, suffix, texture, modelCollector)
-        Direction.Axis.Y -> Models.CUBE_COLUMN_UV_LOCKED_Y.upload(block, suffix, texture, modelCollector)
-        Direction.Axis.Z -> Models.CUBE_COLUMN_UV_LOCKED_Z.upload(block, suffix, texture, modelCollector)
+        Direction.Axis.X -> ModelTemplates.CUBE_COLUMN_UV_LOCKED_X.createWithSuffix(block, suffix, texture, modelOutput)
+        Direction.Axis.Y -> ModelTemplates.CUBE_COLUMN_UV_LOCKED_Y.createWithSuffix(block, suffix, texture, modelOutput)
+        Direction.Axis.Z -> ModelTemplates.CUBE_COLUMN_UV_LOCKED_Z.createWithSuffix(block, suffix, texture, modelOutput)
     }
 }

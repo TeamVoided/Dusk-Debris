@@ -1,27 +1,27 @@
 package org.teamvoided.dusk_debris.entity.tuff_golem.render
 
-import net.minecraft.client.MinecraftClient
-import net.minecraft.client.render.VertexConsumerProvider
-import net.minecraft.client.render.entity.LivingEntityRenderer
-import net.minecraft.client.render.entity.feature.FeatureRenderer
-import net.minecraft.client.render.entity.feature.FeatureRendererContext
-import net.minecraft.client.render.item.ItemRenderer
-import net.minecraft.client.render.model.json.ModelTransformationMode
-import net.minecraft.client.util.math.MatrixStack
-import net.minecraft.entity.EquipmentSlot
-import net.minecraft.item.ItemStack
-import net.minecraft.util.math.Axis
+import com.mojang.blaze3d.vertex.PoseStack
+import com.mojang.math.Axis
+import net.minecraft.client.Minecraft
+import net.minecraft.client.renderer.MultiBufferSource
+import net.minecraft.client.renderer.entity.ItemRenderer
+import net.minecraft.client.renderer.entity.LivingEntityRenderer
+import net.minecraft.client.renderer.entity.RenderLayerParent
+import net.minecraft.client.renderer.entity.layers.RenderLayer
+import net.minecraft.world.entity.EquipmentSlot
+import net.minecraft.world.item.ItemDisplayContext
+import net.minecraft.world.item.ItemStack
 import org.teamvoided.dusk_debris.entity.TuffGolemEntity
 import org.teamvoided.dusk_debris.entity.tuff_golem.model.TuffGolemEntityModel
 
 class TuffGolemHatFeatureRenderer(
-    context: FeatureRendererContext<TuffGolemEntity, TuffGolemEntityModel>,
+    context: RenderLayerParent<TuffGolemEntity, TuffGolemEntityModel>,
     private val itemRenderer: ItemRenderer
-) : FeatureRenderer<TuffGolemEntity, TuffGolemEntityModel>(context) {
+) : RenderLayer<TuffGolemEntity, TuffGolemEntityModel>(context) {
     val scale = 0.8f
     override fun render(
-        matrices: MatrixStack,
-        vertexConsumers: VertexConsumerProvider,
+        matrices: PoseStack,
+        vertexConsumers: MultiBufferSource,
         i: Int,
         tuffGolemEntity: TuffGolemEntity,
         f: Float,
@@ -31,31 +31,31 @@ class TuffGolemHatFeatureRenderer(
         k: Float,
         l: Float
     ) {
-        val hatStack = tuffGolemEntity.getEquippedStack(EquipmentSlot.HEAD)
+        val hatStack = tuffGolemEntity.getItemBySlot(EquipmentSlot.HEAD)
         if (!hatStack.isEmpty &&
             (!tuffGolemEntity.isInvisible ||
-                    (MinecraftClient.getInstance().hasOutline(tuffGolemEntity) && tuffGolemEntity.isInvisible))
+                    (Minecraft.getInstance().shouldEntityAppearGlowing(tuffGolemEntity) && tuffGolemEntity.isInvisible))
         ) {
-            matrices.push()
-            (this.contextModel as TuffGolemEntityModel).body.rotate(matrices)
+            matrices.pushPose()
+            (this.parentModel as TuffGolemEntityModel).body.translateAndRotate(matrices)
             val scale = 0.65f
             matrices.translate(0.0f, -0.6f, 0.0f)
-            matrices.rotate(Axis.Y_POSITIVE.rotationDegrees(180.0f))
+            matrices.mulPose(Axis.YP.rotationDegrees(180.0f))
             matrices.scale(scale, -scale, -scale)
-            itemRenderer.renderItem(
+            itemRenderer.renderStatic(
                 tuffGolemEntity,
                 ItemStack(hatStack.item),
-                ModelTransformationMode.HEAD,
+                ItemDisplayContext.HEAD,
                 false,
                 matrices,
                 vertexConsumers,
-                tuffGolemEntity.world,
+                tuffGolemEntity.level(),
                 i,
-                LivingEntityRenderer.getOverlay(tuffGolemEntity, 0.0f),
+                LivingEntityRenderer.getOverlayCoords(tuffGolemEntity, 0.0f),
                 tuffGolemEntity.id
             )
 
-            matrices.pop()
+            matrices.popPose()
         }
     }
 }

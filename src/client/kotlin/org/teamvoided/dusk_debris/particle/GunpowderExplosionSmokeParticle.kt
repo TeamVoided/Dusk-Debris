@@ -2,62 +2,62 @@ package org.teamvoided.dusk_debris.particle
 
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
+import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.client.particle.*
-import net.minecraft.client.world.ClientWorld
 import org.teamvoided.dusk_debris.particle.color.GunpowderExplosionSmokeParticleEffect
 import java.awt.Color
 
 @Environment(EnvType.CLIENT)
 open class GunpowderExplosionSmokeParticle(
-    world: ClientWorld,
+    world: ClientLevel,
     x: Double,
     y: Double,
     z: Double,
     val color: Color
 ) :
-    SpriteBillboardParticle(world, x, y, z) {
+    TextureSheetParticle(world, x, y, z) {
 
     init {
-        this.velocityY += Math.random() * 0.05
-        this.velocityX += (Math.random() - Math.random()) / 3
-        this.velocityZ += (Math.random() - Math.random()) / 3
-        this.gravityStrength = 0f
-        this.colorRed = color.red / 255f
-        this.colorGreen = color.green / 255f
-        this.colorBlue = color.blue / 255f
-        this.scale = 0.33f * (random.nextFloat() * random.nextFloat() * 6.0f + 1.0f)
-        this.maxAge = ((random.nextFloat() * 80).toInt() + 60)
+        this.yd += Math.random() * 0.05
+        this.xd += (Math.random() - Math.random()) / 3
+        this.zd += (Math.random() - Math.random()) / 3
+        this.gravity = 0f
+        this.rCol = color.red / 255f
+        this.gCol = color.green / 255f
+        this.bCol = color.blue / 255f
+        this.quadSize = 0.33f * (random.nextFloat() * random.nextFloat() * 6.0f + 1.0f)
+        this.lifetime = ((random.nextFloat() * 80).toInt() + 60)
     }
 
-    override fun getType(): ParticleTextureSheet {
-        return ParticleTextureSheet.PARTICLE_SHEET_LIT
+    override fun getRenderType(): ParticleRenderType {
+        return ParticleRenderType.PARTICLE_SHEET_LIT
     }
 
     override fun tick() {
-        val multiplier = -((this.age / this.maxAge.toFloat()) * (this.age / this.maxAge.toFloat())) * 0.8f + 1f
-        if (this.colorRed > 0.2) this.colorRed *= multiplier
-        if (this.colorGreen > 0.2) this.colorGreen *= multiplier
-        if (this.colorBlue > 0.2) this.colorBlue *= multiplier
-        this.colorAlpha *=
-            -((this.age / this.maxAge.toFloat()) * (this.age / this.maxAge.toFloat() * (this.age / this.maxAge.toFloat()))) + 1f
-        this.prevPosX = this.x
-        this.prevPosY = this.y
-        this.prevPosZ = this.z
-        if (age++ >= this.maxAge) {
-            this.markDead()
+        val multiplier = -((this.age / this.lifetime.toFloat()) * (this.age / this.lifetime.toFloat())) * 0.8f + 1f
+        if (this.rCol > 0.2) this.rCol *= multiplier
+        if (this.gCol > 0.2) this.gCol *= multiplier
+        if (this.bCol > 0.2) this.bCol *= multiplier
+        this.alpha *=
+            -((this.age / this.lifetime.toFloat()) * (this.age / this.lifetime.toFloat() * (this.age / this.lifetime.toFloat()))) + 1f
+        this.xo = this.x
+        this.yo = this.y
+        this.zo = this.z
+        if (age++ >= this.lifetime) {
+            this.remove()
         } else {
-            this.velocityX *= 0.75
-            this.velocityY *= 0.95
-            this.velocityZ *= 0.75
-            this.move(this.velocityX, this.velocityY, this.velocityZ)
+            this.xd *= 0.75
+            this.yd *= 0.95
+            this.zd *= 0.75
+            this.move(this.xd, this.yd, this.zd)
         }
     }
 
     @Environment(EnvType.CLIENT)
-    class Factory(private val spriteProvider: SpriteProvider) : ParticleFactory<GunpowderExplosionSmokeParticleEffect> {
+    class Factory(private val spriteProvider: SpriteSet) : ParticleProvider<GunpowderExplosionSmokeParticleEffect> {
         override fun createParticle(
             type: GunpowderExplosionSmokeParticleEffect,
-            world: ClientWorld,
+            world: ClientLevel,
             posX: Double,
             posY: Double,
             posZ: Double,
@@ -66,7 +66,7 @@ open class GunpowderExplosionSmokeParticle(
             velZ: Double,
         ): Particle {
             val particle = GunpowderExplosionSmokeParticle(world, posX, posY, posZ, type.color)
-            particle.setSprite(spriteProvider)
+            particle.pickSprite(spriteProvider)
             return particle
         }
     }

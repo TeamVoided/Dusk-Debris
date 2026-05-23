@@ -1,9 +1,9 @@
 package org.teamvoided.dusk_debris.block.voided.sign
 
-import net.minecraft.block.WoodType
-import net.minecraft.block.sign.CeilingHangingSignBlock
-import net.minecraft.util.Identifier
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.world.level.block.CeilingHangingSignBlock
+import net.minecraft.world.level.block.state.properties.WoodType
 
-class VoidCeilingHangingSignBlock(override val texture: Identifier, woodType: WoodType, settings: Settings) :
-    CeilingHangingSignBlock( woodType, settings.solid()), VoidSign
+class VoidCeilingHangingSignBlock(override val texture: ResourceLocation, woodType: WoodType, settings: Properties) :
+    CeilingHangingSignBlock( woodType, settings.forceSolidOn()), VoidSign
 

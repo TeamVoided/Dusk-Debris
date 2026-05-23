@@ -1,26 +1,26 @@
 package org.teamvoided.dusk_debris.util
 
-import net.minecraft.block.Block
-import net.minecraft.block.BlockState
-import net.minecraft.block.Blocks
-import net.minecraft.loot.function.SetCountLootFunction
-import net.minecraft.loot.provider.number.ConstantLootNumberProvider
-import net.minecraft.loot.provider.number.UniformLootNumberProvider
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.MathHelper
-import net.minecraft.util.math.Vec3d
-import net.minecraft.util.math.Vec3i
-import net.minecraft.world.StructureWorldAccess
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Vec3i
+import net.minecraft.util.Mth
+import net.minecraft.world.level.WorldGenLevel
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.storage.loot.functions.SetItemCountFunction
+import net.minecraft.world.level.storage.loot.providers.number.ConstantValue
+import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator
+import net.minecraft.world.phys.Vec3
 import java.util.function.BiConsumer
 
 object Utils {
-    const val PI = MathHelper.PI
+    const val PI = Mth.PI
     const val DEG_TO_RAD = 0.017453292f
     const val RAD_TO_DEG = 57.295776f
     const val rotate30 = PI / 6f
     const val rotate45 = PI / 4f
     const val rotate60 = PI / 3f
-    const val rotate90 = MathHelper.HALF_PI
+    const val rotate90 = Mth.HALF_PI
     const val rotate120 = rotate90 + rotate30
     const val rotate135 = rotate90 + rotate45
     const val rotate150 = rotate90 + rotate60
@@ -32,24 +32,24 @@ object Utils {
     const val rotate300 = rotate270 + rotate30
     const val rotate315 = rotate270 + rotate45
     const val rotate330 = rotate270 + rotate60
-    const val rotate360 = MathHelper.TAU
+    const val rotate360 = Mth.TWO_PI
 
-    fun setCount(x: Number, y: Number) = SetCountLootFunction.builder(uniformNum(x, y))
+    fun setCount(x: Number, y: Number) = SetItemCountFunction.setCount(uniformNum(x, y))
 
-    fun uniformNum(x: Number, y: Number): UniformLootNumberProvider =
-        UniformLootNumberProvider.create(x.toFloat(), y.toFloat())
+    fun uniformNum(x: Number, y: Number): UniformGenerator =
+        UniformGenerator.between(x.toFloat(), y.toFloat())
 
-    fun constantNum(x: Number): ConstantLootNumberProvider =
-        ConstantLootNumberProvider.create(x.toFloat())
+    fun constantNum(x: Number): ConstantValue =
+        ConstantValue.exactly(x.toFloat())
 
-    fun StructureWorldAccess.placeDebug(pos: BlockPos, block: Int) =
-        this.setBlockState(pos, getStateGlass(block), Block.NOTIFY_ALL)
+    fun WorldGenLevel.placeDebug(pos: BlockPos, block: Int) =
+        this.setBlock(pos, getStateGlass(block), Block.UPDATE_ALL)
 
 
     fun BiConsumer<BlockPos, BlockState>.placeDebug(pos: BlockPos, block: Int) = this.accept(pos, getStateGlass(block))
 
-    fun Vec3i.vec3d(): Vec3d = Vec3d(this.x.toDouble(), this.y.toDouble(), this.z.toDouble())
-    fun Vec3d.vec3i(): Vec3i = Vec3i(this.x.toInt(), this.y.toInt(), this.z.toInt())
+    fun Vec3i.vec3d(): Vec3 = Vec3(this.x.toDouble(), this.y.toDouble(), this.z.toDouble())
+    fun Vec3.vec3i(): Vec3i = Vec3i(this.x.toInt(), this.y.toInt(), this.z.toInt())
 
     fun getStateGlass(block: Int): BlockState {
         return when (block) {
@@ -71,7 +71,7 @@ object Utils {
             15 -> Blocks.MAGENTA_STAINED_GLASS
             16 -> Blocks.PINK_STAINED_GLASS
             else -> Blocks.TINTED_GLASS
-        }.defaultState
+        }.defaultBlockState()
     }
 
     fun getStateConcrete(block: Int): BlockState {
@@ -94,6 +94,6 @@ object Utils {
             15 -> Blocks.MAGENTA_CONCRETE
             16 -> Blocks.PINK_CONCRETE
             else -> Blocks.DEEPSLATE
-        }.defaultState
+        }.defaultBlockState()
     }
 }

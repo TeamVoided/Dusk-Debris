@@ -3,18 +3,18 @@ package org.teamvoided.dusk_debris.particle
 import com.mojang.serialization.Codec
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
-import net.minecraft.network.RegistryByteBuf
-import net.minecraft.network.codec.PacketCodec
-import net.minecraft.network.codec.PacketCodecs
-import net.minecraft.particle.ParticleEffect
-import net.minecraft.particle.ParticleType
-import net.minecraft.util.math.Direction
+import net.minecraft.core.Direction
+import net.minecraft.core.particles.ParticleOptions
+import net.minecraft.core.particles.ParticleType
+import net.minecraft.network.RegistryFriendlyByteBuf
+import net.minecraft.network.codec.ByteBufCodecs
+import net.minecraft.network.codec.StreamCodec
 import org.teamvoided.dusk_debris.init.DuskParticles
 
 class GoopLandedParticleEffect(
     private val maxAge: Int,
     private val stoppedDirection: Direction
-) : ParticleEffect {
+) : ParticleOptions {
     override fun getType(): ParticleType<GoopLandedParticleEffect> {
         return DuskParticles.ASTRAS_LANDED_GOOP
     }
@@ -37,10 +37,10 @@ class GoopLandedParticleEffect(
                         .forGetter { obj: GoopLandedParticleEffect -> obj.direction() },
                 ).apply(instance, ::GoopLandedParticleEffect)
             }
-        val PACKET_CODEC: PacketCodec<RegistryByteBuf, GoopLandedParticleEffect> = PacketCodec.tuple(
-            PacketCodecs.VAR_INT,
+        val PACKET_CODEC: StreamCodec<RegistryFriendlyByteBuf, GoopLandedParticleEffect> = StreamCodec.composite(
+            ByteBufCodecs.VAR_INT,
             { obj: GoopLandedParticleEffect -> obj.maxAge() },
-            Direction.PACKET_CODEC,
+            Direction.STREAM_CODEC,
             { obj: GoopLandedParticleEffect -> obj.direction() },
             ::GoopLandedParticleEffect
         )

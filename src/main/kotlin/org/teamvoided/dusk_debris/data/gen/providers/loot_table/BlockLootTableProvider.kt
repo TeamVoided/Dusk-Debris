@@ -2,7 +2,7 @@ package org.teamvoided.dusk_debris.data.gen.providers.loot_table
 
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricBlockLootTableProvider
-import net.minecraft.registry.HolderLookup
+import net.minecraft.core.HolderLookup
 import java.util.concurrent.CompletableFuture
 
 class BlockLootTableProvider(o: FabricDataOutput, r: CompletableFuture<HolderLookup.Provider>) :

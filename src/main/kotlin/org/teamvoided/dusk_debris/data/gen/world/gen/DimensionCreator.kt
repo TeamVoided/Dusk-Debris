@@ -1,62 +1,65 @@
 package org.teamvoided.dusk_debris.data.gen.world.gen
 
-import net.minecraft.registry.*
-import net.minecraft.world.biome.Biome
-import net.minecraft.world.biome.source.MultiNoiseBiomeSource
-import net.minecraft.world.biome.source.util.MultiNoiseUtil.*
-import net.minecraft.world.dimension.DimensionOptions
-import net.minecraft.world.dimension.DimensionType
-import net.minecraft.world.gen.chunk.ChunkGeneratorSettings
-import net.minecraft.world.gen.chunk.NoiseChunkGenerator
+import net.minecraft.core.Holder
+import net.minecraft.core.HolderGetter
+import net.minecraft.core.registries.Registries
+import net.minecraft.data.worldgen.BootstrapContext
+import net.minecraft.resources.ResourceKey
+import net.minecraft.world.level.biome.Biome
+import net.minecraft.world.level.biome.Climate.*
+import net.minecraft.world.level.biome.MultiNoiseBiomeSource
+import net.minecraft.world.level.dimension.DimensionType
+import net.minecraft.world.level.dimension.LevelStem
+import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator
+import net.minecraft.world.level.levelgen.NoiseGeneratorSettings
 import org.teamvoided.dusk_debris.data.gen.world.gen.dimension.OverworldDebugCreator
-import org.teamvoided.dusk_debris.data.gen.world.gen.dimension.OverworldDimensionCreator
 import org.teamvoided.dusk_debris.data.worldgen.DuskDimension
 import org.teamvoided.dusk_debris.data.worldgen.DuskDimensionType
 import org.teamvoided.dusk_debris.data.worldgen.DuskNoiseSettings
 
 object DimensionCreator {
 
-    fun bootstrap(c: BootstrapContext<DimensionOptions>) {
-        val biome: HolderProvider<Biome> = c.getRegistryLookup(RegistryKeys.BIOME)
+    fun bootstrap(c: BootstrapContext<LevelStem>) {
+        val biome: HolderGetter<Biome> = c.lookup(Registries.BIOME)
 
         c.register(
             DuskDimension.OVERWORLD,
             DuskDimensionType.OVERWORLD,
             DuskNoiseSettings.OVERWORLD,
             //OverworldDimensionCreator.noiseBiomeSource { biome.getHolderOrThrow(it) }
-            OverworldDebugCreator.addBiomesTo { biome.getHolderOrThrow(it) }
+            OverworldDebugCreator.addBiomesTo { biome.getOrThrow(it) }
         )
     }
 
-    fun BootstrapContext<DimensionOptions>.register(
-        dimension: RegistryKey<DimensionOptions>,
-        dimensionType: RegistryKey<DimensionType>,
-        noiseSettings: RegistryKey<ChunkGeneratorSettings>,
-        parameters: ParameterRangeList<Holder<Biome>>
+    fun BootstrapContext<LevelStem>.register(
+        dimension: ResourceKey<LevelStem>,
+        dimensionType: ResourceKey<DimensionType>,
+        noiseSettings: ResourceKey<NoiseGeneratorSettings>,
+        parameters: ParameterList<Holder<Biome>>
     ) {
-        val dimensionProvider: HolderProvider<DimensionType> = this.getRegistryLookup(RegistryKeys.DIMENSION_TYPE)
-        val chunkGenSettingsProvider = this.getRegistryLookup(RegistryKeys.CHUNK_GENERATOR_SETTINGS)
+        val dimensionProvider: HolderGetter<DimensionType> = this.lookup(Registries.DIMENSION_TYPE)
+        val chunkGenSettingsProvider = this.lookup(Registries.NOISE_SETTINGS)
         this.register(
             dimension,
-            DimensionOptions(
-                dimensionProvider.getHolderOrThrow(dimensionType),
-                NoiseChunkGenerator(
-                    MultiNoiseBiomeSource.create(parameters),
-                    chunkGenSettingsProvider.getHolderOrThrow(noiseSettings)
+            LevelStem(
+                dimensionProvider.getOrThrow(dimensionType),
+                NoiseBasedChunkGenerator(
+                    MultiNoiseBiomeSource.createFromList(parameters),
+                    chunkGenSettingsProvider.getOrThrow(noiseSettings)
                 )
             )
         )
     }
 
     fun createNoiseHypercube(
-        temperature: ParameterRange,
-        humidity: ParameterRange,
-        continentalness: ParameterRange,
-        erosion: ParameterRange,
-        depth: ParameterRange,
-        weirdness: ParameterRange,
-    ): NoiseHypercube {
-        return NoiseHypercube(
+        temperature: Parameter,
+        humidity: Parameter,
+        continentalness: Parameter,
+        erosion: Parameter,
+        depth: Parameter,
+        weirdness: Parameter,
+    ): ParameterPoint {
+        return ParameterPoint(
             temperature,
             humidity,
             continentalness,

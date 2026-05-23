@@ -2,12 +2,12 @@ package org.teamvoided.dusk_debris.entity.variant
 
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
-import net.minecraft.registry.Holder
-import net.minecraft.registry.HolderSet
-import net.minecraft.registry.RegistryCodecs
-import net.minecraft.registry.RegistryKeys
-import net.minecraft.util.Identifier
-import net.minecraft.world.biome.Biome
+import net.minecraft.core.Holder
+import net.minecraft.core.HolderSet
+import net.minecraft.core.RegistryCodecs
+import net.minecraft.core.registries.Registries
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.world.level.biome.Biome
 import java.util.*
 import kotlin.jvm.optionals.getOrNull
 
@@ -15,7 +15,7 @@ data class SnifferVariant(
     val biomes: HolderSet<Biome>,
     val color: Int? = null,
     val biomeColor: Holder<Biome>? = null,
-    val overlayTexture: Identifier? = null
+    val overlayTexture: ResourceLocation? = null
 ) {
 //    constructor(biomes: HolderSet<Biome>, overlayTexture: Identifier) :
 //            this(biomes, null, null, overlayTexture)
@@ -31,12 +31,12 @@ data class SnifferVariant(
     companion object {
         val CODEC: Codec<SnifferVariant> = RecordCodecBuilder.create { instance ->
             instance.group(
-                RegistryCodecs.homogeneousList(RegistryKeys.BIOME).fieldOf("biomes").forGetter { it.biomes },
+                RegistryCodecs.homogeneousList(Registries.BIOME).fieldOf("biomes").forGetter { it.biomes },
                 Codec.INT.optionalFieldOf("color").forGetter { Optional.ofNullable(it.color) },
-                Biome.REGISTRY_CODEC.optionalFieldOf("biome_color").forGetter { Optional.ofNullable(it.biomeColor) },
-                Identifier.CODEC.optionalFieldOf("overlay_texture")
+                Biome.CODEC.optionalFieldOf("biome_color").forGetter { Optional.ofNullable(it.biomeColor) },
+                ResourceLocation.CODEC.optionalFieldOf("overlay_texture")
                     .forGetter { Optional.ofNullable(it.overlayTexture) })
-                .apply(instance) { biomes: HolderSet<Biome>, color: Optional<Int>, biomeColor: Optional<Holder<Biome>>, overlayTexture: Optional<Identifier> ->
+                .apply(instance) { biomes: HolderSet<Biome>, color: Optional<Int>, biomeColor: Optional<Holder<Biome>>, overlayTexture: Optional<ResourceLocation> ->
                     SnifferVariant(biomes, color.getOrNull(), biomeColor.getOrNull(), overlayTexture.getOrNull())
                 }
         }
@@ -56,7 +56,7 @@ data class SnifferVariant(
 //        val PACKET_CODEC: PacketCodec<RegistryByteBuf, Holder<SnifferVariant>> =
 //            PacketCodecs.holder(SNIFFER_VARIANT, DIRECT_PACKET_CODEC)
 
-        private fun getFullTextureId(texture: Identifier?): Identifier? {
+        private fun getFullTextureId(texture: ResourceLocation?): ResourceLocation? {
             return texture?.withPath { "textures/$it.png" }
         }
     }

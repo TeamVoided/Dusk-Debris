@@ -1,27 +1,27 @@
 package org.teamvoided.dusk_debris.entity.piffling.render
 
-import net.minecraft.client.model.ModelPart
-import net.minecraft.client.render.VertexConsumerProvider
-import net.minecraft.client.render.entity.feature.FeatureRenderer
-import net.minecraft.client.render.entity.feature.FeatureRendererContext
-import net.minecraft.client.render.item.HeldItemRenderer
-import net.minecraft.client.render.model.json.ModelTransformationMode
-import net.minecraft.client.util.math.MatrixStack
-import net.minecraft.entity.LivingEntity
-import net.minecraft.item.ItemStack
-import net.minecraft.util.Arm
-import net.minecraft.util.math.Axis
+import com.mojang.blaze3d.vertex.PoseStack
+import com.mojang.math.Axis
+import net.minecraft.client.model.geom.ModelPart
+import net.minecraft.client.renderer.ItemInHandRenderer
+import net.minecraft.client.renderer.MultiBufferSource
+import net.minecraft.client.renderer.entity.RenderLayerParent
+import net.minecraft.client.renderer.entity.layers.RenderLayer
+import net.minecraft.world.entity.HumanoidArm
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.item.ItemDisplayContext
+import net.minecraft.world.item.ItemStack
 import org.teamvoided.dusk_debris.entity.PifflingPumpkinEntity
 import org.teamvoided.dusk_debris.entity.piffling.model.PifflingPumpkinModel
 import org.teamvoided.dusk_debris.entity.piffling.render.PifflingPumpkinHeadFeatureRenderer.Companion.moveRelativeTo
 
 class PifflingPumpkinHeldItemFeatureRenderer(
-    context: FeatureRendererContext<PifflingPumpkinEntity, PifflingPumpkinModel>,
-    private val heldItemRenderer: HeldItemRenderer
-) : FeatureRenderer<PifflingPumpkinEntity, PifflingPumpkinModel>(context) {
+    context: RenderLayerParent<PifflingPumpkinEntity, PifflingPumpkinModel>,
+    private val heldItemRenderer: ItemInHandRenderer
+) : RenderLayer<PifflingPumpkinEntity, PifflingPumpkinModel>(context) {
     override fun render(
-        matrices: MatrixStack,
-        vertexConsumers: VertexConsumerProvider,
+        matrices: PoseStack,
+        vertexConsumers: MultiBufferSource,
         light: Int,
         entity: PifflingPumpkinEntity,
         f: Float,
@@ -31,18 +31,18 @@ class PifflingPumpkinHeldItemFeatureRenderer(
         k: Float,
         l: Float
     ) {
-        val bl = entity.mainArm == Arm.RIGHT
-        val mainhand: ItemStack = if (bl) entity.mainHandStack else entity.offHandStack
-        val offhand: ItemStack = if (bl) entity.offHandStack else entity.mainHandStack
+        val bl = entity.mainArm == HumanoidArm.RIGHT
+        val mainhand: ItemStack = if (bl) entity.mainHandItem else entity.offhandItem
+        val offhand: ItemStack = if (bl) entity.offhandItem else entity.mainHandItem
         if (!mainhand.isEmpty || !offhand.isEmpty) {
-            val model = (this.contextModel as PifflingPumpkinModel)
+            val model = (this.parentModel as PifflingPumpkinModel)
             this.renderItem(
                 entity,
                 model,
                 model.rightArm,
                 mainhand,
-                ModelTransformationMode.THIRD_PERSON_RIGHT_HAND,
-                Arm.RIGHT,
+                ItemDisplayContext.THIRD_PERSON_RIGHT_HAND,
+                HumanoidArm.RIGHT,
                 matrices,
                 vertexConsumers,
                 light
@@ -52,8 +52,8 @@ class PifflingPumpkinHeldItemFeatureRenderer(
                 model,
                 model.leftArm,
                 offhand,
-                ModelTransformationMode.THIRD_PERSON_LEFT_HAND,
-                Arm.LEFT,
+                ItemDisplayContext.THIRD_PERSON_LEFT_HAND,
+                HumanoidArm.LEFT,
                 matrices,
                 vertexConsumers,
                 light
@@ -66,10 +66,10 @@ class PifflingPumpkinHeldItemFeatureRenderer(
         model: PifflingPumpkinModel,
         armPart: ModelPart,
         stack: ItemStack,
-        transformationMode: ModelTransformationMode,
-        arm: Arm,
-        matrices: MatrixStack,
-        vertexConsumers: VertexConsumerProvider,
+        transformationMode: ItemDisplayContext,
+        arm: HumanoidArm,
+        matrices: PoseStack,
+        vertexConsumers: MultiBufferSource,
         light: Int
     ) {
         if (!stack.isEmpty) {
@@ -83,14 +83,14 @@ class PifflingPumpkinHeldItemFeatureRenderer(
 //            matrices.pop()
 
 
-            matrices.push()
+            matrices.pushPose()
             armPart.moveRelativeTo(matrices, model)
             matrices.translate(0f, 0.3f, -0.1f)
-            matrices.rotate(Axis.X_POSITIVE.rotationDegrees(-90.0f))
-            matrices.rotate(Axis.Y_POSITIVE.rotationDegrees(180.0f))
-            val bl = arm == Arm.LEFT
+            matrices.mulPose(Axis.XP.rotationDegrees(-90.0f))
+            matrices.mulPose(Axis.YP.rotationDegrees(180.0f))
+            val bl = arm == HumanoidArm.LEFT
             heldItemRenderer.renderItem(entity, stack, transformationMode, bl, matrices, vertexConsumers, light)
-            matrices.pop()
+            matrices.popPose()
         }
     }
 }

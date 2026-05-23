@@ -1,30 +1,30 @@
 package org.teamvoided.dusk_debris.block
 
-import net.minecraft.block.Block
-import net.minecraft.block.BlockState
-import net.minecraft.server.world.ServerWorld
-import net.minecraft.state.StateManager
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.random.RandomGenerator
-import net.minecraft.world.WorldAccess
+import net.minecraft.core.BlockPos
+import net.minecraft.server.level.ServerLevel
+import net.minecraft.util.RandomSource
+import net.minecraft.world.level.LevelAccessor
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.block.state.StateDefinition
 import org.teamvoided.dusk_debris.block.not_blocks.DuskProperties
 
-abstract class AbstractMysticalPowerBlock(settings: Settings) : Block(settings) {
+abstract class AbstractMysticalPowerBlock(settings: Properties) : Block(settings) {
     init {
-        this.defaultState = stateManager.defaultState.with(DuskProperties.ACTIVE, false)
+        this.registerDefaultState(stateDefinition.any().setValue(DuskProperties.ACTIVE, false))
     }
 
-    override fun scheduledTick(state: BlockState, world: ServerWorld, pos: BlockPos, random: RandomGenerator) {
-        val isActive = state.get(DuskProperties.ACTIVE)
-        world.setBlockState(pos, state.with(DuskProperties.ACTIVE, !isActive), 2)
+    override fun tick(state: BlockState, world: ServerLevel, pos: BlockPos, random: RandomSource) {
+        val isActive = state.getValue(DuskProperties.ACTIVE)
+        world.setBlock(pos, state.setValue(DuskProperties.ACTIVE, !isActive), 2)
         if (!isActive) scheduleTick(state.block, world, pos, DISABLE_DELAY)
-        super.scheduledTick(state, world, pos, random)
+        super.tick(state, world, pos, random)
     }
 
-    fun scheduleTick(block: Block, world: WorldAccess, pos: BlockPos, delay: Int = ACTIVATION_DELAY) =
-        world.scheduleBlockTick(pos, block, delay)
+    fun scheduleTick(block: Block, world: LevelAccessor, pos: BlockPos, delay: Int = ACTIVATION_DELAY) =
+        world.scheduleTick(pos, block, delay)
 
-    override fun appendProperties(builder: StateManager.Builder<Block, BlockState>) {
+    override fun createBlockStateDefinition(builder: StateDefinition.Builder<Block, BlockState>) {
         builder.add(DuskProperties.ACTIVE)
     }
 

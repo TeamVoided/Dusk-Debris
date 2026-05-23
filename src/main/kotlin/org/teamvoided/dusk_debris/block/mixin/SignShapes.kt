@@ -1,15 +1,14 @@
 package org.teamvoided.dusk_debris.block.mixin
 
-import net.minecraft.block.Block
-import net.minecraft.util.math.Direction
-import net.minecraft.util.shape.VoxelShape
-import net.minecraft.util.shape.VoxelShapes
+import net.minecraft.core.Direction
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.phys.shapes.VoxelShape
 import org.teamvoided.dusk_debris.util.rotate
 
 object SignShapes {
-    val WALL_SHAPE: VoxelShape = Block.createCuboidShape(0.0, 4.0, 0.0, 16.0, 12.0, 2.0)
+    val WALL_SHAPE: VoxelShape = Block.box(0.0, 4.0, 0.0, 16.0, 12.0, 2.0)
     @JvmStatic
-    fun getWallShape(facing: Direction): VoxelShape = WALL_SHAPE.rotate(facing.horizontal)
+    fun getWallShape(facing: Direction): VoxelShape = WALL_SHAPE.rotate(facing.get2DDataValue())
 
 //    private val post = Block.createCuboidShape(7.0, 0.0, 7.0, 9.0, 8.0, 9.0)
 //    @JvmStatic

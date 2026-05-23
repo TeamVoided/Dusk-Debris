@@ -1,23 +1,22 @@
 package org.teamvoided.dusk_debris.util.world_helper
 
-import net.minecraft.registry.RegistryKey
-import net.minecraft.world.biome.Biome
-import net.minecraft.world.biome.Biomes
-import net.minecraft.world.biome.source.util.MultiNoiseUtil.*
-import java.util.function.Function
 import com.mojang.datafixers.util.Pair
+import net.minecraft.resources.ResourceKey
+import net.minecraft.world.level.biome.Biome
+import net.minecraft.world.level.biome.Climate.*
+import java.util.function.Function
 
 
-fun <T> Function<RegistryKey<Biome>, T>.createNH(
-    biome: RegistryKey<Biome>,
-    temperature: ParameterRange,
-    humidity: ParameterRange,
-    continentalness: ParameterRange,
-    erosion: ParameterRange,
-    depth: ParameterRange,
-    weirdness: ParameterRange,
-): kotlin.Pair<T, NoiseHypercube> {
-    return this.apply(biome) to NoiseHypercube(
+fun <T> Function<ResourceKey<Biome>, T>.createNH(
+    biome: ResourceKey<Biome>,
+    temperature: Parameter,
+    humidity: Parameter,
+    continentalness: Parameter,
+    erosion: Parameter,
+    depth: Parameter,
+    weirdness: Parameter,
+): kotlin.Pair<T, ParameterPoint> {
+    return this.apply(biome) to ParameterPoint(
         temperature,
         humidity,
         continentalness,
@@ -35,61 +34,61 @@ val positiveRange = range(0f, 1)
 val zeroRange = range(0f)
 
 data class NoiseHyper3(
-    var biome: RegistryKey<Biome>,
-    var temperature: ParameterRange = zeroRange,
-    var humidity: ParameterRange = zeroRange,
-    var continentalness: ParameterRange = zeroRange,
-    var erosion: ParameterRange = zeroRange,
-    var depth: ParameterRange = zeroRange,
-    var weirdness: ParameterRange = zeroRange,
+    var biome: ResourceKey<Biome>,
+    var temperature: Parameter = zeroRange,
+    var humidity: Parameter = zeroRange,
+    var continentalness: Parameter = zeroRange,
+    var erosion: Parameter = zeroRange,
+    var depth: Parameter = zeroRange,
+    var weirdness: Parameter = zeroRange,
     var offset: Float = 0f
 ) {
-    fun create(): Pair<NoiseHypercube, RegistryKey<Biome>> =
-        Pair(createNoiseHypercube(temperature, humidity, continentalness, erosion, depth, weirdness, offset), biome)
+    fun create(): Pair<ParameterPoint, ResourceKey<Biome>> =
+        Pair(parameters(temperature, humidity, continentalness, erosion, depth, weirdness, offset), biome)
 
-    fun biome(biome: RegistryKey<Biome>): NoiseHyper3 {
+    fun biome(biome: ResourceKey<Biome>): NoiseHyper3 {
         this.biome = biome
         return this
     }
 
     fun temperature(range: Number): NoiseHyper3 = temperature(range(range))
 
-    fun temperature(range: ParameterRange): NoiseHyper3 {
+    fun temperature(range: Parameter): NoiseHyper3 {
         this.temperature = range
         return this
     }
 
     fun humidity(range: Number): NoiseHyper3 = humidity(range(range))
 
-    fun humidity(range: ParameterRange): NoiseHyper3 {
+    fun humidity(range: Parameter): NoiseHyper3 {
         this.humidity = range
         return this
     }
 
     fun continentalness(range: Number): NoiseHyper3 = continentalness(range(range))
 
-    fun continentalness(range: ParameterRange): NoiseHyper3 {
+    fun continentalness(range: Parameter): NoiseHyper3 {
         this.continentalness = range
         return this
     }
 
     fun erosion(range: Number): NoiseHyper3 = erosion(range(range))
 
-    fun erosion(range: ParameterRange): NoiseHyper3 {
+    fun erosion(range: Parameter): NoiseHyper3 {
         this.erosion = range
         return this
     }
 
     fun depth(range: Number): NoiseHyper3 = depth(range(range))
 
-    fun depth(range: ParameterRange): NoiseHyper3 {
+    fun depth(range: Parameter): NoiseHyper3 {
         this.depth = range
         return this
     }
 
     fun weirdness(range: Number): NoiseHyper3 = weirdness(range(range))
 
-    fun weirdness(range: ParameterRange): NoiseHyper3 {
+    fun weirdness(range: Parameter): NoiseHyper3 {
         this.weirdness = range
         return this
     }

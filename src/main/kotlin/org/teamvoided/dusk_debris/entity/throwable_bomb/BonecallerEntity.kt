@@ -1,23 +1,23 @@
 package org.teamvoided.dusk_debris.entity.throwable_bomb
 
-import net.minecraft.component.DataComponentTypes
-import net.minecraft.component.type.DyedColorComponent
-import net.minecraft.entity.EntityType
-import net.minecraft.entity.EquipmentSlot
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.SpawnReason
-import net.minecraft.entity.mob.AbstractSkeletonEntity
-import net.minecraft.entity.mob.SkeletonEntity
-import net.minecraft.item.Item
-import net.minecraft.particle.ParticleEffect
-import net.minecraft.scoreboard.Team
-import net.minecraft.server.world.ServerWorld
-import net.minecraft.sound.SoundCategory
-import net.minecraft.sound.SoundEvents
+import net.minecraft.core.BlockPos
+import net.minecraft.core.component.DataComponents
+import net.minecraft.core.particles.ParticleOptions
+import net.minecraft.server.level.ServerLevel
+import net.minecraft.sounds.SoundEvents
+import net.minecraft.sounds.SoundSource
+import net.minecraft.util.Mth
 import net.minecraft.util.SpawnUtil
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.MathHelper
-import net.minecraft.world.World
+import net.minecraft.world.entity.EntityType
+import net.minecraft.world.entity.EquipmentSlot
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.MobSpawnType
+import net.minecraft.world.entity.monster.AbstractSkeleton
+import net.minecraft.world.entity.monster.Skeleton
+import net.minecraft.world.item.Item
+import net.minecraft.world.item.component.DyedItemColor
+import net.minecraft.world.level.Level
+import net.minecraft.world.scores.PlayerTeam
 import org.teamvoided.dusk_debris.init.DuskBlocks
 import org.teamvoided.dusk_debris.init.DuskEntities
 import org.teamvoided.dusk_debris.init.DuskItems
@@ -27,53 +27,53 @@ import java.awt.Color
 open class BonecallerEntity : AbstractThrwowableBombEntity {
     var owner: LivingEntity? = null
 
-    constructor(entityType: EntityType<out BonecallerEntity>, world: World) : super(entityType, world)
+    constructor(entityType: EntityType<out BonecallerEntity>, world: Level) : super(entityType, world)
 
-    constructor(world: World) : super(DuskEntities.BONECALLER, world)
-    constructor(entityType: EntityType<out BonecallerEntity>, owner: LivingEntity?, world: World) :
+    constructor(world: Level) : super(DuskEntities.BONECALLER, world)
+    constructor(entityType: EntityType<out BonecallerEntity>, owner: LivingEntity?, world: Level) :
             super(entityType, owner, world) {
         this.owner = owner
     }
 
-    constructor(owner: LivingEntity?, world: World) :
+    constructor(owner: LivingEntity?, world: Level) :
             super(DuskEntities.BONECALLER, owner, world) {
         this.owner = owner
     }
 
-    constructor(x: Double, y: Double, z: Double, world: World) :
+    constructor(x: Double, y: Double, z: Double, world: Level) :
             super(DuskEntities.BONECALLER, x, y, z, world)
 
-    constructor(entityType: EntityType<out BonecallerEntity>, x: Double, y: Double, z: Double, world: World) :
+    constructor(entityType: EntityType<out BonecallerEntity>, x: Double, y: Double, z: Double, world: Level) :
             super(entityType, x, y, z, world)
 
     override fun explode() {
-        world.playSound(
+        level().playSound(
             this,
-            this.blockPos,
-            SoundEvents.BLOCK_GLASS_BREAK,
-            SoundCategory.BLOCKS,
+            this.blockPosition(),
+            SoundEvents.GLASS_BREAK,
+            SoundSource.BLOCKS,
             0.7f,
-            0.0f + world.random.nextFloat() * 0.2f
+            0.0f + level().random.nextFloat() * 0.2f
         )
         bonecall(owner)
         super.explode()
     }
 
     open fun bonecall(livingEntity: LivingEntity?) {
-        if (!world.isClient) {
-            val serverWorld = this.world as ServerWorld
-            val team: Team? = livingEntity?.scoreboardTeam
-            val bandanaColor = if (team != null) team.color.colorValue!! else bandanaColors()
-            if (!world.isClient) {
+        if (!level().isClientSide) {
+            val serverWorld = this.level() as ServerLevel
+            val team: PlayerTeam? = livingEntity?.team
+            val bandanaColor = if (team != null) team.color.color!! else bandanaColors()
+            if (!level().isClientSide) {
                 for (ignored in 1..3) {
                     getCalledEntity(serverWorld, bandanaColor, team)
                 }
             }
-            serverWorld.spawnParticles(
+            serverWorld.sendParticles(
                 getTrailingParticle(),
-                blockPos.x + 0.5,
-                blockPos.y.toDouble(),
-                blockPos.z + 0.5,
+                blockPosition().x + 0.5,
+                blockPosition().y.toDouble(),
+                blockPosition().z + 0.5,
                 20,
                 0.0,
                 0.0,
@@ -83,36 +83,36 @@ open class BonecallerEntity : AbstractThrwowableBombEntity {
         }
     }
 
-    open fun getCalledEntity(serverWorld: ServerWorld, bandanaColor: Int, team: Team?) {
+    open fun getCalledEntity(serverWorld: ServerLevel, bandanaColor: Int, team: PlayerTeam?) {
         //overide this to get your own
-        val bandana = DuskItems.BONECALLER_BANDANA.defaultStack
-        val skeletonEntity = SkeletonEntity(EntityType.SKELETON as EntityType<out SkeletonEntity>, world)
+        val bandana = DuskItems.BONECALLER_BANDANA.defaultInstance
+        val skeletonEntity = Skeleton(EntityType.SKELETON as EntityType<out Skeleton>, level())
         val spawnPos = getSummonPos(
             skeletonEntity,
-            SpawnReason.MOB_SUMMONED,
+            MobSpawnType.MOB_SUMMONED,
             serverWorld,
-            blockPos,
+            blockPosition(),
             20,
             3,
             6,
-            SpawnUtil.Strategy.field_39401
+            SpawnUtil.Strategy.ON_TOP_OF_COLLIDER
         )
-        skeletonEntity.refreshPositionAndAngles(spawnPos, 0f, 0.0f)
-        skeletonEntity.initialize(
+        skeletonEntity.moveTo(spawnPos, 0f, 0.0f)
+        skeletonEntity.finalizeSpawn(
             serverWorld,
-            this.world.getLocalDifficulty(this.blockPos),
-            SpawnReason.MOB_SUMMONED,
+            this.level().getCurrentDifficultyAt(this.blockPosition()),
+            MobSpawnType.MOB_SUMMONED,
             null
         )
         bandana.set(
-            DataComponentTypes.DYED_COLOR,
-            DyedColorComponent(bandanaColor, true)
+            DataComponents.DYED_COLOR,
+            DyedItemColor(bandanaColor, true)
         )
-        skeletonEntity.equipStack(EquipmentSlot.HEAD, bandana)
+        skeletonEntity.setItemSlot(EquipmentSlot.HEAD, bandana)
         if (team != null) {
-            serverWorld.scoreboard.addPlayerToTeam(skeletonEntity.profileName, team)
+            serverWorld.scoreboard.addPlayerToTeam(skeletonEntity.scoreboardName, team)
         }
-        serverWorld.spawnParticles(
+        serverWorld.sendParticles(
             getTrailingParticle(),
             spawnPos.x + 0.5,
             spawnPos.y.toDouble(),
@@ -123,13 +123,13 @@ open class BonecallerEntity : AbstractThrwowableBombEntity {
             0.0,
             1.0
         )
-        world.spawnEntity(skeletonEntity)
+        level().addFreshEntity(skeletonEntity)
     }
 
     open fun getSummonPos(
-        entityType: AbstractSkeletonEntity,
-        reason: SpawnReason,
-        world: ServerWorld,
+        entityType: AbstractSkeleton,
+        reason: MobSpawnType,
+        world: ServerLevel,
         pos: BlockPos,
         attempts: Int,
         rangeXZ: Int,
@@ -137,14 +137,14 @@ open class BonecallerEntity : AbstractThrwowableBombEntity {
         spawnStrategy: SpawnUtil.Strategy
     ): BlockPos {
         //overide this to get your own
-        val mutable = pos.mutableCopy()
+        val mutable = pos.mutable()
         for (l in 0 until attempts) {
-            val x = MathHelper.nextBetween(world.random, -rangeXZ, rangeXZ)
-            val z = MathHelper.nextBetween(world.random, -rangeXZ, rangeXZ)
-            mutable[pos, x, rangeY] = z
-            if (world.worldBorder.contains(mutable) && SpawnUtil.method_42121(world, rangeY, mutable, spawnStrategy)) {
-                if (entityType.canSpawn(world, reason) &&
-                    world.doesNotIntersectEntities(entityType)
+            val x = Mth.randomBetweenInclusive(world.random, -rangeXZ, rangeXZ)
+            val z = Mth.randomBetweenInclusive(world.random, -rangeXZ, rangeXZ)
+            mutable.setWithOffset(pos, x, rangeY, z)
+            if (world.worldBorder.isWithinBounds(mutable) && SpawnUtil.moveToPossibleSpawnPosition(world, rangeY, mutable, spawnStrategy)) {
+                if (entityType.checkSpawnRules(world, reason) &&
+                    world.isUnobstructed(entityType)
                 ) {
                     return mutable
                 }
@@ -170,7 +170,7 @@ open class BonecallerEntity : AbstractThrwowableBombEntity {
     open val color1: Color = Color(0xEFC90B)
     open val color2: Color = Color(0x935D26)
 
-    override fun getTrailingParticle(): ParticleEffect = BonecallerParticleEffect(color1.rgb, color2.rgb)
+    override fun getTrailingParticle(): ParticleOptions = BonecallerParticleEffect(color1.rgb, color2.rgb)
     fun Color.lerp(other: Color, amount: Float): Color {
         return Color(
             (this.red * (1 - amount) + other.red * amount).toInt(),

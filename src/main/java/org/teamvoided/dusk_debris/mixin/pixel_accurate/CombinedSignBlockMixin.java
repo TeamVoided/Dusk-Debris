@@ -1,23 +1,21 @@
 package org.teamvoided.dusk_debris.mixin.pixel_accurate;
 
-import com.mojang.serialization.MapCodec;
-import net.minecraft.block.BlockRenderType;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.WoodType;
-import net.minecraft.block.sign.AbstractSignBlock;
-import net.minecraft.block.sign.SignBlock;
-import net.minecraft.block.sign.WallSignBlock;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.SignBlock;
+import net.minecraft.world.level.block.StandingSignBlock;
+import net.minecraft.world.level.block.WallSignBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.WoodType;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 
-@Mixin({SignBlock.class, WallSignBlock.class})
-public abstract class CombinedSignBlockMixin extends AbstractSignBlock {
-    protected CombinedSignBlockMixin(WoodType type, Settings settings) {
+@Mixin({StandingSignBlock.class, WallSignBlock.class})
+public abstract class CombinedSignBlockMixin extends SignBlock {
+    protected CombinedSignBlockMixin(WoodType type, Properties settings) {
         super(type, settings);
     }
 
     @Override
-    protected BlockRenderType getRenderType(BlockState state) {
-        return BlockRenderType.MODEL;
+    protected RenderShape getRenderShape(BlockState state) {
+        return RenderShape.MODEL;
     }
 }

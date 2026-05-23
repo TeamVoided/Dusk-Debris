@@ -1,8 +1,8 @@
 package org.teamvoided.dusk_debris.data.tags
 
-import net.minecraft.entity.damage.DamageType
-import net.minecraft.registry.RegistryKeys
-import net.minecraft.registry.tag.TagKey
+import net.minecraft.core.registries.Registries
+import net.minecraft.tags.TagKey
+import net.minecraft.world.damagesource.DamageType
 import org.teamvoided.dusk_debris.DuskDebris
 
 object DuskDamageTypeTags {
@@ -11,8 +11,9 @@ object DuskDamageTypeTags {
     val BYPASSES_GREED_RESISTANCE = create("bypasses_greed_resistance")
 
 
-    fun create(id: String): TagKey<DamageType> = TagKey.of(RegistryKeys.DAMAGE_TYPE, DuskDebris.id(id))
-    fun create(modId: String, path: String): TagKey<DamageType> = TagKey.of(RegistryKeys.DAMAGE_TYPE,
+    fun create(id: String): TagKey<DamageType> = TagKey.create(Registries.DAMAGE_TYPE, DuskDebris.id(id))
+    fun create(modId: String, path: String): TagKey<DamageType> = TagKey.create(
+        Registries.DAMAGE_TYPE,
         DuskDebris.id(modId, path)
     )
 

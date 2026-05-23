@@ -2,32 +2,32 @@ package org.teamvoided.dusk_debris.world.gen.tree.foliage
 
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
-import net.minecraft.util.math.int_provider.ConstantIntProvider
-import net.minecraft.util.math.int_provider.IntProvider
-import net.minecraft.util.random.RandomGenerator
-import net.minecraft.world.TestableWorld
-import net.minecraft.world.gen.feature.TreeFeatureConfig
-import net.minecraft.world.gen.foliage.FoliagePlacerType
+import net.minecraft.util.RandomSource
+import net.minecraft.util.valueproviders.ConstantInt
+import net.minecraft.util.valueproviders.IntProvider
+import net.minecraft.world.level.LevelSimulatedReader
+import net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration
+import net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacerType
 import org.teamvoided.dusk_debris.init.worldgen.trees.DuskTreeStuff
 
 class OakFoliagePlacer(radius: IntProvider, offset: IntProvider) : FoliageHelper(radius, offset) {
-    constructor(radius: Int, offset: Int) : this(ConstantIntProvider.create(radius), ConstantIntProvider.create(offset))
+    constructor(radius: Int, offset: Int) : this(ConstantInt.of(radius), ConstantInt.of(offset))
 
-    override fun getType(): FoliagePlacerType<OakFoliagePlacer> = DuskTreeStuff.OAK_FOLIAGE_PLACER
+    override fun type(): FoliagePlacerType<OakFoliagePlacer> = DuskTreeStuff.OAK_FOLIAGE_PLACER
 
     override fun createFoliage(
-        world: TestableWorld,
-        placer: Placer,
-        random: RandomGenerator,
-        config: TreeFeatureConfig,
+        world: LevelSimulatedReader,
+        placer: FoliageSetter,
+        random: RandomSource,
+        config: TreeConfiguration,
         trunkHeight: Int,
-        node: TreeNode,
+        node: FoliageAttachment,
         foliageHeight: Int,
         radius: Int,
         offset: Int
     ) {
-        val blockPos = node.center.up(offset)
-        val isBig = node.isGiantTrunk
+        val blockPos = node.pos().above(offset)
+        val isBig = node.doubleTrunk()
         if (!isBig) {
             val twoThird = 0.3f
 
@@ -44,12 +44,12 @@ class OakFoliagePlacer(radius: IntProvider, offset: IntProvider) : FoliageHelper
         }
     }
 
-    override fun getRandomHeight(random: RandomGenerator, trunkHeight: Int, config: TreeFeatureConfig): Int = 0
+    override fun foliageHeight(random: RandomSource, trunkHeight: Int, config: TreeConfiguration): Int = 0
 
     companion object {
         val CODEC: MapCodec<OakFoliagePlacer> =
             RecordCodecBuilder.mapCodec { instance ->
-                fillFoliagePlacerFields(instance)
+                foliagePlacerParts(instance)
                     .apply(instance, ::OakFoliagePlacer)
             }
     }

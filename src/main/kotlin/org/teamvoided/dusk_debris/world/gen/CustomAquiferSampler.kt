@@ -1,22 +1,18 @@
 package org.teamvoided.dusk_debris.world.gen
 
-import net.minecraft.block.BlockState
-import net.minecraft.util.math.ChunkPos
-import net.minecraft.util.random.PositionalRandomFactory
-import net.minecraft.world.gen.DensityFunction
-import net.minecraft.world.gen.chunk.AquiferSampler
-import net.minecraft.world.gen.chunk.ChunkNoiseSampler
-import net.minecraft.world.gen.noise.NoiseRouter
+import net.minecraft.world.level.ChunkPos
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.levelgen.*
 
-interface CustomAquiferSampler : AquiferSampler {
+interface CustomAquiferSampler : Aquifer {
     class ImplCustomNether internal constructor(
-        private val chunkNoiseSampler: ChunkNoiseSampler,
+        private val chunkNoiseSampler: NoiseChunk,
         pos: ChunkPos,
         noise: NoiseRouter,
         private val positionalRandomFactory: PositionalRandomFactory,
         startY: Int,
         endY: Int,
-        private val globalFluidPicker: AquiferSampler.FluidPicker
+        private val globalFluidPicker: Aquifer.FluidPicker
     ) : CustomAquiferSampler {
         private val barrierNoise: DensityFunction = noise.barrierNoise()
         private val fluidLevelFloodednessNoise: DensityFunction = noise.fluidLevelFloodednessNoise()
@@ -46,7 +42,7 @@ interface CustomAquiferSampler : AquiferSampler {
 //        }
 
 
-        override fun apply(c: DensityFunction.FunctionContext, baseNoise: Double): BlockState? {
+        override fun computeSubstance(c: DensityFunction.FunctionContext, baseNoise: Double): BlockState? {
             if (baseNoise > 0.0) return null
 
             val posX = c.blockX()
@@ -54,7 +50,7 @@ interface CustomAquiferSampler : AquiferSampler {
             val posZ = c.blockZ()
             val floodedness = fluidLevelFloodednessNoise.compute(c)
             val posY2 = (posY - floodedness).toInt()
-            return globalFluidPicker.computeFluid(posX, posY2, posZ).getBlockState(posY2)
+            return globalFluidPicker.computeFluid(posX, posY2, posZ).at(posY2)
 
 //            if (floodedness > 0) {
 //                val posY2 = (posY - ((floodedness * 32) / 4).toInt() * 4)
@@ -64,21 +60,21 @@ interface CustomAquiferSampler : AquiferSampler {
 //            return AquiferSampler.seaLevel(globalFluidPicker).apply(c, noiseIDWJ)
         }
 
-        override fun needsFluidTick(): Boolean = needsFluidTick
+        override fun shouldScheduleFluidUpdate(): Boolean = needsFluidTick
     }
 
     companion object {
         const val NETHER_SEA_LEVEL = 32
 
         fun netherSeaLevel(
-            chunkNoiseSampler: ChunkNoiseSampler,
+            chunkNoiseSampler: NoiseChunk,
             pos: ChunkPos,
             noiseRouter: NoiseRouter,
             positionalRandomFactory: PositionalRandomFactory,
             startY: Int,
             height: Int,
-            globalFluidPicker: AquiferSampler.FluidPicker
-        ): AquiferSampler {
+            globalFluidPicker: Aquifer.FluidPicker
+        ): Aquifer {
             return ImplCustomNether(
                 chunkNoiseSampler,
                 pos,
@@ -90,9 +86,9 @@ interface CustomAquiferSampler : AquiferSampler {
             )
         }
 
-        fun netherSeaLevel(fluidPicker: AquiferSampler.FluidPicker): AquiferSampler {
-            return object : AquiferSampler {
-                override fun apply(
+        fun netherSeaLevel(fluidPicker: Aquifer.FluidPicker): Aquifer {
+            return object : Aquifer {
+                override fun computeSubstance(
                     densityFunctionContext: DensityFunction.FunctionContext,
                     baseNoise: Double
                 ): BlockState? {
@@ -100,10 +96,10 @@ interface CustomAquiferSampler : AquiferSampler {
                         densityFunctionContext.blockX(),
                         densityFunctionContext.blockY(),
                         densityFunctionContext.blockZ()
-                    ).getBlockState(densityFunctionContext.blockY())
+                    ).at(densityFunctionContext.blockY())
                 }
 
-                override fun needsFluidTick(): Boolean {
+                override fun shouldScheduleFluidUpdate(): Boolean {
                     return false
                 }
             }

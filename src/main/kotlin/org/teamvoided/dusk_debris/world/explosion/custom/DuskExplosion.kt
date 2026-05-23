@@ -1,33 +1,33 @@
 package org.teamvoided.dusk_debris.world.explosion.custom
 
-import net.minecraft.entity.damage.DamageSource
-import net.minecraft.particle.ParticleEffect
-import net.minecraft.server.world.ServerWorld
-import net.minecraft.util.math.Vec3d
+import net.minecraft.core.particles.ParticleOptions
+import net.minecraft.server.level.ServerLevel
+import net.minecraft.world.damagesource.DamageSource
+import net.minecraft.world.phys.Vec3
 import org.teamvoided.dusk_debris.util.box
 import org.teamvoided.dusk_debris.util.spawnParticles
 
 class DuskExplosion {
     constructor(
-        world: ServerWorld,
+        world: ServerLevel,
         radius: Double,
         damage: Float,
         source: DamageSource,
-        originPos: Vec3d,
-        particle: ParticleEffect
+        originPos: Vec3,
+        particle: ParticleOptions
     ) {
         damageEntities(world, originPos, radius, damage, source)
         particles(world, radius, originPos, particle)
     }
 
     constructor(
-        world: ServerWorld,
+        world: ServerLevel,
         radius: Double,
         damage: Float,
         source: DamageSource,
-        particle: ParticleEffect? = null
+        particle: ParticleOptions? = null
     ) {
-        val origin = source.position
+        val origin = source.sourcePosition
         if (origin != null) {
             damageEntities(world, origin, radius, damage, source)
             if (particle != null) {
@@ -120,19 +120,19 @@ class DuskExplosion {
 //        }
 //    }
 
-    fun damageEntities(world: ServerWorld, origin: Vec3d, radius: Double, damage: Float, source: DamageSource) {
+    fun damageEntities(world: ServerLevel, origin: Vec3, radius: Double, damage: Float, source: DamageSource) {
         val entitiesInRange =
-            world.getOtherEntities(null, box(radius).offset(origin))
+            world.getEntities(null, box(radius).move(origin))
             {
 //                !it.type.isIn(EntityTypeTags.EXPL)
                 it.isAlive
-                it.squaredDistanceTo(origin) <= radius * radius
+                it.distanceToSqr(origin) <= radius * radius
             }
-        entitiesInRange.sortBy { it.pos.add(0.0, it.height / 2.0, 0.0).squaredDistanceTo(origin) }
+        entitiesInRange.sortBy { it.position().add(0.0, it.bbHeight / 2.0, 0.0).distanceToSqr(origin) }
         entitiesInRange.forEach {
-            val position = it.pos.add(0.0, it.height / 2.0, 0.0)
+            val position = it.position().add(0.0, it.bbHeight / 2.0, 0.0)
             val distance = position.subtract(origin).length()
-            it.damage(source, damageDistance(damage, distance, radius))
+            it.hurt(source, damageDistance(damage, distance, radius))
         }
     }
 
@@ -141,15 +141,15 @@ class DuskExplosion {
         return ((square * square) * damage).toFloat()
     }
 
-    fun particles(world: ServerWorld, radius: Double, origin: Vec3d, particle: ParticleEffect) {
+    fun particles(world: ServerLevel, radius: Double, origin: Vec3, particle: ParticleOptions) {
         world.spawnParticles(
             particle,
             origin,
-            Vec3d(
+            Vec3(
                 world.random.nextDouble() - 0.5,
                 world.random.nextDouble() - 0.5,
                 world.random.nextDouble() - 0.5
-            ).normalize().multiply(radius)
+            ).normalize().scale(radius)
         )
     }
 }

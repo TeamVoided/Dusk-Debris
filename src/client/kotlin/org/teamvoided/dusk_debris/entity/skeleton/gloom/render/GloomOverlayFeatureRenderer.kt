@@ -1,27 +1,29 @@
 package org.teamvoided.dusk_debris.entity.skeleton.gloom.render
 
-import net.minecraft.client.MinecraftClient
-import net.minecraft.client.render.RenderLayer
-import net.minecraft.client.render.VertexConsumerProvider
-import net.minecraft.client.render.entity.LivingEntityRenderer
-import net.minecraft.client.render.entity.feature.FeatureRendererContext
-import net.minecraft.client.render.entity.feature.SkeletonOverlayFeatureRenderer
-import net.minecraft.client.render.entity.model.*
-import net.minecraft.client.util.ColorUtil
-import net.minecraft.client.util.math.MatrixStack
-import net.minecraft.util.Identifier
+import com.mojang.blaze3d.vertex.PoseStack
+import net.minecraft.client.model.EntityModel
+import net.minecraft.client.model.SkeletonModel
+import net.minecraft.client.model.geom.EntityModelSet
+import net.minecraft.client.model.geom.ModelLayerLocation
+import net.minecraft.client.renderer.MultiBufferSource
+import net.minecraft.client.renderer.RenderType
+import net.minecraft.client.renderer.entity.LivingEntityRenderer
+import net.minecraft.client.renderer.entity.RenderLayerParent
+import net.minecraft.client.renderer.entity.layers.SkeletonClothingLayer
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.util.FastColor
 import org.teamvoided.dusk_debris.entity.GloomEntity
 
 class GloomOverlayFeatureRenderer<M : EntityModel<GloomEntity>>(
-    context: FeatureRendererContext<GloomEntity, M>,
-    private val modelLoader: EntityModelLoader,
-    private val layer: EntityModelLayer,
-    private val textureGloomOverlay: Identifier
-) : SkeletonOverlayFeatureRenderer<GloomEntity, M>(context, modelLoader, layer, textureGloomOverlay) {
+    context: RenderLayerParent<GloomEntity, M>,
+    private val modelLoader: EntityModelSet,
+    private val layer: ModelLayerLocation,
+    private val textureGloomOverlay: ResourceLocation
+) : SkeletonClothingLayer<GloomEntity, M>(context, modelLoader, layer, textureGloomOverlay) {
 
     override fun render(
-        matrices: MatrixStack,
-        vertexConsumers: VertexConsumerProvider,
+        matrices: PoseStack,
+        vertexConsumers: MultiBufferSource,
         i: Int,
         entity: GloomEntity,
         f: Float,
@@ -32,13 +34,13 @@ class GloomOverlayFeatureRenderer<M : EntityModel<GloomEntity>>(
         l: Float
     ) {
         if (!entity.isLightMode() && !entity.isInvisible) {
-            val vc = vertexConsumers.getBuffer(RenderLayer.getBeaconBeam(textureGloomOverlay, true))
-                .color(ColorUtil.Argb32.of(entity.age % 256, -1))
-            val model = SkeletonEntityModel<GloomEntity>(modelLoader.getModelPart(layer))
-            (this.contextModel).copyStateTo(model)
-            model.animateModel(entity, f, g, h)
-            model.setAngles(entity, f, g, j, k, l)
-            model.method_60879(matrices, vc, i, LivingEntityRenderer.getOverlay(entity, 0.0f))
+            val vc = vertexConsumers.getBuffer(RenderType.beaconBeam(textureGloomOverlay, true))
+                .setColor(FastColor.ARGB32.color(entity.tickCount % 256, -1))
+            val model = SkeletonModel<GloomEntity>(modelLoader.bakeLayer(layer))
+            (this.parentModel).copyPropertiesTo(model)
+            model.prepareMobModel(entity, f, g, h)
+            model.setupAnim(entity, f, g, j, k, l)
+            model.renderToBuffer(matrices, vc, i, LivingEntityRenderer.getOverlayCoords(entity, 0.0f))
         } else
             super.render(matrices, vertexConsumers, i, entity, f, g, h, j, k, l)
     }

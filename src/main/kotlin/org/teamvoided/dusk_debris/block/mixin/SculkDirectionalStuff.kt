@@ -1,30 +1,24 @@
 package org.teamvoided.dusk_debris.block.mixin
 
-import net.minecraft.block.Block
-import net.minecraft.block.BlockState
-import net.minecraft.block.Blocks
-import net.minecraft.block.CalibratedSculkSensorBlock
-import net.minecraft.block.sculk.SculkBlock
-import net.minecraft.block.sculk.SculkShriekerBlock
-import net.minecraft.entity.Entity
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.fluid.Fluids
-import net.minecraft.item.ItemPlacementContext
-import net.minecraft.registry.tag.BlockTags
-import net.minecraft.sound.SoundCategory
-import net.minecraft.state.property.DirectionProperty
-import net.minecraft.state.property.Properties
-import net.minecraft.util.BlockMirror
-import net.minecraft.util.BlockRotation
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Direction
-import net.minecraft.util.math.Vec3i
-import net.minecraft.util.random.RandomGenerator
-import net.minecraft.util.shape.VoxelShape
-import net.minecraft.world.StructureWorldAccess
-import net.minecraft.world.WorldAccess
-import net.minecraft.world.gen.feature.SculkPatchFeatureConfig
-import net.minecraft.world.gen.feature.util.FeatureContext
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
+import net.minecraft.core.Vec3i
+import net.minecraft.sounds.SoundSource
+import net.minecraft.tags.BlockTags
+import net.minecraft.util.RandomSource
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.item.context.BlockPlaceContext
+import net.minecraft.world.level.LevelAccessor
+import net.minecraft.world.level.WorldGenLevel
+import net.minecraft.world.level.block.*
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.block.state.properties.BlockStateProperties
+import net.minecraft.world.level.block.state.properties.DirectionProperty
+import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext
+import net.minecraft.world.level.levelgen.feature.configurations.SculkPatchConfiguration
+import net.minecraft.world.level.material.Fluids
+import net.minecraft.world.phys.shapes.VoxelShape
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import org.teamvoided.dusk_debris.data.tags.DuskBlockTags
 import org.teamvoided.dusk_debris.util.rotateVoxelShape
@@ -32,15 +26,15 @@ import org.teamvoided.dusk_debris.util.rotateVoxelShape
 object SculkDirectionalStuff {
 
     /* - - - BLOCK FUNCTIONS - - - */
-    private val HALF_BLOCK: VoxelShape = Block.createCuboidShape(0.0, 8.0, 0.0, 16.0, 16.0, 16.0)
-    private val HALF_NORTH_BLOCK: VoxelShape = Block.createCuboidShape(0.0, 0.0, 0.0, 16.0, 16.0, 8.0)
-    val FACING: DirectionProperty = Properties.FACING
+    private val HALF_BLOCK: VoxelShape = Block.box(0.0, 8.0, 0.0, 16.0, 16.0, 16.0)
+    private val HALF_NORTH_BLOCK: VoxelShape = Block.box(0.0, 0.0, 0.0, 16.0, 16.0, 8.0)
+    val FACING: DirectionProperty = BlockStateProperties.FACING
 
     @JvmStatic
     fun getDirectionalSlabShape(state: BlockState, cir: CallbackInfoReturnable<VoxelShape>) {
-        val facing = state.get(FACING)
+        val facing = state.getValue(FACING)
         if (facing.axis != Direction.Axis.Y) {
-            val times = state.get(FACING).horizontal
+            val times = state.getValue(FACING).get2DDataValue()
             cir.returnValue = rotateVoxelShape(times, HALF_NORTH_BLOCK)
         } else if (facing == Direction.DOWN) {
             cir.returnValue = HALF_BLOCK
@@ -48,13 +42,13 @@ object SculkDirectionalStuff {
     }
 
     @JvmStatic
-    fun getPlacementState(supr: BlockState?, ctx: ItemPlacementContext?): BlockState? {
+    fun getPlacementState(supr: BlockState?, ctx: BlockPlaceContext?): BlockState? {
         return if (ctx == null || supr == null) supr
-        else supr.with(FACING, ctx.side)
+        else supr.setValue(FACING, ctx.clickedFace)
     }
 
     @JvmStatic
-    fun isNotUp(state: BlockState) = state.get(Properties.FACING) != Direction.UP
+    fun isNotUp(state: BlockState) = state.getValue(BlockStateProperties.FACING) != Direction.UP
 
     @JvmStatic
     fun isNotCalibrated(block: Block) = block !is CalibratedSculkSensorBlock
@@ -64,26 +58,26 @@ object SculkDirectionalStuff {
         isNotCalibrated(state.block) && isNotUp(state)
 
     @JvmStatic
-    fun spin(state: BlockState, rotation: BlockRotation): BlockState =
-        state.with(FACING, rotation.rotate(state.get(FACING)))
+    fun spin(state: BlockState, rotation: Rotation): BlockState =
+        state.setValue(FACING, rotation.rotate(state.getValue(FACING)))
 
     @JvmStatic
-    fun spin(state: BlockState, mirror: BlockMirror): BlockState =
-        state.rotate(mirror.getRotation(state.get(FACING)))
+    fun spin(state: BlockState, mirror: Mirror): BlockState =
+        state.rotate(mirror.getRotation(state.getValue(FACING)))
 
     @JvmStatic
     fun noCreativeFlightAnnoyance(entity: Entity): Boolean =
-        !(entity is PlayerEntity && entity.isCreative && entity.abilities.flying)
+        !(entity is Player && entity.isCreative && entity.abilities.flying)
 
 
     /* - - - SPREADING FUNCTIONS - - - */
     @JvmStatic
     fun tryUseChargeSpreadRewrite(
-        world: WorldAccess,
+        world: LevelAccessor,
         pos: BlockPos,
         charge: Int,
         cost: Int,
-        random: RandomGenerator,
+        random: RandomSource,
         canSummon: Boolean
     ): Boolean {
         val worldState = world.getBlockState(pos)
@@ -91,13 +85,13 @@ object SculkDirectionalStuff {
         if (worldBlock is SculkBlock) {
             if (random.nextInt(cost) < charge) {
                 Direction.entries.forEach {
-                    val posOffset: BlockPos = pos.offset(it)
+                    val posOffset: BlockPos = pos.relative(it)
                     if (canSpreadTo(world, pos, it)) {
                         var blockState: BlockState =
                             worldBlock.getRandomGrowthState(world, posOffset, random, canSummon)
-                        if (blockState.contains(Properties.FACING) || it == Direction.UP) {
-                            blockState = blockState.withIfExists(Properties.FACING, it)
-                            world.setBlockState(posOffset, blockState, 3)
+                        if (blockState.hasProperty(BlockStateProperties.FACING) || it == Direction.UP) {
+                            blockState = blockState.trySetValue(BlockStateProperties.FACING, it)
+                            world.setBlock(posOffset, blockState, 3)
                             sound(world, pos, blockState)
                             return true
                         }
@@ -108,17 +102,17 @@ object SculkDirectionalStuff {
         return false
     }
 
-    private fun sound(world: WorldAccess, pos: BlockPos, state: BlockState) =
-        world.playSound(null, pos, state.soundGroup.placeSound, SoundCategory.BLOCKS, 1f, 1f)
+    private fun sound(world: LevelAccessor, pos: BlockPos, state: BlockState) =
+        world.playSound(null, pos, state.soundType.placeSound, SoundSource.BLOCKS, 1f, 1f)
 
-    private fun canSpreadTo(world: WorldAccess, pos: BlockPos, direction: Direction): Boolean {
-        val upState = world.getBlockState(pos.offset(direction))
-        if (upState.isAir || upState.isOf(Blocks.WATER) && upState.fluidState.isOf(Fluids.WATER)) {
+    private fun canSpreadTo(world: LevelAccessor, pos: BlockPos, direction: Direction): Boolean {
+        val upState = world.getBlockState(pos.relative(direction))
+        if (upState.isAir || upState.`is`(Blocks.WATER) && upState.fluidState.`is`(Fluids.WATER)) {
             val search: Iterator<BlockPos> = getIteratorFromDirection(pos, direction)
 
             var limit = 0
             search.forEach {
-                if (world.getBlockState(it).isIn(DuskBlockTags.SCULK_SPREAD_SEARCH) && ++limit > 2) {
+                if (world.getBlockState(it).`is`(DuskBlockTags.SCULK_SPREAD_SEARCH) && ++limit > 2) {
                     return false
                 }
             }
@@ -146,34 +140,34 @@ object SculkDirectionalStuff {
 //        val var4: Iterator<BlockPos> = BlockPos.iterate(pos.add(-4, 0, -4), pos.add(4, 2, 4)).iterator()
 
         val iterator: Iterator<BlockPos> = when (direction) {
-            Direction.UP -> BlockPos.iterate(
-                pos.add(-4, 0, -4),
-                pos.add(4, 2, 4)
+            Direction.UP -> BlockPos.betweenClosed(
+                pos.offset(-4, 0, -4),
+                pos.offset(4, 2, 4)
             ).iterator()
 
-            Direction.DOWN -> BlockPos.iterate(
-                pos.add(-4, -2, -4),
-                pos.add(4, 0, 4)
+            Direction.DOWN -> BlockPos.betweenClosed(
+                pos.offset(-4, -2, -4),
+                pos.offset(4, 0, 4)
             ).iterator()
 
-            Direction.NORTH -> BlockPos.iterate(
-                pos.add(-4, -4, -2),
-                pos.add(4, 4, 0)
+            Direction.NORTH -> BlockPos.betweenClosed(
+                pos.offset(-4, -4, -2),
+                pos.offset(4, 4, 0)
             ).iterator()
 
-            Direction.SOUTH -> BlockPos.iterate(
-                pos.add(-4, -4, 0),
-                pos.add(4, 4, 2)
+            Direction.SOUTH -> BlockPos.betweenClosed(
+                pos.offset(-4, -4, 0),
+                pos.offset(4, 4, 2)
             ).iterator()
 
-            Direction.WEST -> BlockPos.iterate(
-                pos.add(-2, -4, -4),
-                pos.add(0, 4, 4)
+            Direction.WEST -> BlockPos.betweenClosed(
+                pos.offset(-2, -4, -4),
+                pos.offset(0, 4, 4)
             ).iterator()
 
-            Direction.EAST -> BlockPos.iterate(
-                pos.add(0, -4, -4),
-                pos.add(2, 4, 4)
+            Direction.EAST -> BlockPos.betweenClosed(
+                pos.offset(0, -4, -4),
+                pos.offset(2, 4, 4)
             ).iterator()
         }
 
@@ -182,34 +176,34 @@ object SculkDirectionalStuff {
 
     /* - - - FEATURE FUNCTIONS - - - */
     @JvmStatic
-    fun featureCatalystAndShrieker(context: FeatureContext<SculkPatchFeatureConfig>) {
-        val config = context.config
-        val random = context.random
-        val world = context.world
-        val blockPos = context.origin
+    fun featureCatalystAndShrieker(context: FeaturePlaceContext<SculkPatchConfiguration>) {
+        val config = context.config()
+        val random = context.random()
+        val world = context.level()
+        val blockPos = context.origin()
 
         //blockPos is sculk block it is placing on
         if (random.nextFloat() <= config.catalystChance()) {
             extraGrowthCatalyst(world, blockPos)
         }
 
-        val extraGrowths = config.extraRareGrowths[random]
+        val extraGrowths = config.extraRareGrowths.sample(random)
         for (loop in 0 until extraGrowths) {
             extraGrowthShrieker(world, random, blockPos)
         }
     }
 
 
-    private fun extraGrowthCatalyst(world: StructureWorldAccess, blockPos: BlockPos) {
+    private fun extraGrowthCatalyst(world: WorldGenLevel, blockPos: BlockPos) {
         Direction.entries.forEach {
-            val posOffset = blockPos.offset(it)
+            val posOffset = blockPos.relative(it)
             if (
-                world.getBlockState(posOffset).isFullCube(world, posOffset) &&
-                (it == Direction.DOWN || world.getBlockState(blockPos).isIn(BlockTags.REPLACEABLE))
+                world.getBlockState(posOffset).isCollisionShapeFullBlock(world, posOffset) &&
+                (it == Direction.DOWN || world.getBlockState(blockPos).`is`(BlockTags.REPLACEABLE))
             ) {
-                world.setBlockState(
+                world.setBlock(
                     blockPos,
-                    Blocks.SCULK_CATALYST.defaultState.with(Properties.FACING, it.opposite),
+                    Blocks.SCULK_CATALYST.defaultBlockState().setValue(BlockStateProperties.FACING, it.opposite),
                     3
                 )
                 return
@@ -218,21 +212,21 @@ object SculkDirectionalStuff {
     }
 
     private fun extraGrowthShrieker(
-        world: StructureWorldAccess,
-        random: RandomGenerator,
+        world: WorldGenLevel,
+        random: RandomSource,
         blockPos: BlockPos
     ) {
         Direction.entries.forEach {
             val blockPosRand = blockPos.getRandomOffset(random, it)
             if (world.getBlockState(blockPosRand).isAir &&
-                world.getBlockState(blockPosRand.offset(it))
-                    .isSideSolidFullSquare(world, blockPosRand.offset(it), it.opposite)
+                world.getBlockState(blockPosRand.relative(it))
+                    .isFaceSturdy(world, blockPosRand.relative(it), it.opposite)
             ) {
-                world.setBlockState(
+                world.setBlock(
                     blockPosRand,
-                    Blocks.SCULK_SHRIEKER.defaultState
-                        .with(Properties.FACING, it.opposite)
-                        .with(SculkShriekerBlock.CAN_SUMMON, true),
+                    Blocks.SCULK_SHRIEKER.defaultBlockState()
+                        .setValue(BlockStateProperties.FACING, it.opposite)
+                        .setValue(SculkShriekerBlock.CAN_SUMMON, true),
                     3
                 )
                 return
@@ -240,14 +234,14 @@ object SculkDirectionalStuff {
         }
     }
 
-    private fun BlockPos.getRandomOffset(random: RandomGenerator, direction: Direction): BlockPos {
+    private fun BlockPos.getRandomOffset(random: RandomSource, direction: Direction): BlockPos {
         val x = random.nextInt(5) - 2
         val y = 0
         val z = random.nextInt(5) - 2
         return when (direction.axis) {
-            Direction.Axis.Y -> this.add(Vec3i(x, y, z))
-            Direction.Axis.X -> this.add(Vec3i(y, x, z))
-            Direction.Axis.Z -> this.add(Vec3i(x, z, y))
+            Direction.Axis.Y -> this.offset(Vec3i(x, y, z))
+            Direction.Axis.X -> this.offset(Vec3i(y, x, z))
+            Direction.Axis.Z -> this.offset(Vec3i(x, z, y))
         }
     }
 

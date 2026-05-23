@@ -1,42 +1,42 @@
 package org.teamvoided.dusk_debris.entity.variant
 
+import com.mojang.blaze3d.vertex.PoseStack
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
-import net.minecraft.client.render.OverlayTexture
-import net.minecraft.client.render.RenderLayer
-import net.minecraft.client.render.VertexConsumerProvider
-import net.minecraft.client.render.entity.feature.FeatureRenderer
-import net.minecraft.client.render.entity.feature.FeatureRendererContext
-import net.minecraft.client.render.entity.model.SnifferEntityModel
-import net.minecraft.client.util.math.MatrixStack
-import net.minecraft.entity.passive.SnifferEntity
-import net.minecraft.util.Identifier
+import net.minecraft.client.model.SnifferModel
+import net.minecraft.client.renderer.MultiBufferSource
+import net.minecraft.client.renderer.RenderType
+import net.minecraft.client.renderer.entity.RenderLayerParent
+import net.minecraft.client.renderer.entity.layers.RenderLayer
+import net.minecraft.client.renderer.texture.OverlayTexture
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.world.entity.animal.sniffer.Sniffer
 import org.teamvoided.dusk_debris.data.variants.DuskSnifferVariants
 import org.teamvoided.dusk_debris.util.variant
 
 @Environment(EnvType.CLIENT)
-class SnifferOverlayFeatureRenderer<T : SnifferEntity, M : SnifferEntityModel<T>>(featureRendererContext: FeatureRendererContext<T, M>) :
-    FeatureRenderer<T, M>(featureRendererContext) {
+class SnifferOverlayFeatureRenderer<T : Sniffer, M : SnifferModel<T>>(featureRendererContext: RenderLayerParent<T, M>) :
+    RenderLayer<T, M>(featureRendererContext) {
 
     override fun render(
-        matrices: MatrixStack,
-        vertexConsumers: VertexConsumerProvider,
+        matrices: PoseStack,
+        vertexConsumers: MultiBufferSource,
         light: Int, entity: T,
         limbAngle: Float, limbDistance: Float,
         tickDelta: Float, animationProgress: Float,
         headYaw: Float, headPitch: Float
     ) {
         val variant = entity.variant.value()
-        if (entity.variant.key.get() == DuskSnifferVariants.DEFAULT) return
+        if (entity.variant.unwrapKey().get() == DuskSnifferVariants.DEFAULT) return
         if (variant.overlayTextureFull == null) return
 
         val vertexConsumer = vertexConsumers.getBuffer(texture(variant.overlayTextureFull!!))
         val color: Int = variant.color ?: variant.biomeColor?.value()?.foliageColor ?: -1
-        this.contextModel.method_2828(matrices, vertexConsumer, 15728640, OverlayTexture.DEFAULT_UV, color)
+        this.parentModel.renderToBuffer(matrices, vertexConsumer, 15728640, OverlayTexture.NO_OVERLAY, color)
 
     }
 
     companion object {
-        private fun texture(texture: Identifier): RenderLayer = RenderLayer.getEntityCutoutNoCull(texture)
+        private fun texture(texture: ResourceLocation): RenderType = RenderType.entityCutoutNoCull(texture)
     }
 }

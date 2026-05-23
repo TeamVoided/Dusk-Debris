@@ -1,45 +1,50 @@
 package org.teamvoided.dusk_debris.block
 
 import com.mojang.serialization.MapCodec
-import net.minecraft.block.*
-import net.minecraft.block.entity.BlockEntity
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.item.BlockItem
-import net.minecraft.item.ItemStack
-import net.minecraft.state.StateManager
-import net.minecraft.state.property.IntProperty
-import net.minecraft.util.Hand
-import net.minecraft.util.ItemInteractionResult
-import net.minecraft.util.hit.BlockHitResult
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Direction
-import net.minecraft.util.shape.VoxelShape
-import net.minecraft.util.shape.VoxelShapes
-import net.minecraft.world.BlockView
-import net.minecraft.world.World
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
+import net.minecraft.world.InteractionHand
+import net.minecraft.world.ItemInteractionResult
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.item.BlockItem
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.level.BlockGetter
+import net.minecraft.world.level.Level
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.EntityBlock
+import net.minecraft.world.level.block.HeavyCoreBlock
+import net.minecraft.world.level.block.HorizontalDirectionalBlock
+import net.minecraft.world.level.block.entity.BlockEntity
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.block.state.StateDefinition
+import net.minecraft.world.level.block.state.properties.IntegerProperty
+import net.minecraft.world.phys.BlockHitResult
+import net.minecraft.world.phys.shapes.CollisionContext
+import net.minecraft.world.phys.shapes.Shapes
+import net.minecraft.world.phys.shapes.VoxelShape
 import org.teamvoided.dusk_debris.util.rotate
 import org.teamvoided.dusks_and_dungeons.block.entity.QuarterBlockPileBlockEntity
 
-class QuarterBlockPileBlock(settings: Settings?) : HorizontalFacingBlock(settings), BlockEntityProvider {
+class QuarterBlockPileBlock(settings: Properties?) : HorizontalDirectionalBlock(settings), EntityBlock {
 
     init {
-        defaultState = stateManager.defaultState.with(FACING, Direction.NORTH)
+        registerDefaultState(stateDefinition.any().setValue(FACING, Direction.NORTH))
     }
 
     override fun getCollisionShape(
         state: BlockState,
-        world: BlockView?,
+        world: BlockGetter?,
         pos: BlockPos?,
-        context: ShapeContext?
-    ): VoxelShape = SHAPES[state.get(BLOCKS)].rotate(state.get(FACING).horizontal)
+        context: CollisionContext?
+    ): VoxelShape = SHAPES[state.getValue(BLOCKS)].rotate(state.getValue(FACING).get2DDataValue())
 
-    override fun onInteract(
+    override fun useItemOn(
         stack: ItemStack,
         state: BlockState?,
-        world: World,
+        world: Level,
         pos: BlockPos?,
-        entity: PlayerEntity?,
-        hand: Hand?,
+        entity: Player?,
+        hand: InteractionHand?,
         hitResult: BlockHitResult?
     ): ItemInteractionResult {
         val item = stack.item
@@ -48,7 +53,7 @@ class QuarterBlockPileBlock(settings: Settings?) : HorizontalFacingBlock(setting
             if (block is HeavyCoreBlock /*SmallPumpkinBlock || block is SmallCarvedPumpkinBlock*/) {
                 val blockEntity = world.getBlockEntity(pos)
                 if (blockEntity is QuarterBlockPileBlockEntity) {
-                    if (world.isClient) {
+                    if (world.isClientSide) {
                         return ItemInteractionResult.CONSUME
                     }
 
@@ -56,27 +61,27 @@ class QuarterBlockPileBlock(settings: Settings?) : HorizontalFacingBlock(setting
                 }
             }
         }
-        return super.onInteract(stack, state, world, pos, entity, hand, hitResult)
+        return super.useItemOn(stack, state, world, pos, entity, hand, hitResult)
     }
 
-    override fun getCodec(): MapCodec<out HorizontalFacingBlock> = CODEC
+    override fun codec(): MapCodec<out HorizontalDirectionalBlock> = CODEC
 
-    override fun createBlockEntity(pos: BlockPos?, state: BlockState?): BlockEntity =
+    override fun newBlockEntity(pos: BlockPos?, state: BlockState?): BlockEntity =
         QuarterBlockPileBlockEntity(pos, state)
 
-    override fun appendProperties(builder: StateManager.Builder<Block, BlockState>) {
+    override fun createBlockStateDefinition(builder: StateDefinition.Builder<Block, BlockState>) {
         builder.add(FACING, BLOCKS)
     }
 
     companion object {
-        val CODEC: MapCodec<QuarterBlockPileBlock> = createCodec(::QuarterBlockPileBlock)
-        val BLOCKS: IntProperty = IntProperty.of("blocks", 0, 2)
+        val CODEC: MapCodec<QuarterBlockPileBlock> = simpleCodec(::QuarterBlockPileBlock)
+        val BLOCKS: IntegerProperty = IntegerProperty.create("blocks", 0, 2)
         val SHAPES = arrayOf(
-            VoxelShapes.union(createCuboidShape(4.0, 4.0, 4.0, 12.0, 12.0, 12.0)),
-            VoxelShapes.union(createCuboidShape(4.0, 4.0, 0.0, 12.0, 12.0, 16.0)),
-            VoxelShapes.union(
-                createCuboidShape(4.0, 4.0, 0.0, 12.0, 12.0, 16.0),
-                createCuboidShape(4.0, 4.0, 4.0, 12.0, 12.0, 12.0)
+            Shapes.or(box(4.0, 4.0, 4.0, 12.0, 12.0, 12.0)),
+            Shapes.or(box(4.0, 4.0, 0.0, 12.0, 12.0, 16.0)),
+            Shapes.or(
+                box(4.0, 4.0, 0.0, 12.0, 12.0, 16.0),
+                box(4.0, 4.0, 4.0, 12.0, 12.0, 12.0)
             )
         )
     }

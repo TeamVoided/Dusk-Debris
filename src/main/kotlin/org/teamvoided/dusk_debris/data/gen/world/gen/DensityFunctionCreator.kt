@@ -1,13 +1,13 @@
 package org.teamvoided.dusk_debris.data.gen.world.gen
 
-import net.minecraft.registry.BootstrapContext
-import net.minecraft.registry.Holder
-import net.minecraft.registry.RegistryKey
-import net.minecraft.registry.RegistryKeys
-import net.minecraft.util.math.noise.DoublePerlinNoiseSampler.NoiseParameters
-import net.minecraft.world.gen.DensityFunction
-import net.minecraft.world.gen.DensityFunction.NoiseHolder
-import net.minecraft.world.gen.DensityFunctions.*
+import net.minecraft.core.Holder
+import net.minecraft.core.registries.Registries
+import net.minecraft.data.worldgen.BootstrapContext
+import net.minecraft.resources.ResourceKey
+import net.minecraft.world.level.levelgen.DensityFunction
+import net.minecraft.world.level.levelgen.DensityFunction.NoiseHolder
+import net.minecraft.world.level.levelgen.DensityFunctions.*
+import net.minecraft.world.level.levelgen.synth.NormalNoise.NoiseParameters
 import org.teamvoided.dusk_debris.data.gen.world.gen.density_function.NetherDensityFunctionCreator.theNetherCreator
 import org.teamvoided.dusk_debris.data.gen.world.gen.density_function.OverworldDensityFunctionCreator.overworldCreator
 import org.teamvoided.dusk_debris.data.worldgen.DuskDensityFunctions
@@ -27,21 +27,21 @@ object DensityFunctionCreator {
 //    NoiseRouterData.class
 
 
-    fun BootstrapContext<*>.noise(noi: RegistryKey<NoiseParameters>): NoiseHolder =
+    fun BootstrapContext<*>.noise(noi: ResourceKey<NoiseParameters>): NoiseHolder =
         NoiseHolder(this.noiseHold(noi))
 
-    fun BootstrapContext<*>.noiseHold(noi: RegistryKey<NoiseParameters>): Holder.Reference<NoiseParameters> =
-        this.getRegistryLookup(RegistryKeys.NOISE_PARAMETERS).getHolderOrThrow(noi)
+    fun BootstrapContext<*>.noiseHold(noi: ResourceKey<NoiseParameters>): Holder.Reference<NoiseParameters> =
+        this.lookup(Registries.NOISE).getOrThrow(noi)
 
-    fun BootstrapContext<*>.dense(den: RegistryKey<DensityFunction>): DensityFunction =
+    fun BootstrapContext<*>.dense(den: ResourceKey<DensityFunction>): DensityFunction =
         HolderHolder(this.denseHold(den))
 
-    fun BootstrapContext<*>.denseHold(noi: RegistryKey<DensityFunction>): Holder.Reference<DensityFunction> =
-        this.getRegistryLookup(RegistryKeys.DENSITY_FUNCTION).getHolderOrThrow(noi)
+    fun BootstrapContext<*>.denseHold(noi: ResourceKey<DensityFunction>): Holder.Reference<DensityFunction> =
+        this.lookup(Registries.DENSITY_FUNCTION).getOrThrow(noi)
 
 
     fun BootstrapContext<DensityFunction>.registerAndWrap(
-        registryKey: RegistryKey<DensityFunction>,
+        registryKey: ResourceKey<DensityFunction>,
         den: DensityFunction
     ): DensityFunction {
         return HolderHolder(this.register(registryKey, den))

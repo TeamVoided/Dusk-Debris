@@ -2,10 +2,11 @@
 
 package voidlib.devin.world.gen
 
-import net.minecraft.registry.Holder
-import net.minecraft.util.math.noise.DoublePerlinNoiseSampler.NoiseParameters
-import net.minecraft.world.gen.DensityFunction
-import net.minecraft.world.gen.DensityFunctions
+import net.minecraft.core.Holder
+import net.minecraft.util.CubicSpline
+import net.minecraft.world.level.levelgen.DensityFunction
+import net.minecraft.world.level.levelgen.DensityFunctions
+import net.minecraft.world.level.levelgen.synth.NormalNoise.NoiseParameters
 
 
 fun interpolated(fn: DensityFunction): DensityFunction = DensityFunctions.interpolated(fn)
@@ -13,7 +14,7 @@ fun interpolated(fn: () -> DensityFunction) = interpolated(fn())
 
 fun flatCache(fn: DensityFunction): DensityFunction = DensityFunctions.flatCache(fn)
 fun flatCache(fn: () -> DensityFunction) = flatCache(fn())
-fun cache2D(fn: DensityFunction): DensityFunction = DensityFunctions.cache2D(fn)
+fun cache2D(fn: DensityFunction): DensityFunction = DensityFunctions.cache2d(fn)
 fun cache2D(fn: () -> DensityFunction) = cache2D(fn())
 
 fun cacheOnce(fn: DensityFunction): DensityFunction = DensityFunctions.cacheOnce(fn)
@@ -73,8 +74,8 @@ fun rangeChoice(
 ): DensityFunction =
     DensityFunctions.rangeChoice(input, minInclusive.toDouble(), maxInclusive.toDouble(), whenInRange, whenOutOfRange)
 
-fun shiftX(noise: Holder<NoiseParameters>): DensityFunction = DensityFunctions.shiftX(noise)
-fun shiftZ(noise: Holder<NoiseParameters>): DensityFunction = DensityFunctions.shiftZ(noise)
+fun shiftX(noise: Holder<NoiseParameters>): DensityFunction = DensityFunctions.shiftA(noise)
+fun shiftZ(noise: Holder<NoiseParameters>): DensityFunction = DensityFunctions.shiftB(noise)
 fun shift(noise: Holder<NoiseParameters>): DensityFunction = DensityFunctions.shift(noise)
 
 fun blendDensity(fn: DensityFunction): DensityFunction = DensityFunctions.blendDensity(fn)
@@ -89,7 +90,7 @@ fun add(fn: DensityFunction, fn1: DensityFunction): DensityFunction = DensityFun
 fun add(const: Number, fn: DensityFunction) = add(const(const.toDouble()), fn)
 fun add(const: Number, fn: () -> DensityFunction) = add(const(const.toDouble()), fn())
 
-fun multiply(fn: DensityFunction, fn1: DensityFunction): DensityFunction = DensityFunctions.multiply(fn, fn1)
+fun multiply(fn: DensityFunction, fn1: DensityFunction): DensityFunction = DensityFunctions.mul(fn, fn1)
 fun multiply(const: Number, fn: DensityFunction) = multiply(const(const.toDouble()), fn)
 fun multiply(const: Number, fn: () -> DensityFunction) = multiply(const(const.toDouble()), fn())
 
@@ -101,8 +102,8 @@ fun max(fn: DensityFunction, fn1: DensityFunction): DensityFunction = DensityFun
 fun max(const: Number, fn: DensityFunction) = max(const(const.toDouble()), fn)
 fun max(const: Number, fn: () -> DensityFunction) = max(const(const.toDouble()), fn())
 
-fun copySpline(spline: net.minecraft.util.math.Spline<DensityFunctions.Spline.Point, DensityFunctions.Spline.FunctionWrapper>): DensityFunction =
-    DensityFunctions.copySpline(spline)
+fun copySpline(spline: CubicSpline<DensityFunctions.Spline.Point, DensityFunctions.Spline.Coordinate>): DensityFunction =
+    DensityFunctions.spline(spline)
 
 fun zero(): DensityFunction = DensityFunctions.zero()
 
@@ -110,7 +111,7 @@ fun const(value: Double): DensityFunction = DensityFunctions.constant(value)
 fun const(value: Number) = const(value.toDouble())
 
 fun clampedGradientY(fromY: Int, toY: Int, fromValue: Double, toValue: Double): DensityFunction =
-    DensityFunctions.clampedGradientY(fromY, toY, fromValue, toValue)
+    DensityFunctions.yClampedGradient(fromY, toY, fromValue, toValue)
 
 fun clampedGradientY(fromY: Number, toY: Number, fromValue: Number, toValue: Number) =
     clampedGradientY(fromY.toInt(), toY.toInt(), fromValue.toDouble(), toValue.toDouble())
@@ -118,7 +119,7 @@ fun clampedGradientY(fromY: Number, toY: Number, fromValue: Number, toValue: Num
 //fun mapped(input: DensityFunction, type: Mapped.Type): DensityFunction = DensityFunctions.mapped(input, type)
 
 fun mapFromUnitToValue(value: DensityFunction, min: Double, max: Double): DensityFunction =
-    DensityFunctions.mapFromUnitToValue(value, min, max)
+    DensityFunctions.mapFromUnitTo(value, min, max)
 
 fun mapFromUnitToValue(value: DensityFunction, min: Number, max: Number) =
     mapFromUnitToValue(value, min.toDouble(), max.toDouble())
@@ -128,7 +129,7 @@ fun mapFromUnitToValue(min: Number, max: Number, value: () -> DensityFunction) =
 
 fun blendAlpha(): DensityFunction = DensityFunctions.blendAlpha()
 
-fun getBlendOffset(): DensityFunction = DensityFunctions.getBlendOffset()
+fun getBlendOffset(): DensityFunction = DensityFunctions.blendOffset()
 
 fun lerp(delta: DensityFunction, start: DensityFunction, end: DensityFunction): DensityFunction =
     DensityFunctions.lerp(delta, start, end)

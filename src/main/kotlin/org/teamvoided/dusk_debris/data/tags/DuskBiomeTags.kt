@@ -1,8 +1,8 @@
 package org.teamvoided.dusk_debris.data.tags
 
-import net.minecraft.registry.RegistryKeys
-import net.minecraft.registry.tag.TagKey
-import net.minecraft.world.biome.Biome
+import net.minecraft.core.registries.Registries
+import net.minecraft.tags.TagKey
+import net.minecraft.world.level.biome.Biome
 import org.teamvoided.dusk_debris.DuskDebris.id
 
 object DuskBiomeTags {
@@ -38,5 +38,5 @@ object DuskBiomeTags {
     val SNIFFER_FROZEN = create("sniffer/frozen")
     val SNIFFER_DEEP_DARK = create("sniffer/deep_dark")
 
-    fun create(id: String): TagKey<Biome> = TagKey.of(RegistryKeys.BIOME, id(id))
+    fun create(id: String): TagKey<Biome> = TagKey.create(Registries.BIOME, id(id))
 }

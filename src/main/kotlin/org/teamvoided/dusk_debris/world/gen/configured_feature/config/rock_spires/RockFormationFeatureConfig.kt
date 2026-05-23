@@ -3,52 +3,52 @@ package org.teamvoided.dusk_debris.world.gen.configured_feature.config.rock_spir
 import com.mojang.serialization.Codec
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
-import net.minecraft.block.Block
-import net.minecraft.block.Blocks
-import net.minecraft.registry.RegistryKeys
-import net.minecraft.registry.tag.TagKey
-import net.minecraft.util.math.float_provider.ConstantFloatProvider
-import net.minecraft.util.math.float_provider.FloatProvider
-import net.minecraft.util.math.int_provider.IntProvider
-import net.minecraft.world.gen.feature.FeatureConfig
-import net.minecraft.world.gen.stateprovider.BlockStateProvider
-import net.minecraft.world.gen.stateprovider.SimpleBlockStateProvider
+import net.minecraft.core.registries.Registries
+import net.minecraft.tags.TagKey
+import net.minecraft.util.valueproviders.ConstantFloat
+import net.minecraft.util.valueproviders.FloatProvider
+import net.minecraft.util.valueproviders.IntProvider
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration
+import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider
+import net.minecraft.world.level.levelgen.feature.stateproviders.SimpleStateProvider
 
 open class RockFormationFeatureConfig(
     val rockState: BlockStateProvider,
     var replaceable: TagKey<Block>,
     val sizeY: IntProvider,
     val sizeXZ: IntProvider,
-    val exponent: FloatProvider = ConstantFloatProvider.create(2f)
-) : FeatureConfig {
+    val exponent: FloatProvider = ConstantFloat.of(2f)
+) : FeatureConfiguration {
 
     constructor(
         replaceable: TagKey<Block>,
         sizeY: IntProvider,
         sizeXZ: IntProvider,
-        exponent: FloatProvider = ConstantFloatProvider.create(2f)
-    ) : this(SimpleBlockStateProvider.of(Blocks.STONE.defaultState), replaceable, sizeY, sizeXZ, exponent)
+        exponent: FloatProvider = ConstantFloat.of(2f)
+    ) : this(SimpleStateProvider.simple(Blocks.STONE.defaultBlockState()), replaceable, sizeY, sizeXZ, exponent)
 
     companion object {
         val MAP_CODEC: MapCodec<RockFormationFeatureConfig> =
             RecordCodecBuilder.mapCodec { instance ->
                 instance.group(
-                    BlockStateProvider.TYPE_CODEC
+                    BlockStateProvider.CODEC
                         .fieldOf("rock_state")
-                        .orElse(SimpleBlockStateProvider.of(Blocks.STONE.defaultState))
+                        .orElse(SimpleStateProvider.simple(Blocks.STONE.defaultBlockState()))
                         .forGetter { it.rockState },
-                    TagKey.createHashedCodec(RegistryKeys.BLOCK)
+                    TagKey.hashedCodec(Registries.BLOCK)
                         .fieldOf("replaceable")
                         .forGetter { it.replaceable },
-                    IntProvider.VALUE_CODEC
+                    IntProvider.CODEC
                         .fieldOf("size_y")
                         .forGetter { it.sizeY },
-                    IntProvider.VALUE_CODEC
+                    IntProvider.CODEC
                         .fieldOf("size_xz")
                         .forGetter { it.sizeXZ },
-                    FloatProvider.VALUE_CODEC
+                    FloatProvider.CODEC
                         .fieldOf("exponent")
-                        .orElse(ConstantFloatProvider.create(2f))
+                        .orElse(ConstantFloat.of(2f))
                         .forGetter { it.exponent },
                 ).apply(instance, ::RockFormationFeatureConfig)
             }

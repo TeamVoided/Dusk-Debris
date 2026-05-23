@@ -1,15 +1,15 @@
 package org.teamvoided.dusk_debris.entity
 
-import net.minecraft.component.DataComponentTypes
-import net.minecraft.component.type.NbtComponent
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.mob.MobEntity
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.item.ItemStack
-import net.minecraft.nbt.NbtCompound
-import net.minecraft.sound.SoundEvent
-import net.minecraft.util.ActionResult
-import net.minecraft.util.Hand
+import net.minecraft.core.component.DataComponents
+import net.minecraft.nbt.CompoundTag
+import net.minecraft.sounds.SoundEvent
+import net.minecraft.world.InteractionHand
+import net.minecraft.world.InteractionResult
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.Mob
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.component.CustomData
 import java.util.*
 
 interface Pickupable {
@@ -17,29 +17,29 @@ interface Pickupable {
 
     fun copyDataToStack(stack: ItemStack)
 
-    fun copyDataFromNbt(nbt: NbtCompound)
+    fun copyDataFromNbt(nbt: CompoundTag)
 
     val pickupItem: ItemStack
 
     val pickupSound: SoundEvent?
 
     companion object {
-        fun copyDataToStack(entity: MobEntity, stack: ItemStack) {
-            stack.set(DataComponentTypes.CUSTOM_NAME, entity.customName)
-            NbtComponent.set(DataComponentTypes.BUCKET_ENTITY_DATA, stack) { nbtCompound: NbtCompound ->
-                if (entity.isAiDisabled) {
-                    nbtCompound.putBoolean("NoAI", entity.isAiDisabled)
+        fun copyDataToStack(entity: Mob, stack: ItemStack) {
+            stack.set(DataComponents.CUSTOM_NAME, entity.customName)
+            CustomData.update(DataComponents.BUCKET_ENTITY_DATA, stack) { nbtCompound: CompoundTag ->
+                if (entity.isNoAi) {
+                    nbtCompound.putBoolean("NoAI", entity.isNoAi)
                 }
                 if (entity.isSilent) {
                     nbtCompound.putBoolean("Silent", entity.isSilent)
                 }
 
-                if (entity.hasNoGravity()) {
-                    nbtCompound.putBoolean("NoGravity", entity.hasNoGravity())
+                if (entity.isNoGravity) {
+                    nbtCompound.putBoolean("NoGravity", entity.isNoGravity)
                 }
 
-                if (entity.isGlowingLocal) {
-                    nbtCompound.putBoolean("Glowing", entity.isGlowingLocal)
+                if (entity.hasGlowingTag()) {
+                    nbtCompound.putBoolean("Glowing", entity.hasGlowingTag())
                 }
 
                 if (entity.isInvulnerable) {
@@ -49,9 +49,9 @@ interface Pickupable {
             }
         }
 
-        fun copyDataFromNbt(entity: MobEntity, nbt: NbtCompound) {
+        fun copyDataFromNbt(entity: Mob, nbt: CompoundTag) {
             if (nbt.contains("NoAI")) {
-                entity.isAiDisabled = nbt.getBoolean("NoAI")
+                entity.setNoAi(nbt.getBoolean("NoAI"))
             }
 
             if (nbt.contains("Silent")) {
@@ -63,7 +63,7 @@ interface Pickupable {
             }
 
             if (nbt.contains("Glowing")) {
-                entity.isGlowing = nbt.getBoolean("Glowing")
+                entity.setGlowingTag(nbt.getBoolean("Glowing"))
             }
 
             if (nbt.contains("Invulnerable")) {
@@ -76,17 +76,17 @@ interface Pickupable {
         }
 
         fun <T> tryPickup(
-            player: PlayerEntity,
-            hand: Hand,
+            player: Player,
+            hand: InteractionHand,
             entity: T
-        ): Optional<ActionResult> where T : LivingEntity, T : Pickupable {
-            val handStack = player.getStackInHand(hand)
+        ): Optional<InteractionResult> where T : LivingEntity, T : Pickupable {
+            val handStack = player.getItemInHand(hand)
             if (handStack.isEmpty && entity.isAlive) {
                 entity.playSound((entity as Pickupable).pickupSound, 1f, 1f)
                 val pickupItem = (entity as Pickupable).pickupItem
                 (entity as Pickupable).copyDataToStack(pickupItem)
-                player.setStackInHand(hand, pickupItem)
-                val world = entity.world
+                player.setItemInHand(hand, pickupItem)
+                val world = entity.level()
 
                 /*advancement*/
 //                if (!world.isClient) {
@@ -94,7 +94,7 @@ interface Pickupable {
 //                }
 
                 entity.discard()
-                return Optional.of(ActionResult.success(world.isClient))
+                return Optional.of(InteractionResult.sidedSuccess(world.isClientSide))
             } else {
                 return Optional.empty()
             }

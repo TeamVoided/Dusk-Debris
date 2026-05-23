@@ -4,19 +4,19 @@
   "package": "org.teamvoided.dusk_debris.mixin",
   "compatibilityLevel": "JAVA_21",
   "client": [
-    "BackgroundRendererMixin",
     "EntityRenderDispatcherAccessor",
-    "ModelMixin",
+    "FogRendererMixin",
     "GameRendererMixin",
-    "HeldItemFeatureRendererMixin",
+    "ItemInHandLayerMixin",
     "LivingEntityRendererMixin",
-    "directional_sculk.WorldRendererMixin",
+    "ModelMixin",
+    "directional_sculk.LevelRendererMixin",
     "fluid_tag.CameraMixin",
     "fluid_tag.water.BubbleColumnUpParticleMixin",
     "fluid_tag.water.BubbleParticleMixin",
-    "fluid_tag.water.CurrentDownParticleMixin",
-    "pixel_accurate.SignBlockEntityRendererMixin",
-    "pixel_accurate.SignEditScreenMixin"
+    "fluid_tag.water.WaterCurrentDownParticleMixin",
+    "pixel_accurate.SignEditScreenMixin",
+    "pixel_accurate.SignRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1

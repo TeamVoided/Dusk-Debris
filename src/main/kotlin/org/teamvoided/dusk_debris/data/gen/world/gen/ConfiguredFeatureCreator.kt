@@ -1,28 +1,33 @@
 package org.teamvoided.dusk_debris.data.gen.world.gen
 
-import net.minecraft.block.Block
-import net.minecraft.block.Blocks
-import net.minecraft.registry.BootstrapContext
-import net.minecraft.registry.Holder
-import net.minecraft.registry.RegistryKey
-import net.minecraft.registry.RegistryKeys
-import net.minecraft.registry.tag.BlockTags
-import net.minecraft.state.property.Properties
-import net.minecraft.util.math.Direction
-import net.minecraft.util.math.int_provider.BiasedToBottomIntProvider
-import net.minecraft.util.math.int_provider.ConstantIntProvider
-import net.minecraft.util.math.int_provider.UniformIntProvider
-import net.minecraft.world.gen.feature.*
-import net.minecraft.world.gen.feature.size.TwoLayersFeatureSize
-import net.minecraft.world.gen.feature.util.PlacedFeatureUtil
-import net.minecraft.world.gen.foliage.BlobFoliagePlacer
-import net.minecraft.world.gen.stateprovider.BlockStateProvider
-import net.minecraft.world.gen.treedecorator.TreeDecorator
-import net.minecraft.world.gen.trunk.StraightTrunkPlacer
+import net.minecraft.core.Direction
+import net.minecraft.core.Holder
+import net.minecraft.core.registries.Registries
+import net.minecraft.data.worldgen.BootstrapContext
+import net.minecraft.data.worldgen.placement.PlacementUtils
+import net.minecraft.data.worldgen.placement.TreePlacements
+import net.minecraft.resources.ResourceKey
+import net.minecraft.tags.BlockTags
+import net.minecraft.util.valueproviders.BiasedToBottomInt
+import net.minecraft.util.valueproviders.ConstantInt
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.block.state.properties.BlockStateProperties
+import net.minecraft.world.level.levelgen.feature.ConfiguredFeature
+import net.minecraft.world.level.levelgen.feature.Feature
+import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration
+import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration
+import net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration
+import net.minecraft.world.level.levelgen.feature.featuresize.TwoLayersFeatureSize
+import net.minecraft.world.level.levelgen.feature.foliageplacers.BlobFoliagePlacer
+import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider
+import net.minecraft.world.level.levelgen.feature.treedecorators.TreeDecorator
+import net.minecraft.world.level.levelgen.feature.trunkplacers.StraightTrunkPlacer
+import net.minecraft.world.level.levelgen.placement.PlacedFeature
+import net.minecraft.world.level.levelgen.placement.PlacementModifier
 import org.teamvoided.dusk_debris.data.gen.world.gen.configured_feature.NetherCFCreators.netherConfiguredFeatureCreators
 import org.teamvoided.dusk_debris.data.gen.world.gen.configured_feature.SwampCFCreators.swampConfiguredFeatureCreators
 import org.teamvoided.dusk_debris.data.gen.world.gen.configured_feature.TestCFCreators.testConfiguredFeatureCreators
-import org.teamvoided.dusk_debris.data.tags.DuskBlockTags
 import org.teamvoided.dusk_debris.data.worldgen.DuskConfiguredFeatures
 import org.teamvoided.dusk_debris.init.DuskBlocks
 import org.teamvoided.dusk_debris.init.worldgen.DuskFeatures
@@ -37,9 +42,9 @@ import org.teamvoided.dusk_debris.world.gen.tree.foliage.OakFoliagePlacer
 object ConfiguredFeatureCreator {
 
     fun bootstrap(c: BootstrapContext<ConfiguredFeature<*, *>>) {
-        val configuredFeatures = c.getRegistryLookup(RegistryKeys.CONFIGURED_FEATURE)
-        val placedFeatures = c.getRegistryLookup(RegistryKeys.PLACED_FEATURE)
-        val block = c.getRegistryLookup(RegistryKeys.BLOCK)
+        val configuredFeatures = c.lookup(Registries.CONFIGURED_FEATURE)
+        val placedFeatures = c.lookup(Registries.PLACED_FEATURE)
+        val block = c.lookup(Registries.BLOCK)
         c.netherConfiguredFeatureCreators()
         c.swampConfiguredFeatureCreators()
         c.testConfiguredFeatureCreators()
@@ -50,19 +55,19 @@ object ConfiguredFeatureCreator {
             MushroomFeatureConfig(
                 BlockTags.REPLACEABLE,
                 BlockTags.REPLACEABLE,
-                BlockStateProvider.of(DuskBlocks.NETHERSHROOM_STEM),
-                BiasedToBottomIntProvider.create(5, 10),
-                BlockStateProvider.of(DuskBlocks.PURPLE_NETHERSHROOM_BLOCK),
-                BiasedToBottomIntProvider.create(1, 7),
+                BlockStateProvider.simple(DuskBlocks.NETHERSHROOM_STEM),
+                BiasedToBottomInt.of(5, 10),
+                BlockStateProvider.simple(DuskBlocks.PURPLE_NETHERSHROOM_BLOCK),
+                BiasedToBottomInt.of(1, 7),
             )
         )
         c.registerConfiguredFeature(
             DuskConfiguredFeatures.OAK,
             Feature.TREE,
-            TreeFeatureConfig.Builder(
-                BlockStateProvider.of(Blocks.OAK_LOG),
+            TreeConfiguration.TreeConfigurationBuilder(
+                BlockStateProvider.simple(Blocks.OAK_LOG),
                 StraightTrunkPlacer(5, 1, 2),
-                BlockStateProvider.of(Blocks.OAK_LEAVES),
+                BlockStateProvider.simple(Blocks.OAK_LEAVES),
                 OakFoliagePlacer(3, 0),
                 TwoLayersFeatureSize(1, 0, 1)
             ).ignoreVines().decorators(logsOnTrunk(Blocks.OAK_LOG)).build()
@@ -70,10 +75,10 @@ object ConfiguredFeatureCreator {
         c.registerConfiguredFeature(
             DuskConfiguredFeatures.BIRCH,
             Feature.TREE,
-            TreeFeatureConfig.Builder(
-                BlockStateProvider.of(Blocks.BIRCH_LOG),
+            TreeConfiguration.TreeConfigurationBuilder(
+                BlockStateProvider.simple(Blocks.BIRCH_LOG),
                 StraightTrunkPlacer(8, 0, 0),
-                BlockStateProvider.of(Blocks.BIRCH_LEAVES),
+                BlockStateProvider.simple(Blocks.BIRCH_LEAVES),
                 BirchFoliagePlacer(3, 0),
                 TwoLayersFeatureSize(1, 0, 1)
             ).ignoreVines().decorators(logsOnTrunk(Blocks.BIRCH_LOG)).build()
@@ -92,21 +97,21 @@ object ConfiguredFeatureCreator {
                 listOf(1.25, 2.0, 0.0, 2.0),
                 listOf(
                     ThresholdPlacedFeature(
-                        placedFeatures.getHolderOrThrow(TreePlacedFeatures.MEGA_SPRUCE_CHECKED),
+                        placedFeatures.getOrThrow(TreePlacements.MEGA_SPRUCE_CHECKED),
                         0.25f
                     ),
                     ThresholdPlacedFeature(
-                        placedFeatures.getHolderOrThrow(TreePlacedFeatures.DARK_OAK_CHECKED),
+                        placedFeatures.getOrThrow(TreePlacements.DARK_OAK_CHECKED),
                         -0.25f
                     )
                 ),
-                placedFeatures.getHolderOrThrow(TreePlacedFeatures.SPRUCE_CHECKED)
+                placedFeatures.getOrThrow(TreePlacements.SPRUCE_CHECKED)
             )
         )
         c.registerConfiguredFeature(
             DuskConfiguredFeatures.SEQUOIA_TREE,
             DuskFeatures.SEQUOIA_TREE,
-            DefaultFeatureConfig()
+            NoneFeatureConfiguration()
         )
     }
 
@@ -114,21 +119,21 @@ object ConfiguredFeatureCreator {
         return listOf(
             AttachedToTrunkTreeDecorator(
                 probability,
-                BlockStateProvider.of(block.defaultState.with(Properties.AXIS, Direction.Axis.Z)),
+                BlockStateProvider.simple(block.defaultBlockState().setValue(BlockStateProperties.AXIS, Direction.Axis.Z)),
                 listOf(Direction.NORTH, Direction.SOUTH)
             ),
             AttachedToTrunkTreeDecorator(
                 probability,
-                BlockStateProvider.of(block.defaultState.with(Properties.AXIS, Direction.Axis.X)),
+                BlockStateProvider.simple(block.defaultBlockState().setValue(BlockStateProperties.AXIS, Direction.Axis.X)),
                 listOf(Direction.EAST, Direction.WEST)
             )
         )
     }
 
-    fun BootstrapContext<ConfiguredFeature<*, *>>.emptyPlaceInLine(registryKey: RegistryKey<ConfiguredFeature<*, *>>): Holder<PlacedFeature> {
-        return PlacedFeatureUtil.placedInline(
-            this.getRegistryLookup(RegistryKeys.CONFIGURED_FEATURE)
-                .getHolderOrThrow(registryKey), *arrayOfNulls<PlacementModifier>(0)
+    fun BootstrapContext<ConfiguredFeature<*, *>>.emptyPlaceInLine(registryKey: ResourceKey<ConfiguredFeature<*, *>>): Holder<PlacedFeature> {
+        return PlacementUtils.inlinePlaced(
+            this.lookup(Registries.CONFIGURED_FEATURE)
+                .getOrThrow(registryKey), *arrayOfNulls<PlacementModifier>(0)
         )
     }
 
@@ -139,28 +144,28 @@ object ConfiguredFeatureCreator {
         firstRandomHeight: Int,
         secondRandomHeight: Int,
         foliageRadius: Int
-    ): TreeFeatureConfig.Builder {
-        return TreeFeatureConfig.Builder(
-            BlockStateProvider.of(trunk),
+    ): TreeConfiguration.TreeConfigurationBuilder {
+        return TreeConfiguration.TreeConfigurationBuilder(
+            BlockStateProvider.simple(trunk),
             StraightTrunkPlacer(baseHeight, firstRandomHeight, secondRandomHeight),
-            BlockStateProvider.of(foliage),
+            BlockStateProvider.simple(foliage),
             BlobFoliagePlacer(
-                ConstantIntProvider.create(foliageRadius), ConstantIntProvider.create(0), 3
+                ConstantInt.of(foliageRadius), ConstantInt.of(0), 3
             ),
             TwoLayersFeatureSize(1, 0, 1)
         )
     }
 
 
-    fun <FC : FeatureConfig, F : Feature<FC>> BootstrapContext<ConfiguredFeature<*, *>>.registerConfiguredFeature(
-        registryKey: RegistryKey<ConfiguredFeature<*, *>>,
+    fun <FC : FeatureConfiguration, F : Feature<FC>> BootstrapContext<ConfiguredFeature<*, *>>.registerConfiguredFeature(
+        registryKey: ResourceKey<ConfiguredFeature<*, *>>,
         feature: F,
         featureConfig: FC
     ): Any = this.register(registryKey, ConfiguredFeature(feature, featureConfig))
 
     @Suppress("unused")
     private fun BootstrapContext<ConfiguredFeature<*, *>>.registerConfiguredFeature(
-        registryKey: RegistryKey<ConfiguredFeature<*, *>>, feature: Feature<DefaultFeatureConfig>
-    ) = this.registerConfiguredFeature(registryKey, feature, FeatureConfig.DEFAULT)
+        registryKey: ResourceKey<ConfiguredFeature<*, *>>, feature: Feature<NoneFeatureConfiguration>
+    ) = this.registerConfiguredFeature(registryKey, feature, FeatureConfiguration.NONE)
 
 }

@@ -1,9 +1,9 @@
 package org.teamvoided.dusk_debris.world.gen.density_functions
 
-import net.minecraft.util.StringIdentifiable
-import net.minecraft.util.dynamic.CodecHolder
-import net.minecraft.world.gen.DensityFunction
-import net.minecraft.world.gen.DensityFunctions
+import net.minecraft.util.KeyDispatchDataCodec
+import net.minecraft.util.StringRepresentable
+import net.minecraft.world.level.levelgen.DensityFunction
+import net.minecraft.world.level.levelgen.DensityFunctions
 import org.teamvoided.dusk_debris.util.Utils
 import kotlin.math.*
 
@@ -18,7 +18,7 @@ data class SingleDensityFunctionModifier(
     override fun mapAll(visitor: DensityFunction.Visitor): SingleDensityFunctionModifier =
         create(this.type, input.mapAll(visitor))
 
-    override fun codec(): CodecHolder<out DensityFunction> = type.codec
+    override fun codec(): KeyDispatchDataCodec<out DensityFunction> = type.codec
 
     override fun input(): DensityFunction = this.input
 
@@ -26,7 +26,7 @@ data class SingleDensityFunctionModifier(
 
     override fun maxValue(): Double = this.maxValue
 
-    enum class Type(private val type: String) : StringIdentifiable {
+    enum class Type(private val type: String) : StringRepresentable {
         ROUND("round"),
         FLOOR("floor"),
         CEIL("ceil"),
@@ -36,10 +36,10 @@ data class SingleDensityFunctionModifier(
         COS("cos"), //only between 1 and -1
         TAN("tan"); //this one has to do something if NAN, probably should just remove this one, too unpredictable?
 
-        val codec: CodecHolder<SingleDensityFunctionModifier> =
+        val codec: KeyDispatchDataCodec<SingleDensityFunctionModifier> =
             DensityFunctions.singleFunctionArgumentCodec({ create(this, it) }, { it.input })
 
-        override fun asString(): String = this.type
+        override fun getSerializedName(): String = this.type
     }
 
     companion object {

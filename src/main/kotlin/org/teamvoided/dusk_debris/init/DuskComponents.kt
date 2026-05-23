@@ -1,18 +1,18 @@
 package org.teamvoided.dusk_debris.init
 
-import net.minecraft.component.DataComponentType
-import net.minecraft.registry.Registries
-import net.minecraft.registry.Registry
+import net.minecraft.core.Registry
+import net.minecraft.core.component.DataComponentType
+import net.minecraft.core.registries.BuiltInRegistries
 import org.teamvoided.dusk_debris.DuskDebris.id
 import org.teamvoided.dusk_debris.component.SpellComponent
 
 object DuskComponents {
-    val SPELL = register("spell") { it.codec(SpellComponent.CODEC).build() }
+    val SPELL = register("spell") { it.persistent(SpellComponent.CODEC).build() }
     fun <T> register(
         name: String,
         build: (DataComponentType.Builder<T>) -> DataComponentType<T>
     ): DataComponentType<T> =
-        Registry.register(Registries.DATA_COMPONENT_TYPE, id(name), build(DataComponentType.builder()))
+        Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE, id(name), build(DataComponentType.builder()))
 
     fun init() {}
 }

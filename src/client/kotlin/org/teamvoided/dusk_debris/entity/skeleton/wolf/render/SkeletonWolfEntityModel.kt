@@ -3,13 +3,17 @@ package org.teamvoided.dusk_debris.entity.skeleton.wolf.render
 import com.google.common.collect.ImmutableList
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
-import net.minecraft.client.model.*
-import net.minecraft.client.render.entity.model.TintableAnimalModel
-import net.minecraft.util.math.MathHelper
+import net.minecraft.client.model.ColorableAgeableListModel
+import net.minecraft.client.model.geom.ModelPart
+import net.minecraft.client.model.geom.PartPose
+import net.minecraft.client.model.geom.builders.CubeListBuilder
+import net.minecraft.client.model.geom.builders.LayerDefinition
+import net.minecraft.client.model.geom.builders.MeshDefinition
+import net.minecraft.util.Mth
 import org.teamvoided.dusk_debris.entity.SkeletonWolfEntity
 
 @Environment(EnvType.CLIENT)
-class SkeletonWolfEntityModel<T : SkeletonWolfEntity>(root: ModelPart) : TintableAnimalModel<T>() {
+class SkeletonWolfEntityModel<T : SkeletonWolfEntity>(root: ModelPart) : ColorableAgeableListModel<T>() {
     private val head: ModelPart = root.getChild("head")
     private val realHead: ModelPart = head.getChild(REAL_HEAD)
     private val torso: ModelPart = root.getChild("body")
@@ -22,11 +26,11 @@ class SkeletonWolfEntityModel<T : SkeletonWolfEntity>(root: ModelPart) : Tintabl
 
     private val neck: ModelPart = root.getChild(UPPER_BODY)
 
-    override fun getHeadParts(): Iterable<ModelPart> {
+    override fun headParts(): Iterable<ModelPart> {
         return ImmutableList.of(this.head)
     }
 
-    override fun getBodyParts(): Iterable<ModelPart> {
+    override fun bodyParts(): Iterable<ModelPart> {
         return ImmutableList.of(
             this.torso,
             this.rightHindLeg,
@@ -38,32 +42,32 @@ class SkeletonWolfEntityModel<T : SkeletonWolfEntity>(root: ModelPart) : Tintabl
         )
     }
 
-    override fun animateModel(wolfEntity: T, f: Float, g: Float, h: Float) {
-        if (wolfEntity.hasAngerTime()) {
-            tail.yaw = 0.0f
+    override fun prepareMobModel(wolfEntity: T, f: Float, g: Float, h: Float) {
+        if (wolfEntity.isAngry) {
+            tail.yRot = 0.0f
         } else {
-            tail.yaw = MathHelper.cos(f * 0.6662f) * 1.4f * g
+            tail.yRot = Mth.cos(f * 0.6662f) * 1.4f * g
         }
 
-        torso.setPivot(0.0f, 14.0f, 2.0f)
-        torso.pitch = 1.5707964f
-        neck.setPivot(-1.0f, 14.0f, -3.0f)
-        neck.pitch = torso.pitch
-        tail.setPivot(-1.0f, 12.0f, 8.0f)
-        rightHindLeg.setPivot(-2.5f, 16.0f, 7.0f)
-        leftHindLeg.setPivot(0.5f, 16.0f, 7.0f)
-        rightFrontLeg.setPivot(-2.5f, 16.0f, -4.0f)
-        leftFrontLeg.setPivot(0.5f, 16.0f, -4.0f)
-        rightHindLeg.pitch = MathHelper.cos(f * 0.6662f) * 1.4f * g
-        leftHindLeg.pitch = MathHelper.cos(f * 0.6662f + 3.1415927f) * 1.4f * g
-        rightFrontLeg.pitch = MathHelper.cos(f * 0.6662f + 3.1415927f) * 1.4f * g
-        leftFrontLeg.pitch = MathHelper.cos(f * 0.6662f) * 1.4f * g
+        torso.setPos(0.0f, 14.0f, 2.0f)
+        torso.xRot = 1.5707964f
+        neck.setPos(-1.0f, 14.0f, -3.0f)
+        neck.xRot = torso.xRot
+        tail.setPos(-1.0f, 12.0f, 8.0f)
+        rightHindLeg.setPos(-2.5f, 16.0f, 7.0f)
+        leftHindLeg.setPos(0.5f, 16.0f, 7.0f)
+        rightFrontLeg.setPos(-2.5f, 16.0f, -4.0f)
+        leftFrontLeg.setPos(0.5f, 16.0f, -4.0f)
+        rightHindLeg.xRot = Mth.cos(f * 0.6662f) * 1.4f * g
+        leftHindLeg.xRot = Mth.cos(f * 0.6662f + 3.1415927f) * 1.4f * g
+        rightFrontLeg.xRot = Mth.cos(f * 0.6662f + 3.1415927f) * 1.4f * g
+        leftFrontLeg.xRot = Mth.cos(f * 0.6662f) * 1.4f * g
     }
 
-    override fun setAngles(wolfEntity: T, f: Float, g: Float, h: Float, i: Float, j: Float) {
-        head.pitch = j * 0.017453292f
-        head.yaw = i * 0.017453292f
-        tail.pitch = h
+    override fun setupAnim(wolfEntity: T, f: Float, g: Float, h: Float, i: Float, j: Float) {
+        head.xRot = j * 0.017453292f
+        head.yRot = i * 0.017453292f
+        tail.xRot = h
     }
 
     companion object {
@@ -72,47 +76,47 @@ class SkeletonWolfEntityModel<T : SkeletonWolfEntity>(root: ModelPart) : Tintabl
         private const val REAL_TAIL = "real_tail"
         private const val LEG_SIZE = 8
 
-        fun texturedModelData(): TexturedModelData {
-            val modelData = ModelData()
+        fun texturedModelData(): LayerDefinition {
+            val modelData = MeshDefinition()
             val modelPartData = modelData.root
             val modelPartData2 =
-                modelPartData.addChild("head", ModelPartBuilder.create(), ModelTransform.pivot(-1.0f, 13.5f, -7.0f))
-            modelPartData2.addChild(
+                modelPartData.addOrReplaceChild("head", CubeListBuilder.create(), PartPose.offset(-1.0f, 13.5f, -7.0f))
+            modelPartData2.addOrReplaceChild(
                 REAL_HEAD,
-                ModelPartBuilder.create().uv(0, 0).cuboid(-2.0f, -3.0f, -2.0f, 6.0f, 6.0f, 4.0f)
-                    .uv(16, 14)
-                    .cuboid(-2.0f, -5.0f, 0.0f, 2.0f, 2.0f, 1.0f).uv(16, 14)
-                    .cuboid(2.0f, -5.0f, 0.0f, 2.0f, 2.0f, 1.0f).uv(0, 10)
-                    .cuboid(-0.5f, -0.001f, -5.0f, 3.0f, 3.0f, 4.0f),
-                ModelTransform.NONE
+                CubeListBuilder.create().texOffs(0, 0).addBox(-2.0f, -3.0f, -2.0f, 6.0f, 6.0f, 4.0f)
+                    .texOffs(16, 14)
+                    .addBox(-2.0f, -5.0f, 0.0f, 2.0f, 2.0f, 1.0f).texOffs(16, 14)
+                    .addBox(2.0f, -5.0f, 0.0f, 2.0f, 2.0f, 1.0f).texOffs(0, 10)
+                    .addBox(-0.5f, -0.001f, -5.0f, 3.0f, 3.0f, 4.0f),
+                PartPose.ZERO
             )
-            modelPartData.addChild(
+            modelPartData.addOrReplaceChild(
                 "body",
-                ModelPartBuilder.create().uv(18, 14).cuboid(-3.0f, -2.0f, -3.0f, 6.0f, 9.0f, 6.0f),
-                ModelTransform.of(0.0f, 14.0f, 2.0f, 1.5707964f, 0.0f, 0.0f)
+                CubeListBuilder.create().texOffs(18, 14).addBox(-3.0f, -2.0f, -3.0f, 6.0f, 9.0f, 6.0f),
+                PartPose.offsetAndRotation(0.0f, 14.0f, 2.0f, 1.5707964f, 0.0f, 0.0f)
             )
-            modelPartData.addChild(
+            modelPartData.addOrReplaceChild(
                 UPPER_BODY,
-                ModelPartBuilder.create().uv(21, 0).cuboid(-3.0f, -3.0f, -3.0f, 8.0f, 6.0f, 7.0f),
-                ModelTransform.of(-1.0f, 14.0f, -3.0f, 1.5707964f, 0.0f, 0.0f)
+                CubeListBuilder.create().texOffs(21, 0).addBox(-3.0f, -3.0f, -3.0f, 8.0f, 6.0f, 7.0f),
+                PartPose.offsetAndRotation(-1.0f, 14.0f, -3.0f, 1.5707964f, 0.0f, 0.0f)
             )
             val modelPartBuilder =
-                ModelPartBuilder.create().uv(0, 18).cuboid(0.0f, 0.0f, -1.0f, 2.0f, 8.0f, 2.0f)
-            modelPartData.addChild("right_hind_leg", modelPartBuilder, ModelTransform.pivot(-2.5f, 16.0f, 7.0f))
-            modelPartData.addChild("left_hind_leg", modelPartBuilder, ModelTransform.pivot(0.5f, 16.0f, 7.0f))
-            modelPartData.addChild("right_front_leg", modelPartBuilder, ModelTransform.pivot(-2.5f, 16.0f, -4.0f))
-            modelPartData.addChild("left_front_leg", modelPartBuilder, ModelTransform.pivot(0.5f, 16.0f, -4.0f))
-            val modelPartData3 = modelPartData.addChild(
+                CubeListBuilder.create().texOffs(0, 18).addBox(0.0f, 0.0f, -1.0f, 2.0f, 8.0f, 2.0f)
+            modelPartData.addOrReplaceChild("right_hind_leg", modelPartBuilder, PartPose.offset(-2.5f, 16.0f, 7.0f))
+            modelPartData.addOrReplaceChild("left_hind_leg", modelPartBuilder, PartPose.offset(0.5f, 16.0f, 7.0f))
+            modelPartData.addOrReplaceChild("right_front_leg", modelPartBuilder, PartPose.offset(-2.5f, 16.0f, -4.0f))
+            modelPartData.addOrReplaceChild("left_front_leg", modelPartBuilder, PartPose.offset(0.5f, 16.0f, -4.0f))
+            val modelPartData3 = modelPartData.addOrReplaceChild(
                 "tail",
-                ModelPartBuilder.create(),
-                ModelTransform.of(-1.0f, 12.0f, 8.0f, 0.62831855f, 0.0f, 0.0f)
+                CubeListBuilder.create(),
+                PartPose.offsetAndRotation(-1.0f, 12.0f, 8.0f, 0.62831855f, 0.0f, 0.0f)
             )
-            modelPartData3.addChild(
+            modelPartData3.addOrReplaceChild(
                 REAL_TAIL,
-                ModelPartBuilder.create().uv(9, 18).cuboid(0.0f, 0.0f, -1.0f, 2.0f, 8.0f, 2.0f),
-                ModelTransform.NONE
+                CubeListBuilder.create().texOffs(9, 18).addBox(0.0f, 0.0f, -1.0f, 2.0f, 8.0f, 2.0f),
+                PartPose.ZERO
             )
-            return TexturedModelData.of(modelData, 64, 32)
+            return LayerDefinition.create(modelData, 64, 32)
         }
     }
 }

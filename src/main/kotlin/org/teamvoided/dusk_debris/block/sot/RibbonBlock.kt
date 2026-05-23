@@ -1,39 +1,45 @@
 package org.teamvoided.dusk_debris.block.sot
 
 import com.mojang.serialization.MapCodec
-import net.minecraft.block.*
-import net.minecraft.entity.ai.pathing.NavigationType
-import net.minecraft.fluid.FluidState
-import net.minecraft.fluid.Fluids
-import net.minecraft.item.ItemPlacementContext
-import net.minecraft.state.StateManager
-import net.minecraft.state.property.BooleanProperty
-import net.minecraft.state.property.Properties
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Direction
-import net.minecraft.util.shape.VoxelShape
-import net.minecraft.util.shape.VoxelShapes
-import net.minecraft.world.BlockView
-import net.minecraft.world.WorldAccess
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
+import net.minecraft.world.item.context.BlockPlaceContext
+import net.minecraft.world.level.BlockGetter
+import net.minecraft.world.level.LevelAccessor
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.RotatedPillarBlock
+import net.minecraft.world.level.block.SimpleWaterloggedBlock
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.block.state.StateDefinition
+import net.minecraft.world.level.block.state.properties.BlockStateProperties
+import net.minecraft.world.level.block.state.properties.BooleanProperty
+import net.minecraft.world.level.material.FluidState
+import net.minecraft.world.level.material.Fluids
+import net.minecraft.world.level.pathfinder.PathComputationType
+import net.minecraft.world.phys.shapes.CollisionContext
+import net.minecraft.world.phys.shapes.Shapes
+import net.minecraft.world.phys.shapes.VoxelShape
 
-class RibbonBlock(settings: Settings) : PillarBlock(settings), Waterloggable {
-    override fun getCodec(): MapCodec<RibbonBlock> {
+class RibbonBlock(settings: Properties) : RotatedPillarBlock(settings), SimpleWaterloggedBlock {
+    override fun codec(): MapCodec<RibbonBlock> {
         return CODEC
     }
 
     init {
-        this.defaultState = ((stateManager.defaultState)
-            .with(WATERLOGGED, false))
-            .with(AXIS, Direction.Axis.Y)
+        this.registerDefaultState(
+            ((stateDefinition.any())
+                .setValue(WATERLOGGED, false))
+                .setValue(AXIS, Direction.Axis.Y)
+        )
     }
 
-    override fun getOutlineShape(
+    override fun getShape(
         state: BlockState,
-        world: BlockView,
+        world: BlockGetter,
         pos: BlockPos,
-        context: ShapeContext
+        context: CollisionContext
     ): VoxelShape {
-        return when (state.get(AXIS)) {
+        return when (state.getValue(AXIS)) {
             Direction.Axis.X -> X_SHAPE
             Direction.Axis.Z -> Z_SHAPE
             Direction.Axis.Y -> Y_SHAPE
@@ -43,58 +49,58 @@ class RibbonBlock(settings: Settings) : PillarBlock(settings), Waterloggable {
 
     override fun getCollisionShape(
         state: BlockState?,
-        world: BlockView?,
+        world: BlockGetter?,
         pos: BlockPos?,
-        context: ShapeContext?
+        context: CollisionContext?
     ): VoxelShape {
-        return VoxelShapes.empty()
+        return Shapes.empty()
     }
 
-    override fun getPlacementState(ctx: ItemPlacementContext): BlockState {
-        val fluidState = ctx.world.getFluidState(ctx.blockPos)
-        val bl = fluidState.fluid === Fluids.WATER
-        return super.getPlacementState(ctx)!!
-            .with(WATERLOGGED, bl)
+    override fun getStateForPlacement(ctx: BlockPlaceContext): BlockState {
+        val fluidState = ctx.level.getFluidState(ctx.clickedPos)
+        val bl = fluidState.type === Fluids.WATER
+        return super.getStateForPlacement(ctx)!!
+            .setValue(WATERLOGGED, bl)
     }
 
-    override fun getStateForNeighborUpdate(
+    override fun updateShape(
         state: BlockState,
         direction: Direction,
         neighborState: BlockState,
-        world: WorldAccess,
+        world: LevelAccessor,
         pos: BlockPos,
         neighborPos: BlockPos
     ): BlockState {
-        if (state.get(WATERLOGGED)) {
-            world.scheduleFluidTick(pos, Fluids.WATER, Fluids.WATER.getTickRate(world))
+        if (state.getValue(WATERLOGGED)) {
+            world.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(world))
         }
-        return super.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos)
+        return super.updateShape(state, direction, neighborState, world, pos, neighborPos)
     }
 
-    override fun appendProperties(builder: StateManager.Builder<Block, BlockState>) {
+    override fun createBlockStateDefinition(builder: StateDefinition.Builder<Block, BlockState>) {
         builder.add(WATERLOGGED).add(AXIS)
     }
 
     override fun getFluidState(state: BlockState): FluidState {
-        return if (state.get(WATERLOGGED)) Fluids.WATER.getStill(false)
+        return if (state.getValue(WATERLOGGED)) Fluids.WATER.getSource(false)
         else super.getFluidState(state)
     }
 
-    override fun canPathfindThrough(state: BlockState, navigationType: NavigationType): Boolean {
+    override fun isPathfindable(state: BlockState, navigationType: PathComputationType): Boolean {
         return false
     }
 
     companion object {
-        val CODEC: MapCodec<RibbonBlock> = createCodec { settings: Settings ->
+        val CODEC: MapCodec<RibbonBlock> = simpleCodec { settings: Properties ->
             RibbonBlock(
                 settings
             )
         }
-        val WATERLOGGED: BooleanProperty = Properties.WATERLOGGED
+        val WATERLOGGED: BooleanProperty = BlockStateProperties.WATERLOGGED
         protected const val SHAPE_MIN = 6.5
         protected const val SHAPE_MAX = 9.5
-        protected val X_SHAPE: VoxelShape = createCuboidShape(0.0, SHAPE_MIN, SHAPE_MIN, 16.0, SHAPE_MAX, SHAPE_MAX)
-        protected val Y_SHAPE: VoxelShape = createCuboidShape(SHAPE_MIN, 0.0, SHAPE_MIN, SHAPE_MAX, 16.0, SHAPE_MAX)
-        protected val Z_SHAPE: VoxelShape = createCuboidShape(SHAPE_MIN, SHAPE_MIN, 0.0, SHAPE_MAX, SHAPE_MAX, 16.0)
+        protected val X_SHAPE: VoxelShape = box(0.0, SHAPE_MIN, SHAPE_MIN, 16.0, SHAPE_MAX, SHAPE_MAX)
+        protected val Y_SHAPE: VoxelShape = box(SHAPE_MIN, 0.0, SHAPE_MIN, SHAPE_MAX, 16.0, SHAPE_MAX)
+        protected val Z_SHAPE: VoxelShape = box(SHAPE_MIN, SHAPE_MIN, 0.0, SHAPE_MAX, SHAPE_MAX, 16.0)
     }
 }

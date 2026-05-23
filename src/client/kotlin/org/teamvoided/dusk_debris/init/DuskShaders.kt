@@ -4,23 +4,23 @@ import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.vertex.*
 import net.fabricmc.fabric.api.client.rendering.v1.CoreShaderRegistrationCallback
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext
-import net.minecraft.client.render.RenderPhase.Shader
-import net.minecraft.client.render.ShaderProgram
-import net.minecraft.util.math.Vec3d
+import net.minecraft.client.renderer.RenderStateShard.ShaderStateShard
+import net.minecraft.client.renderer.ShaderInstance
+import net.minecraft.world.phys.Vec3
 import org.joml.Matrix4f
 import org.teamvoided.dusk_debris.DuskDebris.id
 
 object DuskShaders {
-    private var customType: ShaderProgram? = null
+    private var customType: ShaderInstance? = null
 
-    val STATUE_SHADER: Shader = Shader { statueRenderType }
-    var statueRenderType: ShaderProgram? = null
+    val STATUE_SHADER: ShaderStateShard = ShaderStateShard { statueRenderType }
+    var statueRenderType: ShaderInstance? = null
         private set
 
     fun init() {
         CoreShaderRegistrationCallback.EVENT.register { ctx ->
             ctx.register(
-                id("rendertype_statue"), VertexFormats.POSITION_COLOR_TEXTURE_OVERLAY_LIGHT_NORMAL
+                id("rendertype_statue"), DefaultVertexFormat.NEW_ENTITY
             ) { statueRenderType = it }
 //            ctx.register(id("rendertype_custom"), VertexFormats.POSITION_COLOR) { customType = it }
         }
@@ -30,8 +30,8 @@ object DuskShaders {
     fun grayscale(ctx: WorldRenderContext) = ctx.matrixStack()?.apply {
         val profiler = ctx.profiler()
         profiler.push("duskDebris")
-        this.push()
-        this.pop()
+        this.pushPose()
+        this.popPose()
         profiler.pop()
         Thread.yield()
     }
@@ -41,10 +41,10 @@ object DuskShaders {
         profiler.push("duskDebris")
 
         val color = 0xffffffff.toInt()
-        val tessellator = Tessellator.getInstance()
-        val pose = this.peek().model
+        val tessellator = Tesselator.getInstance()
+        val pose = this.last().pose()
 
-        this.push()
+        this.pushPose()
         RenderSystem.disableDepthTest()
         RenderSystem.enableBlend()
         RenderSystem.setShader { customType }
@@ -53,32 +53,32 @@ object DuskShaders {
 //        RenderSystem.setShaderTexture(1, EndPortalBlockEntityRenderer.SKY_TEXTURE)
 
         RenderSystem.disableCull()
-        val camPos = ctx.camera().pos
-        val camPosY100 = Vec3d(camPos.x, 100.0, camPos.y)
+        val camPos = ctx.camera().position
+        val camPosY100 = Vec3(camPos.x, 100.0, camPos.y)
         for (x in -100..100) {
             for (z in -100..100) {
                 val pos = camPosY100.add(x.toDouble(), 0.0, z.toDouble())
                 tessellator.plane(pos, pose, camPos, color)
             }
         }
-        this.pop()
+        this.popPose()
 
         profiler.pop()
         Thread.yield()
     }
 
-    private fun Tessellator.plane(pos: Vec3d, pose: Matrix4f, camPos: Vec3d, color: Int) {
-        val builder: BufferBuilder = this.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR)
-        builder.xyz(pose, pos, camPos).color(color)
-        builder.xyz(pose, pos.add(0.0, 0.0, 1.0), camPos).color(color)
-        builder.xyz(pose, pos.add(1.0, 0.0, 1.0), camPos).color(color)
-        builder.xyz(pose, pos.add(1.0, 0.0, 0.0), camPos).color(color)
-        builder.end()?.let { BufferRenderer.drawWithShader(it) }
+    private fun Tesselator.plane(pos: Vec3, pose: Matrix4f, camPos: Vec3, color: Int) {
+        val builder: BufferBuilder = this.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR)
+        builder.xyz(pose, pos, camPos).setColor(color)
+        builder.xyz(pose, pos.add(0.0, 0.0, 1.0), camPos).setColor(color)
+        builder.xyz(pose, pos.add(1.0, 0.0, 1.0), camPos).setColor(color)
+        builder.xyz(pose, pos.add(1.0, 0.0, 0.0), camPos).setColor(color)
+        builder.build()?.let { BufferUploader.drawWithShader(it) }
     }
 
-    fun VertexConsumer.xyz(model: Matrix4f, vec: Vec3d, camera: Vec3d = Vec3d.ZERO): VertexConsumer =
-        this.xyz(model, (vec.x - camera.x).toFloat(), (vec.y - camera.y).toFloat(), (vec.z - camera.z).toFloat())
+    fun VertexConsumer.xyz(model: Matrix4f, vec: Vec3, camera: Vec3 = Vec3.ZERO): VertexConsumer =
+        this.addVertex(model, (vec.x - camera.x).toFloat(), (vec.y - camera.y).toFloat(), (vec.z - camera.z).toFloat())
 
-    fun VertexConsumer.normal(vec: Vec3d): VertexConsumer =
-        this.normal(vec.x.toFloat(), vec.y.toFloat(), vec.z.toFloat())
+    fun VertexConsumer.normal(vec: Vec3): VertexConsumer =
+        this.setNormal(vec.x.toFloat(), vec.y.toFloat(), vec.z.toFloat())
 }

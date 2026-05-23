@@ -1,10 +1,8 @@
 package org.teamvoided.dusk_debris.data.gen.world.gen
 
-import net.minecraft.registry.BootstrapContext
-import net.minecraft.registry.RegistryKey
-import net.minecraft.util.math.noise.DoublePerlinNoiseSampler.NoiseParameters
-import org.teamvoided.dusk_debris.data.gen.world.gen.NoiseCreator.nether
-import org.teamvoided.dusk_debris.data.gen.world.gen.NoiseCreator.register
+import net.minecraft.data.worldgen.BootstrapContext
+import net.minecraft.resources.ResourceKey
+import net.minecraft.world.level.levelgen.synth.NormalNoise.NoiseParameters
 import org.teamvoided.dusk_debris.data.worldgen.DuskNoiseParametersKeys
 
 object NoiseCreator {
@@ -63,11 +61,11 @@ object NoiseCreator {
 
     private fun BootstrapContext<NoiseParameters>.registerNetherBiomeNoises(
         octaveOffset: Int,
-        temperature: RegistryKey<NoiseParameters>,
-        humidity: RegistryKey<NoiseParameters>,
-        continentalness: RegistryKey<NoiseParameters>,
-        erosion: RegistryKey<NoiseParameters>,
-        dropCeiling: RegistryKey<NoiseParameters>
+        temperature: ResourceKey<NoiseParameters>,
+        humidity: ResourceKey<NoiseParameters>,
+        continentalness: ResourceKey<NoiseParameters>,
+        erosion: ResourceKey<NoiseParameters>,
+        dropCeiling: ResourceKey<NoiseParameters>
     ) {
         this.register(temperature, -10 + octaveOffset, 1.5, 0, 1, 0, 0, 0)
         this.register(humidity, -8 + octaveOffset, 1, 1, 0, 0, 0, 0)
@@ -77,7 +75,7 @@ object NoiseCreator {
     }
 
     private fun BootstrapContext<NoiseParameters>.register(
-        key: RegistryKey<NoiseParameters>,
+        key: ResourceKey<NoiseParameters>,
         firstOctave: Int,
         firstAmplitude: Number,
         vararg amplitudes: Number

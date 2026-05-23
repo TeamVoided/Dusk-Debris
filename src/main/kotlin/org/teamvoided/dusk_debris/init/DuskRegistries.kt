@@ -1,7 +1,7 @@
 package org.teamvoided.dusk_debris.init
 
 import net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder
-import net.minecraft.registry.Registry
+import net.minecraft.core.Registry
 import org.teamvoided.dusk_debris.spell.SpellType
 
 object DuskRegistries {

@@ -2,8 +2,8 @@ package org.teamvoided.dusk_debris.world.gen.density_functions
 
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
-import net.minecraft.util.dynamic.CodecHolder
-import net.minecraft.world.gen.DensityFunction
+import net.minecraft.util.KeyDispatchDataCodec
+import net.minecraft.world.level.levelgen.DensityFunction
 import org.teamvoided.dusk_debris.util.world_helper.makeCodec
 import kotlin.math.abs
 
@@ -30,7 +30,7 @@ class Fold(val densityFunction: DensityFunction) : DensityFunction {
     override fun maxValue(): Double = densityFunction.maxValue()
 
 
-    override fun codec(): CodecHolder<out DensityFunction> = CODEC
+    override fun codec(): KeyDispatchDataCodec<out DensityFunction> = CODEC
 
     companion object {
         private val DATA_CODEC: MapCodec<Fold> =
@@ -40,7 +40,7 @@ class Fold(val densityFunction: DensityFunction) : DensityFunction {
                     .apply(instance, ::Fold)
             }
 
-        val CODEC: CodecHolder<Fold> = makeCodec(DATA_CODEC)
+        val CODEC: KeyDispatchDataCodec<Fold> = makeCodec(DATA_CODEC)
 
     }
 }

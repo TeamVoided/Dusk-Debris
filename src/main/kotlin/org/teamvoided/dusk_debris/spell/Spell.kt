@@ -1,22 +1,14 @@
 package org.teamvoided.dusk_debris.spell
 
 import com.mojang.serialization.Codec
-import net.minecraft.enchantment.Enchantment
-import net.minecraft.entity.LivingEntity
-import net.minecraft.network.codec.PacketCodecs
-import net.minecraft.registry.Holder
-import net.minecraft.registry.RegistryCodecs
-import net.minecraft.registry.RegistryFixedCodec
-import net.minecraft.registry.tag.EnchantmentTags
-import net.minecraft.text.CommonTexts
-import net.minecraft.text.Style
-import net.minecraft.text.Text
-import net.minecraft.text.Texts
-import net.minecraft.util.Formatting
-import net.minecraft.util.dynamic.RegistryElementCodec
-import net.minecraft.util.math.Vec3d
-import net.minecraft.util.random.RandomGenerator
-import net.minecraft.world.World
+import net.minecraft.core.RegistryCodecs
+import net.minecraft.network.codec.ByteBufCodecs
+import net.minecraft.resources.RegistryFileCodec
+import net.minecraft.resources.RegistryFixedCodec
+import net.minecraft.util.RandomSource
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.level.Level
+import net.minecraft.world.phys.Vec3
 import org.teamvoided.dusk_debris.init.DuskRegistries
 import org.teamvoided.dusk_debris.init.DuskRegistryKeys
 
@@ -26,17 +18,17 @@ class Spell<SS : SpellSettings, S : SpellType<SS>>(val spellType: S, val setting
     fun castTick(castor: LivingEntity) = spellType.castTick(castor, settings)
     fun onCastEnd(castor: LivingEntity) = spellType.onCastEnd(castor, settings)
     fun actualSpell(castor: LivingEntity) = spellType.actualSpell(castor, settings)
-    fun nonEntityBehavior(world: World, random: RandomGenerator, pos: Vec3d, rotation: Vec3d) =
+    fun nonEntityBehavior(world: Level, random: RandomSource, pos: Vec3, rotation: Vec3) =
         spellType.nonEntityBehavior(world, random, pos, rotation, settings)
 
     companion object {
         val CODEC: Codec<Spell<out SpellSettings, out SpellType<out SpellSettings>>> =
-            DuskRegistries.SPELL_TYPE.codec.dispatch({ it.spellType }, { it.getCodec() })
+            DuskRegistries.SPELL_TYPE.byNameCodec().dispatch({ it.spellType }, { it.getCodec() })
 
         val ENTRY_CODEC = RegistryFixedCodec.create(DuskRegistryKeys.SPELL)
-        val ENTRY_PACKET_CODEC = PacketCodecs.holder(DuskRegistryKeys.SPELL)
+        val ENTRY_PACKET_CODEC = ByteBufCodecs.holderRegistry(DuskRegistryKeys.SPELL)
 
-        val REGISTRY_CODEC = RegistryElementCodec.of(DuskRegistryKeys.SPELL, CODEC)
+        val REGISTRY_CODEC = RegistryFileCodec.create(DuskRegistryKeys.SPELL, CODEC)
         val LIST_CODEC = RegistryCodecs.homogeneousList(DuskRegistryKeys.SPELL, CODEC)
     }
 }

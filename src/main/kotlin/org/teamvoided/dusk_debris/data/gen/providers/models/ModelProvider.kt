@@ -3,10 +3,11 @@ package org.teamvoided.dusk_debris.data.gen.providers.models
 
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider
-import net.minecraft.block.Blocks
-import net.minecraft.data.client.ItemModelGenerator
-import net.minecraft.data.client.model.*
-import net.minecraft.data.client.model.BlockStateModelGenerator.TintType
+import net.minecraft.data.models.BlockModelGenerators
+import net.minecraft.data.models.BlockModelGenerators.TintState
+import net.minecraft.data.models.ItemModelGenerators
+import net.minecraft.data.models.model.*
+import net.minecraft.world.level.block.Blocks
 import org.teamvoided.dusk_debris.DuskDebris.id
 import org.teamvoided.dusk_debris.DuskDebris.mc
 import org.teamvoided.dusk_debris.block.DuskBlockFamilies
@@ -24,25 +25,25 @@ import java.util.*
 class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
     private val minecraft = false
 
-    override fun generateBlockStateModels(gen: BlockStateModelGenerator) {
-        gen.sandstoneModels = mapOf(
-            DuskBlocks.VOLCANIC_SANDSTONE to TexturedModel.SIDE_TOP_BOTTOM_WALL[DuskBlocks.VOLCANIC_SANDSTONE],
-            DuskBlocks.SMOOTH_VOLCANIC_SANDSTONE to TexturedModel.getCubeAll(
-                Texture.getSubId(DuskBlocks.VOLCANIC_SANDSTONE, "_top")
+    override fun generateBlockStateModels(gen: BlockModelGenerators) {
+        gen.texturedModels = mapOf(
+            DuskBlocks.VOLCANIC_SANDSTONE to TexturedModel.TOP_BOTTOM_WITH_WALL[DuskBlocks.VOLCANIC_SANDSTONE],
+            DuskBlocks.SMOOTH_VOLCANIC_SANDSTONE to TexturedModel.createAllSame(
+                TextureMapping.getBlockTexture(DuskBlocks.VOLCANIC_SANDSTONE, "_top")
             ),
-            DuskBlocks.CUT_VOLCANIC_SANDSTONE to TexturedModel.CUBE_COLUMN[DuskBlocks.VOLCANIC_SANDSTONE].texture { texture: Texture ->
+            DuskBlocks.CUT_VOLCANIC_SANDSTONE to TexturedModel.COLUMN[DuskBlocks.VOLCANIC_SANDSTONE].updateTextures { texture: TextureMapping ->
                 texture.put(
-                    TextureKey.SIDE,
-                    Texture.getId(DuskBlocks.CUT_VOLCANIC_SANDSTONE)
+                    TextureSlot.SIDE,
+                    TextureMapping.getBlockTexture(DuskBlocks.CUT_VOLCANIC_SANDSTONE)
                 )
             },
-            DuskBlocks.CHISELED_VOLCANIC_SANDSTONE to TexturedModel.CUBE_COLUMN[DuskBlocks.CHISELED_VOLCANIC_SANDSTONE].texture { texture: Texture ->
-                texture.put(TextureKey.END, Texture.getSubId(DuskBlocks.VOLCANIC_SANDSTONE, "_top"))
-                texture.put(TextureKey.SIDE, Texture.getId(DuskBlocks.CHISELED_VOLCANIC_SANDSTONE))
+            DuskBlocks.CHISELED_VOLCANIC_SANDSTONE to TexturedModel.COLUMN[DuskBlocks.CHISELED_VOLCANIC_SANDSTONE].updateTextures { texture: TextureMapping ->
+                texture.put(TextureSlot.END, TextureMapping.getBlockTexture(DuskBlocks.VOLCANIC_SANDSTONE, "_top"))
+                texture.put(TextureSlot.SIDE, TextureMapping.getBlockTexture(DuskBlocks.CHISELED_VOLCANIC_SANDSTONE))
             }
         )
         DuskBlockFamilies.blockFamilies.forEach {
-            gen.registerCubeAllModelTexturePool(it.baseBlock).family(it)
+            gen.family(it.baseBlock).generateFor(it)
         }
 
         if (minecraft) {
@@ -53,7 +54,7 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
         gen.fogCanyonModels()
 
         DuskItemLists.SPAWN_EGGS_ITEM_LIST.forEach {
-            gen.registerParentedItemModel(it, mc("item/template_spawn_egg"))
+            gen.delegateItemModel(it, mc("item/template_spawn_egg"))
         }
         DuskBlockLists.RIBBON_BLOCKS_LIST.forEach {
             gen.registerRibbon(it)
@@ -68,19 +69,19 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
         gen.carpetStairs(DuskBlocks.RED_CARPET_STAIRS, Blocks.RED_WOOL)
 
 
-        gen.registerItemModel(DuskItems.MACE_BLAZE)
+        gen.createSimpleFlatItemModel(DuskItems.MACE_BLAZE)
 
 
-        gen.registerSimpleCubeAll(DuskBlocks.BRONZE_BLOCK)
+        gen.createTrivialCube(DuskBlocks.BRONZE_BLOCK)
         gen.wallOffset(DuskBlocks.CUT_BRONZE_WALL, DuskBlocks.CUT_BRONZE)
-        gen.registerTrapdoor(DuskBlocks.BRONZE_TRAPDOOR)
+        gen.createTrapdoor(DuskBlocks.BRONZE_TRAPDOOR)
         gen.godhomeShiftBlock(DuskBlocks.BRONZE_SHIFT_BLOCK)
         gen.vesselLantern(DuskBlocks.PALE_SOUL_VESSEL)
-        gen.registerLantern(DuskBlocks.PALE_SOUL_LANTERN)
+        gen.createLantern(DuskBlocks.PALE_SOUL_LANTERN)
 
         gen.registerDustBlockFromRedstone(DuskBlocks.GUNPOWDER)
 
-        gen.registerItemModel(DuskBlocks.GUNPOWDER)
+        gen.createSimpleFlatItemModel(DuskBlocks.GUNPOWDER)
 //        gen.registerBuiltin(ModelIds.getMinecraftNamespacedBlock("skull"), Blocks.SOUL_SAND)
 //            .includeWithItem(
 //                DuskBlocks.STRAY_SKULL,
@@ -93,28 +94,28 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
 //                DuskBlocks.GLOOM_WALL_SKULL
 //            )
 
-        gen.registerSimpleCubeAll(DuskBlocks.TREACHEROUS_GOLD_BLOCK)
-        gen.registerSimpleCubeAll(DuskBlocks.TARNISHED_GOLD_BLOCK)
-        gen.registerSimpleCubeAll(DuskBlocks.LOST_SILVER_BLOCK)
-        gen.registerSimpleCubeAll(DuskBlocks.SUNKEN_BRONZE_BLOCK)
+        gen.createTrivialCube(DuskBlocks.TREACHEROUS_GOLD_BLOCK)
+        gen.createTrivialCube(DuskBlocks.TARNISHED_GOLD_BLOCK)
+        gen.createTrivialCube(DuskBlocks.LOST_SILVER_BLOCK)
+        gen.createTrivialCube(DuskBlocks.SUNKEN_BRONZE_BLOCK)
         DuskBlockLists.COIN_STACK_BLOCK_LIST.forEach {
             gen.registerCoinStack(it)
         }
         gen.registerGoldPileBlock(
             DuskBlocks.TREACHEROUS_GOLD_COIN_PILE,
-            Texture.getSubId(DuskBlocks.TREACHEROUS_GOLD_COIN_STACK, "_side")
+            TextureMapping.getBlockTexture(DuskBlocks.TREACHEROUS_GOLD_COIN_STACK, "_side")
         )
         gen.registerGoldPileBlock(
             DuskBlocks.TARNISHED_GOLD_COIN_PILE,
-            Texture.getSubId(DuskBlocks.TARNISHED_GOLD_COIN_STACK, "_side")
+            TextureMapping.getBlockTexture(DuskBlocks.TARNISHED_GOLD_COIN_STACK, "_side")
         )
         gen.registerGoldPileBlock(
             DuskBlocks.LOST_SILVER_COIN_PILE,
-            Texture.getSubId(DuskBlocks.LOST_SILVER_COIN_STACK, "_side")
+            TextureMapping.getBlockTexture(DuskBlocks.LOST_SILVER_COIN_STACK, "_side")
         )
         gen.registerGoldPileBlock(
             DuskBlocks.SUNKEN_BRONZE_COIN_PILE,
-            Texture.getSubId(DuskBlocks.SUNKEN_BRONZE_COIN_STACK, "_side")
+            TextureMapping.getBlockTexture(DuskBlocks.SUNKEN_BRONZE_COIN_STACK, "_side")
         )
         DuskBlockLists.VESSEL_BLOCK_LIST.forEach {
             gen.registerDecorativeGoldBlock(it, "parent/mysterious_vessel", true)
@@ -136,17 +137,17 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
         gen.registerNethershroomBlock(DuskBlocks.PURPLE_NETHERSHROOM_BLOCK)
         gen.registerNethershroomBlock(DuskBlocks.NETHERSHROOM_STEM)
 
-        gen.registerSimpleCubeAll(DuskBlocks.PAPER_BLOCK)
+        gen.createTrivialCube(DuskBlocks.PAPER_BLOCK)
 
-        gen.registerSimpleState(DuskBlocks.BOG_MUD)
-        gen.registerItemModel(DuskItems.BOG_MUD_BUCKET)
+        gen.createNonTemplateModelBlock(DuskBlocks.BOG_MUD)
+        gen.createSimpleFlatItemModel(DuskItems.BOG_MUD_BUCKET)
 
 
-        gen.registerSimpleCubeAll(DuskBlocks.CRYSTAL_BLOCK)
-        gen.registerAxisRotated(
+        gen.createTrivialCube(DuskBlocks.CRYSTAL_BLOCK)
+        gen.createRotatedPillarWithHorizontalVariant(
             DuskBlocks.CRYSTAL_PILLAR_BLOCK,
-            TexturedModel.END_FOR_TOP_CUBE_COLUMN,
-            TexturedModel.END_FOR_TOP_CUBE_COLUMN_HORIZONTAL
+            TexturedModel.COLUMN_ALT,
+            TexturedModel.COLUMN_HORIZONTAL_ALT
         )
 
 
@@ -157,16 +158,16 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
         gen.registerCopperFan(DuskBlocks.OXIDIZED_COPPER_FAN, DuskBlocks.WAXED_OXIDIZED_COPPER_FAN)
 
         gen.registerGeyser(DuskBlocks.ROARING_GEYSER)
-        gen.registerRotatable(DuskBlocks.VOLCANIC_SAND)
-        gen.registerDustable(DuskBlocks.SUSPICIOUS_VOLCANIC_SAND)
+        gen.createRotatedVariantBlock(DuskBlocks.VOLCANIC_SAND)
+        gen.createBrushableBlock(DuskBlocks.SUSPICIOUS_VOLCANIC_SAND)
 //        gen.registerSingleton(DuskBlocks.SMOOTH_VOLCANIC_SANDSTONE) {
 //            TexturedModel.getCubeAll(Texture.getSubId(DuskBlocks.VOLCANIC_SANDSTONE, "_top"))
 //        }
 
 
         // DnD
-        gen.registerGalleryRose(DuskBlocks.PAINTED_ROSE, TintType.NOT_TINTED)
-        gen.registerSpiderlilly(DuskBlocks.SPIDERLILY, TintType.NOT_TINTED)
+        gen.registerGalleryRose(DuskBlocks.PAINTED_ROSE, TintState.NOT_TINTED)
+        gen.registerSpiderlilly(DuskBlocks.SPIDERLILY, TintState.NOT_TINTED)
 
 //        gen.registerBigChain(DuskBlocks.BIG_CELESTAL_CHAIN)
         val bottomModel = id("block/big_celestal_lantern_bottom")
@@ -179,36 +180,36 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
         gen.registerBigLantern(DuskBlocks.BIG_ECLIPSE_LANTERN, bottomModel)
 
         gen.registerBell(DuskBlocks.CELESTAL_BELL)
-        gen.registerSingleton(
-            DuskBlocks.JOUNCESHROOM_BLOCK, TexturedModel.makeFactory(Texture::sideEnd, Models.CUBE_COLUMN)
+        gen.createTrivialBlock(
+            DuskBlocks.JOUNCESHROOM_BLOCK, TexturedModel.createDefault(TextureMapping::column, ModelTemplates.CUBE_COLUMN)
         )
 
-        gen.registerAmethyst(DuskBlocks.MOONCORE)
+        gen.createAmethystCluster(DuskBlocks.MOONCORE)
         gen.registerTallCrystal(DuskBlocks.TALL_REDSTONE_CRYSTAL)
-        gen.registerBuiltin(ModelIds.getMinecraftNamespacedBlock("decorated_pot"), Blocks.TERRACOTTA)
-            .includeWithoutItem(DuskBlocks.POT_O_SCREAMS)
-        gen.registerBuiltin(ModelIds.getMinecraftNamespacedBlock("chest"), Blocks.OAK_PLANKS)
-            .includeWithoutItem(DuskBlocks.CHEST_O_SOULS)
+        gen.blockEntityModels(ModelLocationUtils.decorateBlockModelLocation("decorated_pot"), Blocks.TERRACOTTA)
+            .createWithoutBlockItem(DuskBlocks.POT_O_SCREAMS)
+        gen.blockEntityModels(ModelLocationUtils.decorateBlockModelLocation("chest"), Blocks.OAK_PLANKS)
+            .createWithoutBlockItem(DuskBlocks.CHEST_O_SOULS)
 
         gen.registerBunnyGrave(DuskBlocks.BUNNY_GRAVE, Blocks.SMOOTH_STONE, Blocks.STONE)
 
     }
 
-    private fun BlockStateModelGenerator.fogCanyonModels() {
+    private fun BlockModelGenerators.fogCanyonModels() {
         this.bubbleBlock(DuskBlocks.FOG_BUBBLE)
         this.bubbleBlossomBlock(DuskBlocks.PURPLE_BUBBLE_BLOSSOM)
     }
 
     private val single = listOf(DuskItems.DEBUG_SPELL_ITEM, DuskItems.DIE_ITEM, DuskItems.CHILL_CHARGE)
-    override fun generateItemModels(gen: ItemModelGenerator) {
-        single.forEach { gen.register(it, Models.SINGLE_LAYER_ITEM) }
-        gen.register(DuskItems.FREEZE_ROD, Models.HANDHELD_ROD)
-        gen.register(DuskItems.HARVESTER_SCYTHE, item("parent/handheld_32", TextureKey.LAYER0))
+    override fun generateItemModels(gen: ItemModelGenerators) {
+        single.forEach { gen.generateFlatItem(it, ModelTemplates.FLAT_ITEM) }
+        gen.generateFlatItem(DuskItems.FREEZE_ROD, ModelTemplates.FLAT_HANDHELD_ROD_ITEM)
+        gen.generateFlatItem(DuskItems.HARVESTER_SCYTHE, item("parent/handheld_32", TextureSlot.LAYER0))
 
-        val webWeaver = item("web_weaver", TextureKey.LAYER0)
-        gen.register(DuskItems.WEB_WEAVER, "_0", webWeaver)
-        gen.register(DuskItems.WEB_WEAVER, "_1", webWeaver)
-        gen.register(DuskItems.WEB_WEAVER, "_2", webWeaver)
+        val webWeaver = item("web_weaver", TextureSlot.LAYER0)
+        gen.generateFlatItem(DuskItems.WEB_WEAVER, "_0", webWeaver)
+        gen.generateFlatItem(DuskItems.WEB_WEAVER, "_1", webWeaver)
+        gen.generateFlatItem(DuskItems.WEB_WEAVER, "_2", webWeaver)
 
 //        gen.register(DuskItems.STRAY_SKULL, parentedItemModel(mc("template_skull")))
 //        gen.register(DuskItems.BOGGED_SKULL, parentedItemModel(mc("template_skull")))
@@ -216,6 +217,6 @@ class ModelProvider(o: FabricDataOutput) : FabricModelProvider(o) {
     }
 
     // TODO replace with voidlib
-    private fun item(parent: String, vararg requiredTextures: TextureKey): Model =
-        Model(Optional.of(id("item/$parent")), Optional.empty(), *requiredTextures)
+    private fun item(parent: String, vararg requiredTextures: TextureSlot): ModelTemplate =
+        ModelTemplate(Optional.of(id("item/$parent")), Optional.empty(), *requiredTextures)
 }

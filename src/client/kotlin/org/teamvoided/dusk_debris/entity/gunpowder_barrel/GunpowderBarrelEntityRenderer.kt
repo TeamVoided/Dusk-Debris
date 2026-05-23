@@ -1,52 +1,52 @@
 package org.teamvoided.dusk_debris.entity.gunpowder_barrel
 
+import com.mojang.blaze3d.vertex.PoseStack
+import com.mojang.math.Axis
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
-import net.minecraft.client.render.VertexConsumerProvider
-import net.minecraft.client.render.block.BlockRenderManager
-import net.minecraft.client.render.entity.EntityRenderer
-import net.minecraft.client.render.entity.EntityRendererFactory
-import net.minecraft.client.render.entity.TntMinecartEntityRenderer
-import net.minecraft.client.texture.SpriteAtlasTexture
-import net.minecraft.client.util.math.MatrixStack
-import net.minecraft.util.Identifier
-import net.minecraft.util.math.Axis
-import net.minecraft.util.math.MathHelper
+import net.minecraft.client.renderer.MultiBufferSource
+import net.minecraft.client.renderer.block.BlockRenderDispatcher
+import net.minecraft.client.renderer.entity.EntityRenderer
+import net.minecraft.client.renderer.entity.EntityRendererProvider
+import net.minecraft.client.renderer.entity.TntMinecartRenderer
+import net.minecraft.client.renderer.texture.TextureAtlas
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.util.Mth
 import org.teamvoided.dusk_debris.entity.GunpowderBarrelEntity
 
 @Environment(EnvType.CLIENT)
-class GunpowderBarrelEntityRenderer(context: EntityRendererFactory.Context) : EntityRenderer<GunpowderBarrelEntity>(context) {
-    private val blockRenderManager: BlockRenderManager
+class GunpowderBarrelEntityRenderer(context: EntityRendererProvider.Context) : EntityRenderer<GunpowderBarrelEntity>(context) {
+    private val blockRenderManager: BlockRenderDispatcher
 
     init {
         this.shadowRadius = 0.5f
-        this.blockRenderManager = context.blockRenderManager
+        this.blockRenderManager = context.blockRenderDispatcher
     }
 
     override fun render(
         gunpowderBlockEntity: GunpowderBarrelEntity,
         f: Float,
         g: Float,
-        matrices: MatrixStack,
-        vertexConsumers: VertexConsumerProvider,
+        matrices: PoseStack,
+        vertexConsumers: MultiBufferSource,
         i: Int
     ) {
-        matrices.push()
+        matrices.pushPose()
         matrices.translate(0.0f, 0.5f, 0.0f)
         val fuse = gunpowderBlockEntity.fuse
         if (fuse.toFloat() - g + 1.0f < 10.0f) {
             var h = 1.0f - (fuse.toFloat() - g + 1.0f) / 10.0f
-            h = MathHelper.clamp(h, 0.0f, 1.0f)
+            h = Mth.clamp(h, 0.0f, 1.0f)
             h *= h
             h *= h
             val k = 1.0f + h * 0.3f
             matrices.scale(k, k, k)
         }
 
-        matrices.rotate(Axis.Y_POSITIVE.rotationDegrees(-90.0f))
+        matrices.mulPose(Axis.YP.rotationDegrees(-90.0f))
         matrices.translate(-0.5f, -0.5f, 0.5f)
-        matrices.rotate(Axis.Y_POSITIVE.rotationDegrees(90.0f))
-        TntMinecartEntityRenderer.renderFlashingBlock(
+        matrices.mulPose(Axis.YP.rotationDegrees(90.0f))
+        TntMinecartRenderer.renderWhiteSolidBlock(
             this.blockRenderManager,
             gunpowderBlockEntity.blockState,
             matrices,
@@ -54,11 +54,11 @@ class GunpowderBarrelEntityRenderer(context: EntityRendererFactory.Context) : En
             i,
             fuse / 5 % 2 == 0
         )
-        matrices.pop()
+        matrices.popPose()
         super.render(gunpowderBlockEntity, f, g, matrices, vertexConsumers, i)
     }
 
-    override fun getTexture(gunpowderBarrelEntity: GunpowderBarrelEntity): Identifier {
-        return SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE
+    override fun getTextureLocation(gunpowderBarrelEntity: GunpowderBarrelEntity): ResourceLocation {
+        return TextureAtlas.LOCATION_BLOCKS
     }
 }

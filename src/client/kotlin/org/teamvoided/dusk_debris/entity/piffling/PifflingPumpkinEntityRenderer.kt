@@ -1,8 +1,8 @@
 package org.teamvoided.dusk_debris.entity.piffling
 
-import net.minecraft.client.render.entity.EntityRendererFactory
-import net.minecraft.client.render.entity.MobEntityRenderer
-import net.minecraft.util.Identifier
+import net.minecraft.client.renderer.entity.EntityRendererProvider
+import net.minecraft.client.renderer.entity.MobRenderer
+import net.minecraft.resources.ResourceLocation
 import org.teamvoided.dusk_debris.DuskDebris.id
 import org.teamvoided.dusk_debris.entity.DuskEntityModelLayers
 import org.teamvoided.dusk_debris.entity.PifflingPumpkinEntity
@@ -10,18 +10,18 @@ import org.teamvoided.dusk_debris.entity.piffling.model.PifflingPumpkinModel
 import org.teamvoided.dusk_debris.entity.piffling.render.PifflingPumpkinHeadFeatureRenderer
 import org.teamvoided.dusk_debris.entity.piffling.render.PifflingPumpkinHeldItemFeatureRenderer
 
-class PifflingPumpkinEntityRenderer(context: EntityRendererFactory.Context) :
-    MobEntityRenderer<PifflingPumpkinEntity, PifflingPumpkinModel>(
+class PifflingPumpkinEntityRenderer(context: EntityRendererProvider.Context) :
+    MobRenderer<PifflingPumpkinEntity, PifflingPumpkinModel>(
         context,
-        PifflingPumpkinModel(context.getPart(DuskEntityModelLayers.PIFFLING_PUMPKIN)),
+        PifflingPumpkinModel(context.bakeLayer(DuskEntityModelLayers.PIFFLING_PUMPKIN)),
         0.35f
     ) {
     init {
-        this.addFeature(PifflingPumpkinHeldItemFeatureRenderer(this, context.heldItemRenderer))
-        this.addFeature(PifflingPumpkinHeadFeatureRenderer(this, context.itemRenderer))
+        this.addLayer(PifflingPumpkinHeldItemFeatureRenderer(this, context.itemInHandRenderer))
+        this.addLayer(PifflingPumpkinHeadFeatureRenderer(this, context.itemRenderer))
     }
 
-    override fun getTexture(tuffGolemEntity: PifflingPumpkinEntity): Identifier {
+    override fun getTextureLocation(tuffGolemEntity: PifflingPumpkinEntity): ResourceLocation {
         return TEXTURE
     }
 
@@ -30,6 +30,6 @@ class PifflingPumpkinEntityRenderer(context: EntityRendererFactory.Context) :
     }
 
     companion object {
-        private val TEXTURE: Identifier = id("textures/entity/pumpkin/piffling_pumpkin.png")
+        private val TEXTURE: ResourceLocation = id("textures/entity/pumpkin/piffling_pumpkin.png")
     }
 }

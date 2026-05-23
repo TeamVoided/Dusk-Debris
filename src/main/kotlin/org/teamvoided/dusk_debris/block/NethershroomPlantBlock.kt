@@ -1,28 +1,32 @@
 package org.teamvoided.dusk_debris.block
 
 import com.mojang.serialization.MapCodec
-import net.minecraft.block.*
-import net.minecraft.entity.Entity
-import net.minecraft.entity.effect.StatusEffect
-import net.minecraft.entity.effect.StatusEffectInstance
-import net.minecraft.entity.effect.StatusEffects
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.particle.ParticleEffect
-import net.minecraft.registry.Holder
-import net.minecraft.registry.RegistryKey
-import net.minecraft.registry.RegistryKeys
-import net.minecraft.server.world.ServerWorld
-import net.minecraft.sound.SoundCategory
-import net.minecraft.state.StateManager
-import net.minecraft.state.property.BooleanProperty
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.random.RandomGenerator
-import net.minecraft.util.shape.VoxelShape
-import net.minecraft.world.BlockView
-import net.minecraft.world.GameRules
-import net.minecraft.world.World
-import net.minecraft.world.WorldView
-import net.minecraft.world.gen.feature.ConfiguredFeature
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Holder
+import net.minecraft.core.particles.ParticleOptions
+import net.minecraft.core.registries.Registries
+import net.minecraft.resources.ResourceKey
+import net.minecraft.server.level.ServerLevel
+import net.minecraft.sounds.SoundSource
+import net.minecraft.util.RandomSource
+import net.minecraft.world.effect.MobEffect
+import net.minecraft.world.effect.MobEffectInstance
+import net.minecraft.world.effect.MobEffects
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.level.BlockGetter
+import net.minecraft.world.level.GameRules
+import net.minecraft.world.level.Level
+import net.minecraft.world.level.LevelReader
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.BonemealableBlock
+import net.minecraft.world.level.block.BushBlock
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.block.state.StateDefinition
+import net.minecraft.world.level.block.state.properties.BooleanProperty
+import net.minecraft.world.level.levelgen.feature.ConfiguredFeature
+import net.minecraft.world.phys.shapes.CollisionContext
+import net.minecraft.world.phys.shapes.VoxelShape
 import org.teamvoided.dusk_debris.block.not_blocks.DuskProperties
 import org.teamvoided.dusk_debris.data.tags.DuskBlockTags
 import org.teamvoided.dusk_debris.data.tags.DuskEntityTypeTags
@@ -35,117 +39,117 @@ import kotlin.random.Random
 
 class NethershroomPlantBlock(
     val delay: Int,
-    val feature: RegistryKey<ConfiguredFeature<*, *>>,
-    val particle: ParticleEffect,
-    val statusEffect: Holder<StatusEffect>,
+    val feature: ResourceKey<ConfiguredFeature<*, *>>,
+    val particle: ParticleOptions,
+    val statusEffect: Holder<MobEffect>,
     val hasDoubleEffect: Boolean,
-    settings: Settings
+    settings: Properties
 ) :
-    AbstractPlantBlock(settings), Fertilizable {
+    BushBlock(settings), BonemealableBlock {
 
-    public override fun getCodec(): MapCodec<NethershroomPlantBlock> {
+    public override fun codec(): MapCodec<NethershroomPlantBlock> {
         return CODEC
     }
 
     init {
-        this.defaultState = stateManager.defaultState.with(SQUISHED, false)
+        this.registerDefaultState(stateDefinition.any().setValue(SQUISHED, false))
     }
 
-    override fun getOutlineShape(
+    override fun getShape(
         state: BlockState,
-        world: BlockView,
+        world: BlockGetter,
         pos: BlockPos,
-        context: ShapeContext
+        context: CollisionContext
     ): VoxelShape {
         return SHAPE
     }
 
-    override fun canPlantOnTop(floor: BlockState, world: BlockView, pos: BlockPos): Boolean {
-        return floor.isOpaqueFullCube(world, pos)
+    override fun mayPlaceOn(floor: BlockState, world: BlockGetter, pos: BlockPos): Boolean {
+        return floor.isSolidRender(world, pos)
     }
 
-    override fun onEntityCollision(state: BlockState, world: World, pos: BlockPos, entity: Entity) {
-        if (!state.get(SQUISHED) &&
-            entity.isLiving &&
-            !entity.isSneaking &&
-            !entity.type.isIn(DuskEntityTypeTags.IS_NOT_AFFECTED_BY_NETHERSHROOM)
+    override fun entityInside(state: BlockState, world: Level, pos: BlockPos, entity: Entity) {
+        if (!state.getValue(SQUISHED) &&
+            entity.showVehicleHealth() &&
+            !entity.isShiftKeyDown &&
+            !entity.type.`is`(DuskEntityTypeTags.IS_NOT_AFFECTED_BY_NETHERSHROOM)
         ) {
-            if ((entity is PlayerEntity || world.gameRules.getBooleanValue(GameRules.DO_MOB_GRIEFING))) {
-                world.setBlockState(
+            if ((entity is Player || world.gameRules.getBoolean(GameRules.RULE_MOBGRIEFING))) {
+                world.setBlock(
                     pos,
-                    state.with(SQUISHED, true),
+                    state.setValue(SQUISHED, true),
                     3
                 )
                 world.playSound(
                     null,
                     pos,
                     DuskSoundEvents.BLOCK_NETHERSHROOM_SQUISHED,
-                    SoundCategory.BLOCKS,
+                    SoundSource.BLOCKS,
                     1f,
                     0.9f + world.random.nextFloat() * 0.2f
                 )
-                world.scheduleBlockTick(pos, this, delay)
+                world.scheduleTick(pos, this, delay)
             }
         }
-        super.onEntityCollision(state, world, pos, entity)
+        super.entityInside(state, world, pos, entity)
     }
 
-    override fun appendProperties(builder: StateManager.Builder<Block, BlockState>) {
+    override fun createBlockStateDefinition(builder: StateDefinition.Builder<Block, BlockState>) {
         builder.add(SQUISHED)
     }
 
-    override fun scheduledTick(state: BlockState, world: ServerWorld, pos: BlockPos, random: RandomGenerator) {
-        if (state.get(SQUISHED)) {
+    override fun tick(state: BlockState, world: ServerLevel, pos: BlockPos, random: RandomSource) {
+        if (state.getValue(SQUISHED)) {
             val dropChance = 0.2
-            world.breakBlock(pos, Random.nextDouble() <= dropChance)
+            world.destroyBlock(pos, Random.nextDouble() <= dropChance)
             explode(world, pos, particle, statusEffect, hasDoubleEffect)
         }
     }
 
-    override fun isFertilizable(world: WorldView, pos: BlockPos, state: BlockState): Boolean {
-        val belowBlock = world.getBlockState(pos.down())
-        return belowBlock.isIn(DuskBlockTags.NETHERSHROOM_GROWABLE_ON)
+    override fun isValidBonemealTarget(world: LevelReader, pos: BlockPos, state: BlockState): Boolean {
+        val belowBlock = world.getBlockState(pos.below())
+        return belowBlock.`is`(DuskBlockTags.NETHERSHROOM_GROWABLE_ON)
     }
 
-    override fun canFertilize(world: World, random: RandomGenerator, pos: BlockPos, state: BlockState): Boolean {
+    override fun isBonemealSuccess(world: Level, random: RandomSource, pos: BlockPos, state: BlockState): Boolean {
         return random.nextFloat().toDouble() < 0.4
     }
 
-    override fun fertilize(world: ServerWorld, random: RandomGenerator, pos: BlockPos, state: BlockState) {
+    override fun performBonemeal(world: ServerLevel, random: RandomSource, pos: BlockPos, state: BlockState) {
         this.trySpawningBigNethershroom(world, pos, state, random)
     }
 
     fun trySpawningBigNethershroom(
-        world: ServerWorld,
+        world: ServerLevel,
         pos: BlockPos,
         state: BlockState,
-        random: RandomGenerator
+        random: RandomSource
     ): Boolean {
         val optional: Optional<out Holder<ConfiguredFeature<*, *>>> =
-            world.registryManager.get(RegistryKeys.CONFIGURED_FEATURE).getHolder(
+            world.registryAccess().registryOrThrow(Registries.CONFIGURED_FEATURE).getHolder(
                 this.feature
             )
         if (optional.isEmpty) {
             return false
         } else {
             world.removeBlock(pos, false)
-            if (((optional.get() as Holder<*>).value() as ConfiguredFeature<*, *>).generate(
+            if (((optional.get() as Holder<*>).value() as ConfiguredFeature<*, *>).place(
                     world,
-                    world.chunkManager.chunkGenerator,
+                    world.chunkSource.generator,
                     random,
                     pos
                 )
             ) {
                 return true
             } else {
-                world.setBlockState(pos, state, 3)
+                world.setBlock(pos, state, 3)
                 return false
             }
         }
     }
 
 //    private fun applyLingeringPotion(potionContents: PotionContentsComponent) {
-//        val areaEffectCloudEntity = AreaEffectCloudEntity(this.getWorld(), this.getX(), this.getY(), this.getZ())
+//        val areaEffectCloudEntity = AreaEffectCloudEntity(this.getLevel(), this.getX(), this.getY(), this.getZ())
 //        val var4: Entity = this.getOwner()
 //        if (var4 is LivingEntity) {
 //            areaEffectCloudEntity.owner = var4
@@ -156,47 +160,47 @@ class NethershroomPlantBlock(
 //        areaEffectCloudEntity.waitTime = 10
 //        areaEffectCloudEntity.radiusGrowth = -areaEffectCloudEntity.radius / areaEffectCloudEntity.duration.toFloat()
 //        areaEffectCloudEntity.setPotionContents(potionContents)
-//        this.getWorld().spawnEntity(areaEffectCloudEntity)
+//        this.getLevel().spawnEntity(areaEffectCloudEntity)
 //    }
 
     companion object {
-        val CODEC: MapCodec<NethershroomPlantBlock> = createCodec { settings: Settings ->
+        val CODEC: MapCodec<NethershroomPlantBlock> = simpleCodec { settings: Properties ->
             NethershroomPlantBlock(
                 20,
                 DuskConfiguredFeatures.HUGE_BLUE_NETHERSHROOM,
                 NethershroomSporeParticleEffect(0xffffff),
-                StatusEffects.POISON,
+                MobEffects.POISON,
                 false,
                 settings
             )
         }
 
         fun explode(
-            world: World,
+            world: Level,
             pos: BlockPos,
-            particle: ParticleEffect,
-            statusEffect: Holder<StatusEffect>,
+            particle: ParticleOptions,
+            statusEffect: Holder<MobEffect>,
             hasDoubleEffect: Boolean
         ) {
             world.playSound(
                 null,
                 pos,
                 DuskSoundEvents.BLOCK_NETHERSHROOM_EXPLODE,
-                SoundCategory.BLOCKS,
+                SoundSource.BLOCKS,
                 1f,
                 0.8f + world.random.nextFloat() * 0.4f
             )
             val poisonCloud = DuskEntities.BOX_AREA_EFFECT_CLOUD.create(world)
             if (poisonCloud != null) {
-                poisonCloud.particleType = particle
+                poisonCloud.particle = particle
                 poisonCloud.addEffect(
-                    StatusEffectInstance(
+                    MobEffectInstance(
                         statusEffect,
                         700
                     )
                 )
                 if (hasDoubleEffect) poisonCloud.addEffect(
-                    StatusEffectInstance(
+                    MobEffectInstance(
                         statusEffect,
                         50,
                         1
@@ -205,46 +209,46 @@ class NethershroomPlantBlock(
                 poisonCloud.radius = 4.0f
                 poisonCloud.duration = 700
                 poisonCloud.waitTime = 10
-                poisonCloud.radiusGrowth = -poisonCloud.radius / (poisonCloud.duration.toFloat() * 2)
-                poisonCloud.refreshPositionAndAngles(
+                poisonCloud.setRadiusPerTick(-poisonCloud.radius / (poisonCloud.duration.toFloat() * 2))
+                poisonCloud.moveTo(
                     pos.x.toDouble() + 0.5,
                     pos.y.toDouble() + 1 - ((3 * poisonCloud.radius) / 4),
                     pos.z.toDouble() + 0.5,
                     0.0f,
                     0.0f
                 )
-                world.spawnEntity(poisonCloud)
+                world.addFreshEntity(poisonCloud)
             }
         }
 
-        fun explode(world: World, pos: BlockPos, particle: ParticleEffect) {
+        fun explode(world: Level, pos: BlockPos, particle: ParticleOptions) {
             world.playSound(
                 null,
                 pos,
                 DuskSoundEvents.BLOCK_NETHERSHROOM_EXPLODE,
-                SoundCategory.BLOCKS,
+                SoundSource.BLOCKS,
                 1f,
                 0.9f + world.random.nextFloat() * 0.2f
             )
             val poisonCloud = DuskEntities.BOX_AREA_EFFECT_CLOUD.create(world)
             if (poisonCloud != null) {
-                poisonCloud.particleType = particle
+                poisonCloud.particle = particle
                 poisonCloud.radius = 4.0f
                 poisonCloud.duration = 700
                 poisonCloud.waitTime = 10
-                poisonCloud.radiusGrowth = -poisonCloud.radius / (poisonCloud.duration.toFloat() * 2)
-                poisonCloud.refreshPositionAndAngles(
+                poisonCloud.setRadiusPerTick(-poisonCloud.radius / (poisonCloud.duration.toFloat() * 2))
+                poisonCloud.moveTo(
                     pos.x.toDouble() + 0.5,
                     pos.y.toDouble() + 1 - ((3 * poisonCloud.radius) / 4),
                     pos.z.toDouble() + 0.5,
                     0.0f,
                     0.0f
                 )
-                world.spawnEntity(poisonCloud)
+                world.addFreshEntity(poisonCloud)
             }
         }
 
-        private val SHAPE: VoxelShape = createCuboidShape(5.0, 0.0, 5.0, 11.0, 6.0, 11.0)
+        private val SHAPE: VoxelShape = box(5.0, 0.0, 5.0, 11.0, 6.0, 11.0)
         val SQUISHED: BooleanProperty = DuskProperties.SQUISHED
     }
 }

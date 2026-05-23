@@ -3,15 +3,15 @@ package org.teamvoided.dusk_debris.particle.color
 import com.mojang.serialization.Codec
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
-import net.minecraft.network.RegistryByteBuf
-import net.minecraft.network.codec.PacketCodec
-import net.minecraft.network.codec.PacketCodecs
-import net.minecraft.particle.ParticleEffect
-import net.minecraft.particle.ParticleType
+import net.minecraft.core.particles.ParticleOptions
+import net.minecraft.core.particles.ParticleType
+import net.minecraft.network.RegistryFriendlyByteBuf
+import net.minecraft.network.codec.ByteBufCodecs
+import net.minecraft.network.codec.StreamCodec
 import org.teamvoided.dusk_debris.init.DuskParticles
 import java.awt.Color
 
-class BonecallerParticleEffect(val color1: Color, val color2: Color) : ParticleEffect {
+class BonecallerParticleEffect(val color1: Color, val color2: Color) : ParticleOptions {
     constructor(color1: Int, color2: Int) : this(Color(color1), Color(color2))
 
     override fun getType(): ParticleType<BonecallerParticleEffect> = DuskParticles.BONECALLER
@@ -23,9 +23,9 @@ class BonecallerParticleEffect(val color1: Color, val color2: Color) : ParticleE
                 Codec.INT.fieldOf("color_2").forGetter { it.color2.rgb }
             ).apply(instance, ::BonecallerParticleEffect)
         }
-        val PACKET_CODEC: PacketCodec<RegistryByteBuf, BonecallerParticleEffect> = PacketCodec.tuple(
-            PacketCodecs.INT, { it.color1.rgb },
-            PacketCodecs.INT, { it.color2.rgb },
+        val PACKET_CODEC: StreamCodec<RegistryFriendlyByteBuf, BonecallerParticleEffect> = StreamCodec.composite(
+            ByteBufCodecs.INT, { it.color1.rgb },
+            ByteBufCodecs.INT, { it.color2.rgb },
             ::BonecallerParticleEffect
         )
     }

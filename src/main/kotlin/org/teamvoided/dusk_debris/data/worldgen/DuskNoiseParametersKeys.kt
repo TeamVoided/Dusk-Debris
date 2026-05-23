@@ -1,8 +1,8 @@
 package org.teamvoided.dusk_debris.data.worldgen
 
-import net.minecraft.registry.RegistryKey
-import net.minecraft.registry.RegistryKeys
-import net.minecraft.util.math.noise.DoublePerlinNoiseSampler
+import net.minecraft.core.registries.Registries
+import net.minecraft.resources.ResourceKey
+import net.minecraft.world.level.levelgen.synth.NormalNoise
 import org.teamvoided.dusk_debris.DuskDebris.id
 
 object DuskNoiseParametersKeys {
@@ -50,8 +50,8 @@ object DuskNoiseParametersKeys {
      */
 
 
-    private  fun create(id: String): RegistryKey<DoublePerlinNoiseSampler.NoiseParameters> =
-        RegistryKey.of(RegistryKeys.NOISE_PARAMETERS, id(id))
-    private  fun nether(id: String): RegistryKey<DoublePerlinNoiseSampler.NoiseParameters> =
-        RegistryKey.of(RegistryKeys.NOISE_PARAMETERS, id("nether/$id"))
+    private  fun create(id: String): ResourceKey<NormalNoise.NoiseParameters> =
+        ResourceKey.create(Registries.NOISE, id(id))
+    private  fun nether(id: String): ResourceKey<NormalNoise.NoiseParameters> =
+        ResourceKey.create(Registries.NOISE, id("nether/$id"))
 }

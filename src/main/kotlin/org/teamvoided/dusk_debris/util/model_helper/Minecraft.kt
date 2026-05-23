@@ -1,80 +1,85 @@
 package org.teamvoided.dusk_debris.util.model_helper
 
-import net.minecraft.block.Block
-import net.minecraft.block.enums.SculkSensorPhase
-import net.minecraft.data.client.model.*
-import net.minecraft.state.property.Properties
-import net.minecraft.util.math.Direction
+import net.minecraft.core.Direction
+import net.minecraft.data.models.BlockModelGenerators
+import net.minecraft.data.models.blockstates.MultiVariantGenerator
+import net.minecraft.data.models.blockstates.PropertyDispatch
+import net.minecraft.data.models.blockstates.Variant
+import net.minecraft.data.models.blockstates.VariantProperties
+import net.minecraft.data.models.model.ModelLocationUtils
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.state.properties.BlockStateProperties
+import net.minecraft.world.level.block.state.properties.SculkSensorPhase
 import org.teamvoided.dusk_debris.util.model
 
 
-fun BlockStateModelGenerator.sculkCatalystRotate(block: Block) {
-    val identifier = ModelIds.getBlockModelId(block)
-    val identifierBloom = ModelIds.getBlockSubModelId(block, "_bloom")
-    blockStateCollector.accept(
-        VariantsBlockStateSupplier.create(block)
-            .coordinate(
-                BlockStateVariantMap.create(Properties.BLOOM).register {
-                    BlockStateVariant.create().put(VariantSettings.MODEL, if (it) identifierBloom else identifier)
+fun BlockModelGenerators.sculkCatalystRotate(block: Block) {
+    val identifier = ModelLocationUtils.getModelLocation(block)
+    val identifierBloom = ModelLocationUtils.getModelLocation(block, "_bloom")
+    blockStateOutput.accept(
+        MultiVariantGenerator.multiVariant(block)
+            .with(
+                PropertyDispatch.property(BlockStateProperties.BLOOM).generate {
+                    Variant.variant().with(VariantProperties.MODEL, if (it) identifierBloom else identifier)
                 })
-            .coordinate(createUpDefaultRotationStates())
+            .with(createUpDefaultRotationStates())
     )
 }
 
-fun BlockStateModelGenerator.sculkShriekerRotate(block: Block) {
-    val identifier = ModelIds.getBlockModelId(block)
-    val identifier2 = ModelIds.getBlockSubModelId(block, "_can_summon")
-    blockStateCollector.accept(
-        VariantsBlockStateSupplier.create(block)
-            .coordinate(BlockStateModelGenerator.createBooleanModelMap(Properties.CAN_SUMMON, identifier2, identifier))
-            .coordinate(createUpDefaultRotationStates())
+fun BlockModelGenerators.sculkShriekerRotate(block: Block) {
+    val identifier = ModelLocationUtils.getModelLocation(block)
+    val identifier2 = ModelLocationUtils.getModelLocation(block, "_can_summon")
+    blockStateOutput.accept(
+        MultiVariantGenerator.multiVariant(block)
+            .with(BlockModelGenerators.createBooleanModelDispatch(BlockStateProperties.CAN_SUMMON, identifier2, identifier))
+            .with(createUpDefaultRotationStates())
     )
 }
 
-fun BlockStateModelGenerator.sculkSensorRotate(block: Block) {
-    val identifier = ModelIds.getBlockSubModelId(block, "_inactive")
-    val identifier2 = ModelIds.getBlockSubModelId(block, "_active")
-    blockStateCollector.accept(
-        VariantsBlockStateSupplier.create(block)
-            .coordinate(
-                BlockStateVariantMap.create(Properties.SCULK_SENSOR_PHASE).register {
-                    BlockStateVariant.create().put(
-                        VariantSettings.MODEL,
+fun BlockModelGenerators.sculkSensorRotate(block: Block) {
+    val identifier = ModelLocationUtils.getModelLocation(block, "_inactive")
+    val identifier2 = ModelLocationUtils.getModelLocation(block, "_active")
+    blockStateOutput.accept(
+        MultiVariantGenerator.multiVariant(block)
+            .with(
+                PropertyDispatch.property(BlockStateProperties.SCULK_SENSOR_PHASE).generate {
+                    Variant.variant().with(
+                        VariantProperties.MODEL,
                         if (it == SculkSensorPhase.INACTIVE) identifier
                         else identifier2
                     )
                 })
-            .coordinate(createUpDefaultRotationStates())
+            .with(createUpDefaultRotationStates())
     )
 }
 
-fun BlockStateModelGenerator.addAxis(block: Block) =
-    this.blockStateCollector.accept(BlockStateModelGenerator.createAxisRotatedBlockState(block, block.model()))
+fun BlockModelGenerators.addAxis(block: Block) =
+    this.blockStateOutput.accept(BlockModelGenerators.createAxisAlignedPillarBlock(block, block.model()))
 
-fun createUpDefaultRotationStates(): BlockStateVariantMap {
-    return BlockStateVariantMap.create(Properties.FACING)
-        .register(Direction.UP, BlockStateVariant.create())
-        .register(
-            Direction.DOWN, BlockStateVariant.create()
-                .put(VariantSettings.X, VariantSettings.Rotation.R180)
+fun createUpDefaultRotationStates(): PropertyDispatch {
+    return PropertyDispatch.property(BlockStateProperties.FACING)
+        .select(Direction.UP, Variant.variant())
+        .select(
+            Direction.DOWN, Variant.variant()
+                .with(VariantProperties.X_ROT, VariantProperties.Rotation.R180)
         )
-        .register(
-            Direction.NORTH, BlockStateVariant.create()
-                .put(VariantSettings.X, VariantSettings.Rotation.R90)
+        .select(
+            Direction.NORTH, Variant.variant()
+                .with(VariantProperties.X_ROT, VariantProperties.Rotation.R90)
         )
-        .register(
-            Direction.SOUTH, BlockStateVariant.create()
-                .put(VariantSettings.X, VariantSettings.Rotation.R90)
-                .put(VariantSettings.Y, VariantSettings.Rotation.R180)
+        .select(
+            Direction.SOUTH, Variant.variant()
+                .with(VariantProperties.X_ROT, VariantProperties.Rotation.R90)
+                .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R180)
         )
-        .register(
-            Direction.WEST, BlockStateVariant.create()
-                .put(VariantSettings.X, VariantSettings.Rotation.R90)
-                .put(VariantSettings.Y, VariantSettings.Rotation.R270)
+        .select(
+            Direction.WEST, Variant.variant()
+                .with(VariantProperties.X_ROT, VariantProperties.Rotation.R90)
+                .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270)
         )
-        .register(
-            Direction.EAST, BlockStateVariant.create()
-                .put(VariantSettings.X, VariantSettings.Rotation.R90)
-                .put(VariantSettings.Y, VariantSettings.Rotation.R90)
+        .select(
+            Direction.EAST, Variant.variant()
+                .with(VariantProperties.X_ROT, VariantProperties.Rotation.R90)
+                .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90)
         )
 }

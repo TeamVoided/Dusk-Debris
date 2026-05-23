@@ -1,48 +1,48 @@
 package org.teamvoided.dusk_debris.item
 
-import net.minecraft.block.Block
-import net.minecraft.item.BlockItem
-import net.minecraft.item.ItemPlacementContext
-import net.minecraft.server.network.ServerPlayerEntity
-import net.minecraft.text.Text
-import net.minecraft.util.Formatting
-import net.minecraft.util.math.Direction
+import net.minecraft.ChatFormatting
+import net.minecraft.core.Direction
+import net.minecraft.network.chat.Component
+import net.minecraft.server.level.ServerPlayer
+import net.minecraft.world.item.BlockItem
+import net.minecraft.world.item.context.BlockPlaceContext
+import net.minecraft.world.level.block.Block
 
-class StrongScaffoldingItem(block: Block, settings: Settings) : BlockItem(block, settings) {
-    override fun getPlacementContext(context: ItemPlacementContext): ItemPlacementContext? {
-        val blockPos = context.blockPos
-        val world = context.world
+class StrongScaffoldingItem(block: Block, settings: Properties) : BlockItem(block, settings) {
+    override fun updatePlacementContext(context: BlockPlaceContext): BlockPlaceContext? {
+        val blockPos = context.clickedPos
+        val world = context.level
         var blockState = world.getBlockState(blockPos)
-        if (!blockState.isOf(this.block)) {
-            return super.getPlacementContext(context)
+        if (!blockState.`is`(this.block)) {
+            return super.updatePlacementContext(context)
         } else {
-            val direction = if (context.shouldCancelInteraction()) {
-                if (context.hitsInsideBlock()) context.side.opposite
-                else context.side
+            val direction = if (context.isSecondaryUseActive) {
+                if (context.isInside) context.clickedFace.opposite
+                else context.clickedFace
             } else {
-                if (context.side == Direction.UP) context.playerFacing
+                if (context.clickedFace == Direction.UP) context.horizontalDirection
                 else Direction.UP
             }
 
             var looper = 0
-            val mutable = blockPos.mutableCopy().move(direction)
+            val mutable = blockPos.mutable().move(direction)
 
             while (looper < 7) {
-                if (!world.isClient && !world.isInBuildLimit(mutable)) {
+                if (!world.isClientSide && !world.isInWorldBounds(mutable)) {
                     val playerEntity = context.player
-                    val j = world.topY
-                    if (playerEntity is ServerPlayerEntity && mutable.y >= j) {
+                    val j = world.maxBuildHeight
+                    if (playerEntity is ServerPlayer && mutable.y >= j) {
                         playerEntity.sendSystemMessage(
-                            Text.translatable("build.tooHigh", *arrayOf<Any>(j - 1)).formatted(Formatting.RED), true
+                            Component.translatable("build.tooHigh", *arrayOf<Any>(j - 1)).withStyle(ChatFormatting.RED), true
                         )
                     }
                     break
                 }
 
                 blockState = world.getBlockState(mutable)
-                if (!blockState.isOf(this.block)) {
-                    if (blockState.canReplace(context)) {
-                        return ItemPlacementContext.offset(context, mutable, direction)
+                if (!blockState.`is`(this.block)) {
+                    if (blockState.canBeReplaced(context)) {
+                        return BlockPlaceContext.at(context, mutable, direction)
                     }
                     break
                 }
@@ -57,5 +57,5 @@ class StrongScaffoldingItem(block: Block, settings: Settings) : BlockItem(block,
         }
     }
 
-    override fun checkStatePlacement(): Boolean = false
+    override fun mustSurvive(): Boolean = false
 }

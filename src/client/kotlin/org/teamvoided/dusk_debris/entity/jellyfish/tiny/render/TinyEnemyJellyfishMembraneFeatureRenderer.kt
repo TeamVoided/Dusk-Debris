@@ -1,13 +1,13 @@
 package org.teamvoided.dusk_debris.entity.jellyfish.tiny.render
 
-import net.minecraft.client.MinecraftClient
-import net.minecraft.client.render.RenderLayer
-import net.minecraft.client.render.VertexConsumerProvider
-import net.minecraft.client.render.entity.LivingEntityRenderer
-import net.minecraft.client.render.entity.feature.FeatureRenderer
-import net.minecraft.client.render.entity.feature.FeatureRendererContext
-import net.minecraft.client.render.entity.model.EntityModelLoader
-import net.minecraft.client.util.math.MatrixStack
+import com.mojang.blaze3d.vertex.PoseStack
+import net.minecraft.client.Minecraft
+import net.minecraft.client.model.geom.EntityModelSet
+import net.minecraft.client.renderer.MultiBufferSource
+import net.minecraft.client.renderer.RenderType
+import net.minecraft.client.renderer.entity.LivingEntityRenderer
+import net.minecraft.client.renderer.entity.RenderLayerParent
+import net.minecraft.client.renderer.entity.layers.RenderLayer
 import org.teamvoided.dusk_debris.entity.DuskEntityModelLayers
 import org.teamvoided.dusk_debris.entity.TinyEnemyJellyfishEntity
 import org.teamvoided.dusk_debris.entity.jellyfish.tiny.TinyEnemyJellyfishEntityRenderer.Companion.TEXTURE_MESOGLEA
@@ -15,14 +15,14 @@ import org.teamvoided.dusk_debris.entity.jellyfish.tiny.model.TinyEnemyJellyfish
 import org.teamvoided.dusk_debris.entity.jellyfish.tiny.model.TinyEnemyJellyfishModel
 
 class TinyEnemyJellyfishMembraneFeatureRenderer(
-    context: FeatureRendererContext<TinyEnemyJellyfishEntity, TinyEnemyJellyfishCoreModel>,
-    loader: EntityModelLoader
-) : FeatureRenderer<TinyEnemyJellyfishEntity, TinyEnemyJellyfishCoreModel>(context) {
-    private val model = TinyEnemyJellyfishModel(loader.getModelPart(DuskEntityModelLayers.TINY_ENEMY_JELLYFISH_MESOGLEA))
+    context: RenderLayerParent<TinyEnemyJellyfishEntity, TinyEnemyJellyfishCoreModel>,
+    loader: EntityModelSet
+) : RenderLayer<TinyEnemyJellyfishEntity, TinyEnemyJellyfishCoreModel>(context) {
+    private val model = TinyEnemyJellyfishModel(loader.bakeLayer(DuskEntityModelLayers.TINY_ENEMY_JELLYFISH_MESOGLEA))
 
     override fun render(
-        matrices: MatrixStack,
-        vertexConsumers: VertexConsumerProvider,
+        matrices: PoseStack,
+        vertexConsumers: MultiBufferSource,
         light: Int, //i
         entity: TinyEnemyJellyfishEntity,
         limbAngle: Float, //f
@@ -32,19 +32,19 @@ class TinyEnemyJellyfishMembraneFeatureRenderer(
         headYaw: Float, //k
         headPitch: Float //l
     ) {
-        val minecraftClient = MinecraftClient.getInstance()
-        val bl = minecraftClient.hasOutline(entity) && entity.isInvisible
+        val minecraftClient = Minecraft.getInstance()
+        val bl = minecraftClient.shouldEntityAppearGlowing(entity) && entity.isInvisible
         if (!entity.isInvisible || bl) {
             val vertexConsumer = if (bl) {
-                vertexConsumers.getBuffer(RenderLayer.getOutline(TEXTURE_MESOGLEA))
+                vertexConsumers.getBuffer(RenderType.outline(TEXTURE_MESOGLEA))
             } else {
-                vertexConsumers.getBuffer(RenderLayer.getEntityTranslucent(TEXTURE_MESOGLEA))
+                vertexConsumers.getBuffer(RenderType.entityTranslucent(TEXTURE_MESOGLEA))
             }
 
-            this.contextModel.copyStateTo(this.model)
-            model.animateModel(entity, limbAngle, limbDistance, tickDelta)
-            model.setAngles(entity, limbAngle, limbDistance, age, headYaw, headPitch)
-            model.method_60879(matrices, vertexConsumer, light, LivingEntityRenderer.getOverlay(entity, 0.0f))
+            this.parentModel.copyPropertiesTo(this.model)
+            model.prepareMobModel(entity, limbAngle, limbDistance, tickDelta)
+            model.setupAnim(entity, limbAngle, limbDistance, age, headYaw, headPitch)
+            model.renderToBuffer(matrices, vertexConsumer, light, LivingEntityRenderer.getOverlayCoords(entity, 0.0f))
         }
     }
 }

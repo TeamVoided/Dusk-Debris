@@ -1,11 +1,15 @@
 package org.teamvoided.dusk_debris.data.gen.providers.variants
 
-import net.minecraft.registry.*
-import net.minecraft.registry.tag.BiomeTags
-import net.minecraft.registry.tag.TagKey
-import net.minecraft.util.Identifier
-import net.minecraft.world.biome.Biome
-import net.minecraft.world.biome.Biomes
+import net.minecraft.core.Holder
+import net.minecraft.core.RegistryAccess
+import net.minecraft.core.registries.Registries
+import net.minecraft.data.worldgen.BootstrapContext
+import net.minecraft.resources.ResourceKey
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.tags.BiomeTags
+import net.minecraft.tags.TagKey
+import net.minecraft.world.level.biome.Biome
+import net.minecraft.world.level.biome.Biomes
 import org.teamvoided.dusk_debris.DuskDebris.id
 import org.teamvoided.dusk_debris.data.tags.DuskBiomeTags
 import org.teamvoided.dusk_debris.data.variants.DuskSnifferVariants
@@ -21,7 +25,7 @@ object SnifferVariants {
     val DEFAULT = DuskSnifferVariants.DEFAULT
 
     fun bootstrap(c: BootstrapContext<SnifferVariant>) {
-        c.registerDefault(DuskSnifferVariants.DEFAULT, BiomeTags.OVERWORLD)
+        c.registerDefault(DuskSnifferVariants.DEFAULT, BiomeTags.IS_OVERWORLD)
         c.register(DuskSnifferVariants.BRIGHT, DuskBiomeTags.SNIFFER_BRIGHT, Biomes.JUNGLE)
         c.register(DuskSnifferVariants.SWAMP, DuskBiomeTags.SNIFFER_SWAMP, Biomes.SWAMP)
         c.register(DuskSnifferVariants.MANGROVE_SWAMP, DuskBiomeTags.SNIFFER_MANGROVE_SWAMP, Biomes.MANGROVE_SWAMP)
@@ -40,22 +44,22 @@ object SnifferVariants {
     }
 
     fun BootstrapContext<SnifferVariant>.registerDefault(
-        registryKey: RegistryKey<SnifferVariant>,
+        registryKey: ResourceKey<SnifferVariant>,
         biomes: TagKey<Biome>
     ): Holder.Reference<SnifferVariant> {
         return this.register(registryKey,biomes)
     }
 
     fun BootstrapContext<SnifferVariant>.register(
-        registryKey: RegistryKey<SnifferVariant>,
+        registryKey: ResourceKey<SnifferVariant>,
         biomes: TagKey<Biome>,
-        biomeColor: RegistryKey<Biome>
+        biomeColor: ResourceKey<Biome>
     ): Holder.Reference<SnifferVariant> {
         return this.register(registryKey, biomes, null, biomeColor, defaultOverlay)
     }
 
     fun BootstrapContext<SnifferVariant>.register(
-        registryKey: RegistryKey<SnifferVariant>,
+        registryKey: ResourceKey<SnifferVariant>,
         biomes: TagKey<Biome>,
         color: Int
     ): Holder.Reference<SnifferVariant> {
@@ -63,42 +67,42 @@ object SnifferVariants {
     }
 
     fun BootstrapContext<SnifferVariant>.register(
-        registryKey: RegistryKey<SnifferVariant>,
+        registryKey: ResourceKey<SnifferVariant>,
         biomes: TagKey<Biome>,
-        overlayTexture: Identifier
+        overlayTexture: ResourceLocation
     ): Holder.Reference<SnifferVariant> {
         return this.register(registryKey, biomes, null, null, overlayTexture)
     }
 
     private fun BootstrapContext<SnifferVariant>.register(
-        registryKey: RegistryKey<SnifferVariant>,
-        biomes:TagKey<Biome>,
+        registryKey: ResourceKey<SnifferVariant>,
+        biomes: TagKey<Biome>,
         color: Int? = null,
-        biomeColor: RegistryKey<Biome>? = null,
-        overlayTexture: Identifier? = null
+        biomeColor: ResourceKey<Biome>? = null,
+        overlayTexture: ResourceLocation? = null
     ): Holder.Reference<SnifferVariant> {
         return this.register(
             registryKey,
             SnifferVariant(
-                getRegistryLookup(RegistryKeys.BIOME).getTagOrThrow(biomes),
+                lookup(Registries.BIOME).getOrThrow(biomes),
                 color,
-                biomeColor?.let { getRegistryLookup(RegistryKeys.BIOME).getHolder(it).get() },
+                biomeColor?.let { lookup(Registries.BIOME).get(it).get() },
                 overlayTexture
             )
         )
     }
 
 
-    fun texture(name: String): Identifier = texture(null, name)
+    fun texture(name: String): ResourceLocation = texture(null, name)
 
-    fun texture(idenifier: String?, name: String): Identifier {
+    fun texture(idenifier: String?, name: String): ResourceLocation {
         val path = "entity/sniffer/overlay/$name"
         return if (idenifier != null) id(idenifier, path) else id(path)
     }
 
     @JvmStatic
-    fun fromBiome(registryManager: DynamicRegistryManager, biome: Holder<Biome>): Holder<SnifferVariant> {
-        val registry = registryManager.get(SNIFFER_VARIANT)
+    fun fromBiome(registryManager: RegistryAccess, biome: Holder<Biome>): Holder<SnifferVariant> {
+        val registry = registryManager.registryOrThrow(SNIFFER_VARIANT)
         val variant = registry.holders()
             .filter { it.value().biomes.contains(biome) }.findAny()
             .or { registry.getHolder(DuskSnifferVariants.DEFAULT) }

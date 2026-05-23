@@ -1,21 +1,25 @@
 package org.teamvoided.dusk_debris.data.gen.world.gen.configured_feature
 
-import net.minecraft.block.BlockState
-import net.minecraft.block.Blocks
-import net.minecraft.block.MushroomBlock
-import net.minecraft.registry.BootstrapContext
-import net.minecraft.registry.RegistryKeys
-import net.minecraft.registry.tag.BlockTags
-import net.minecraft.util.collection.DataPool
-import net.minecraft.util.math.int_provider.UniformIntProvider
-import net.minecraft.world.gen.blockpredicate.BlockPredicate
-import net.minecraft.world.gen.decorator.BlockPredicateFilterPlacementModifier
-import net.minecraft.world.gen.feature.*
-import net.minecraft.world.gen.feature.util.ConfiguredFeatureUtil
-import net.minecraft.world.gen.feature.util.PlacedFeatureUtil
-import net.minecraft.world.gen.stateprovider.BlockStateProvider
-import net.minecraft.world.gen.stateprovider.SimpleBlockStateProvider
-import net.minecraft.world.gen.stateprovider.WeightedBlockStateProvider
+import net.minecraft.core.registries.Registries
+import net.minecraft.data.worldgen.BootstrapContext
+import net.minecraft.data.worldgen.features.FeatureUtils
+import net.minecraft.data.worldgen.placement.PlacementUtils
+import net.minecraft.tags.BlockTags
+import net.minecraft.util.random.SimpleWeightedRandomList
+import net.minecraft.util.valueproviders.UniformInt
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.block.HugeMushroomBlock
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate
+import net.minecraft.world.level.levelgen.feature.ConfiguredFeature
+import net.minecraft.world.level.levelgen.feature.Feature
+import net.minecraft.world.level.levelgen.feature.WeightedPlacedFeature
+import net.minecraft.world.level.levelgen.feature.configurations.RandomFeatureConfiguration
+import net.minecraft.world.level.levelgen.feature.configurations.SimpleBlockConfiguration
+import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider
+import net.minecraft.world.level.levelgen.feature.stateproviders.SimpleStateProvider
+import net.minecraft.world.level.levelgen.feature.stateproviders.WeightedStateProvider
+import net.minecraft.world.level.levelgen.placement.BlockPredicateFilter
 import org.teamvoided.dusk_debris.data.gen.world.gen.ConfiguredFeatureCreator.registerConfiguredFeature
 import org.teamvoided.dusk_debris.data.tags.DuskBlockTags
 import org.teamvoided.dusk_debris.data.worldgen.DuskConfiguredFeatures
@@ -32,7 +36,7 @@ object NetherCFCreators {
             DuskConfiguredFeatures.BLACKSTONE_STRIPS,
             DuskFeatures.NOISE_SURFACE,
             NoiseSurfaceFeatureConfig(
-                SimpleBlockStateProvider.of(Blocks.BLACKSTONE.defaultState),
+                SimpleStateProvider.simple(Blocks.BLACKSTONE.defaultBlockState()),
                 BlockTags.BASE_STONE_NETHER,
                 0.925f
             )
@@ -40,29 +44,29 @@ object NetherCFCreators {
     }
 
     private fun BootstrapContext<ConfiguredFeature<*, *>>.nethershrooms() {
-        val configuredFeatures = this.getRegistryLookup(RegistryKeys.CONFIGURED_FEATURE)
-        val placedFeatures = this.getRegistryLookup(RegistryKeys.PLACED_FEATURE)
-        val block = this.getRegistryLookup(RegistryKeys.BLOCK)
+        val configuredFeatures = this.lookup(Registries.CONFIGURED_FEATURE)
+        val placedFeatures = this.lookup(Registries.PLACED_FEATURE)
+        val block = this.lookup(Registries.BLOCK)
 
         this.registerConfiguredFeature(
             DuskConfiguredFeatures.BLUE_NETHERSHROOM,
             Feature.SIMPLE_BLOCK,
-            SimpleBlockFeatureConfig(
-                WeightedBlockStateProvider(
-                    DataPool.builder<BlockState>()
-                        .addWeighted(DuskBlocks.BLUE_NETHERSHROOM.defaultState, 24)
-                        .add(DuskBlocks.PURPLE_NETHERSHROOM.defaultState)
+            SimpleBlockConfiguration(
+                WeightedStateProvider(
+                    SimpleWeightedRandomList.builder<BlockState>()
+                        .add(DuskBlocks.BLUE_NETHERSHROOM.defaultBlockState(), 24)
+                        .add(DuskBlocks.PURPLE_NETHERSHROOM.defaultBlockState())
                 )
             )
         )
         this.registerConfiguredFeature(
             DuskConfiguredFeatures.BLUE_NETHERSHROOM_PATCH,
             Feature.RANDOM_PATCH,
-            ConfiguredFeatureUtil.createRandomPatchFeatureConfig(
-                64, PlacedFeatureUtil.placedInline(
-                    configuredFeatures.getHolderOrThrow(DuskConfiguredFeatures.BLUE_NETHERSHROOM),
-                    BlockPredicateFilterPlacementModifier.create(
-                        BlockPredicate.matchingBlockTags(BlockTags.AIR)
+            FeatureUtils.simpleRandomPatchConfiguration(
+                64, PlacementUtils.inlinePlaced(
+                    configuredFeatures.getOrThrow(DuskConfiguredFeatures.BLUE_NETHERSHROOM),
+                    BlockPredicateFilter.forPredicate(
+                        BlockPredicate.matchesTag(BlockTags.AIR)
                     )
                 )
             )
@@ -73,38 +77,38 @@ object NetherCFCreators {
             HugeNethershroomFeatureConfig(
                 DuskBlockTags.NETHERSHROOM_REPLACEABLE,
                 DuskBlockTags.NETHERSHROOM_IGNORE,
-                BlockStateProvider.of(
-                    DuskBlocks.NETHERSHROOM_STEM.defaultState
-                        .with(MushroomBlock.UP, false)
-                        .with(MushroomBlock.DOWN, false)
+                BlockStateProvider.simple(
+                    DuskBlocks.NETHERSHROOM_STEM.defaultBlockState()
+                        .setValue(HugeMushroomBlock.UP, false)
+                        .setValue(HugeMushroomBlock.DOWN, false)
                 ),
-                UniformIntProvider.create(5, 10),
-                BlockStateProvider.of(
-                    DuskBlocks.BLUE_NETHERSHROOM_BLOCK.defaultState
-                        .with(MushroomBlock.UP, true)
-                        .with(MushroomBlock.DOWN, false)
+                UniformInt.of(5, 10),
+                BlockStateProvider.simple(
+                    DuskBlocks.BLUE_NETHERSHROOM_BLOCK.defaultBlockState()
+                        .setValue(HugeMushroomBlock.UP, true)
+                        .setValue(HugeMushroomBlock.DOWN, false)
                 ),
-                UniformIntProvider.create(2, 4),
-                UniformIntProvider.create(2, 5),
-                UniformIntProvider.create(1, 2),
-                UniformIntProvider.create(1, 4)
+                UniformInt.of(2, 4),
+                UniformInt.of(2, 5),
+                UniformInt.of(1, 2),
+                UniformInt.of(1, 4)
             )
         )
         this.registerConfiguredFeature(
             DuskConfiguredFeatures.LARGE_BLUE_NETHERSHROOM_PATCH,
             Feature.RANDOM_PATCH,
-            ConfiguredFeatureUtil.createRandomPatchFeatureConfig(
-                96, PlacedFeatureUtil.placedInline<RandomFeatureConfig, Feature<RandomFeatureConfig>>(
-                    Feature.RANDOM_SELECTOR, RandomFeatureConfig(
+            FeatureUtils.simpleRandomPatchConfiguration(
+                96, PlacementUtils.inlinePlaced<RandomFeatureConfiguration, Feature<RandomFeatureConfiguration>>(
+                    Feature.RANDOM_SELECTOR, RandomFeatureConfiguration(
                         listOf(
                             WeightedPlacedFeature(
-                                placedFeatures.getHolderOrThrow(DuskPlacedFeatures.HUGE_BLUE_NETHERSHROOM), 0.0001f
+                                placedFeatures.getOrThrow(DuskPlacedFeatures.HUGE_BLUE_NETHERSHROOM), 0.0001f
                             )
                         ),
-                        PlacedFeatureUtil.placedInline(
-                            configuredFeatures.getHolderOrThrow(DuskConfiguredFeatures.BLUE_NETHERSHROOM),
-                            BlockPredicateFilterPlacementModifier.create(
-                                BlockPredicate.matchingBlockTags(BlockTags.AIR)
+                        PlacementUtils.inlinePlaced(
+                            configuredFeatures.getOrThrow(DuskConfiguredFeatures.BLUE_NETHERSHROOM),
+                            BlockPredicateFilter.forPredicate(
+                                BlockPredicate.matchesTag(BlockTags.AIR)
                             )
                         )
                     )
@@ -114,22 +118,22 @@ object NetherCFCreators {
         this.registerConfiguredFeature(
             DuskConfiguredFeatures.PURPLE_NETHERSHROOM,
             Feature.SIMPLE_BLOCK,
-            SimpleBlockFeatureConfig(
-                WeightedBlockStateProvider(
-                    DataPool.builder<BlockState>()
-                        .addWeighted(DuskBlocks.PURPLE_NETHERSHROOM.defaultState, 24)
-                        .add(DuskBlocks.BLUE_NETHERSHROOM.defaultState)
+            SimpleBlockConfiguration(
+                WeightedStateProvider(
+                    SimpleWeightedRandomList.builder<BlockState>()
+                        .add(DuskBlocks.PURPLE_NETHERSHROOM.defaultBlockState(), 24)
+                        .add(DuskBlocks.BLUE_NETHERSHROOM.defaultBlockState())
                 )
             )
         )
         this.registerConfiguredFeature(
             DuskConfiguredFeatures.PURPLE_NETHERSHROOM_PATCH,
             Feature.RANDOM_PATCH,
-            ConfiguredFeatureUtil.createRandomPatchFeatureConfig(
-                64, PlacedFeatureUtil.placedInline(
-                    configuredFeatures.getHolderOrThrow(DuskConfiguredFeatures.PURPLE_NETHERSHROOM),
-                    BlockPredicateFilterPlacementModifier.create(
-                        BlockPredicate.matchingBlockTags(BlockTags.AIR)
+            FeatureUtils.simpleRandomPatchConfiguration(
+                64, PlacementUtils.inlinePlaced(
+                    configuredFeatures.getOrThrow(DuskConfiguredFeatures.PURPLE_NETHERSHROOM),
+                    BlockPredicateFilter.forPredicate(
+                        BlockPredicate.matchesTag(BlockTags.AIR)
                     )
                 )
             )
@@ -140,38 +144,38 @@ object NetherCFCreators {
             HugeNethershroomFeatureConfig(
                 DuskBlockTags.NETHERSHROOM_REPLACEABLE,
                 DuskBlockTags.NETHERSHROOM_IGNORE,
-                BlockStateProvider.of(
-                    DuskBlocks.NETHERSHROOM_STEM.defaultState
-                        .with(MushroomBlock.UP, false)
-                        .with(MushroomBlock.DOWN, false)
+                BlockStateProvider.simple(
+                    DuskBlocks.NETHERSHROOM_STEM.defaultBlockState()
+                        .setValue(HugeMushroomBlock.UP, false)
+                        .setValue(HugeMushroomBlock.DOWN, false)
                 ),
-                UniformIntProvider.create(5, 10),
-                BlockStateProvider.of(
-                    DuskBlocks.PURPLE_NETHERSHROOM_BLOCK.defaultState
-                        .with(MushroomBlock.UP, true)
-                        .with(MushroomBlock.DOWN, false)
+                UniformInt.of(5, 10),
+                BlockStateProvider.simple(
+                    DuskBlocks.PURPLE_NETHERSHROOM_BLOCK.defaultBlockState()
+                        .setValue(HugeMushroomBlock.UP, true)
+                        .setValue(HugeMushroomBlock.DOWN, false)
                 ),
-                UniformIntProvider.create(2, 4),
-                UniformIntProvider.create(2, 5),
-                UniformIntProvider.create(1, 3),
-                UniformIntProvider.create(1, 3)
+                UniformInt.of(2, 4),
+                UniformInt.of(2, 5),
+                UniformInt.of(1, 3),
+                UniformInt.of(1, 3)
             )
         )
         this.registerConfiguredFeature(
             DuskConfiguredFeatures.LARGE_PURPLE_NETHERSHROOM_PATCH,
             Feature.RANDOM_PATCH,
-            ConfiguredFeatureUtil.createRandomPatchFeatureConfig(
-                96, PlacedFeatureUtil.placedInline<RandomFeatureConfig, Feature<RandomFeatureConfig>>(
-                    Feature.RANDOM_SELECTOR, RandomFeatureConfig(
+            FeatureUtils.simpleRandomPatchConfiguration(
+                96, PlacementUtils.inlinePlaced<RandomFeatureConfiguration, Feature<RandomFeatureConfiguration>>(
+                    Feature.RANDOM_SELECTOR, RandomFeatureConfiguration(
                         listOf(
                             WeightedPlacedFeature(
-                                placedFeatures.getHolderOrThrow(DuskPlacedFeatures.HUGE_PURPLE_NETHERSHROOM), 0.0001f
+                                placedFeatures.getOrThrow(DuskPlacedFeatures.HUGE_PURPLE_NETHERSHROOM), 0.0001f
                             )
                         ),
-                        PlacedFeatureUtil.placedInline(
-                            configuredFeatures.getHolderOrThrow(DuskConfiguredFeatures.PURPLE_NETHERSHROOM),
-                            BlockPredicateFilterPlacementModifier.create(
-                                BlockPredicate.matchingBlockTags(BlockTags.AIR)
+                        PlacementUtils.inlinePlaced(
+                            configuredFeatures.getOrThrow(DuskConfiguredFeatures.PURPLE_NETHERSHROOM),
+                            BlockPredicateFilter.forPredicate(
+                                BlockPredicate.matchesTag(BlockTags.AIR)
                             )
                         )
                     )

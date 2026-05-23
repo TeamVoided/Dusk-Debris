@@ -1,8 +1,8 @@
 package org.teamvoided.dusk_debris.data.gen.providers.english_translation
 
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricLanguageProvider
-import net.minecraft.entity.damage.DamageType
-import net.minecraft.registry.RegistryKey
+import net.minecraft.resources.ResourceKey
+import net.minecraft.world.damagesource.DamageType
 import org.teamvoided.dusk_debris.data.DuskDamageTypes
 
 object DamageTypeTranslations {
@@ -17,25 +17,25 @@ object DamageTypeTranslations {
     }
 
     private fun FabricLanguageProvider.TranslationBuilder.defaultDamageTranslaion(
-        key: RegistryKey<DamageType>,
+        key: ResourceKey<DamageType>,
         message: String,
         transition: String = "by",
         tryingToEscape: String = "whilst trying to escape",
         using: String = "using"
     ) {
-        val key0 = key.value.path
+        val key0 = key.location().path
         this.add("death.attack.$key0", "%s $message")
         this.add("death.attack.$key0.item", "%s $message $transition %s $using %s")
         this.add("death.attack.$key0.player", "%s $message $tryingToEscape %s")
     }
 
     private fun FabricLanguageProvider.TranslationBuilder.damageTranslaion(
-        key: RegistryKey<DamageType>,
+        key: ResourceKey<DamageType>,
         message: String,
         messageItem: String,
         messageAttacker: String = messageItem
     ) {
-        val key0 = key.value.path
+        val key0 = key.location().path
         this.add("death.attack.$key0", "%s $message")
         this.add("death.attack.$key0.item", "%s $messageItem %s using %s")
         this.add("death.attack.$key0.player", "%s $messageAttacker %s")
@@ -43,8 +43,8 @@ object DamageTypeTranslations {
 
 
     private fun FabricLanguageProvider.TranslationBuilder.damageTranslaion(
-        direct: RegistryKey<DamageType>,
-        indirect: RegistryKey<DamageType>,
+        direct: ResourceKey<DamageType>,
+        indirect: ResourceKey<DamageType>,
         message: String,
         messageItem: String,
         messageAttacker: String = messageItem
@@ -55,21 +55,21 @@ object DamageTypeTranslations {
 
 
     private fun FabricLanguageProvider.TranslationBuilder.directDamageTranslaion(
-        key: RegistryKey<DamageType>,
+        key: ResourceKey<DamageType>,
         message: String,
         messageAttacker: String
     ) {
-        val key0 = key.value.path
+        val key0 = key.location().path
         this.add("death.attack.$key0", "%s $message")
         this.add("death.attack.$key0.player", "%s $messageAttacker %s")
     }
 
     private fun FabricLanguageProvider.TranslationBuilder.indirectDamageTranslaion(
-        key: RegistryKey<DamageType>,
+        key: ResourceKey<DamageType>,
         message: String,
         messageItem: String
     ) {
-        val key0 = key.value.path
+        val key0 = key.location().path
         this.add("death.attack.$key0", "%s $message")
         this.add("death.attack.$key0.item", "%s $messageItem %s using %s")
     }

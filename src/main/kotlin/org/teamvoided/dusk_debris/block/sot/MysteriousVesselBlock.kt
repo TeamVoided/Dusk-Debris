@@ -1,47 +1,52 @@
 package org.teamvoided.dusk_debris.block.sot
 
 import com.mojang.serialization.MapCodec
-import net.minecraft.block.*
-import net.minecraft.fluid.FluidState
-import net.minecraft.fluid.Fluids
-import net.minecraft.item.ItemPlacementContext
-import net.minecraft.state.StateManager
-import net.minecraft.state.property.BooleanProperty
-import net.minecraft.state.property.DirectionProperty
-import net.minecraft.state.property.Properties
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Direction
-import net.minecraft.util.shape.VoxelShape
-import net.minecraft.util.shape.VoxelShapes
-import net.minecraft.world.BlockView
-import net.minecraft.world.WorldAccess
-import net.minecraft.world.WorldView
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
+import net.minecraft.world.item.context.BlockPlaceContext
+import net.minecraft.world.level.BlockGetter
+import net.minecraft.world.level.LevelAccessor
+import net.minecraft.world.level.LevelReader
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.HorizontalDirectionalBlock
+import net.minecraft.world.level.block.SimpleWaterloggedBlock
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.block.state.StateDefinition
+import net.minecraft.world.level.block.state.properties.BlockStateProperties
+import net.minecraft.world.level.block.state.properties.BooleanProperty
+import net.minecraft.world.level.block.state.properties.DirectionProperty
+import net.minecraft.world.level.material.FluidState
+import net.minecraft.world.level.material.Fluids
+import net.minecraft.world.phys.shapes.CollisionContext
+import net.minecraft.world.phys.shapes.Shapes
+import net.minecraft.world.phys.shapes.VoxelShape
 
-open class MysteriousVesselBlock(settings: Settings) : HorizontalFacingBlock(settings), Waterloggable {
-    override fun getCodec(): MapCodec<out HorizontalFacingBlock> {
+open class MysteriousVesselBlock(settings: Properties) : HorizontalDirectionalBlock(settings), SimpleWaterloggedBlock {
+    override fun codec(): MapCodec<out HorizontalDirectionalBlock> {
         return CODEC
     }
 
     init {
-        this.defaultState =
-            (stateManager.defaultState)
-                .with(FACING, Direction.NORTH)
-                .with(WATERLOGGED, false)
+        this.registerDefaultState(
+            (stateDefinition.any())
+                .setValue(FACING, Direction.NORTH)
+                .setValue(WATERLOGGED, false)
+        )
     }
 
 
-    override fun getStateForNeighborUpdate(
+    override fun updateShape(
         state: BlockState,
         direction: Direction,
         neighborState: BlockState,
-        world: WorldAccess,
+        world: LevelAccessor,
         pos: BlockPos,
         neighborPos: BlockPos
     ): BlockState {
-        if (state.get(WATERLOGGED)) {
-            world.scheduleFluidTick(pos, Fluids.WATER, Fluids.WATER.getTickRate(world))
+        if (state.getValue(WATERLOGGED)) {
+            world.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(world))
         }
-        return super.getStateForNeighborUpdate(
+        return super.updateShape(
             state,
             direction,
             neighborState,
@@ -51,47 +56,47 @@ open class MysteriousVesselBlock(settings: Settings) : HorizontalFacingBlock(set
         )
     }
 
-    override fun getPlacementState(ctx: ItemPlacementContext): BlockState {
-        val waterlog = ctx.world.getFluidState(ctx.blockPos).fluid === Fluids.WATER
-        return defaultState
-            .with(FACING, ctx.playerFacing.opposite)
-            .with(WATERLOGGED, waterlog)
+    override fun getStateForPlacement(ctx: BlockPlaceContext): BlockState {
+        val waterlog = ctx.level.getFluidState(ctx.clickedPos).type === Fluids.WATER
+        return defaultBlockState()
+            .setValue(FACING, ctx.horizontalDirection.opposite)
+            .setValue(WATERLOGGED, waterlog)
     }
 
     override fun getFluidState(state: BlockState): FluidState {
-        return if (state.get(WATERLOGGED)) Fluids.WATER.getStill(false)
+        return if (state.getValue(WATERLOGGED)) Fluids.WATER.getSource(false)
         else super.getFluidState(state)
     }
 
-    override fun canPlaceAt(state: BlockState, world: WorldView, pos: BlockPos): Boolean {
-        return sideCoversSmallSquare(world, pos.offset(Direction.DOWN), Direction.DOWN.opposite)
+    override fun canSurvive(state: BlockState, world: LevelReader, pos: BlockPos): Boolean {
+        return canSupportCenter(world, pos.relative(Direction.DOWN), Direction.DOWN.opposite)
     }
 
-    override fun getOutlineShape(
+    override fun getShape(
         state: BlockState,
-        world: BlockView,
+        world: BlockGetter,
         pos: BlockPos,
-        context: ShapeContext
+        context: CollisionContext
     ): VoxelShape {
         return SHAPE
     }
 
-    override fun appendProperties(builder: StateManager.Builder<Block, BlockState>) {
+    override fun createBlockStateDefinition(builder: StateDefinition.Builder<Block, BlockState>) {
         builder.add(FACING, WATERLOGGED)
     }
 
 
     companion object {
-        val CODEC: MapCodec<MysteriousVesselBlock> = createCodec { settings: Settings ->
+        val CODEC: MapCodec<MysteriousVesselBlock> = simpleCodec { settings: Properties ->
             MysteriousVesselBlock(
                 settings
             )
         }
-        val SHAPE: VoxelShape = VoxelShapes.union(
-            createCuboidShape(5.0, 0.0, 5.0, 11.0, 8.0, 11.0),
-            createCuboidShape(6.0, 8.0, 6.0, 10.0, 10.0, 10.0)
+        val SHAPE: VoxelShape = Shapes.or(
+            box(5.0, 0.0, 5.0, 11.0, 8.0, 11.0),
+            box(6.0, 8.0, 6.0, 10.0, 10.0, 10.0)
         )
-        val FACING: DirectionProperty = HorizontalFacingBlock.FACING
-        val WATERLOGGED: BooleanProperty = Properties.WATERLOGGED
+        val FACING: DirectionProperty = HorizontalDirectionalBlock.FACING
+        val WATERLOGGED: BooleanProperty = BlockStateProperties.WATERLOGGED
     }
 }

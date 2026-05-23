@@ -1,28 +1,28 @@
 package org.teamvoided.dusk_debris.block
 
-import net.minecraft.block.BlockState
-import net.minecraft.block.LeavesBlock
-import net.minecraft.entity.Entity
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.effect.StatusEffectInstance
-import net.minecraft.entity.effect.StatusEffects
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.registry.tag.EntityTypeTags
-import net.minecraft.util.math.BlockPos
-import net.minecraft.world.World
+import net.minecraft.core.BlockPos
+import net.minecraft.tags.EntityTypeTags
+import net.minecraft.world.effect.MobEffectInstance
+import net.minecraft.world.effect.MobEffects
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.level.Level
+import net.minecraft.world.level.block.LeavesBlock
+import net.minecraft.world.level.block.state.BlockState
 import org.teamvoided.dusk_debris.data.tags.DuskItemTags
 
-class PoisonLeavesBlock(settings: Settings) : LeavesBlock(settings) {
-    override fun onSteppedOn(world: World, pos: BlockPos, state: BlockState, entity: Entity) {
-        if (entity is LivingEntity && !entity.type.isIn(EntityTypeTags.UNDEAD)) applyEffect(entity)
-        super.onSteppedOn(world, pos, state, entity)
+class PoisonLeavesBlock(settings: Properties) : LeavesBlock(settings) {
+    override fun stepOn(world: Level, pos: BlockPos, state: BlockState, entity: Entity) {
+        if (entity is LivingEntity && !entity.type.`is`(EntityTypeTags.UNDEAD)) applyEffect(entity)
+        super.stepOn(world, pos, state, entity)
     }
 
-    override fun onBlockBreakStart(state: BlockState, world: World, pos: BlockPos, player: PlayerEntity) {
-        if (player.mainHandStack.isIn(DuskItemTags.LEAVES_DONT_POISON)) applyEffect(player)
-        super.onBlockBreakStart(state, world, pos, player)
+    override fun attack(state: BlockState, world: Level, pos: BlockPos, player: Player) {
+        if (player.mainHandItem.`is`(DuskItemTags.LEAVES_DONT_POISON)) applyEffect(player)
+        super.attack(state, world, pos, player)
     }
 
     private fun applyEffect(entity: LivingEntity) =
-        entity.addStatusEffect(StatusEffectInstance(StatusEffects.POISON, 100))
+        entity.addEffect(MobEffectInstance(MobEffects.POISON, 100))
 }

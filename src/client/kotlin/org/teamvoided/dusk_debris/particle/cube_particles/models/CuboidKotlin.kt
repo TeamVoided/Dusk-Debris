@@ -1,9 +1,9 @@
 package org.teamvoided.dusk_debris.particle.cube_particles.models
 
+import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.blaze3d.vertex.VertexConsumer
-import net.minecraft.client.model.ModelPart
-import net.minecraft.client.util.math.MatrixStack
-import net.minecraft.util.math.Direction
+import net.minecraft.client.model.geom.ModelPart
+import net.minecraft.core.Direction
 import org.joml.Quaternionf
 import org.joml.Vector3f
 import org.joml.Vector4f
@@ -170,8 +170,8 @@ class CuboidKotlin(
         }
     }
 
-    fun renderCuboid(entry: MatrixStack.Entry, vertexConsumer: VertexConsumer, light: Int, overlay: Int, color: Int) {
-        val matrix4f = entry.model
+    fun renderCuboid(entry: PoseStack.Pose, vertexConsumer: VertexConsumer, light: Int, overlay: Int, color: Int) {
+        val matrix4f = entry.pose()
         val vector3f = Vector3f()
         this.sides.forEach { quad ->
             val vector3f2 = entry.transformNormal(quad!!.direction, vector3f)
@@ -226,10 +226,10 @@ class CuboidKotlin(
                     .add(x, y, z)
                     .add(vX, vY, vZ)
                 vertexConsumer
-                    .xyz(vector3f.x, vector3f.y, vector3f.z)
-                    .uv0(vertex.u, vertex.v)
-                    .color(color.x, color.y, color.z, color.w)
-                    .uv2(brightness)
+                    .addVertex(vector3f.x, vector3f.y, vector3f.z)
+                    .setUv(vertex.u, vertex.v)
+                    .setColor(color.x, color.y, color.z, color.w)
+                    .setLight(brightness)
             }
         }
     }
@@ -262,7 +262,7 @@ class CuboidKotlin(
                 }
             }
 
-            this.direction = direction.unitVector
+            this.direction = direction.step()
             if (mirror) {
                 this.direction.mul(-1f, 1f, 1f)
             }

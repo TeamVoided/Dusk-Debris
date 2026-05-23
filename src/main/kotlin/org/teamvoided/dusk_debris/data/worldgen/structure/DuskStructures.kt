@@ -1,8 +1,8 @@
 package org.teamvoided.dusk_debris.data.worldgen.structure
 
-import net.minecraft.registry.RegistryKey
-import net.minecraft.registry.RegistryKeys
-import net.minecraft.world.gen.feature.StructureFeature
+import net.minecraft.core.registries.Registries
+import net.minecraft.resources.ResourceKey
+import net.minecraft.world.level.levelgen.structure.Structure
 import org.teamvoided.dusk_debris.DuskDebris.id
 
 object DuskStructures {
@@ -12,5 +12,5 @@ object DuskStructures {
 
     fun init() {}
 
-    private fun create(id: String): RegistryKey<StructureFeature> = RegistryKey.of(RegistryKeys.STRUCTURE_FEATURE, id(id))
+    private fun create(id: String): ResourceKey<Structure> = ResourceKey.create(Registries.STRUCTURE, id(id))
 }

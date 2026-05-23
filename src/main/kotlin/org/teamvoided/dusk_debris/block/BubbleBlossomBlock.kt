@@ -1,43 +1,43 @@
 package org.teamvoided.dusk_debris.block
 
-import net.minecraft.block.Block
-import net.minecraft.block.BlockState
-import net.minecraft.block.Blocks
-import net.minecraft.block.ShapeContext
-import net.minecraft.entity.SpawnGroup
-import net.minecraft.entity.SpawnReason
-import net.minecraft.server.world.ServerWorld
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
+import net.minecraft.server.level.ServerLevel
+import net.minecraft.util.Mth
+import net.minecraft.util.RandomSource
 import net.minecraft.util.SpawnUtil
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Direction
-import net.minecraft.util.math.MathHelper
-import net.minecraft.util.random.RandomGenerator
-import net.minecraft.util.shape.VoxelShape
-import net.minecraft.world.BlockView
-import net.minecraft.world.World
-import net.minecraft.world.WorldAccess
-import net.minecraft.world.WorldView
+import net.minecraft.world.entity.MobCategory
+import net.minecraft.world.entity.MobSpawnType
+import net.minecraft.world.level.BlockGetter
+import net.minecraft.world.level.Level
+import net.minecraft.world.level.LevelAccessor
+import net.minecraft.world.level.LevelReader
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.phys.shapes.CollisionContext
+import net.minecraft.world.phys.shapes.VoxelShape
 import org.teamvoided.dusk_debris.init.DuskEntities
 import org.teamvoided.dusk_debris.init.DuskParticles
 
-class BubbleBlossomBlock(settings: Settings) : Block(settings) {
-    override fun canPlaceAt(state: BlockState, world: WorldView, pos: BlockPos): Boolean {
-        return sideCoversSmallSquare(world, pos.down(), Direction.UP) && !world.isWater(pos)
+class BubbleBlossomBlock(settings: Properties) : Block(settings) {
+    override fun canSurvive(state: BlockState, world: LevelReader, pos: BlockPos): Boolean {
+        return canSupportCenter(world, pos.below(), Direction.UP) && !world.isWaterAt(pos)
     }
 
-    override fun getStateForNeighborUpdate(
+    override fun updateShape(
         state: BlockState,
         direction: Direction,
         neighborState: BlockState,
-        world: WorldAccess,
+        world: LevelAccessor,
         pos: BlockPos,
         neighborPos: BlockPos
     ): BlockState {
-        return if (direction == Direction.DOWN && !this.canPlaceAt(state, world, pos)) Blocks.AIR.defaultState
-        else super.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos)
+        return if (direction == Direction.DOWN && !this.canSurvive(state, world, pos)) Blocks.AIR.defaultBlockState()
+        else super.updateShape(state, direction, neighborState, world, pos, neighborPos)
     }
 
-    override fun randomDisplayTick(state: BlockState, world: World, pos: BlockPos, random: RandomGenerator) {
+    override fun animateTick(state: BlockState, world: Level, pos: BlockPos, random: RandomSource) {
         if (random.nextInt(13) == 0) {
             if (random.nextInt(3) == 0) {
                 world.addParticle(
@@ -49,12 +49,12 @@ class BubbleBlossomBlock(settings: Settings) : Block(settings) {
                 )
             }
             val randPos = BlockPos(
-                pos.x + MathHelper.nextInt(random, -10, 10),
+                pos.x + Mth.nextInt(random, -10, 10),
                 pos.y + random.nextInt(10),
-                pos.z + MathHelper.nextInt(random, -10, 10)
+                pos.z + Mth.nextInt(random, -10, 10)
             )
             val blockState = world.getBlockState(randPos)
-            if (!blockState.isFullCube(world, randPos)) {
+            if (!blockState.isCollisionShapeFullBlock(world, randPos)) {
                 world.addParticle(
                     DuskParticles.PURPLE_BIOME_BUBBLE,
                     randPos.x + random.nextDouble(),
@@ -66,14 +66,14 @@ class BubbleBlossomBlock(settings: Settings) : Block(settings) {
         }
     }
 
-    override fun randomTick(state: BlockState, world: ServerWorld, pos: BlockPos, random: RandomGenerator) {
+    override fun randomTick(state: BlockState, world: ServerLevel, pos: BlockPos, random: RandomSource) {
         if (random.nextInt(1024) == 0) {
-            val spawnCap = world.chunkManager.spawnInfo
-            if (spawnCap != null && spawnCap.groupToCount.getInt(SpawnGroup.AMBIENT) < SpawnGroup.AMBIENT.capacity) {
+            val spawnCap = world.chunkSource.lastSpawnState
+            if (spawnCap != null && spawnCap.mobCategoryCounts.getInt(MobCategory.AMBIENT) < MobCategory.AMBIENT.maxInstancesPerChunk) {
                 repeat(random.nextInt(4) + 1) {
-                    SpawnUtil.method_42122(
+                    SpawnUtil.trySpawnMob(
                         DuskEntities.TINY_ENEMY_JELLYFISH,
-                        SpawnReason.TRIGGERED,
+                        MobSpawnType.TRIGGERED,
                         world,
                         pos,
                         20, 5, 6,
@@ -84,18 +84,18 @@ class BubbleBlossomBlock(settings: Settings) : Block(settings) {
         }
     }
 
-    override fun getOutlineShape(
+    override fun getShape(
         state: BlockState,
-        world: BlockView,
+        world: BlockGetter,
         pos: BlockPos,
-        context: ShapeContext
+        context: CollisionContext
     ): VoxelShape = SHAPE
 
     companion object {
-        private val SHAPE: VoxelShape = createCuboidShape(2.0, 0.0, 2.0, 14.0, 6.0, 14.0)
+        private val SHAPE: VoxelShape = box(2.0, 0.0, 2.0, 14.0, 6.0, 14.0)
 
         val spawnInAirStrategy: SpawnUtil.Strategy =
-            SpawnUtil.Strategy { world: ServerWorld, _: BlockPos, _: BlockState, blockPos: BlockPos, blockState2: BlockState ->
+            SpawnUtil.Strategy { world: ServerLevel, _: BlockPos, _: BlockState, blockPos: BlockPos, blockState2: BlockState ->
                 blockState2.getCollisionShape(world, blockPos).isEmpty
             }
     }

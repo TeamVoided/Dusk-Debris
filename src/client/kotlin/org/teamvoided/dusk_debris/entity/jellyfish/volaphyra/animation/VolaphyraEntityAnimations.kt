@@ -1,13 +1,13 @@
 package org.teamvoided.dusk_debris.entity.jellyfish.volaphyra.animation
 
-import net.minecraft.client.render.animation.Animation
-import net.minecraft.client.render.animation.AnimationKeyframe
-import net.minecraft.client.render.animation.Animator.rotate
-import net.minecraft.client.render.animation.Animator.translate
-import net.minecraft.client.render.animation.PartAnimation
-import net.minecraft.client.render.animation.PartAnimation.AnimationTargets
-import net.minecraft.client.render.animation.PartAnimation.Interpolations
-import net.minecraft.util.math.Direction
+import net.minecraft.client.animation.AnimationChannel
+import net.minecraft.client.animation.AnimationChannel.Interpolations
+import net.minecraft.client.animation.AnimationChannel.Targets
+import net.minecraft.client.animation.AnimationDefinition
+import net.minecraft.client.animation.Keyframe
+import net.minecraft.client.animation.KeyframeAnimations.degreeVec
+import net.minecraft.client.animation.KeyframeAnimations.posVec
+import net.minecraft.core.Direction
 import org.teamvoided.dusk_debris.entity.jellyfish.volaphyra.model.VolaphyraMesogleaModel.Companion.ARMS_EAST
 import org.teamvoided.dusk_debris.entity.jellyfish.volaphyra.model.VolaphyraMesogleaModel.Companion.ARMS_EAST_LOWER
 import org.teamvoided.dusk_debris.entity.jellyfish.volaphyra.model.VolaphyraMesogleaModel.Companion.ARMS_NORTH
@@ -21,113 +21,113 @@ import org.teamvoided.dusk_debris.entity.jellyfish.volaphyra.model.VolaphyraMeso
 import org.teamvoided.dusk_debris.util.scale
 
 object VolaphyraEntityAnimations {
-    val IDLE: Animation = Animation.Builder.withLength(3f)
-        .addPartAnimation(
-            "root", PartAnimation(
-                AnimationTargets.TRANSLATE,
-                AnimationKeyframe(0f, translate(0f, 0f, 0f), Interpolations.SPLINE),
-                AnimationKeyframe(0.7083f, translate(0f, -2f, 0f), Interpolations.SPLINE),
-                AnimationKeyframe(1.5f, translate(0f, 4f, 0f), Interpolations.SPLINE),
-                AnimationKeyframe(3f, translate(0f, 0f, 0f), Interpolations.SPLINE)
+    val IDLE: AnimationDefinition = AnimationDefinition.Builder.withLength(3f)
+        .addAnimation(
+            "root", AnimationChannel(
+                Targets.POSITION,
+                Keyframe(0f, posVec(0f, 0f, 0f), Interpolations.CATMULLROM),
+                Keyframe(0.7083f, posVec(0f, -2f, 0f), Interpolations.CATMULLROM),
+                Keyframe(1.5f, posVec(0f, 4f, 0f), Interpolations.CATMULLROM),
+                Keyframe(3f, posVec(0f, 0f, 0f), Interpolations.CATMULLROM)
             )
         )
-        .addPartAnimation(
-            MESOGLEA, PartAnimation(
-                AnimationTargets.SCALE,
-                AnimationKeyframe(
+        .addAnimation(
+            MESOGLEA, AnimationChannel(
+                Targets.SCALE,
+                Keyframe(
                     0.2917f,
                     scale(1f, 1f, 1f),
-                    Interpolations.SPLINE
+                    Interpolations.CATMULLROM
                 ),
-                AnimationKeyframe(
+                Keyframe(
                     0.7083f,
                     scale(1.025f, 1f, 1.025f),
-                    Interpolations.SPLINE
+                    Interpolations.CATMULLROM
                 ),
-                AnimationKeyframe(
+                Keyframe(
                     1.25f,
                     scale(1f, 0.85f, 1f),
-                    Interpolations.SPLINE
+                    Interpolations.CATMULLROM
                 ),
-                AnimationKeyframe(
+                Keyframe(
                     2f,
                     scale(1f, 1f, 1f),
-                    Interpolations.SPLINE
+                    Interpolations.CATMULLROM
                 )
             )
         )
-        .addPartAnimation(
-            MESOGLEA_LOWER, PartAnimation(
-                AnimationTargets.SCALE,
-                AnimationKeyframe(
+        .addAnimation(
+            MESOGLEA_LOWER, AnimationChannel(
+                Targets.SCALE,
+                Keyframe(
                     0.2917f,
                     scale(1f, 1f, 1f),
-                    Interpolations.SPLINE
+                    Interpolations.CATMULLROM
                 ),
-                AnimationKeyframe(
+                Keyframe(
                     0.5f,
                     scale(1.1f, 0.7f, 1.1f),
-                    Interpolations.SPLINE
+                    Interpolations.CATMULLROM
                 ),
-                AnimationKeyframe(
+                Keyframe(
                     0.7083f,
                     scale(1f, 1f, 1f),
-                    Interpolations.SPLINE
+                    Interpolations.CATMULLROM
                 )
             )
         )
-        .addPartAnimation(ARMS_NORTH, arms(Direction.NORTH))
-        .addPartAnimation(ARMS_SOUTH, arms(Direction.SOUTH))
-        .addPartAnimation(ARMS_WEST, arms(Direction.WEST))
-        .addPartAnimation(ARMS_EAST, arms(Direction.EAST))
-        .addPartAnimation(ARMS_NORTH_LOWER, arms(Direction.NORTH, true))
-        .addPartAnimation(ARMS_SOUTH_LOWER, arms(Direction.SOUTH, true))
-        .addPartAnimation(ARMS_WEST_LOWER, arms(Direction.WEST, true))
-        .addPartAnimation(ARMS_EAST_LOWER, arms(Direction.EAST, true))
+        .addAnimation(ARMS_NORTH, arms(Direction.NORTH))
+        .addAnimation(ARMS_SOUTH, arms(Direction.SOUTH))
+        .addAnimation(ARMS_WEST, arms(Direction.WEST))
+        .addAnimation(ARMS_EAST, arms(Direction.EAST))
+        .addAnimation(ARMS_NORTH_LOWER, arms(Direction.NORTH, true))
+        .addAnimation(ARMS_SOUTH_LOWER, arms(Direction.SOUTH, true))
+        .addAnimation(ARMS_WEST_LOWER, arms(Direction.WEST, true))
+        .addAnimation(ARMS_EAST_LOWER, arms(Direction.EAST, true))
         .build()
 
-    private fun arms(direction: Direction, lower: Boolean = false): PartAnimation {
+    private fun arms(direction: Direction, lower: Boolean = false): AnimationChannel {
         return if (!lower)
-            PartAnimation(
-                AnimationTargets.ROTATE,
-                AnimationKeyframe(
+            AnimationChannel(
+                Targets.ROTATION,
+                Keyframe(
                     0f,
-                    rotate(0f, 0f, 0f),
-                    Interpolations.SPLINE
+                    degreeVec(0f, 0f, 0f),
+                    Interpolations.CATMULLROM
                 ),
-                AnimationKeyframe(
+                Keyframe(
                     0.5f,
-                    rotate(60f * direction.vector.z, 0f, 60f * direction.vector.x),
-                    Interpolations.SPLINE
+                    degreeVec(60f * direction.normal.z, 0f, 60f * direction.normal.x),
+                    Interpolations.CATMULLROM
                 ),
-                AnimationKeyframe(
+                Keyframe(
                     1f,
-                    rotate(0f, 0f, 0f),
-                    Interpolations.SPLINE
+                    degreeVec(0f, 0f, 0f),
+                    Interpolations.CATMULLROM
                 )
             )
         else
-            PartAnimation(
-                AnimationTargets.ROTATE,
-                AnimationKeyframe(
+            AnimationChannel(
+                Targets.ROTATION,
+                Keyframe(
                     0f,
-                    rotate(0f, 0f, 0f),
-                    Interpolations.SPLINE
+                    degreeVec(0f, 0f, 0f),
+                    Interpolations.CATMULLROM
                 ),
-                AnimationKeyframe(
+                Keyframe(
                     0.5f,
-                    rotate(-80f * direction.vector.z, 0f, -80f * direction.vector.x),
-                    Interpolations.SPLINE
+                    degreeVec(-80f * direction.normal.z, 0f, -80f * direction.normal.x),
+                    Interpolations.CATMULLROM
                 ),
-                AnimationKeyframe(
+                Keyframe(
                     0.7917f,
-                    rotate(40f * direction.vector.z, 0f, 40f * direction.vector.x),
-                    Interpolations.SPLINE
+                    degreeVec(40f * direction.normal.z, 0f, 40f * direction.normal.x),
+                    Interpolations.CATMULLROM
                 ),
-                AnimationKeyframe(
+                Keyframe(
                     1f,
-                    rotate(0f, 0f, 0f),
-                    Interpolations.SPLINE
+                    degreeVec(0f, 0f, 0f),
+                    Interpolations.CATMULLROM
                 )
             )
     }

@@ -27,7 +27,7 @@
 //    }
 //
 //    private fun setOpen(state: BlockState, open: Int) {
-//        world!!.setBlockState(this.getPos(), state.with(DuskProperties.CHEST_PHASE, ChestPhase.fromInt(open)), 3)
+//        world!!.setBlockState(blockPos, state.with(DuskProperties.CHEST_PHASE, ChestPhase.fromInt(open)), 3)
 //        if (open == 0) lidOpeningTicks = 0
 //    }
 //

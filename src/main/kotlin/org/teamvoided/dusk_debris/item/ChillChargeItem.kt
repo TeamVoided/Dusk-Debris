@@ -1,57 +1,57 @@
 package org.teamvoided.dusk_debris.item
 
-import net.minecraft.block.dispenser.DispenserBlock
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.entity.projectile.ProjectileEntity
-import net.minecraft.item.Item
-import net.minecraft.item.ItemStack
-import net.minecraft.item.ProjectileItem
-import net.minecraft.item.ProjectileItem.DispenserConfig
-import net.minecraft.sound.SoundCategory
-import net.minecraft.sound.SoundEvents
-import net.minecraft.stat.Stats
-import net.minecraft.util.Hand
-import net.minecraft.util.TypedActionResult
-import net.minecraft.util.math.Direction
-import net.minecraft.util.math.Position
-import net.minecraft.util.math.Vec3d
-import net.minecraft.world.World
+import net.minecraft.core.Direction
+import net.minecraft.core.Position
+import net.minecraft.sounds.SoundEvents
+import net.minecraft.sounds.SoundSource
+import net.minecraft.stats.Stats
+import net.minecraft.world.InteractionHand
+import net.minecraft.world.InteractionResultHolder
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.entity.projectile.Projectile
+import net.minecraft.world.item.Item
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.ProjectileItem
+import net.minecraft.world.item.ProjectileItem.DispenseConfig
+import net.minecraft.world.level.Level
+import net.minecraft.world.level.block.DispenserBlock
+import net.minecraft.world.phys.Vec3
 import org.teamvoided.dusk_debris.entity.ChillChargeEntity
 
-class ChillChargeItem(settings: Settings) : Item(settings), ProjectileItem {
-    override fun use(world: World, user: PlayerEntity, hand: Hand): TypedActionResult<ItemStack> {
-        if (!world.isClient()) {
-            val chillChargeEntity = ChillChargeEntity(user, world, user.pos.getX(), user.eyePos.getY(), user.pos.getZ())
-            chillChargeEntity.setProperties(user, user.pitch, user.yaw, 0.0f, 1.5f, 1.0f)
-            world.spawnEntity(chillChargeEntity)
+class ChillChargeItem(settings: Properties) : Item(settings), ProjectileItem {
+    override fun use(world: Level, user: Player, hand: InteractionHand): InteractionResultHolder<ItemStack> {
+        if (!world.isClientSide) {
+            val chillChargeEntity = ChillChargeEntity(user, world, user.position().x(), user.eyePosition.y(), user.position().z())
+            chillChargeEntity.shootFromRotation(user, user.xRot, user.yRot, 0.0f, 1.5f, 1.0f)
+            world.addFreshEntity(chillChargeEntity)
         }
 
         world.playSound(
             null, user.x, user.y, user.z,
-            SoundEvents.ENTITY_WIND_CHARGE_THROW, SoundCategory.NEUTRAL,
+            SoundEvents.WIND_CHARGE_THROW, SoundSource.NEUTRAL,
             0.5f, 0.4f / (world.getRandom().nextFloat() * 0.4f + 0.8f)
         )
-        val itemStack = user.getStackInHand(hand)
-        user.itemCooldownManager[this] = cooldown
-        user.incrementStat(Stats.USED.getOrCreateStat(this))
+        val itemStack = user.getItemInHand(hand)
+        user.cooldowns.addCooldown(this, cooldown)
+        user.awardStat(Stats.ITEM_USED.get(this))
         itemStack.consume(1, user)
-        return TypedActionResult.success(itemStack, world.isClient())
+        return InteractionResultHolder.sidedSuccess(itemStack, world.isClientSide)
     }
 
-    override fun createEntity(world: World, pos: Position, stack: ItemStack, direction: Direction): ProjectileEntity {
+    override fun asProjectile(world: Level, pos: Position, stack: ItemStack, direction: Direction): Projectile {
         val randomGenerator = world.getRandom()
-        val offsetX = randomGenerator.nextTriangular(direction.offsetX.toDouble(), 0.11485)
-        val offsetY = randomGenerator.nextTriangular(direction.offsetY.toDouble(), 0.11485)
-        val offsetZ = randomGenerator.nextTriangular(direction.offsetZ.toDouble(), 0.11485)
-        val vec3d = Vec3d(offsetX, offsetY, offsetZ)
-        val chillChargeEntity = ChillChargeEntity(world, pos.x, pos.y, pos.z, vec3d)
-        chillChargeEntity.velocity = vec3d
+        val offsetX = randomGenerator.triangle(direction.stepX.toDouble(), 0.11485)
+        val offsetY = randomGenerator.triangle(direction.stepY.toDouble(), 0.11485)
+        val offsetZ = randomGenerator.triangle(direction.stepZ.toDouble(), 0.11485)
+        val vec3d = Vec3(offsetX, offsetY, offsetZ)
+        val chillChargeEntity = ChillChargeEntity(world, pos.x(), pos.y(), pos.z(), vec3d)
+        chillChargeEntity.setDeltaMovement(vec3d)
         return chillChargeEntity
     }
 
-    override fun initializeProjectile(p: ProjectileEntity, x: Double, y: Double, z: Double, s: Float, d: Float) = Unit
-    override fun createDispenserConfig(): DispenserConfig = DispenserConfig.builder()
-        .positionFunction { blockPointer, _ -> DispenserBlock.getDispensePos(blockPointer, 1.0, Vec3d.ZERO) }
+    override fun shoot(p: Projectile, x: Double, y: Double, z: Double, s: Float, d: Float) = Unit
+    override fun createDispenseConfig(): DispenseConfig = DispenseConfig.builder()
+        .positionFunction { blockPointer, _ -> DispenserBlock.getDispensePosition(blockPointer, 1.0, Vec3.ZERO) }
         .uncertainty(6.6666665f)
         .power(1.0f)
         .overrideDispenseEvent(1051)

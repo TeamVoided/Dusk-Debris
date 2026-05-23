@@ -1,8 +1,8 @@
 package org.teamvoided.dusk_debris.data.worldgen
 
-import net.minecraft.registry.RegistryKey
-import net.minecraft.registry.RegistryKeys
-import net.minecraft.world.gen.feature.ConfiguredFeature
+import net.minecraft.core.registries.Registries
+import net.minecraft.resources.ResourceKey
+import net.minecraft.world.level.levelgen.feature.ConfiguredFeature
 import org.teamvoided.dusk_debris.DuskDebris.id
 
 @Suppress("MemberVisibilityCanBePrivate")
@@ -46,7 +46,7 @@ object DuskConfiguredFeatures {
 
 
 
-    private fun create(id: String): RegistryKey<ConfiguredFeature<*, *>> =
-        RegistryKey.of(RegistryKeys.CONFIGURED_FEATURE, id(id))
+    private fun create(id: String): ResourceKey<ConfiguredFeature<*, *>> =
+        ResourceKey.create(Registries.CONFIGURED_FEATURE, id(id))
 
 }

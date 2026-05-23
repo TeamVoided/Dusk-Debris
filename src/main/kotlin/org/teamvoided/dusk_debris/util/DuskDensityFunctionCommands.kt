@@ -1,20 +1,19 @@
 package org.teamvoided.dusk_debris.util
 
 import com.mojang.brigadier.context.CommandContext
-import net.minecraft.block.Blocks
-import net.minecraft.server.command.ServerCommandSource
-import net.minecraft.text.Text
-import net.minecraft.util.function.ToFloatFunction
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.MathHelper
-import net.minecraft.util.math.Spline
-import net.minecraft.world.biome.source.util.VanillaTerrainParametersCreator
+import net.minecraft.commands.CommandSourceStack
+import net.minecraft.core.BlockPos
+import net.minecraft.network.chat.Component
+import net.minecraft.util.CubicSpline
+import net.minecraft.util.Mth
+import net.minecraft.util.ToFloatFunction
+import net.minecraft.world.level.block.Blocks
 import org.teamvoided.dusk_debris.world.gen.terrain_parameters.OverworldTerrainCreator
 import kotlin.math.max
 import kotlin.math.min
 
-fun splineCommand(cx: CommandContext<ServerCommandSource>): Int {
-    val world = cx.source.world
+fun splineCommand(cx: CommandContext<CommandSourceStack>): Int {
+    val world = cx.source.level
     //if (!DuskDebris.isDev()) {
     //    world.players.forEach { it.sendMessage(Text.literal("do not run the spline command"), false) }
     //    return 1
@@ -23,7 +22,7 @@ fun splineCommand(cx: CommandContext<ServerCommandSource>): Int {
     val zSize = 100
     val xRange = xSize * (3 / 4f)
     val zRange = zSize * (3 / 4f)
-    val height = world.dimension.minY..(world.dimension.height - world.dimension.minY)
+    val height = world.dimensionType().minY..(world.dimensionType().height - world.dimensionType().minY)
     for (x in -xSize..xSize) {
         val xSample = sample(x, xRange, -1f, 1f) //x / xRange
         val xAlt = x > xRange || -x > xRange
@@ -50,14 +49,14 @@ fun splineCommand(cx: CommandContext<ServerCommandSource>): Int {
                 ToFloatFunction.createUnlimited { flTy },
                 ToFloatFunction.createUnlimited { flEl }
             )
-            val spline: Spline<Float, ToFloatFunction<Float>> = OverworldTerrainCreator.offsetSpline(data, false)
+            val spline: CubicSpline<Float, ToFloatFunction<Float>> = OverworldTerrainCreator.offsetSpline(data, false)
             //val spline: Spline<Float, ToFloatFunction<Float>> = VanillaTerrainParametersCreator.method_42056(
             //    data.continents,
             //    data.erosion,
             //    data.ridgesFolded,
             //    false
             //)
-            if (spline !is Spline.Multipoint<Float, ToFloatFunction<Float>>) return 1
+            if (spline !is CubicSpline.Multipoint<Float, ToFloatFunction<Float>>) return 1
             val the = spline.apply(0f)
 
             val yHeight = 128 * (the + 0.5f)
@@ -68,17 +67,17 @@ fun splineCommand(cx: CommandContext<ServerCommandSource>): Int {
                         else Blocks.AIR
                     else if (xAlt || zAlt) Blocks.TINTED_GLASS
                     else Blocks.STONE
-                world.setBlockState(BlockPos(x, y, z), block2.defaultState)
+                world.setBlockAndUpdate(BlockPos(x, y, z), block2.defaultBlockState())
             }
         }
     }
 
-    world.players.forEach { it.sendMessage(Text.literal("spline placed"), false) }
+    world.players().forEach { it.displayClientMessage(Component.literal("spline placed"), false) }
     return 1
 }
 
 private fun sample(value: Int, range: Float, num1: Float, num2: Float): Float {
     val min = min(num1, num2)
     val max = max(num1, num2)
-    return MathHelper.lerp((value / range + 1f) / 2f, min, max)
+    return Mth.lerp((value / range + 1f) / 2f, min, max)
 }

@@ -1,8 +1,8 @@
 package org.teamvoided.dusk_debris.data.tags
 
-import net.minecraft.enchantment.Enchantment
-import net.minecraft.registry.RegistryKeys
-import net.minecraft.registry.tag.TagKey
+import net.minecraft.core.registries.Registries
+import net.minecraft.tags.TagKey
+import net.minecraft.world.item.enchantment.Enchantment
 import org.teamvoided.dusk_debris.DuskDebris
 
 object DuskEnchantmentTags {
@@ -13,8 +13,9 @@ object DuskEnchantmentTags {
     val UNBREAKING_EXCLUSIVE_SET = create("exclusive_set/unbreaking")
 
 
-    fun create(id: String): TagKey<Enchantment> = TagKey.of(RegistryKeys.ENCHANTMENT, DuskDebris.id(id))
-    fun create(modId: String, path: String): TagKey<Enchantment> = TagKey.of(RegistryKeys.ENCHANTMENT,
+    fun create(id: String): TagKey<Enchantment> = TagKey.create(Registries.ENCHANTMENT, DuskDebris.id(id))
+    fun create(modId: String, path: String): TagKey<Enchantment> = TagKey.create(
+        Registries.ENCHANTMENT,
         DuskDebris.id(modId, path)
     )
 

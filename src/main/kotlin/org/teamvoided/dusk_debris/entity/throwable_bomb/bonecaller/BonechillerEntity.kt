@@ -1,17 +1,17 @@
 package org.teamvoided.dusk_debris.entity.throwable_bomb.bonecaller
 
-import net.minecraft.component.DataComponentTypes
-import net.minecraft.component.type.DyedColorComponent
-import net.minecraft.entity.EntityType
-import net.minecraft.entity.EquipmentSlot
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.SpawnReason
-import net.minecraft.entity.mob.StrayEntity
-import net.minecraft.item.Item
-import net.minecraft.scoreboard.Team
-import net.minecraft.server.world.ServerWorld
+import net.minecraft.core.component.DataComponents
+import net.minecraft.server.level.ServerLevel
 import net.minecraft.util.SpawnUtil
-import net.minecraft.world.World
+import net.minecraft.world.entity.EntityType
+import net.minecraft.world.entity.EquipmentSlot
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.MobSpawnType
+import net.minecraft.world.entity.monster.Stray
+import net.minecraft.world.item.Item
+import net.minecraft.world.item.component.DyedItemColor
+import net.minecraft.world.level.Level
+import net.minecraft.world.scores.PlayerTeam
 import org.teamvoided.dusk_debris.entity.throwable_bomb.BonecallerEntity
 import org.teamvoided.dusk_debris.init.DuskBlocks
 import org.teamvoided.dusk_debris.init.DuskEntities
@@ -20,46 +20,46 @@ import java.awt.Color
 
 open class BonechillerEntity : BonecallerEntity {
 
-    constructor(entityType: EntityType<out BonechillerEntity>, world: World) : super(entityType, world)
+    constructor(entityType: EntityType<out BonechillerEntity>, world: Level) : super(entityType, world)
 
-    constructor(world: World) : super(DuskEntities.BONECHILLER, world)
-    constructor(owner: LivingEntity?, world: World) :
+    constructor(world: Level) : super(DuskEntities.BONECHILLER, world)
+    constructor(owner: LivingEntity?, world: Level) :
             super(DuskEntities.BONECHILLER, owner, world) {
         this.owner = owner
     }
 
-    constructor(x: Double, y: Double, z: Double, world: World) :
+    constructor(x: Double, y: Double, z: Double, world: Level) :
             super(DuskEntities.BONECHILLER, x, y, z, world)
 
-    override fun getCalledEntity(serverWorld: ServerWorld, bandanaColor: Int, team: Team?) {
-        val bandana = DuskItems.BONECALLER_BANDANA.defaultStack
-        val strayEntity = StrayEntity(EntityType.STRAY as EntityType<out StrayEntity>, world)
+    override fun getCalledEntity(serverWorld: ServerLevel, bandanaColor: Int, team: PlayerTeam?) {
+        val bandana = DuskItems.BONECALLER_BANDANA.defaultInstance
+        val strayEntity = Stray(EntityType.STRAY as EntityType<out Stray>, level())
         val spawnPos = getSummonPos(
             strayEntity,
-            SpawnReason.MOB_SUMMONED,
+            MobSpawnType.MOB_SUMMONED,
             serverWorld,
-            blockPos,
+            blockPosition(),
             20,
             3,
             6,
-            SpawnUtil.Strategy.field_39401
+            SpawnUtil.Strategy.ON_TOP_OF_COLLIDER
         )
-        strayEntity.refreshPositionAndAngles(spawnPos, 0f, 0.0f)
-        strayEntity.initialize(
+        strayEntity.moveTo(spawnPos, 0f, 0.0f)
+        strayEntity.finalizeSpawn(
             serverWorld,
-            this.world.getLocalDifficulty(this.blockPos),
-            SpawnReason.MOB_SUMMONED,
+            this.level().getCurrentDifficultyAt(this.blockPosition()),
+            MobSpawnType.MOB_SUMMONED,
             null
         )
         bandana.set(
-            DataComponentTypes.DYED_COLOR,
-            DyedColorComponent(bandanaColor, true)
+            DataComponents.DYED_COLOR,
+            DyedItemColor(bandanaColor, true)
         )
-        strayEntity.equipStack(EquipmentSlot.HEAD, bandana)
+        strayEntity.setItemSlot(EquipmentSlot.HEAD, bandana)
         if (team != null) {
-            serverWorld.scoreboard.addPlayerToTeam(strayEntity.profileName, team)
+            serverWorld.scoreboard.addPlayerToTeam(strayEntity.scoreboardName, team)
         }
-        serverWorld.spawnParticles(
+        serverWorld.sendParticles(
             getTrailingParticle(),
             spawnPos.x + 0.5,
             spawnPos.y.toDouble(),
@@ -70,7 +70,7 @@ open class BonechillerEntity : BonecallerEntity {
             0.0,
             1.0
         )
-        world.spawnEntity(strayEntity)
+        level().addFreshEntity(strayEntity)
     }
 
     override fun getDefaultItem(): Item {

@@ -1,77 +1,77 @@
 package org.teamvoided.dusk_debris.entity.jellyfish.tiny.animation
 
-import net.minecraft.client.render.animation.Animation
-import net.minecraft.client.render.animation.AnimationKeyframe
-import net.minecraft.client.render.animation.Animator
-import net.minecraft.client.render.animation.PartAnimation
+import net.minecraft.client.animation.AnimationChannel
+import net.minecraft.client.animation.AnimationDefinition
+import net.minecraft.client.animation.Keyframe
+import net.minecraft.client.animation.KeyframeAnimations
 import org.teamvoided.dusk_debris.util.scale
 
 object TinyEnemyJellyfishAnimations {
-    val IDLE: Animation = Animation.Builder.withLength(2.0f).looping()
-        .addPartAnimation(
-            "jellyfish", PartAnimation(
-                PartAnimation.AnimationTargets.TRANSLATE,
-                AnimationKeyframe(0.0f, Animator.translate(0.0f, 0.0f, 0.0f), PartAnimation.Interpolations.SPLINE),
-                AnimationKeyframe(
+    val IDLE: AnimationDefinition = AnimationDefinition.Builder.withLength(2.0f).looping()
+        .addAnimation(
+            "jellyfish", AnimationChannel(
+                AnimationChannel.Targets.POSITION,
+                Keyframe(0.0f, KeyframeAnimations.posVec(0.0f, 0.0f, 0.0f), AnimationChannel.Interpolations.CATMULLROM),
+                Keyframe(
                     0.75f,
-                    Animator.translate(0.0f, -0.5f, 0.0f),
-                    PartAnimation.Interpolations.SPLINE
+                    KeyframeAnimations.posVec(0.0f, -0.5f, 0.0f),
+                    AnimationChannel.Interpolations.CATMULLROM
                 ),
-                AnimationKeyframe(
+                Keyframe(
                     1.375f,
-                    Animator.translate(0.0f, 1.0f, 0.0f),
-                    PartAnimation.Interpolations.SPLINE
+                    KeyframeAnimations.posVec(0.0f, 1.0f, 0.0f),
+                    AnimationChannel.Interpolations.CATMULLROM
                 ),
-                AnimationKeyframe(2.0f, Animator.translate(0.0f, 0.0f, 0.0f), PartAnimation.Interpolations.SPLINE)
+                Keyframe(2.0f, KeyframeAnimations.posVec(0.0f, 0.0f, 0.0f), AnimationChannel.Interpolations.CATMULLROM)
             )
         )
-        .addPartAnimation(
-            "membrane", PartAnimation(
-                PartAnimation.AnimationTargets.SCALE,
-                AnimationKeyframe(0.0f, scale(1.0f, 1.0f, 1.0f), PartAnimation.Interpolations.SPLINE),
-                AnimationKeyframe(0.5417f, scale(1.05f, 0.95f, 1.05f), PartAnimation.Interpolations.SPLINE),
-                AnimationKeyframe(1.0f, scale(0.95f, 1.05f, 0.95f), PartAnimation.Interpolations.SPLINE),
-                AnimationKeyframe(1.8333f, scale(1.0f, 1.0f, 1.0f), PartAnimation.Interpolations.SPLINE)
+        .addAnimation(
+            "membrane", AnimationChannel(
+                AnimationChannel.Targets.SCALE,
+                Keyframe(0.0f, scale(1.0f, 1.0f, 1.0f), AnimationChannel.Interpolations.CATMULLROM),
+                Keyframe(0.5417f, scale(1.05f, 0.95f, 1.05f), AnimationChannel.Interpolations.CATMULLROM),
+                Keyframe(1.0f, scale(0.95f, 1.05f, 0.95f), AnimationChannel.Interpolations.CATMULLROM),
+                Keyframe(1.8333f, scale(1.0f, 1.0f, 1.0f), AnimationChannel.Interpolations.CATMULLROM)
             )
         )
-        .addPartAnimation(
-            "membrane_extra", PartAnimation(
-                PartAnimation.AnimationTargets.SCALE,
-                AnimationKeyframe(0.0f, scale(1.0f, 1.0f, 1.0f), PartAnimation.Interpolations.SPLINE),
-                AnimationKeyframe(0.5417f, scale(1.05f, 0.75f, 1.05f), PartAnimation.Interpolations.SPLINE),
-                AnimationKeyframe(1.125f, scale(1.0f, 1.0f, 1.0f), PartAnimation.Interpolations.SPLINE)
+        .addAnimation(
+            "membrane_extra", AnimationChannel(
+                AnimationChannel.Targets.SCALE,
+                Keyframe(0.0f, scale(1.0f, 1.0f, 1.0f), AnimationChannel.Interpolations.CATMULLROM),
+                Keyframe(0.5417f, scale(1.05f, 0.75f, 1.05f), AnimationChannel.Interpolations.CATMULLROM),
+                Keyframe(1.125f, scale(1.0f, 1.0f, 1.0f), AnimationChannel.Interpolations.CATMULLROM)
             )
         )
-        .addPartAnimation(
-            "tendrils_north", PartAnimation(
-                PartAnimation.AnimationTargets.ROTATE,
-                AnimationKeyframe(0.0f, Animator.rotate(0.0f, 0.0f, 0.0f), PartAnimation.Interpolations.SPLINE),
-                AnimationKeyframe(0.5f, Animator.rotate(-30.0f, 0.0f, 0.0f), PartAnimation.Interpolations.SPLINE),
-                AnimationKeyframe(1.0f, Animator.rotate(0.0f, 0.0f, 0.0f), PartAnimation.Interpolations.SPLINE)
+        .addAnimation(
+            "tendrils_north", AnimationChannel(
+                AnimationChannel.Targets.ROTATION,
+                Keyframe(0.0f, KeyframeAnimations.degreeVec(0.0f, 0.0f, 0.0f), AnimationChannel.Interpolations.CATMULLROM),
+                Keyframe(0.5f, KeyframeAnimations.degreeVec(-30.0f, 0.0f, 0.0f), AnimationChannel.Interpolations.CATMULLROM),
+                Keyframe(1.0f, KeyframeAnimations.degreeVec(0.0f, 0.0f, 0.0f), AnimationChannel.Interpolations.CATMULLROM)
             )
         )
-        .addPartAnimation(
-            "tendrils_west", PartAnimation(
-                PartAnimation.AnimationTargets.ROTATE,
-                AnimationKeyframe(0.0f, Animator.rotate(0.0f, 0.0f, 0.0f), PartAnimation.Interpolations.SPLINE),
-                AnimationKeyframe(0.5f, Animator.rotate(0.0f, 0.0f, -30.0f), PartAnimation.Interpolations.SPLINE),
-                AnimationKeyframe(1.0f, Animator.rotate(0.0f, 0.0f, 0.0f), PartAnimation.Interpolations.SPLINE)
+        .addAnimation(
+            "tendrils_west", AnimationChannel(
+                AnimationChannel.Targets.ROTATION,
+                Keyframe(0.0f, KeyframeAnimations.degreeVec(0.0f, 0.0f, 0.0f), AnimationChannel.Interpolations.CATMULLROM),
+                Keyframe(0.5f, KeyframeAnimations.degreeVec(0.0f, 0.0f, -30.0f), AnimationChannel.Interpolations.CATMULLROM),
+                Keyframe(1.0f, KeyframeAnimations.degreeVec(0.0f, 0.0f, 0.0f), AnimationChannel.Interpolations.CATMULLROM)
             )
         )
-        .addPartAnimation(
-            "tendrils_south", PartAnimation(
-                PartAnimation.AnimationTargets.ROTATE,
-                AnimationKeyframe(0.0f, Animator.rotate(0.0f, 0.0f, 0.0f), PartAnimation.Interpolations.SPLINE),
-                AnimationKeyframe(0.5f, Animator.rotate(30.0f, 0.0f, 0.0f), PartAnimation.Interpolations.SPLINE),
-                AnimationKeyframe(1.0f, Animator.rotate(0.0f, 0.0f, 0.0f), PartAnimation.Interpolations.SPLINE)
+        .addAnimation(
+            "tendrils_south", AnimationChannel(
+                AnimationChannel.Targets.ROTATION,
+                Keyframe(0.0f, KeyframeAnimations.degreeVec(0.0f, 0.0f, 0.0f), AnimationChannel.Interpolations.CATMULLROM),
+                Keyframe(0.5f, KeyframeAnimations.degreeVec(30.0f, 0.0f, 0.0f), AnimationChannel.Interpolations.CATMULLROM),
+                Keyframe(1.0f, KeyframeAnimations.degreeVec(0.0f, 0.0f, 0.0f), AnimationChannel.Interpolations.CATMULLROM)
             )
         )
-        .addPartAnimation(
-            "tendrils_east", PartAnimation(
-                PartAnimation.AnimationTargets.ROTATE,
-                AnimationKeyframe(0.0f, Animator.rotate(0.0f, 0.0f, 0.0f), PartAnimation.Interpolations.SPLINE),
-                AnimationKeyframe(0.5f, Animator.rotate(0.0f, 0.0f, 30.0f), PartAnimation.Interpolations.SPLINE),
-                AnimationKeyframe(1.0f, Animator.rotate(0.0f, 0.0f, 0.0f), PartAnimation.Interpolations.SPLINE)
+        .addAnimation(
+            "tendrils_east", AnimationChannel(
+                AnimationChannel.Targets.ROTATION,
+                Keyframe(0.0f, KeyframeAnimations.degreeVec(0.0f, 0.0f, 0.0f), AnimationChannel.Interpolations.CATMULLROM),
+                Keyframe(0.5f, KeyframeAnimations.degreeVec(0.0f, 0.0f, 30.0f), AnimationChannel.Interpolations.CATMULLROM),
+                Keyframe(1.0f, KeyframeAnimations.degreeVec(0.0f, 0.0f, 0.0f), AnimationChannel.Interpolations.CATMULLROM)
             )
         )
         .build()

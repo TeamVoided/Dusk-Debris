@@ -1,16 +1,18 @@
 package org.teamvoided.dusk_debris.entity.bird.render
 
-import net.minecraft.client.model.*
-import net.minecraft.client.render.RenderLayer
-import net.minecraft.client.render.entity.model.SinglePartEntityModel
+import net.minecraft.client.model.HierarchicalModel
+import net.minecraft.client.model.geom.ModelPart
+import net.minecraft.client.model.geom.PartPose
+import net.minecraft.client.model.geom.builders.*
+import net.minecraft.client.renderer.RenderType
 import org.teamvoided.dusk_debris.entity.BirdEntity
 
 class BirdEntityModel(root: ModelPart) :
-    SinglePartEntityModel<BirdEntity>(RenderLayer::getEntityTranslucent) {
+    HierarchicalModel<BirdEntity>(RenderType::entityTranslucent) {
     private val bone: ModelPart = root.getChild("bone")
     private val block: ModelPart = bone.getChild("block")
 
-    override fun setAngles(
+    override fun setupAnim(
         entity: BirdEntity,
         limbAngle: Float,
         limbDistance: Float,
@@ -18,34 +20,34 @@ class BirdEntityModel(root: ModelPart) :
         headYaw: Float,
         headPitch: Float
     ) {
-        block.yaw = headYaw * 0.017453292F;
-        block.pitch = headPitch * 0.017453292F;
+        block.yRot = headYaw * 0.017453292F;
+        block.xRot = headPitch * 0.017453292F;
     }
 
-    override fun getPart(): ModelPart = this.bone
+    override fun root(): ModelPart = this.bone
 
     companion object {
-        val texturedModelData: TexturedModelData
+        val texturedModelData: LayerDefinition
             get() {
-                val modelData = ModelData()
-                val modelPartData: ModelPartData = modelData.root
-                val modelPartData2: ModelPartData = modelPartData.addChild(
+                val modelData = MeshDefinition()
+                val modelPartData: PartDefinition = modelData.root
+                val modelPartData2: PartDefinition = modelPartData.addOrReplaceChild(
                     "bone",
-                    ModelPartBuilder.create(),
-                    ModelTransform.pivot(0f, 16f, 0f)
+                    CubeListBuilder.create(),
+                    PartPose.offset(0f, 16f, 0f)
                 )
-                modelPartData2.addChild(
+                modelPartData2.addOrReplaceChild(
                     "block",
-                    ModelPartBuilder.create().uv(0, 0)
-                        .cuboid(-2.0f, -2.0f, -2.0f, 4.0f, 10.0f, 4.0f, Dilation.NONE),
-                    ModelTransform.pivot(0f, 0f, 0f)
-                ).addChild(
+                    CubeListBuilder.create().texOffs(0, 0)
+                        .addBox(-2.0f, -2.0f, -2.0f, 4.0f, 10.0f, 4.0f, CubeDeformation.NONE),
+                    PartPose.offset(0f, 0f, 0f)
+                ).addOrReplaceChild(
                     "beak",
-                    ModelPartBuilder.create().uv(0, 0)
-                        .cuboid(-1.0f, 0.0f, -4.0f, 2.0f, 2.0f, 2.0f, Dilation.NONE),
-                    ModelTransform.pivot(0.0f, 0.0f, 0.0f)
+                    CubeListBuilder.create().texOffs(0, 0)
+                        .addBox(-1.0f, 0.0f, -4.0f, 2.0f, 2.0f, 2.0f, CubeDeformation.NONE),
+                    PartPose.offset(0.0f, 0.0f, 0.0f)
                 )
-                return TexturedModelData.of(modelData, 16, 16)
+                return LayerDefinition.create(modelData, 16, 16)
             }
     }
 }

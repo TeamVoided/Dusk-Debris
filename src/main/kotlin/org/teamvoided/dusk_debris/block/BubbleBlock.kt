@@ -2,54 +2,54 @@ package org.teamvoided.dusk_debris.block
 
 
 import com.mojang.serialization.MapCodec
-import net.minecraft.block.Block
-import net.minecraft.block.BlockState
-import net.minecraft.block.ShapeContext
-import net.minecraft.block.Waterloggable
-import net.minecraft.entity.Entity
-import net.minecraft.entity.ai.pathing.NavigationType
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.particle.DefaultParticleType
-import net.minecraft.particle.ParticleTypes
-import net.minecraft.server.world.ServerWorld
-import net.minecraft.state.StateManager
-import net.minecraft.state.property.BooleanProperty
-import net.minecraft.state.property.DirectionProperty
-import net.minecraft.state.property.Properties
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Direction
-import net.minecraft.util.random.RandomGenerator
-import net.minecraft.util.shape.VoxelShape
-import net.minecraft.util.shape.VoxelShapes
-import net.minecraft.world.BlockView
-import net.minecraft.world.GameRules
-import net.minecraft.world.World
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
+import net.minecraft.core.particles.ParticleTypes
+import net.minecraft.core.particles.SimpleParticleType
+import net.minecraft.server.level.ServerLevel
+import net.minecraft.util.RandomSource
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.level.BlockGetter
+import net.minecraft.world.level.GameRules
+import net.minecraft.world.level.Level
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.SimpleWaterloggedBlock
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.block.state.StateDefinition
+import net.minecraft.world.level.block.state.properties.BlockStateProperties
+import net.minecraft.world.level.block.state.properties.BooleanProperty
+import net.minecraft.world.level.block.state.properties.DirectionProperty
+import net.minecraft.world.level.pathfinder.PathComputationType
+import net.minecraft.world.phys.shapes.CollisionContext
+import net.minecraft.world.phys.shapes.Shapes
+import net.minecraft.world.phys.shapes.VoxelShape
 import org.teamvoided.dusk_debris.block.not_blocks.DuskProperties
 import org.teamvoided.dusk_debris.data.tags.DuskEntityTypeTags
 import org.teamvoided.dusk_debris.util.rotate
 
-class BubbleBlock(settings: Settings) : Block(settings), Waterloggable {
-    public override fun getCodec(): MapCodec<BubbleBlock> = CODEC
+class BubbleBlock(settings: Properties) : Block(settings), SimpleWaterloggedBlock {
+    public override fun codec(): MapCodec<BubbleBlock> = CODEC
 
     init {
-        this.defaultState = stateManager.defaultState.with(SQUISHED, false)
+        this.registerDefaultState(stateDefinition.any().setValue(SQUISHED, false))
     }
 
-    override fun onEntityCollision(state: BlockState, world: World, pos: BlockPos, entity: Entity) {
-        if (!getPopCheck(state) && !world.isClient && !entity.type.isIn(DuskEntityTypeTags.DONT_POP_FOG_BUBBLES)) {
-            if ((world.gameRules.getBooleanValue(GameRules.DO_MOB_GRIEFING) || entity is PlayerEntity) &&
-                entity.canModifyAt(world, pos)
+    override fun entityInside(state: BlockState, world: Level, pos: BlockPos, entity: Entity) {
+        if (!getPopCheck(state) && !world.isClientSide && !entity.type.`is`(DuskEntityTypeTags.DONT_POP_FOG_BUBBLES)) {
+            if ((world.gameRules.getBoolean(GameRules.RULE_MOBGRIEFING) || entity is Player) &&
+                entity.mayInteract(world, pos)
             ) {
                 setPopped(state, world, pos)
             }
         }
     }
 
-    override fun randomTick(state: BlockState, world: ServerWorld, pos: BlockPos, random: RandomGenerator) {
+    override fun randomTick(state: BlockState, world: ServerLevel, pos: BlockPos, random: RandomSource) {
         val randInt = random.nextInt(127)
-        if (randInt == 0 || (state.get(SQUISHED) && randInt <= 8)) {
-            world.setBlockState(pos, state.with(SQUISHED, !state.get(SQUISHED)))
-            val ofCenter = pos.ofCenter()
+        if (randInt == 0 || (state.getValue(SQUISHED) && randInt <= 8)) {
+            world.setBlockAndUpdate(pos, state.setValue(SQUISHED, !state.getValue(SQUISHED)))
+            val ofCenter = pos.center
             repeat(7) {
                 world.addParticle(
                     getBubbleParticle(),
@@ -66,16 +66,16 @@ class BubbleBlock(settings: Settings) : Block(settings), Waterloggable {
         super.randomTick(state, world, pos, random)
     }
 
-    override fun getOutlineShape(
+    override fun getShape(
         state: BlockState,
-        world: BlockView,
+        world: BlockGetter,
         pos: BlockPos,
-        context: ShapeContext
+        context: CollisionContext
     ): VoxelShape {
         if (!getPopCheck(state))
-            return super.getOutlineShape(state, world, pos, context)
+            return super.getShape(state, world, pos, context)
         else {
-            val facing = state.get(FACING)
+            val facing = state.getValue(FACING)
             if (facing.axis != Direction.Axis.Y) {
                 val rotations = when (facing) {
                     Direction.NORTH -> 0
@@ -92,40 +92,40 @@ class BubbleBlock(settings: Settings) : Block(settings), Waterloggable {
         }
     }
 
-    override fun getCullingShape(state: BlockState, world: BlockView, pos: BlockPos): VoxelShape = VoxelShapes.empty()
+    override fun getOcclusionShape(state: BlockState, world: BlockGetter, pos: BlockPos): VoxelShape = Shapes.empty()
 
     override fun getCollisionShape(
         state: BlockState,
-        world: BlockView,
+        world: BlockGetter,
         pos: BlockPos,
-        context: ShapeContext
-    ): VoxelShape = VoxelShapes.empty()
+        context: CollisionContext
+    ): VoxelShape = Shapes.empty()
 
-    override fun isSideInvisible(state: BlockState, stateFrom: BlockState, direction: Direction): Boolean {
-        return super.isSideInvisible(state, stateFrom, direction)
+    override fun skipRendering(state: BlockState, stateFrom: BlockState, direction: Direction): Boolean {
+        return super.skipRendering(state, stateFrom, direction)
     }
 
-    override fun canPathfindThrough(state: BlockState, navigationType: NavigationType): Boolean {
+    override fun isPathfindable(state: BlockState, navigationType: PathComputationType): Boolean {
         return true
     }
 
-    fun getBubbleParticle(): DefaultParticleType = ParticleTypes.BUBBLE
-    fun getPopCheck(state: BlockState): Boolean = state.get(SQUISHED)
-    fun setPopped(state: BlockState, world: World, pos: BlockPos) =
-        world.setBlockState(pos, state.with(SQUISHED, true))
+    fun getBubbleParticle(): SimpleParticleType = ParticleTypes.BUBBLE
+    fun getPopCheck(state: BlockState): Boolean = state.getValue(SQUISHED)
+    fun setPopped(state: BlockState, world: Level, pos: BlockPos) =
+        world.setBlockAndUpdate(pos, state.setValue(SQUISHED, true))
 
     fun poppedProperty() = SQUISHED
 
-    override fun appendProperties(builder: StateManager.Builder<Block, BlockState>) {
+    override fun createBlockStateDefinition(builder: StateDefinition.Builder<Block, BlockState>) {
         builder.add(poppedProperty(), FACING)
     }
 
     companion object {
-        val CODEC: MapCodec<BubbleBlock> = createCodec(::BubbleBlock)
+        val CODEC: MapCodec<BubbleBlock> = simpleCodec(::BubbleBlock)
         val SQUISHED: BooleanProperty = DuskProperties.SQUISHED
-        val FACING: DirectionProperty = Properties.FACING
-        val POPPED_SHAPE: VoxelShape = createCuboidShape(0.0, 5.0, 5.0, 1.0, 11.0, 11.0)
-        val POPPED_UP_SHAPE: VoxelShape = createCuboidShape(5.0, 15.0, 5.0, 11.0, 16.0, 11.0)
-        val POPPED_DOWN_SHAPE: VoxelShape = createCuboidShape(5.0, 0.0, 5.0, 11.0, 1.0, 11.0)
+        val FACING: DirectionProperty = BlockStateProperties.FACING
+        val POPPED_SHAPE: VoxelShape = box(0.0, 5.0, 5.0, 1.0, 11.0, 11.0)
+        val POPPED_UP_SHAPE: VoxelShape = box(5.0, 15.0, 5.0, 11.0, 16.0, 11.0)
+        val POPPED_DOWN_SHAPE: VoxelShape = box(5.0, 0.0, 5.0, 11.0, 1.0, 11.0)
     }
 }

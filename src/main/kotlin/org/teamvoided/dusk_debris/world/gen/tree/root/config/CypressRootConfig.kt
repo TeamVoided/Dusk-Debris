@@ -2,11 +2,11 @@ package org.teamvoided.dusk_debris.world.gen.tree.root.config
 
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
-import net.minecraft.block.Block
-import net.minecraft.registry.HolderSet
-import net.minecraft.registry.RegistryCodecs
-import net.minecraft.registry.RegistryKeys
-import net.minecraft.world.gen.stateprovider.BlockStateProvider
+import net.minecraft.core.HolderSet
+import net.minecraft.core.RegistryCodecs
+import net.minecraft.core.registries.Registries
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider
 
 @JvmRecord
 data class CypressRootConfig(
@@ -20,11 +20,11 @@ data class CypressRootConfig(
     companion object {
         val CODEC: Codec<CypressRootConfig> = RecordCodecBuilder.create {
             it.group(
-                RegistryCodecs.homogeneousList(RegistryKeys.BLOCK)
+                RegistryCodecs.homogeneousList(Registries.BLOCK)
                     .fieldOf("can_grow_through").forGetter(CypressRootConfig::canGrowThrough),
-                RegistryCodecs.homogeneousList(RegistryKeys.BLOCK).fieldOf("muddy_roots_in")
+                RegistryCodecs.homogeneousList(Registries.BLOCK).fieldOf("muddy_roots_in")
                     .forGetter { placement: CypressRootConfig -> placement.muddyRootsIn },
-                BlockStateProvider.TYPE_CODEC.fieldOf("muddy_roots_provider")
+                BlockStateProvider.CODEC.fieldOf("muddy_roots_provider")
                     .forGetter(CypressRootConfig::muddyRootsProvider),
                 Codec.intRange(1, 12).fieldOf("max_root_width").forGetter(CypressRootConfig::maxRootWidth),
                 Codec.intRange(1, 64).fieldOf("max_root_length").forGetter(CypressRootConfig::maxRootLength),

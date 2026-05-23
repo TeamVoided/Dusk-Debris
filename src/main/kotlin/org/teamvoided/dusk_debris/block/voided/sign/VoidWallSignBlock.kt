@@ -1,9 +1,9 @@
 package org.teamvoided.dusk_debris.block.voided.sign
 
-import net.minecraft.block.WoodType
-import net.minecraft.block.sign.WallSignBlock
-import net.minecraft.util.Identifier
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.world.level.block.WallSignBlock
+import net.minecraft.world.level.block.state.properties.WoodType
 
-class VoidWallSignBlock(override val texture: Identifier, woodType: WoodType, settings: Settings) :
-    WallSignBlock(woodType, settings.solid()), VoidSign
+class VoidWallSignBlock(override val texture: ResourceLocation, woodType: WoodType, settings: Properties) :
+    WallSignBlock(woodType, settings.forceSolidOn()), VoidSign
 

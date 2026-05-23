@@ -1,20 +1,20 @@
 package org.teamvoided.dusk_debris.entity
 
-import net.minecraft.block.BlockState
-import net.minecraft.entity.AnimationState
-import net.minecraft.entity.EntityType
-import net.minecraft.entity.attribute.DefaultAttributeContainer
-import net.minecraft.entity.attribute.EntityAttributes
-import net.minecraft.entity.mob.Angerable
-import net.minecraft.entity.mob.HostileEntity
-import net.minecraft.nbt.NbtCompound
-import net.minecraft.server.world.ServerWorld
-import net.minecraft.util.math.BlockPos
-import net.minecraft.world.World
+import net.minecraft.core.BlockPos
+import net.minecraft.nbt.CompoundTag
+import net.minecraft.server.level.ServerLevel
+import net.minecraft.world.entity.AnimationState
+import net.minecraft.world.entity.EntityType
+import net.minecraft.world.entity.NeutralMob
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier
+import net.minecraft.world.entity.ai.attributes.Attributes
+import net.minecraft.world.entity.monster.Monster
+import net.minecraft.world.level.Level
+import net.minecraft.world.level.block.state.BlockState
 import java.util.*
 
-abstract class AbstractJellyfishEntity(entityType: EntityType<out AbstractJellyfishEntity>, world: World) :
-    HostileEntity(entityType, world), Angerable {
+abstract class AbstractJellyfishEntity(entityType: EntityType<out AbstractJellyfishEntity>, world: Level) :
+    Monster(entityType, world), NeutralMob {
     var angerTicks = 0
     var targetUuid: UUID? = null
     val idleAnimationState: AnimationState = AnimationState()
@@ -32,17 +32,17 @@ abstract class AbstractJellyfishEntity(entityType: EntityType<out AbstractJellyf
         this.updateAnimations()
     }
 
-    override fun writeCustomDataToNbt(nbt: NbtCompound) {
-        super.writeCustomDataToNbt(nbt)
-        this.writeAngerToNbt(nbt)
+    override fun addAdditionalSaveData(nbt: CompoundTag) {
+        super.addAdditionalSaveData(nbt)
+        this.addPersistentAngerSaveData(nbt)
     }
 
-    override fun readCustomDataFromNbt(nbt: NbtCompound) {
-        super.readCustomDataFromNbt(nbt)
-        this.readAngerFromNbt(this.world, nbt)
+    override fun readAdditionalSaveData(nbt: CompoundTag) {
+        super.readAdditionalSaveData(nbt)
+        this.readPersistentAngerSaveData(this.level(), nbt)
     }
 
-    override fun tickMovement() {
+    override fun aiStep() {
 //        if (world.isClient) {
 //                world.addParticle(
 //                    ParticleTypes.PORTAL,
@@ -56,35 +56,35 @@ abstract class AbstractJellyfishEntity(entityType: EntityType<out AbstractJellyf
 //        }
 
         this.jumping = false
-        if (!world.isClient) {
-            this.tickAngerLogic(world as ServerWorld, true)
+        if (!level().isClientSide) {
+            this.updatePersistentAnger(level() as ServerLevel, true)
         }
-        super.tickMovement()
+        super.aiStep()
     }
 
-    override fun isClimbing(): Boolean = false
+    override fun onClimbable(): Boolean = false
 
-    override fun fall(fallDistance: Double, onGround: Boolean, landedState: BlockState, landedPosition: BlockPos) {}
+    override fun checkFallDamage(fallDistance: Double, onGround: Boolean, landedState: BlockState, landedPosition: BlockPos) {}
 
     override fun playStepSound(pos: BlockPos, state: BlockState) {}
 
-    override fun setAngerTime(ticks: Int) {
+    override fun setRemainingPersistentAngerTime(ticks: Int) {
         this.angerTicks = ticks
     }
 
-    override fun getAngerTime(): Int {
+    override fun getRemainingPersistentAngerTime(): Int {
         return this.angerTicks
     }
 
-    override fun setAngryAt(uuid: UUID?) {
+    override fun setPersistentAngerTarget(uuid: UUID?) {
         this.targetUuid = uuid
     }
 
-    override fun getAngryAt(): UUID? {
+    override fun getPersistentAngerTarget(): UUID? {
         return this.targetUuid
     }
 
-    override fun canTarget(type: EntityType<*>): Boolean {
+    override fun canAttackType(type: EntityType<*>): Boolean {
         return true
     }
 
@@ -93,18 +93,18 @@ abstract class AbstractJellyfishEntity(entityType: EntityType<out AbstractJellyf
     companion object {
         const val GRAVITY_VALUE = 0.003
 
-        fun createAttributes(): DefaultAttributeContainer.Builder {
+        fun createAttributes(): AttributeSupplier.Builder {
             return createAttributesNoSpecial()
-                .add(EntityAttributes.GENERIC_ARMOR, 30.0)
-                .add(EntityAttributes.GENERIC_ARMOR_TOUGHNESS, 20.0)
-                .add(EntityAttributes.GENERIC_FOLLOW_RANGE, 64.0)
+                .add(Attributes.ARMOR, 30.0)
+                .add(Attributes.ARMOR_TOUGHNESS, 20.0)
+                .add(Attributes.FOLLOW_RANGE, 64.0)
         }
 
-        fun createAttributesNoSpecial(): DefaultAttributeContainer.Builder {
-            return HostileEntity.createAttributes()
-                .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.3)
-                .add(EntityAttributes.GENERIC_FLYING_SPEED, 0.3)
-                .add(EntityAttributes.GENERIC_GRAVITY, 0.0)
+        fun createAttributesNoSpecial(): AttributeSupplier.Builder {
+            return Monster.createMonsterAttributes()
+                .add(Attributes.MOVEMENT_SPEED, 0.3)
+                .add(Attributes.FLYING_SPEED, 0.3)
+                .add(Attributes.GRAVITY, 0.0)
         }
     }
 

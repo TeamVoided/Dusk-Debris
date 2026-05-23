@@ -1,11 +1,11 @@
 package org.teamvoided.dusk_debris.item
 
-import net.minecraft.block.Block
-import net.minecraft.item.Item
-import net.minecraft.item.ToolMaterial
-import net.minecraft.recipe.Ingredient
-import net.minecraft.registry.tag.BlockTags
-import net.minecraft.registry.tag.TagKey
+import net.minecraft.tags.BlockTags
+import net.minecraft.tags.TagKey
+import net.minecraft.world.item.Item
+import net.minecraft.world.item.Tier
+import net.minecraft.world.item.crafting.Ingredient
+import net.minecraft.world.level.block.Block
 import org.teamvoided.dusk_debris.data.tags.DuskItemTags
 
 object DuskToolMaterials {
@@ -20,20 +20,20 @@ object DuskToolMaterials {
         val incorrectForDropsBlocks: TagKey<Block>,
         val enchantability: Int,
         val repairIngredient: Ingredient
-    ) : ToolMaterial {
+    ) : Tier {
         constructor(
             durability: Int, miningSpeedMultiplier: Float, attackDamage: Float,
             incorrectForDropsBlocks: TagKey<Block>, enchantability: Int, repairTag: TagKey<Item>
         ) : this(
             durability, miningSpeedMultiplier, attackDamage,
-            incorrectForDropsBlocks, enchantability, Ingredient.ofTag(repairTag)
+            incorrectForDropsBlocks, enchantability, Ingredient.of(repairTag)
         )
 
-        override fun getDurability(): Int = durability
-        override fun getMiningSpeedMultiplier(): Float = miningSpeedMultiplier
-        override fun getAttackDamage(): Float = attackDamage
-        override fun getIncorrectForDropsBlocks(): TagKey<Block> = incorrectForDropsBlocks
-        override fun getEnchantability(): Int = enchantability
+        override fun getUses(): Int = durability
+        override fun getSpeed(): Float = miningSpeedMultiplier
+        override fun getAttackDamageBonus(): Float = attackDamage
+        override fun getIncorrectBlocksForDrops(): TagKey<Block> = incorrectForDropsBlocks
+        override fun getEnchantmentValue(): Int = enchantability
         override fun getRepairIngredient(): Ingredient = repairIngredient
 
         companion object {

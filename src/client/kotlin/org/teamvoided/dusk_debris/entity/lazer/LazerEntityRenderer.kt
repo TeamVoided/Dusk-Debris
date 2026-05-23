@@ -1,22 +1,22 @@
 package org.teamvoided.dusk_debris.entity.lazer
 
+import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.blaze3d.vertex.VertexConsumer
-import net.minecraft.client.render.Frustum
-import net.minecraft.client.render.OverlayTexture
-import net.minecraft.client.render.RenderLayer
-import net.minecraft.client.render.VertexConsumerProvider
-import net.minecraft.client.render.entity.EntityRenderer
-import net.minecraft.client.render.entity.EntityRendererFactory
-import net.minecraft.client.util.math.MatrixStack
-import net.minecraft.util.Identifier
-import net.minecraft.util.math.Axis
-import net.minecraft.util.math.Box
-import net.minecraft.util.math.MathHelper
-import net.minecraft.util.math.Vec3d
+import com.mojang.math.Axis
+import net.minecraft.client.renderer.MultiBufferSource
+import net.minecraft.client.renderer.RenderType
+import net.minecraft.client.renderer.culling.Frustum
+import net.minecraft.client.renderer.entity.EntityRenderer
+import net.minecraft.client.renderer.entity.EntityRendererProvider
+import net.minecraft.client.renderer.texture.OverlayTexture
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.util.Mth
+import net.minecraft.world.phys.AABB
+import net.minecraft.world.phys.Vec3
 import org.joml.Vector2f
 import org.teamvoided.dusk_debris.entity.LazerEntity
 
-class LazerEntityRenderer(ctx: EntityRendererFactory.Context) : EntityRenderer<LazerEntity>(ctx) {
+class LazerEntityRenderer(ctx: EntityRendererProvider.Context) : EntityRenderer<LazerEntity>(ctx) {
 
     override fun shouldRender(
         entity: LazerEntity,
@@ -28,9 +28,9 @@ class LazerEntityRenderer(ctx: EntityRendererFactory.Context) : EntityRenderer<L
         if (super.shouldRender(entity, frustum, x, y, z)) {
             return true
         } else {
-            val eyePos = entity.eyePos
+            val eyePos = entity.eyePosition
             val target = entity.target
-            val box = Box(eyePos, target).expand(entity.displayRadius.second.toDouble())
+            val box = AABB(eyePos, target).inflate(entity.displayRadius.second.toDouble())
             return frustum.isVisible(box)
         }
     }
@@ -39,13 +39,13 @@ class LazerEntityRenderer(ctx: EntityRendererFactory.Context) : EntityRenderer<L
         entity: LazerEntity,
         yaw: Float,
         tickDelta: Float,
-        matrices: MatrixStack,
-        vertexConsumers: VertexConsumerProvider,
+        matrices: PoseStack,
+        vertexConsumers: MultiBufferSource,
         light: Int
     ) {
-        val tim = entity.age.toLong()
+        val tim = entity.tickCount.toLong()
         val target = entity.fromLerpedPosition(entity.prevTarget, entity.target, tickDelta)
-        val position = this.fromLerpedPosition(entity, entity.standingEyeHeight, tickDelta)
+        val position = this.fromLerpedPosition(entity, entity.eyeHeight, tickDelta)
         var vec3d3 = target.subtract(position)
         val len = vec3d3.length().toFloat()
         vec3d3 = vec3d3.normalize()
@@ -54,24 +54,24 @@ class LazerEntityRenderer(ctx: EntityRendererFactory.Context) : EntityRenderer<L
         drawSegment(
             matrices,
             vertexConsumers,
-            getTexture(entity),
+            getTextureLocation(entity),
             tickDelta,
             tim,
             dir,
             0f,
             len,
-            entity.standingEyeHeight.toDouble(),
+            entity.eyeHeight.toDouble(),
             rad.first,
             rad.second
         )
         super.render(entity, yaw, tickDelta, matrices, vertexConsumers, light)
     }
 
-    private fun fromLerpedPosition(entity: LazerEntity, yOffset: Float, delta: Float): Vec3d {
-        val d = MathHelper.lerp(delta.toDouble(), entity.lastRenderX, entity.x)
-        val e = MathHelper.lerp(delta.toDouble(), entity.lastRenderY, entity.y) + yOffset
-        val f = MathHelper.lerp(delta.toDouble(), entity.lastRenderZ, entity.z)
-        return Vec3d(d, e, f)
+    private fun fromLerpedPosition(entity: LazerEntity, yOffset: Float, delta: Float): Vec3 {
+        val d = Mth.lerp(delta.toDouble(), entity.xOld, entity.x)
+        val e = Mth.lerp(delta.toDouble(), entity.yOld, entity.y) + yOffset
+        val f = Mth.lerp(delta.toDouble(), entity.zOld, entity.z)
+        return Vec3(d, e, f)
     }
 
 //    fun render(
@@ -110,13 +110,13 @@ class LazerEntityRenderer(ctx: EntityRendererFactory.Context) : EntityRenderer<L
 //    }
 
 
-    override fun getTexture(entity: LazerEntity): Identifier = entity.getTexture()
+    override fun getTextureLocation(entity: LazerEntity): ResourceLocation = entity.getTexture()
 
     companion object {
         private fun drawSegment(
-            matrices: MatrixStack,
-            vertexConsumers: VertexConsumerProvider,
-            texture: Identifier,
+            matrices: PoseStack,
+            vertexConsumers: MultiBufferSource,
+            texture: ResourceLocation,
             tickDelta: Float,
             time: Long,
             direction: Vector2f,
@@ -143,9 +143,9 @@ class LazerEntityRenderer(ctx: EntityRendererFactory.Context) : EntityRenderer<L
         }
 
         fun drawSegment(
-            matrices: MatrixStack,
-            vertexConsumers: VertexConsumerProvider,
-            texture: Identifier,
+            matrices: PoseStack,
+            vertexConsumers: MultiBufferSource,
+            texture: ResourceLocation,
             tickDelta: Float,
             heightScale: Float,
             time: Long,
@@ -157,13 +157,13 @@ class LazerEntityRenderer(ctx: EntityRendererFactory.Context) : EntityRenderer<L
             outerRadius: Float
         ) {
             val segmentTop = segmentBottom + segmentHeight
-            matrices.push()
+            matrices.pushPose()
             matrices.translate(0.0, entityRadius, 0.0)
             val spinRate = time + tickDelta
             val spinDir = if (segmentHeight < 0) spinRate else -spinRate
-            val spinDec = MathHelper.fractionalPart(spinDir * 0.1f)
+            val spinDec = Mth.frac(spinDir * 0.1f)
 
-            matrices.push()
+            matrices.pushPose()
             matrices.rotateBeam(direction)
             //matrices.rotate(Axis.Y_POSITIVE.rotationDegrees(spinRate * 2.25f - 45f))
             val spinDecInv = spinDec - 1f
@@ -190,7 +190,7 @@ class LazerEntityRenderer(ctx: EntityRendererFactory.Context) : EntityRenderer<L
                 textureAnim,
                 spinDecInv - innerRadius
             )
-            matrices.pop()
+            matrices.popPose()
             matrices.rotateBeam(direction)
             val outerRadius2 = outerRadius / 2f
             renderBeamLayer(
@@ -215,22 +215,22 @@ class LazerEntityRenderer(ctx: EntityRendererFactory.Context) : EntityRenderer<L
                 textureAnim + outerRadius2,
                 spinDecInv - outerRadius
             )
-            matrices.pop()
+            matrices.popPose()
         }
 
-        private fun MatrixStack.rotateBeam(direction: Vector2f) {
+        private fun PoseStack.rotateBeam(direction: Vector2f) {
 //            this.rotate(Axis.Z_POSITIVE.rotationDegrees(direction.x - 0f))
 //            this.rotate(Axis.X_POSITIVE.rotationDegrees(direction.y + 90f))
 
-            this.rotate(Axis.Y_POSITIVE.rotationDegrees((1.5707964f - direction.y) * 57.295776f))
-            this.rotate(Axis.X_POSITIVE.rotationDegrees(direction.x * 57.295776f))
+            this.mulPose(Axis.YP.rotationDegrees((1.5707964f - direction.y) * 57.295776f))
+            this.mulPose(Axis.XP.rotationDegrees(direction.x * 57.295776f))
         }
 
         private fun renderBeamLayer(
-            matrices: MatrixStack,
-            vertexConsumers: VertexConsumerProvider,
-            sideTexture: Identifier,
-            endTexture: Identifier,
+            matrices: PoseStack,
+            vertexConsumers: MultiBufferSource,
+            sideTexture: ResourceLocation,
+            endTexture: ResourceLocation,
             invert: Boolean,
             argb: Int,
             segmentBottom: Float,
@@ -242,30 +242,30 @@ class LazerEntityRenderer(ctx: EntityRendererFactory.Context) : EntityRenderer<L
             u1: Float, u2: Float,
             v1: Float, v2: Float
         ) {
-            val side = vertexConsumers.getBuffer(RenderLayer.getBeaconBeam(sideTexture, invert))
-            val entry = matrices.peek()
+            val side = vertexConsumers.getBuffer(RenderType.beaconBeam(sideTexture, invert))
+            val entry = matrices.last()
             renderBeamFace(entry, side, argb, segmentBottom, segmentTop, x1, z1, x2, z2, u1, u2, v1, v2)
             renderBeamFace(entry, side, argb, segmentBottom, segmentTop, x4, z4, x3, z3, u1, u2, v1, v2)
             renderBeamFace(entry, side, argb, segmentBottom, segmentTop, x2, z2, x4, z4, u1, u2, v1, v2)
             renderBeamFace(entry, side, argb, segmentBottom, segmentTop, x3, z3, x1, z1, u1, u2, v1, v2)
 
 
-            val end = vertexConsumers.getBuffer(RenderLayer.getBeaconBeam(endTexture, invert))
+            val end = vertexConsumers.getBuffer(RenderType.beaconBeam(endTexture, invert))
             val sB = if (invert) segmentBottom else -segmentBottom
             val sT = if (invert) -segmentTop else segmentTop
             val radius = u1 - 0.5f
-            matrices.rotate(Axis.X_POSITIVE.rotationDegrees(if (invert) -90f else 90f))
+            matrices.mulPose(Axis.XP.rotationDegrees(if (invert) -90f else 90f))
             renderBeamFace(
-                matrices.peek(), end, argb,
+                matrices.last(), end, argb,
                 -radius, radius,
                 -radius, sB,
                 radius, sB,
                 u1, u2,
                 u1, u2
             )
-            matrices.rotate(Axis.X_POSITIVE.rotationDegrees(180f))
+            matrices.mulPose(Axis.XP.rotationDegrees(180f))
             renderBeamFace(
-                matrices.peek(), end, argb,
+                matrices.last(), end, argb,
                 -radius, radius,
                 -radius, sT,
                 radius, sT,
@@ -275,7 +275,7 @@ class LazerEntityRenderer(ctx: EntityRendererFactory.Context) : EntityRenderer<L
         }
 
         private fun renderBeamFace(
-            matrices: MatrixStack.Entry,
+            matrices: PoseStack.Pose,
             vertexConsumers: VertexConsumer,
             argb: Int,
             segmentBottom: Float,
@@ -292,7 +292,7 @@ class LazerEntityRenderer(ctx: EntityRendererFactory.Context) : EntityRenderer<L
         }
 
         private fun renderBeamVertex(
-            matrices: MatrixStack.Entry,
+            matrices: PoseStack.Pose,
             vertexConsumers: VertexConsumer,
             argb: Int,
             y: Float,
@@ -302,12 +302,12 @@ class LazerEntityRenderer(ctx: EntityRendererFactory.Context) : EntityRenderer<L
             v: Float
         ) {
             vertexConsumers
-                .xyz(matrices, x, y, z)
-                .color(argb)
-                .uv0(u, v)
-                .uv1(OverlayTexture.DEFAULT_UV)
-                .uv2(15728880)
-                .normal(matrices, 0.0f, 1.0f, 0.0f)
+                .addVertex(matrices, x, y, z)
+                .setColor(argb)
+                .setUv(u, v)
+                .setOverlay(OverlayTexture.NO_OVERLAY)
+                .setLight(15728880)
+                .setNormal(matrices, 0.0f, 1.0f, 0.0f)
         }
     }
 }

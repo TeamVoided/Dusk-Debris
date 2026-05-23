@@ -1,15 +1,10 @@
 package org.teamvoided.dusk_debris.data.gen.world.gen.density_function
 
-import net.minecraft.registry.BootstrapContext
-import net.minecraft.registry.RegistryKey
-import net.minecraft.util.math.Spline
-import net.minecraft.util.math.noise.DoublePerlinNoiseSampler
-import net.minecraft.world.gen.DensityFunction
-import net.minecraft.world.gen.DensityFunctions
-import net.minecraft.world.gen.chunk.ChunkGeneratorSettings
-import net.minecraft.world.gen.noise.NoiseParametersKeys
-import net.minecraft.world.gen.noise.NoiseRouter
-import net.minecraft.world.gen.noise.NoiseRouterData
+import net.minecraft.data.worldgen.BootstrapContext
+import net.minecraft.resources.ResourceKey
+import net.minecraft.util.CubicSpline
+import net.minecraft.world.level.levelgen.*
+import net.minecraft.world.level.levelgen.synth.NormalNoise
 import org.teamvoided.dusk_debris.data.gen.world.gen.DensityFunctionCreator.dense
 import org.teamvoided.dusk_debris.data.gen.world.gen.DensityFunctionCreator.denseHold
 import org.teamvoided.dusk_debris.data.gen.world.gen.DensityFunctionCreator.noiseHold
@@ -37,8 +32,8 @@ object OverworldDensityFunctionCreator {
     fun BootstrapContext<DensityFunction>.routerParameters() {
         val shiftX = this.dense(NoiseRouterData.SHIFT_X)
         val shiftZ = this.dense(NoiseRouterData.SHIFT_Z)
-        this.register(DuskDensityFunctions.TEMPERATURE, noi2D(NoiseParametersKeys.TEMPERATURE))
-        this.register(DuskDensityFunctions.HUMIDITY, noi2D(NoiseParametersKeys.VEGETATION))
+        this.register(DuskDensityFunctions.TEMPERATURE, noi2D(Noises.TEMPERATURE))
+        this.register(DuskDensityFunctions.HUMIDITY, noi2D(Noises.VEGETATION))
         this.register(
             DuskDensityFunctions.UR_TYPE,
             flatCacheNoi2D(DuskNoiseParametersKeys.UR_TYPE)
@@ -67,12 +62,12 @@ object OverworldDensityFunctionCreator {
         this.register(
             DuskDensityFunctions.EROSION_ROUTER,
             //const(OverworldTerrainCreator.Eros.Flats2.f)
-            add(0, this.dense(NoiseRouterData.EROSION_OVERWORLD))
+            add(0, this.dense(NoiseRouterData.EROSION))
         )
 
         // (-||1.5x|-1|)+1, or (RF+1)/2
-        // add(1, multiply(-1, add(-1, multiply(1.5, this.dense(NoiseRouterData.RIDGES_OVERWORLD)).abs()).abs()))
-        val rf = this.dense(NoiseRouterData.RIDGES_FOLDED_OVERWORLD)
+        // add(1, multiply(-1, add(-1, multiply(1.5, this.dense(NoiseRouterData.RIDGES)).abs()).abs()))
+        val rf = this.dense(NoiseRouterData.RIDGES_FOLDED)
         this.register(
             DuskDensityFunctions.RIDGES_ROUTER,
             rangeChoice(
@@ -119,7 +114,7 @@ object OverworldDensityFunctionCreator {
                     0.1,
                     add(
                         1,
-                        this.dense(NoiseRouterData.RIDGES_FOLDED_OVERWORLD)
+                        this.dense(NoiseRouterData.RIDGES_FOLDED)
                     )
                 ),
                 multiply(
@@ -132,14 +127,14 @@ object OverworldDensityFunctionCreator {
             DuskDensityFunctions.GRAND_CANYON_RIDGES_FOLDED,
             cacheOnce(
                 min(
-                    this.dense(NoiseRouterData.RIDGES_FOLDED_OVERWORLD),
+                    this.dense(NoiseRouterData.RIDGES_FOLDED),
                     add(
                         -grandCanyonBias,
                         multiply(
                             grandCanyonShifter,
                             add(
                                 grandCanyonBias,
-                                this.dense(NoiseRouterData.RIDGES_FOLDED_OVERWORLD)
+                                this.dense(NoiseRouterData.RIDGES_FOLDED)
                             )
                         )
                     )
@@ -152,11 +147,11 @@ object OverworldDensityFunctionCreator {
     private fun BootstrapContext<DensityFunction>.unchangingShapers() {
         this.register(
             DuskDensityFunctions.AQU_BARRIER,
-            noise(this.noiseHold(NoiseParametersKeys.AQUIFER_BARRIER), 0.5)
+            noise(this.noiseHold(Noises.AQUIFER_BARRIER), 0.5)
         )
         this.register(
             DuskDensityFunctions.AQU_LAVA,
-            noise(this.noiseHold(NoiseParametersKeys.AQUIFER_LAVA))
+            noise(this.noiseHold(Noises.AQUIFER_LAVA))
         )
     }
 
@@ -166,23 +161,23 @@ object OverworldDensityFunctionCreator {
         caves: Boolean = true
     ) {
         //every single one of these values has to change depending on *amplified* or *largeBiome*
-        val continents: RegistryKey<DensityFunction> = DuskDensityFunctions.CONTINENT_ROUTER
-        val erosion: RegistryKey<DensityFunction> = DuskDensityFunctions.EROSION_ROUTER
-        val depth: RegistryKey<DensityFunction> = DuskDensityFunctions.DEPTH
+        val continents: ResourceKey<DensityFunction> = DuskDensityFunctions.CONTINENT_ROUTER
+        val erosion: ResourceKey<DensityFunction> = DuskDensityFunctions.EROSION_ROUTER
+        val depth: ResourceKey<DensityFunction> = DuskDensityFunctions.DEPTH
 
-        val offset: RegistryKey<DensityFunction> = DuskDensityFunctions.OFFSET
-        val jaggedness: RegistryKey<DensityFunction> = DuskDensityFunctions.JAGGEDNESS
-        val factor: RegistryKey<DensityFunction> = DuskDensityFunctions.FACTOR
-        val cheese: RegistryKey<DensityFunction> = DuskDensityFunctions.SLOPED_CHEESE
+        val offset: ResourceKey<DensityFunction> = DuskDensityFunctions.OFFSET
+        val jaggedness: ResourceKey<DensityFunction> = DuskDensityFunctions.JAGGEDNESS
+        val factor: ResourceKey<DensityFunction> = DuskDensityFunctions.FACTOR
+        val cheese: ResourceKey<DensityFunction> = DuskDensityFunctions.SLOPED_CHEESE
 
-        val idwj: RegistryKey<DensityFunction> = DuskDensityFunctions.OVERWORLD_IDWJ
-        val finalDensity: RegistryKey<DensityFunction> = DuskDensityFunctions.OVERWORLD_FINAL_DENSITY
+        val idwj: ResourceKey<DensityFunction> = DuskDensityFunctions.OVERWORLD_IDWJ
+        val finalDensity: ResourceKey<DensityFunction> = DuskDensityFunctions.OVERWORLD_FINAL_DENSITY
 
-        val aquiferFloodedness: RegistryKey<DensityFunction> = DuskDensityFunctions.AQU_FLOODEDNESS
-        val aquiferFluidSpread: RegistryKey<DensityFunction> = DuskDensityFunctions.AQU_FLUID_SPREAD
+        val aquiferFloodedness: ResourceKey<DensityFunction> = DuskDensityFunctions.AQU_FLOODEDNESS
+        val aquiferFluidSpread: ResourceKey<DensityFunction> = DuskDensityFunctions.AQU_FLUID_SPREAD
 
-        val urCondition: RegistryKey<DensityFunction> = DuskDensityFunctions.UR_CONDITION
-        val urDensity: RegistryKey<DensityFunction> = DuskDensityFunctions.UR_DENSITY
+        val urCondition: ResourceKey<DensityFunction> = DuskDensityFunctions.UR_CONDITION
+        val urDensity: ResourceKey<DensityFunction> = DuskDensityFunctions.UR_DENSITY
 
         //val caveLakeCondition: RegistryKey<DensityFunction> = DuskDensityFunctions.LAKE_CAVE_CONDITION
         //val caveLakeAquifer: RegistryKey<DensityFunction> = DuskDensityFunctions.LAKE_CAVE_AQUIFER
@@ -191,8 +186,8 @@ object OverworldDensityFunctionCreator {
         val data = OverworldTerrainCreator.TerrainParametersData(
             this.wrap(continents),
             this.wrap(erosion),
-            this.wrap(NoiseRouterData.RIDGES_OVERWORLD),
-            this.wrap(NoiseRouterData.RIDGES_FOLDED_OVERWORLD),
+            this.wrap(NoiseRouterData.RIDGES),
+            this.wrap(NoiseRouterData.RIDGES_FOLDED),
             this.wrap(DuskDensityFunctions.PLATEAU_TYPE),
             this.wrap(DuskDensityFunctions.GRAND_CANYON_RIDGES_FOLDED),
             this.wrap(DuskDensityFunctions.FLATS_TYPE),
@@ -204,7 +199,7 @@ object OverworldDensityFunctionCreator {
         this.register(
             aquiferFloodedness,
             this.everyAquiferModifier(
-                noise(this.noiseHold(NoiseParametersKeys.AQUIFER_FLUID_LEVEL_FLOODEDNESS), 0.67),
+                noise(this.noiseHold(Noises.AQUIFER_FLUID_LEVEL_FLOODEDNESS), 0.67),
                 1,
                 urCondition
             )
@@ -212,7 +207,7 @@ object OverworldDensityFunctionCreator {
         this.register(
             aquiferFluidSpread,
             this.everyAquiferModifier(
-                noise(this.noiseHold(NoiseParametersKeys.AQUIFER_FLUID_LEVEL_SPREAD), 0.7142857),
+                noise(this.noiseHold(Noises.AQUIFER_FLUID_LEVEL_SPREAD), 0.7142857),
                 0.5,
                 urCondition
             )
@@ -249,7 +244,7 @@ object OverworldDensityFunctionCreator {
             )
         )
 
-        val jaggednessFunction = noise(this.noiseHold(NoiseParametersKeys.JAGGED), 1500.0, 0.0)
+        val jaggednessFunction = noise(this.noiseHold(Noises.JAGGED), 1500.0, 0.0)
         val jagged = multiply(this.dense(jaggedness), jaggednessFunction.halfNegative())
         //val jaggednessAndExtra = add(jagged, this.dense(DuskDensityFunctions.STONE_TOWERS_TOWER))
         this.register(
@@ -267,7 +262,7 @@ object OverworldDensityFunctionCreator {
                 this.dense(cheese),
                 multiply(
                     5,
-                    this.dense(NoiseRouterData.CAVES_ENTRANCES_OVERWORLD)
+                    this.dense(NoiseRouterData.ENTRANCES)
                 )
             )
             val slopedCaves = rangeChoice(
@@ -287,7 +282,7 @@ object OverworldDensityFunctionCreator {
                             interpolated(blendDensity(surfaceSlide(amplified, slopedCaves)))
                         )
                     ).squeeze(),
-                    this.dense(NoiseRouterData.CAVES_NOODLE_OVERWORLD)
+                    this.dense(NoiseRouterData.NOODLE)
                 )
             )
         } else {
@@ -309,7 +304,7 @@ object OverworldDensityFunctionCreator {
     private fun BootstrapContext<DensityFunction>.everyAquiferModifier(
         aquifer: DensityFunction,
         conditionValue: Number,
-        vararg functions: RegistryKey<DensityFunction>
+        vararg functions: ResourceKey<DensityFunction>
     ): DensityFunction {
         var retorn: DensityFunction = aquifer
         functions.forEachIndexed { idx, it ->
@@ -354,14 +349,14 @@ object OverworldDensityFunctionCreator {
         //)
 
         //val stoneTowersHeight = Spline.builder(this.wrap()) //do 0.3 to 1, its around 100 to 190
-        val stoneTowersSpline = Spline.builder(this.wrap(DuskDensityFunctions.STONE_TOWERS))
+        val stoneTowersSpline = CubicSpline.builder(this.wrap(DuskDensityFunctions.STONE_TOWERS))
             .add(0.3f, 0f)
-            .add(0.45f, 0.2f, 2f)
-            .add(0.5f, 0.5f, 0.5f)
+            .addPoint(0.45f, 0.2f, 2f)
+            .addPoint(0.5f, 0.5f, 0.5f)
         this.register(
             DuskDensityFunctions.STONE_TOWERS_TOWER,
             copySpline(
-                Spline.builder(this.wrap(NoiseRouterData.RIDGES_FOLDED_OVERWORLD))
+                CubicSpline.builder(this.wrap(NoiseRouterData.RIDGES_FOLDED))
                     .add(-0.8f, 0f)
                     .add(-0.6f, stoneTowersSpline.build())
                     .build()
@@ -383,12 +378,12 @@ object OverworldDensityFunctionCreator {
         )
     }
 
-    fun BootstrapContext<DensityFunction>.wrap(df: RegistryKey<DensityFunction>): DensityFunctions.Spline.FunctionWrapper =
-        DensityFunctions.Spline.FunctionWrapper(this.denseHold(df))
+    fun BootstrapContext<DensityFunction>.wrap(df: ResourceKey<DensityFunction>): DensityFunctions.Spline.Coordinate =
+        DensityFunctions.Spline.Coordinate(this.denseHold(df))
 
 
     private fun BootstrapContext<DensityFunction>.noi2D(
-        noise: RegistryKey<DoublePerlinNoiseSampler.NoiseParameters>,
+        noise: ResourceKey<NormalNoise.NoiseParameters>,
         scaleXZ: Double = 0.25
     ): DensityFunction =
         shiftedNoise2d(
@@ -399,12 +394,12 @@ object OverworldDensityFunctionCreator {
         )
 
     fun BootstrapContext<DensityFunction>.flatCacheNoi2D(
-        noise: RegistryKey<DoublePerlinNoiseSampler.NoiseParameters>,
+        noise: ResourceKey<NormalNoise.NoiseParameters>,
         scaleXZ: Double = 0.25
     ): DensityFunction = flatCache(cache2D(this.noi2D(noise, scaleXZ)))
 
 
-    fun BootstrapContext<ChunkGeneratorSettings>.overworld(largeBiome: Boolean, amplified: Boolean): NoiseRouter {
+    fun BootstrapContext<NoiseGeneratorSettings>.overworld(largeBiome: Boolean, amplified: Boolean): NoiseRouter {
         return NoiseRouter(
             this.dense(DuskDensityFunctions.AQU_BARRIER),
             this.dense(DuskDensityFunctions.AQU_FLOODEDNESS),
@@ -465,7 +460,7 @@ object OverworldDensityFunctionCreator {
             slopedCheese,
             multiply(
                 5,
-                this.dense(NoiseRouterData.CAVES_ENTRANCES_OVERWORLD)
+                this.dense(NoiseRouterData.ENTRANCES)
             )
         )
         val slopedCaves = rangeChoice(
@@ -481,7 +476,7 @@ object OverworldDensityFunctionCreator {
                     amplified,
                     slopedCaves
                 )
-            ), this.dense(NoiseRouterData.CAVES_NOODLE_OVERWORLD)
+            ), this.dense(NoiseRouterData.NOODLE)
         )
         return NoiseRouter(
             aquiferBarrier,
@@ -496,10 +491,10 @@ object OverworldDensityFunctionCreator {
             ),
             this.dense(
                 if (largeBiome) NoiseRouterData.EROSION_OVERWORLD_LARGE_BIOME
-                else NoiseRouterData.EROSION_OVERWORLD
+                else NoiseRouterData.EROSION
             ),
             depth,
-            this.dense(NoiseRouterData.RIDGES_OVERWORLD),
+            this.dense(NoiseRouterData.RIDGES),
             surfaceSlide(
                 amplified,
                 add(-0.703125, idwj).clamp(-64.0, 64.0)
@@ -556,7 +551,7 @@ object OverworldDensityFunctionCreator {
             slopedCheese,
             DensityFunctions.multiply(
                 DensityFunctions.constant(5.0),
-                NoiseRouterData.getFunction(densityFunction, NoiseRouterData.CAVES_ENTRANCES_OVERWORLD)
+                NoiseRouterData.getFunction(densityFunction, NoiseRouterData.ENTRANCES)
             )
         )
         val slopedCaves = DensityFunctions.rangeChoice(
@@ -572,7 +567,7 @@ object OverworldDensityFunctionCreator {
                     amplified,
                     slopedCaves
                 )
-            ), NoiseRouterData.getFunction(densityFunction, NoiseRouterData.CAVES_NOODLE_OVERWORLD)
+            ), NoiseRouterData.getFunction(densityFunction, NoiseRouterData.NOODLE)
         )
         val yLevel = NoiseRouterData.getFunction(densityFunction, NoiseRouterData.Y)
         val veinMin = Stream.of(*OreVeinCreator.VeinType.entries.toTypedArray())
@@ -621,10 +616,10 @@ object OverworldDensityFunctionCreator {
             ),
             NoiseRouterData.getFunction(
                 densityFunction,
-                if (largeBiome) NoiseRouterData.EROSION_OVERWORLD_LARGE_BIOME else NoiseRouterData.EROSION_OVERWORLD
+                if (largeBiome) NoiseRouterData.EROSION_OVERWORLD_LARGE_BIOME else NoiseRouterData.EROSION
             ),
             depth,
-            NoiseRouterData.getFunction(densityFunction, NoiseRouterData.RIDGES_OVERWORLD),
+            NoiseRouterData.getFunction(densityFunction, NoiseRouterData.RIDGES),
             NoiseRouterData.surfaceSlide(
                 amplified,
                 DensityFunctions.add(idwj, DensityFunctions.constant(-0.703125)).clamp(-64.0, 64.0)

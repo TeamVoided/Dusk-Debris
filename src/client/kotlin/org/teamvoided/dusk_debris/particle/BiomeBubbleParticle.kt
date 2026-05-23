@@ -3,70 +3,70 @@ package org.teamvoided.dusk_debris.particle
 import com.mojang.blaze3d.vertex.VertexConsumer
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
+import net.minecraft.client.Camera
+import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.client.particle.*
-import net.minecraft.client.render.Camera
-import net.minecraft.client.world.ClientWorld
-import net.minecraft.particle.DefaultParticleType
+import net.minecraft.core.particles.SimpleParticleType
 import org.teamvoided.dusk_debris.util.Utils
 import org.teamvoided.dusk_debris.util.Utils.PI
 
 class BiomeBubbleParticle(
-    world: ClientWorld,
+    world: ClientLevel,
     posX: Double,
     posY: Double,
     posZ: Double,
-) : SpriteBillboardParticle(world, posX, posY, posZ) {
+) : TextureSheetParticle(world, posX, posY, posZ) {
     val spinSpeed: Float
     val maxAlpha: Float
 
     init {
-        this.maxAge = 80 + random.nextInt(420)
-        this.scale = random.nextFloat() * 0.85f + 0.15f
-        this.angle = (random.nextFloat()) * Utils.rotate90 - Utils.rotate45
-        this.prevAngle = angle
+        this.lifetime = 80 + random.nextInt(420)
+        this.quadSize = random.nextFloat() * 0.85f + 0.15f
+        this.roll = (random.nextFloat()) * Utils.rotate90 - Utils.rotate45
+        this.oRoll = roll
         this.spinSpeed = (random.nextFloat() - 0.5f) * 0.01f * PI
-        this.velocityX = (random.nextDouble() - 0.5f) * 0.005
-        this.velocityY = (random.nextDouble() - 0.5f) * 0.02
-        this.velocityZ = (random.nextDouble() - 0.5f) * 0.005
-        this.colorAlpha = 0f
+        this.xd = (random.nextDouble() - 0.5f) * 0.005
+        this.yd = (random.nextDouble() - 0.5f) * 0.02
+        this.zd = (random.nextDouble() - 0.5f) * 0.005
+        this.alpha = 0f
         this.maxAlpha = random.nextFloat() * 0.35f + 0.15f
     }
 
-    override fun getType(): ParticleTextureSheet = ParticleTextureSheet.PARTICLE_SHEET_TRANSLUCENT
+    override fun getRenderType(): ParticleRenderType = ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT
 
-    public override fun getBrightness(tint: Float): Int = super.getBrightness(tint) + 255
+    public override fun getLightColor(tint: Float): Int = super.getLightColor(tint) + 255
 
     override fun tick() {
-        if (age++ >= this.maxAge) {
-            this.markDead()
+        if (age++ >= this.lifetime) {
+            this.remove()
         } else {
-            this.prevAngle = angle
-            this.angle += spinSpeed
-            this.prevPosX = this.x
-            this.prevPosY = this.y
-            this.prevPosZ = this.z
-            this.x += this.velocityX
-            this.y += this.velocityY
-            this.z += this.velocityZ
+            this.oRoll = roll
+            this.roll += spinSpeed
+            this.xo = this.x
+            this.yo = this.y
+            this.zo = this.z
+            this.x += this.xd
+            this.y += this.yd
+            this.z += this.zd
         }
     }
 
-    override fun buildGeometry(vertexConsumer: VertexConsumer, camera: Camera, tickDelta: Float) {
-        if (age + tickDelta < maxAge) {
-            var alpha = (age + tickDelta) / maxAge
+    override fun render(vertexConsumer: VertexConsumer, camera: Camera, tickDelta: Float) {
+        if (age + tickDelta < lifetime) {
+            var alpha = (age + tickDelta) / lifetime
             alpha = 1f - 2f * alpha
             alpha *= alpha
             alpha = 1f - alpha
-            this.colorAlpha = alpha * maxAlpha
+            this.alpha = alpha * maxAlpha
         }
-        super.buildGeometry(vertexConsumer, camera, tickDelta)
+        super.render(vertexConsumer, camera, tickDelta)
     }
 
     @Environment(EnvType.CLIENT)
-    class Factory(private val spriteProvider: SpriteProvider) : ParticleFactory<DefaultParticleType> {
+    class Factory(private val spriteProvider: SpriteSet) : ParticleProvider<SimpleParticleType> {
         override fun createParticle(
-            defaultParticleType: DefaultParticleType,
-            world: ClientWorld,
+            defaultParticleType: SimpleParticleType,
+            world: ClientLevel,
             posX: Double,
             posY: Double,
             posZ: Double,
@@ -75,7 +75,7 @@ class BiomeBubbleParticle(
             velZ: Double,
         ): Particle {
             val particle = BiomeBubbleParticle(world, posX, posY, posZ)
-            particle.setSprite(spriteProvider)
+            particle.pickSprite(spriteProvider)
             particle.scale(0.5f)
             return particle
         }

@@ -2,66 +2,66 @@ package org.teamvoided.dusk_debris.particle
 
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
+import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.client.particle.*
-import net.minecraft.client.world.ClientWorld
-import net.minecraft.particle.DefaultParticleType
+import net.minecraft.core.particles.SimpleParticleType
 import org.teamvoided.dusk_debris.util.Utils
 import org.teamvoided.dusk_debris.util.Utils.PI
 
 class DrainedSoulParticle(
-    world: ClientWorld,
+    world: ClientLevel,
     posX: Double,
     posY: Double,
     posZ: Double,
     velX: Double,
     velY: Double,
     velZ: Double,
-    private val spriteProvider: SpriteProvider
-) : SpriteBillboardParticle(world, posX, posY, posZ, velX, velY, velZ) {
+    private val spriteProvider: SpriteSet
+) : TextureSheetParticle(world, posX, posY, posZ, velX, velY, velZ) {
     val spinSpeed: Float
 
     init {
-        this.setSpriteForAge(spriteProvider)
-        this.maxAge = 12 + random.nextInt(8)
-        this.scale = random.nextFloat() * 0.667f + 0.333f
-        this.angle = (random.nextFloat()) * Utils.rotate360
-        this.prevAngle = angle
+        this.setSpriteFromAge(spriteProvider)
+        this.lifetime = 12 + random.nextInt(8)
+        this.quadSize = random.nextFloat() * 0.667f + 0.333f
+        this.roll = (random.nextFloat()) * Utils.rotate360
+        this.oRoll = roll
         this.spinSpeed = (random.nextFloat() - 0.5f) * 0.2f * PI
-        this.velocityMultiplier = 0.9f
-        this.velocityX = velX
-        this.velocityY = velY
-        this.velocityZ = velZ
+        this.friction = 0.9f
+        this.xd = velX
+        this.yd = velY
+        this.zd = velZ
     }
 
-    override fun getType(): ParticleTextureSheet {
-        return ParticleTextureSheet.PARTICLE_SHEET_LIT
+    override fun getRenderType(): ParticleRenderType {
+        return ParticleRenderType.PARTICLE_SHEET_LIT
     }
 
-    public override fun getBrightness(tint: Float): Int {
+    public override fun getLightColor(tint: Float): Int {
         return 15728880
     }
 
     override fun tick() {
-        if (age++ >= this.maxAge) {
-            this.markDead()
+        if (age++ >= this.lifetime) {
+            this.remove()
         } else {
-            this.prevAngle = angle
-            this.angle += spinSpeed()
-            this.prevPosX = this.x
-            this.prevPosY = this.y
-            this.prevPosZ = this.z
-            velocityX *= velocityMultiplier
-            velocityY *= velocityMultiplier
-            velocityZ *= velocityMultiplier
-            this.x += this.velocityX
-            this.y += this.velocityY
-            this.z += this.velocityZ
-            this.setSpriteForAge(this.spriteProvider)
+            this.oRoll = roll
+            this.roll += spinSpeed()
+            this.xo = this.x
+            this.yo = this.y
+            this.zo = this.z
+            xd *= friction
+            yd *= friction
+            zd *= friction
+            this.x += this.xd
+            this.y += this.yd
+            this.z += this.zd
+            this.setSpriteFromAge(this.spriteProvider)
         }
     }
 
     private fun spinSpeed(): Float {
-        var value = age / maxAge.toFloat()
+        var value = age / lifetime.toFloat()
         value = 1f - 2 * value
         value *= value
         value = 1f - value
@@ -69,10 +69,10 @@ class DrainedSoulParticle(
     }
 
     @Environment(EnvType.CLIENT)
-    class SmallFactory(private val spriteProvider: SpriteProvider) : ParticleFactory<DefaultParticleType> {
+    class SmallFactory(private val spriteProvider: SpriteSet) : ParticleProvider<SimpleParticleType> {
         override fun createParticle(
-            defaultParticleType: DefaultParticleType,
-            world: ClientWorld,
+            defaultParticleType: SimpleParticleType,
+            world: ClientLevel,
             posX: Double,
             posY: Double,
             posZ: Double,
@@ -87,10 +87,10 @@ class DrainedSoulParticle(
     }
 
     @Environment(EnvType.CLIENT)
-    class Factory(private val spriteProvider: SpriteProvider) : ParticleFactory<DefaultParticleType> {
+    class Factory(private val spriteProvider: SpriteSet) : ParticleProvider<SimpleParticleType> {
         override fun createParticle(
-            defaultParticleType: DefaultParticleType,
-            world: ClientWorld,
+            defaultParticleType: SimpleParticleType,
+            world: ClientLevel,
             posX: Double,
             posY: Double,
             posZ: Double,

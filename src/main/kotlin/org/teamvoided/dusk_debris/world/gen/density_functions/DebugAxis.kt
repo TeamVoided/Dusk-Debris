@@ -3,10 +3,10 @@ package org.teamvoided.dusk_debris.world.gen.density_functions
 import com.mojang.serialization.Codec
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
-import net.minecraft.util.dynamic.CodecHolder
-import net.minecraft.util.math.Direction
-import net.minecraft.world.gen.DensityFunction
-import net.minecraft.world.gen.DensityFunction.ContextProvider
+import net.minecraft.core.Direction
+import net.minecraft.util.KeyDispatchDataCodec
+import net.minecraft.world.level.levelgen.DensityFunction
+import net.minecraft.world.level.levelgen.DensityFunction.ContextProvider
 import org.teamvoided.dusk_debris.util.world_helper.makeCodec
 import kotlin.math.abs
 
@@ -37,7 +37,7 @@ class DebugAxis(
 
     override fun maxValue(): Double = 1.0
 
-    override fun codec(): CodecHolder<DebugAxis> = CODEC
+    override fun codec(): KeyDispatchDataCodec<DebugAxis> = CODEC
 
     companion object {
         private val DATA_CODEC: MapCodec<DebugAxis> =
@@ -47,6 +47,6 @@ class DebugAxis(
                     Codec.doubleRange(0.0, 1000000.0).fieldOf("period").forGetter { it.period })
                     .apply(instance, ::DebugAxis)
             }
-        val CODEC: CodecHolder<DebugAxis> = makeCodec(DATA_CODEC)
+        val CODEC: KeyDispatchDataCodec<DebugAxis> = makeCodec(DATA_CODEC)
     }
 }

@@ -1,118 +1,122 @@
 package org.teamvoided.dusk_debris.block
 
 import com.mojang.serialization.MapCodec
-import net.minecraft.block.*
-import net.minecraft.block.entity.BlockEntity
-import net.minecraft.block.entity.BlockEntityTicker
-import net.minecraft.block.entity.BlockEntityType
-import net.minecraft.fluid.FluidState
-import net.minecraft.fluid.Fluids
-import net.minecraft.item.ItemPlacementContext
-import net.minecraft.server.world.ServerWorld
-import net.minecraft.state.StateManager
-import net.minecraft.state.property.IntProperty
-import net.minecraft.state.property.Properties
-import net.minecraft.util.BlockMirror
-import net.minecraft.util.BlockRotation
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Direction
-import net.minecraft.util.random.RandomGenerator
-import net.minecraft.util.shape.VoxelShape
-import net.minecraft.util.shape.VoxelShapes
-import net.minecraft.world.BlockView
-import net.minecraft.world.World
-import net.minecraft.world.WorldAccess
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
+import net.minecraft.server.level.ServerLevel
+import net.minecraft.util.RandomSource
+import net.minecraft.world.item.context.BlockPlaceContext
+import net.minecraft.world.level.BlockGetter
+import net.minecraft.world.level.Level
+import net.minecraft.world.level.LevelAccessor
+import net.minecraft.world.level.block.*
+import net.minecraft.world.level.block.entity.BlockEntity
+import net.minecraft.world.level.block.entity.BlockEntityTicker
+import net.minecraft.world.level.block.entity.BlockEntityType
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.block.state.StateDefinition
+import net.minecraft.world.level.block.state.properties.BlockStateProperties
+import net.minecraft.world.level.block.state.properties.IntegerProperty
+import net.minecraft.world.level.material.FluidState
+import net.minecraft.world.level.material.Fluids
+import net.minecraft.world.phys.shapes.CollisionContext
+import net.minecraft.world.phys.shapes.Shapes
+import net.minecraft.world.phys.shapes.VoxelShape
 import org.teamvoided.dusk_debris.block.entity.BunnyGraveBlockEntity
 import org.teamvoided.dusk_debris.init.DuskBlockEntities
 import org.teamvoided.dusk_debris.util.rotate
 
-class BunnyGraveBlock(settings: Settings) : BlockWithEntity(settings), Waterloggable {
+class BunnyGraveBlock(settings: Properties) : BaseEntityBlock(settings), SimpleWaterloggedBlock {
     init {
-        this.defaultState = stateManager.defaultState
-            .with(DUST, 0)
-            .with(Properties.HORIZONTAL_FACING, Direction.NORTH)
-            .with(Properties.WATERLOGGED, false)
+        this.registerDefaultState(
+            stateDefinition.any()
+                .setValue(DUST, 0)
+                .setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.NORTH)
+                .setValue(BlockStateProperties.WATERLOGGED, false)
+        )
     }
 
-    override fun getCodec(): MapCodec<out BlockWithEntity> = CODEC
+    override fun codec(): MapCodec<out BaseEntityBlock> = CODEC
 
-    override fun createBlockEntity(pos: BlockPos, state: BlockState): BlockEntity {
+    override fun newBlockEntity(pos: BlockPos, state: BlockState): BlockEntity {
         return BunnyGraveBlockEntity(pos, state)
     }
 
-    override fun getRenderType(state: BlockState): BlockRenderType {
-        return BlockRenderType.MODEL
+    override fun getRenderShape(state: BlockState): RenderShape {
+        return RenderShape.MODEL
     }
 
     override fun <T : BlockEntity> getTicker(
-        world: World,
+        world: Level,
         state: BlockState,
         type: BlockEntityType<T>
     ): BlockEntityTicker<T>? {
-        return checkType(
+        return createTickerHelper(
             type,
             DuskBlockEntities.BUNNY_GRAVE,
-            if (!world.isClient)
+            if (!world.isClientSide)
                 BunnyGraveBlockEntity::serverTick
             else null
         )
     }
 
-    override fun randomTick(state: BlockState, world: ServerWorld, pos: BlockPos, random: RandomGenerator) {
-        val dustState = state.get(DUST)
+    override fun randomTick(state: BlockState, world: ServerLevel, pos: BlockPos, random: RandomSource) {
+        val dustState = state.getValue(DUST)
         if (random.nextFloat() < 0.1 && dustState < maxDust) {
-            world.setBlockState(pos, state.with(DUST, dustState + 1))
+            world.setBlockAndUpdate(pos, state.setValue(DUST, dustState + 1))
         }
         super.randomTick(state, world, pos, random)
     }
 
-    override fun getPlacementState(ctx: ItemPlacementContext): BlockState {
-        val waterlogged = ctx.world.getFluidState(ctx.blockPos).fluid === Fluids.WATER
-        return defaultState
-            .with(Properties.HORIZONTAL_FACING, ctx.playerFacing.opposite)
-            .with(Properties.WATERLOGGED, waterlogged)
+    override fun getStateForPlacement(ctx: BlockPlaceContext): BlockState {
+        val waterlogged = ctx.level.getFluidState(ctx.clickedPos).type === Fluids.WATER
+        return defaultBlockState()
+            .setValue(BlockStateProperties.HORIZONTAL_FACING, ctx.horizontalDirection.opposite)
+            .setValue(BlockStateProperties.WATERLOGGED, waterlogged)
     }
 
-    override fun getOutlineShape(
-        state: BlockState, world: BlockView, pos: BlockPos, context: ShapeContext
+    override fun getShape(
+        state: BlockState, world: BlockGetter, pos: BlockPos, context: CollisionContext
     ): VoxelShape {
-        val rotations = state.get(Properties.HORIZONTAL_FACING).horizontal
+        val rotations = state.getValue(BlockStateProperties.HORIZONTAL_FACING).get2DDataValue()
         return SHAPE.rotate(rotations)
     }
 
-    override fun getStateForNeighborUpdate(
+    override fun updateShape(
         state: BlockState, direction: Direction, neighborState: BlockState,
-        world: WorldAccess, pos: BlockPos, neighborPos: BlockPos
+        world: LevelAccessor, pos: BlockPos, neighborPos: BlockPos
     ): BlockState {
-        if (state.get(Properties.WATERLOGGED))
-            world.scheduleFluidTick(pos, Fluids.WATER, Fluids.WATER.getTickRate(world))
+        if (state.getValue(BlockStateProperties.WATERLOGGED))
+            world.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(world))
         return state
     }
 
     override fun getFluidState(state: BlockState): FluidState {
-        return if (state.get(Properties.WATERLOGGED)) Fluids.WATER.getStill(false) else super.getFluidState(state)
+        return if (state.getValue(BlockStateProperties.WATERLOGGED)) Fluids.WATER.getSource(false) else super.getFluidState(state)
     }
 
-    override fun appendProperties(builder: StateManager.Builder<Block, BlockState>) {
-        super.appendProperties(builder)
-        builder.add(DUST, Properties.HORIZONTAL_FACING, Properties.WATERLOGGED)
+    override fun createBlockStateDefinition(builder: StateDefinition.Builder<Block, BlockState>) {
+        super.createBlockStateDefinition(builder)
+        builder.add(DUST, BlockStateProperties.HORIZONTAL_FACING, BlockStateProperties.WATERLOGGED)
     }
 
-    override fun rotate(state: BlockState, rotation: BlockRotation): BlockState {
-        return state.with(Properties.HORIZONTAL_FACING, rotation.rotate(state.get(Properties.HORIZONTAL_FACING)))
+    override fun rotate(state: BlockState, rotation: Rotation): BlockState {
+        return state.setValue(
+            BlockStateProperties.HORIZONTAL_FACING, rotation.rotate(state.getValue(
+                BlockStateProperties.HORIZONTAL_FACING)))
     }
 
-    override fun mirror(state: BlockState, mirror: BlockMirror): BlockState {
-        return state.rotate(mirror.getRotation(state.get(Properties.HORIZONTAL_FACING)))
+    override fun mirror(state: BlockState, mirror: Mirror): BlockState {
+        return state.rotate(mirror.getRotation(state.getValue(BlockStateProperties.HORIZONTAL_FACING)))
     }
 
     companion object {
-        val CODEC: MapCodec<BunnyGraveBlock> = createCodec(::BunnyGraveBlock)
+        val CODEC: MapCodec<BunnyGraveBlock> = simpleCodec(::BunnyGraveBlock)
         const val maxDust = 7
-        val DUST: IntProperty = IntProperty.of("dust", 0, maxDust)
-        val SHAPE: VoxelShape = VoxelShapes.union(
-            createCuboidShape(1.0, 0.0, 1.0, 15.0, 2.0, 15.0),
-            createCuboidShape(5.0, 2.0, 1.0, 11.0, 14.0, 11.0)
+        val DUST: IntegerProperty = IntegerProperty.create("dust", 0, maxDust)
+        val SHAPE: VoxelShape = Shapes.or(
+            box(1.0, 0.0, 1.0, 15.0, 2.0, 15.0),
+            box(5.0, 2.0, 1.0, 11.0, 14.0, 11.0)
         )
     }
 }

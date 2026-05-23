@@ -2,15 +2,15 @@ package org.teamvoided.dusk_debris.particle
 
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
+import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.client.particle.*
-import net.minecraft.client.world.ClientWorld
 import org.joml.Vector3f
 import org.teamvoided.dusk_debris.particle.color.BonecallerParticleEffect
 import java.awt.Color
 
 @Environment(EnvType.CLIENT)
 open class BonecallerParticle(
-    world: ClientWorld,
+    world: ClientLevel,
     x: Double,
     y: Double,
     z: Double,
@@ -20,15 +20,15 @@ open class BonecallerParticle(
     val color1: Color,
     val color2: Color
 ) :
-    SpriteBillboardParticle(world, x, y, z) {
+    TextureSheetParticle(world, x, y, z) {
     init {
-        this.velocityX += ((random.nextFloat() - random.nextFloat()) * 0.2)
-        this.velocityY += (random.nextFloat().toDouble() * 0.75)
-        this.velocityZ += ((random.nextFloat() - random.nextFloat()) * 0.2)
-        this.gravityStrength = 0f
+        this.xd += ((random.nextFloat() - random.nextFloat()) * 0.2)
+        this.yd += (random.nextFloat().toDouble() * 0.75)
+        this.zd += ((random.nextFloat() - random.nextFloat()) * 0.2)
+        this.gravity = 0f
         chooseColor()
-        this.scale = random.nextFloat() * 0.3f + 0.3f
-        this.maxAge = (random.nextFloat() * 80).toInt() + 60
+        this.quadSize = random.nextFloat() * 0.3f + 0.3f
+        this.lifetime = (random.nextFloat() * 80).toInt() + 60
     }
 
     private fun chooseColor() {
@@ -36,34 +36,34 @@ open class BonecallerParticle(
         val colorOption1 = Vector3f(color1.red / 255f, color1.green / 255f, color1.blue / 255f)
         val colorOption2 = Vector3f(color2.red / 255f, color2.green / 255f, color2.blue / 255f)
         val colorChoice: Vector3f = colorOption1.lerp(colorOption2, f)
-        this.colorRed = colorChoice.x()
-        this.colorGreen = colorChoice.y()
-        this.colorBlue = colorChoice.z()
+        this.rCol = colorChoice.x()
+        this.gCol = colorChoice.y()
+        this.bCol = colorChoice.z()
     }
 
-    override fun getType(): ParticleTextureSheet {
-        return ParticleTextureSheet.PARTICLE_SHEET_LIT
+    override fun getRenderType(): ParticleRenderType {
+        return ParticleRenderType.PARTICLE_SHEET_LIT
     }
 
     override fun tick() {
-        this.prevPosX = this.x
-        this.prevPosY = this.y
-        this.prevPosZ = this.z
-        if (age++ >= this.maxAge) {
-            this.markDead()
+        this.xo = this.x
+        this.yo = this.y
+        this.zo = this.z
+        if (age++ >= this.lifetime) {
+            this.remove()
         } else {
-            velocityX *= 0.8
-            velocityY *= if (this.velocityY > 0.01) 0.8 else 0.95
-            velocityZ *= 0.8
-            this.move(this.velocityX, this.velocityY, this.velocityZ)
+            xd *= 0.8
+            yd *= if (this.yd > 0.01) 0.8 else 0.95
+            zd *= 0.8
+            this.move(this.xd, this.yd, this.zd)
         }
     }
 
     @Environment(EnvType.CLIENT)
-    class Factory(private val spriteProvider: SpriteProvider) : ParticleFactory<BonecallerParticleEffect> {
+    class Factory(private val spriteProvider: SpriteSet) : ParticleProvider<BonecallerParticleEffect> {
         override fun createParticle(
             type: BonecallerParticleEffect,
-            world: ClientWorld,
+            world: ClientLevel,
             posX: Double,
             posY: Double,
             posZ: Double,
@@ -72,7 +72,7 @@ open class BonecallerParticle(
             velZ: Double,
         ): Particle {
             val particle = BonecallerParticle(world, posX, posY, posZ, velX, velY, velZ, type.color1, type.color2)
-            particle.setSprite(spriteProvider)
+            particle.pickSprite(spriteProvider)
             return particle
         }
     }

@@ -1,8 +1,8 @@
 package org.teamvoided.dusk_debris.data.tags
 
-import net.minecraft.fluid.Fluid
-import net.minecraft.registry.RegistryKeys
-import net.minecraft.registry.tag.TagKey
+import net.minecraft.core.registries.Registries
+import net.minecraft.tags.TagKey
+import net.minecraft.world.level.material.Fluid
 import org.teamvoided.dusk_debris.DuskDebris
 
 object DuskFluidTags {
@@ -65,7 +65,7 @@ object DuskFluidTags {
     val LAVA_SPAWN_TYPE = create("spawn_type/lava")
 
     fun create(id: String): TagKey<Fluid> {
-        val regTag = TagKey.of(RegistryKeys.FLUID, DuskDebris.id(id))
+        val regTag = TagKey.create(Registries.FLUID, DuskDebris.id(id))
         FLUID_TAGS.add(regTag)
         return regTag
     }

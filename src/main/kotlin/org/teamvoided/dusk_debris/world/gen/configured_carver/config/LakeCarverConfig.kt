@@ -2,39 +2,39 @@ package org.teamvoided.dusk_debris.world.gen.configured_carver.config
 
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
-import net.minecraft.block.Block
-import net.minecraft.block.BlockState
-import net.minecraft.block.Blocks
-import net.minecraft.registry.HolderProvider
-import net.minecraft.registry.HolderSet
-import net.minecraft.registry.tag.BlockTags
-import net.minecraft.util.math.float_provider.FloatProvider
-import net.minecraft.util.math.float_provider.UniformFloatProvider
-import net.minecraft.util.math.int_provider.IntProvider
-import net.minecraft.util.math.int_provider.UniformIntProvider
-import net.minecraft.world.gen.YOffset
-import net.minecraft.world.gen.carver.CarverConfig
-import net.minecraft.world.gen.carver.CarverDebugConfig
-import net.minecraft.world.gen.heightprovider.HeightProvider
-import net.minecraft.world.gen.heightprovider.UniformHeightProvider
+import net.minecraft.core.HolderGetter
+import net.minecraft.core.HolderSet
+import net.minecraft.tags.BlockTags
+import net.minecraft.util.valueproviders.FloatProvider
+import net.minecraft.util.valueproviders.IntProvider
+import net.minecraft.util.valueproviders.UniformFloat
+import net.minecraft.util.valueproviders.UniformInt
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.levelgen.VerticalAnchor
+import net.minecraft.world.level.levelgen.carver.CarverConfiguration
+import net.minecraft.world.level.levelgen.carver.CarverDebugSettings
+import net.minecraft.world.level.levelgen.heightproviders.HeightProvider
+import net.minecraft.world.level.levelgen.heightproviders.UniformHeight
 import org.teamvoided.dusk_debris.world.gen.configured_carver.config.debug.LakeCarverDebugConfig
 
 class LakeCarverConfig(
     probability: Float,
     y: HeightProvider,
     yScale: FloatProvider,
-    lavaLevel: YOffset,
-    debugConfig: CarverDebugConfig, //LakeCarverDebugConfig, this doesent work
+    lavaLevel: VerticalAnchor,
+    debugConfig: CarverDebugSettings, //LakeCarverDebugConfig, this doesent work
     replaceableBlocks: HolderSet<Block>,
     val horizontalRadius: IntProvider,
     val fluidState: BlockState,
     val waterLevel: FloatProvider //section of carver filled with water, bottom is -1, top is 1
-) : CarverConfig(probability, y, yScale, lavaLevel, debugConfig, replaceableBlocks) {
+) : CarverConfiguration(probability, y, yScale, lavaLevel, debugConfig, replaceableBlocks) {
     constructor(
         probability: Float,
         y: HeightProvider,
         yScale: FloatProvider,
-        lavaLevel: YOffset,
+        lavaLevel: VerticalAnchor,
         replaceableBlocks: HolderSet<Block>,
         horizontalRadiusMultiplier: IntProvider,
         fluidState: BlockState,
@@ -52,7 +52,7 @@ class LakeCarverConfig(
     )
 
     constructor(
-        config: CarverConfig,
+        config: CarverConfiguration,
         horizontalRadiusMultiplier: IntProvider,
         fluidState: BlockState,
         waterLevel: FloatProvider
@@ -61,7 +61,7 @@ class LakeCarverConfig(
         config.y,
         config.yScale,
         config.lavaLevel,
-        config.debugConfig,
+        config.debugSettings,
         config.replaceable,
         horizontalRadiusMultiplier,
         fluidState,
@@ -70,33 +70,33 @@ class LakeCarverConfig(
 
     companion object {
         fun defaultWithFluid(
-            block: HolderProvider<Block>,
-            heightProvider: HeightProvider = UniformHeightProvider.create(YOffset.aboveBottom(8), YOffset.fixed(180)),
-            fluidState: BlockState = Blocks.WATER.defaultState
+            block: HolderGetter<Block>,
+            heightProvider: HeightProvider = UniformHeight.of(VerticalAnchor.aboveBottom(8), VerticalAnchor.absolute(180)),
+            fluidState: BlockState = Blocks.WATER.defaultBlockState()
         ): LakeCarverConfig {
             return LakeCarverConfig(
                 0.15f, //0.015f,
                 heightProvider,
-                UniformFloatProvider.create(0.4f, 1f),
-                YOffset.aboveBottom(8),
+                UniformFloat.of(0.4f, 1f),
+                VerticalAnchor.aboveBottom(8),
                 LakeCarverDebugConfig.default(),
-                block.getTagOrThrow(BlockTags.OVERWORLD_CARVER_REPLACEABLES),
+                block.getOrThrow(BlockTags.OVERWORLD_CARVER_REPLACEABLES),
 
-                UniformIntProvider.create(10, 30),
+                UniformInt.of(10, 30),
                 fluidState,
-                UniformFloatProvider.create(-0.8f, 0.2f)
+                UniformFloat.of(-0.8f, 0.2f)
             )
         }
 
         val CODEC: Codec<LakeCarverConfig> =
             RecordCodecBuilder.create { instance: RecordCodecBuilder.Instance<LakeCarverConfig> ->
                 instance.group(
-                    CarverConfig.CODEC.forGetter { it },
-                    IntProvider.VALUE_CODEC.fieldOf("horizontal_radius")
+                    CarverConfiguration.CODEC.forGetter { it },
+                    IntProvider.CODEC.fieldOf("horizontal_radius")
                         .forGetter { it.horizontalRadius },
-                    BlockState.CODEC.optionalFieldOf("fluid_state", Blocks.WATER.defaultState)
+                    BlockState.CODEC.optionalFieldOf("fluid_state", Blocks.WATER.defaultBlockState())
                         .forGetter { it.fluidState },
-                    FloatProvider.createValidatedCodec(-1.0f, 1.0f).fieldOf("water_level")
+                    FloatProvider.codec(-1.0f, 1.0f).fieldOf("water_level")
                         .forGetter { it.waterLevel }
                 ).apply(instance, ::LakeCarverConfig)
             }

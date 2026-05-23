@@ -1,7 +1,8 @@
 package org.teamvoided.dusk_debris.data.gen.world.gen.dimension
 
-import org.teamvoided.dusk_debris.util.world_helper.*
-import java.util.function.Function
+import org.teamvoided.dusk_debris.util.world_helper.mult
+import org.teamvoided.dusk_debris.util.world_helper.range
+import org.teamvoided.dusk_debris.util.world_helper.zeroRange
 
 object OverworldDimensionCreator {
 

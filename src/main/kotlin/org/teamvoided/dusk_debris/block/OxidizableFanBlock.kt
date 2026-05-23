@@ -1,24 +1,24 @@
 package org.teamvoided.dusk_debris.block
 
-import net.minecraft.block.BlockState
-import net.minecraft.block.Oxidizable
-import net.minecraft.block.Oxidizable.OxidizationLevel
-import net.minecraft.server.world.ServerWorld
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.random.RandomGenerator
+import net.minecraft.core.BlockPos
+import net.minecraft.server.level.ServerLevel
+import net.minecraft.util.RandomSource
+import net.minecraft.world.level.block.WeatheringCopper
+import net.minecraft.world.level.block.WeatheringCopper.WeatherState
+import net.minecraft.world.level.block.state.BlockState
 
-class OxidizableFanBlock(private val oxidizationLevel: OxidizationLevel, strength: Int, settings: Settings) :
-    FanBlock(strength, settings), Oxidizable {
+class OxidizableFanBlock(private val oxidizationLevel: WeatherState, strength: Int, settings: Properties) :
+    FanBlock(strength, settings), WeatheringCopper {
 
-    override fun randomTick(state: BlockState?, world: ServerWorld?, pos: BlockPos?, random: RandomGenerator?) {
-        this.tickDegradation(state, world, pos, random)
+    override fun randomTick(state: BlockState?, world: ServerLevel?, pos: BlockPos?, random: RandomSource?) {
+        this.changeOverTime(state, world, pos, random)
     }
 
-    override fun getRandomTicks(state: BlockState): Boolean {
-        return Oxidizable.getIncreasedOxidationBlock(state.block).isPresent
+    override fun isRandomlyTicking(state: BlockState): Boolean {
+        return WeatheringCopper.getNext(state.block).isPresent
     }
 
-    override fun getDegradationLevel(): OxidizationLevel {
+    override fun getAge(): WeatherState {
         return this.oxidizationLevel
     }
 }

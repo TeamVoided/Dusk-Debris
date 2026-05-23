@@ -1,71 +1,72 @@
 package org.teamvoided.dusk_debris.block.sot
 
 import com.mojang.serialization.MapCodec
-import net.minecraft.block.Block
-import net.minecraft.block.BlockState
-import net.minecraft.block.ShapeContext
-import net.minecraft.item.ItemPlacementContext
-import net.minecraft.server.world.ServerWorld
-import net.minecraft.state.StateManager
-import net.minecraft.state.property.IntProperty
-import net.minecraft.state.property.Properties
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Direction
-import net.minecraft.util.random.RandomGenerator
-import net.minecraft.util.shape.VoxelShape
-import net.minecraft.util.shape.VoxelShapes
-import net.minecraft.world.BlockView
-import net.minecraft.world.WorldAccess
-import net.minecraft.world.WorldView
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
+import net.minecraft.server.level.ServerLevel
+import net.minecraft.util.RandomSource
+import net.minecraft.world.item.context.BlockPlaceContext
+import net.minecraft.world.level.BlockGetter
+import net.minecraft.world.level.LevelAccessor
+import net.minecraft.world.level.LevelReader
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.block.state.StateDefinition
+import net.minecraft.world.level.block.state.properties.BlockStateProperties
+import net.minecraft.world.level.block.state.properties.IntegerProperty
+import net.minecraft.world.phys.shapes.CollisionContext
+import net.minecraft.world.phys.shapes.Shapes
+import net.minecraft.world.phys.shapes.VoxelShape
 import org.teamvoided.dusk_debris.util.rotate
 
-class CoinStackBlock(settings: Settings) : MysteriousVesselBlock(settings) {
+class CoinStackBlock(settings: Properties) : MysteriousVesselBlock(settings) {
     init {
-        this.defaultState =
-            (stateManager.defaultState)
-                .with(FACING, Direction.NORTH)
-                .with(LAYERS, 1)
-                .with(WATERLOGGED, false)
+        this.registerDefaultState(
+            (stateDefinition.any())
+                .setValue(FACING, Direction.NORTH)
+                .setValue(LAYERS, 1)
+                .setValue(WATERLOGGED, false)
+        )
     }
 
-    override fun appendProperties(builder: StateManager.Builder<Block, BlockState>) {
-        super.appendProperties(builder)
+    override fun createBlockStateDefinition(builder: StateDefinition.Builder<Block, BlockState>) {
+        super.createBlockStateDefinition(builder)
         builder.add(LAYERS)
     }
 
-    override fun canPlaceAt(state: BlockState, world: WorldView, pos: BlockPos): Boolean {
-        val blockStateDown = world.getBlockState(pos.down())
-        if (blockStateDown.isOf(this) && blockStateDown.get(LAYERS) == 8) {
+    override fun canSurvive(state: BlockState, world: LevelReader, pos: BlockPos): Boolean {
+        val blockStateDown = world.getBlockState(pos.below())
+        if (blockStateDown.`is`(this) && blockStateDown.getValue(LAYERS) == 8) {
             return true
         }
-        return super.canPlaceAt(state, world, pos)
+        return super.canSurvive(state, world, pos)
     }
 
-    override fun getPlacementState(ctx: ItemPlacementContext): BlockState {
-        val blockState = ctx.world.getBlockState(ctx.blockPos)
-        val blockStateDown = ctx.world.getBlockState(ctx.blockPos.down())
-        if (blockState.isOf(this)) {
+    override fun getStateForPlacement(ctx: BlockPlaceContext): BlockState {
+        val blockState = ctx.level.getBlockState(ctx.clickedPos)
+        val blockStateDown = ctx.level.getBlockState(ctx.clickedPos.below())
+        if (blockState.`is`(this)) {
             return blockState.cycle(LAYERS)
-        } else if (blockStateDown.isOf(this)) {
-            return super.getPlacementState(ctx).with(FACING, blockStateDown.get(FACING))
+        } else if (blockStateDown.`is`(this)) {
+            return super.getStateForPlacement(ctx).setValue(FACING, blockStateDown.getValue(FACING))
         }
-        return super.getPlacementState(ctx)
+        return super.getStateForPlacement(ctx)
     }
 
-    override fun getOutlineShape(
+    override fun getShape(
         state: BlockState,
-        world: BlockView,
+        world: BlockGetter,
         pos: BlockPos,
-        context: ShapeContext
+        context: CollisionContext
     ): VoxelShape {
-        val rotations = when (state.get(FACING)) {
+        val rotations = when (state.getValue(FACING)) {
             Direction.NORTH -> 0
             Direction.SOUTH -> 2
             Direction.WEST -> 3
             Direction.EAST -> 1
             else -> 0
         }
-        return (when (state.get(LAYERS)) {
+        return (when (state.getValue(LAYERS)) {
             1 -> COINS_1
             2 -> COINS_2
             3 -> COINS_3
@@ -78,35 +79,35 @@ class CoinStackBlock(settings: Settings) : MysteriousVesselBlock(settings) {
         }).rotate(rotations)
     }
 
-    override fun canReplace(state: BlockState, context: ItemPlacementContext): Boolean {
-        if (!context.shouldCancelInteraction() && context.stack.item === asItem() && state.get(LAYERS) < 8) {
+    override fun canBeReplaced(state: BlockState, context: BlockPlaceContext): Boolean {
+        if (!context.isSecondaryUseActive && context.itemInHand.item === asItem() && state.getValue(LAYERS) < 8) {
             return true
         }
-        return super.canReplace(state, context)
+        return super.canBeReplaced(state, context)
     }
 
-    override fun getStateForNeighborUpdate(
+    override fun updateShape(
         state: BlockState,
         direction: Direction,
         neighborState: BlockState,
-        world: WorldAccess,
+        world: LevelAccessor,
         pos: BlockPos,
         neighborPos: BlockPos
     ): BlockState {
-        if (!state.canPlaceAt(world, pos)) {
-            world.scheduleBlockTick(pos, this, 1)
+        if (!state.canSurvive(world, pos)) {
+            world.scheduleTick(pos, this, 1)
         }
-        return super.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos)
+        return super.updateShape(state, direction, neighborState, world, pos, neighborPos)
     }
 
-    override fun scheduledTick(state: BlockState, world: ServerWorld, pos: BlockPos?, random: RandomGenerator?) {
-        if (!state.canPlaceAt(world, pos)) {
-            world.breakBlock(pos, true)
+    override fun tick(state: BlockState, world: ServerLevel, pos: BlockPos?, random: RandomSource?) {
+        if (!state.canSurvive(world, pos)) {
+            world.destroyBlock(pos, true)
         }
     }
 
     companion object {
-        val CODEC: MapCodec<CoinStackBlock> = createCodec { settings: Settings ->
+        val CODEC: MapCodec<CoinStackBlock> = simpleCodec { settings: Properties ->
             CoinStackBlock(
                 settings
             )
@@ -130,17 +131,17 @@ class CoinStackBlock(settings: Settings) : MysteriousVesselBlock(settings) {
             coinTopCenter: Double,
             coinTopLeft: Double
         ): VoxelShape {
-            return VoxelShapes.union(
-                createCuboidShape(2.0, 0.0, 1.0, 6.0, coinBottomRight, 5.0),
-                createCuboidShape(8.0, 0.0, 2.0, 11.0, coinBottomCenter, 5.0),
-                createCuboidShape(6.0, 0.0, 5.0, 9.0, coinTrueCenter, 8.0),
-                createCuboidShape(9.0, 0.0, 5.0, 13.0, coinCenterRight, 9.0),
-                createCuboidShape(3.0, 0.0, 8.0, 7.0, coinTopRight, 12.0),
-                createCuboidShape(6.0, 0.0, 12.0, 9.0, coinTopCenter, 15.0),
-                createCuboidShape(11.0, 0.0, 10.0, 14.0, coinTopLeft, 13.0)
+            return Shapes.or(
+                box(2.0, 0.0, 1.0, 6.0, coinBottomRight, 5.0),
+                box(8.0, 0.0, 2.0, 11.0, coinBottomCenter, 5.0),
+                box(6.0, 0.0, 5.0, 9.0, coinTrueCenter, 8.0),
+                box(9.0, 0.0, 5.0, 13.0, coinCenterRight, 9.0),
+                box(3.0, 0.0, 8.0, 7.0, coinTopRight, 12.0),
+                box(6.0, 0.0, 12.0, 9.0, coinTopCenter, 15.0),
+                box(11.0, 0.0, 10.0, 14.0, coinTopLeft, 13.0)
             )
         }
 
-        val LAYERS: IntProperty = Properties.LAYERS
+        val LAYERS: IntegerProperty = BlockStateProperties.LAYERS
     }
 }

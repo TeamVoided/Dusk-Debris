@@ -3,17 +3,17 @@ package org.teamvoided.dusk_debris.particle.color
 import com.mojang.serialization.Codec
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
-import net.minecraft.network.RegistryByteBuf
-import net.minecraft.network.codec.PacketCodec
-import net.minecraft.network.codec.PacketCodecs
-import net.minecraft.particle.ParticleEffect
-import net.minecraft.particle.ParticleType
+import net.minecraft.core.particles.ParticleOptions
+import net.minecraft.core.particles.ParticleType
+import net.minecraft.network.RegistryFriendlyByteBuf
+import net.minecraft.network.codec.ByteBufCodecs
+import net.minecraft.network.codec.StreamCodec
 import org.teamvoided.dusk_debris.init.DuskParticles
 import java.awt.Color
 
 class GodhomeParticleEffect(
     val color: Color = Color(0xFFFFFF)
-) : ParticleEffect {
+) : ParticleOptions {
     constructor(
         color: Int
     ) : this(Color(color))
@@ -28,9 +28,9 @@ class GodhomeParticleEffect(
                     Codec.INT.fieldOf("color").forGetter { it.color.rgb }
                 ).apply(instance, ::GodhomeParticleEffect)
             }
-        val PACKET_CODEC: PacketCodec<RegistryByteBuf, GodhomeParticleEffect> =
-            PacketCodec.tuple(
-                PacketCodecs.INT, { it.color.rgb },
+        val PACKET_CODEC: StreamCodec<RegistryFriendlyByteBuf, GodhomeParticleEffect> =
+            StreamCodec.composite(
+                ByteBufCodecs.INT, { it.color.rgb },
                 ::GodhomeParticleEffect
             )
     }

@@ -2,16 +2,16 @@ package org.teamvoided.dusk_debris.particle.emmiter
 
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
+import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.client.particle.NoRenderParticle
 import net.minecraft.client.particle.Particle
-import net.minecraft.client.particle.ParticleFactory
-import net.minecraft.client.world.ClientWorld
-import net.minecraft.particle.DefaultParticleType
-import net.minecraft.particle.ParticleTypes
+import net.minecraft.client.particle.ParticleProvider
+import net.minecraft.core.particles.ParticleTypes
+import net.minecraft.core.particles.SimpleParticleType
 
 @Environment(EnvType.CLIENT)
 class FirebombParticle(
-    world: ClientWorld,
+    world: ClientLevel,
     x: Double,
     y: Double,
     z: Double
@@ -19,15 +19,15 @@ class FirebombParticle(
     NoRenderParticle(world, x, y, z, 0.0, 0.0, 0.0) {
 
     init {
-        this.velocityX = 2 * (random.nextDouble() - random.nextDouble())
-        this.velocityY = 2 * (random.nextDouble() - random.nextDouble())
-        this.velocityZ = 2 * (random.nextDouble() - random.nextDouble())
-        this.maxAge = 10
+        this.xd = 2 * (random.nextDouble() - random.nextDouble())
+        this.yd = 2 * (random.nextDouble() - random.nextDouble())
+        this.zd = 2 * (random.nextDouble() - random.nextDouble())
+        this.lifetime = 10
     }
 
     override fun tick() {
-        this.velocityMultiplier *= 0.9f
-        world.addParticle(
+        this.friction *= 0.9f
+        level.addParticle(
             ParticleTypes.FLAME,
             x,
             y,
@@ -40,10 +40,10 @@ class FirebombParticle(
     }
 
     @Environment(EnvType.CLIENT)
-    class Factory : ParticleFactory<DefaultParticleType> {
+    class Factory : ParticleProvider<SimpleParticleType> {
         override fun createParticle(
-            defaultParticleType: DefaultParticleType,
-            world: ClientWorld,
+            defaultParticleType: SimpleParticleType,
+            world: ClientLevel,
             d: Double,
             e: Double,
             f: Double,

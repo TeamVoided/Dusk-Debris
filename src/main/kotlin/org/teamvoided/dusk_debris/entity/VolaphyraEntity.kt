@@ -1,35 +1,35 @@
 package org.teamvoided.dusk_debris.entity
 
-import net.minecraft.entity.*
-import net.minecraft.entity.ai.goal.RevengeGoal
-import net.minecraft.entity.ai.goal.UniversalAngerGoal
-import net.minecraft.entity.attribute.DefaultAttributeContainer
-import net.minecraft.entity.attribute.EntityAttributes
-import net.minecraft.entity.damage.DamageSource
-import net.minecraft.entity.data.DataTracker
-import net.minecraft.entity.data.TrackedData
-import net.minecraft.entity.data.TrackedDataHandlerRegistry
-import net.minecraft.entity.projectile.ProjectileEntity
-import net.minecraft.nbt.NbtCompound
-import net.minecraft.server.world.ServerWorld
-import net.minecraft.sound.SoundEvent
-import net.minecraft.util.TimeHelper
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Vec3d
-import net.minecraft.util.math.int_provider.UniformIntProvider
-import net.minecraft.world.LocalDifficulty
-import net.minecraft.world.ServerWorldAccess
-import net.minecraft.world.World
+import net.minecraft.core.BlockPos
+import net.minecraft.nbt.CompoundTag
+import net.minecraft.network.syncher.EntityDataAccessor
+import net.minecraft.network.syncher.EntityDataSerializers
+import net.minecraft.network.syncher.SynchedEntityData
+import net.minecraft.server.level.ServerLevel
+import net.minecraft.sounds.SoundEvent
+import net.minecraft.util.TimeUtil
+import net.minecraft.util.valueproviders.UniformInt
+import net.minecraft.world.DifficultyInstance
+import net.minecraft.world.damagesource.DamageSource
+import net.minecraft.world.entity.*
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier
+import net.minecraft.world.entity.ai.attributes.Attributes
+import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal
+import net.minecraft.world.entity.ai.goal.target.ResetUniversalAngerTargetGoal
+import net.minecraft.world.entity.projectile.Projectile
+import net.minecraft.world.level.Level
+import net.minecraft.world.level.ServerLevelAccessor
+import net.minecraft.world.phys.Vec3
 import org.teamvoided.dusk_debris.init.DuskEntities
 
-class VolaphyraEntity(entityType: EntityType<VolaphyraEntity>, world: World) :
+class VolaphyraEntity(entityType: EntityType<VolaphyraEntity>, world: Level) :
     AbstractVolaphyraEntity(entityType, world) {
 
     init {
-        this.experiencePoints = 3
+        this.xpReward = 3
     }
 
-    override fun initGoals() {
+    override fun registerGoals() {
 //        goalSelector.add(
 //            8, LookAtEntityGoal(
 //                this,
@@ -37,24 +37,24 @@ class VolaphyraEntity(entityType: EntityType<VolaphyraEntity>, world: World) :
 //            )
 //        )
 //        goalSelector.add(8, LookAroundGoal(this))
-        targetSelector.add(1, RevengeGoal(this))
-        targetSelector.add(2, UniversalAngerGoal(this, false))
+        targetSelector.addGoal(1, HurtByTargetGoal(this))
+        targetSelector.addGoal(2, ResetUniversalAngerTargetGoal(this, false))
     }
 
-    override fun initialize(
-        world: ServerWorldAccess,
-        difficulty: LocalDifficulty,
-        spawnReason: SpawnReason,
-        entityData: EntityData?
-    ): EntityData? {
+    override fun finalizeSpawn(
+        world: ServerLevelAccessor,
+        difficulty: DifficultyInstance,
+        spawnReason: MobSpawnType,
+        entityData: SpawnGroupData?
+    ): SpawnGroupData? {
         isLaunched = false
-        hoverPos = this.blockPos
-        return super.initialize(world, difficulty, spawnReason, entityData)
+        hoverPos = this.blockPosition()
+        return super.finalizeSpawn(world, difficulty, spawnReason, entityData)
     }
 
-    override fun move(movementType: MovementType, movement: Vec3d) {
+    override fun move(movementType: MoverType, movement: Vec3) {
 //        if (!this.isLaunched) {
-//            val gravity = this.getAttributeInstance(EntityAttributes.GENERIC_GRAVITY)?.value
+//            val gravity = this.getAttributeInstance(EntityAttributes.GRAVITY)?.value
 //            moveEntities(velocity.add(0.0, gravity!!, 0.0))
 //        }
         super.move(movementType, movement)
@@ -63,8 +63,8 @@ class VolaphyraEntity(entityType: EntityType<VolaphyraEntity>, world: World) :
         }
     }
 
-    override fun tickMovement() {
-        super.tickMovement()
+    override fun aiStep() {
+        super.aiStep()
 //        if (!world.isClient && this.isAlive && this.isLaunched && this.angerTime <= 0) {
 //            println(angerTime)
 //            isLaunched = false
@@ -72,71 +72,71 @@ class VolaphyraEntity(entityType: EntityType<VolaphyraEntity>, world: World) :
         println(propulsionTicks)
     }
 
-    override fun travel(movementInput: Vec3d?) {
+    override fun travel(movementInput: Vec3?) {
         if (this.isAlive)
             if (!this.isLaunched) {
-                if (this.canAiMove()) {
-                    this.velocity = velocity.multiply(0.9)
-                    if (this.hoverPos != BlockPos.ORIGIN) {
+                if (this.isEffectiveAi) {
+                    this.setDeltaMovement(deltaMovement.scale(0.9))
+                    if (this.hoverPos != BlockPos.ZERO) {
                         if (this.propulsionTicks == 10) {
                             propulse()
-                        } else if (world is ServerWorld && ((this.propulsionTicks >= 40 && checkCollisionForPathing()) || this.propulsionTicks >= 60)) {
-                            world.sendEntityStatus(this, 19.toByte())
+                        } else if (level() is ServerLevel && ((this.propulsionTicks >= 40 && checkCollisionForPathing()) || this.propulsionTicks >= 60)) {
+                            level().broadcastEntityEvent(this, 19.toByte())
                         }
                     }
-                    this.updateVelocity(0.01f, movementInput)
-                    this.move(MovementType.SELF, this.velocity)
+                    this.moveRelative(0.01f, movementInput)
+                    this.move(MoverType.SELF, this.deltaMovement)
                     gravity()
                 } else {
-                    this.velocity = Vec3d.ZERO
+                    this.setDeltaMovement(Vec3.ZERO)
                 }
             } else {
-                this.updateVelocity(0.01f, movementInput)
-                this.move(MovementType.SELF, this.velocity)
+                this.moveRelative(0.01f, movementInput)
+                this.move(MoverType.SELF, this.deltaMovement)
             }
     }
 
     fun propulse() {
-        val direction = this.hoverPos.ofCenter().subtract(this.pos)
+        val direction = this.hoverPos.center.subtract(this.position())
         var moveDirection = direction.normalize()
-        moveDirection = moveDirection.multiply(0.25)
+        moveDirection = moveDirection.scale(0.25)
         if (moveDirection.y < 0)
             moveDirection = moveDirection.multiply(1.0, 0.0, 1.0)
-        if (direction.horizontalLength() < 1)
+        if (direction.horizontalDistance() < 1)
             moveDirection.multiply(0.5, 1.0, 0.5)
-        this.velocity = this.velocity.add(moveDirection)
+        this.setDeltaMovement(this.deltaMovement.add(moveDirection))
     }
 
     fun gravity() {
-        val gravity = this.getAttributeInstance(EntityAttributes.GENERIC_GRAVITY)?.value
-        this.velocity = velocity.add(0.0, -gravity!!, 0.0)
+        val gravity = this.getAttribute(Attributes.GRAVITY)?.value
+        this.setDeltaMovement(deltaMovement.add(0.0, -gravity!!, 0.0))
     }
 
-    override fun shouldRender(distance: Double): Boolean {
-        var averageSideLength = this.bounds.averageSideLength
+    override fun shouldRenderAtSqrDistance(distance: Double): Boolean {
+        var averageSideLength = this.boundingBox.size
         if (java.lang.Double.isNaN(averageSideLength)) {
             averageSideLength = 1.0
         }
 
-        averageSideLength *= 64.0 * getRenderDistanceMultiplier()
+        averageSideLength *= 64.0 * getViewScale()
         return distance < averageSideLength * averageSideLength
     }
 
-    override fun initDataTracker(builder: DataTracker.Builder) {
-        super.initDataTracker(builder)
-        builder.add(HOVER_POS, BlockPos.ORIGIN)
-        builder.add(LAUNCHED, false)
+    override fun defineSynchedData(builder: SynchedEntityData.Builder) {
+        super.defineSynchedData(builder)
+        builder.define(HOVER_POS, BlockPos.ZERO)
+        builder.define(LAUNCHED, false)
     }
 
-    override fun writeCustomDataToNbt(nbt: NbtCompound) {
-        super.writeCustomDataToNbt(nbt)
+    override fun addAdditionalSaveData(nbt: CompoundTag) {
+        super.addAdditionalSaveData(nbt)
         nbt.putInt("HoverPosX", hoverPos.x)
         nbt.putInt("HoverPosY", hoverPos.y)
         nbt.putInt("HoverPosZ", hoverPos.z)
     }
 
-    override fun readCustomDataFromNbt(nbt: NbtCompound) {
-        super.readCustomDataFromNbt(nbt)
+    override fun readAdditionalSaveData(nbt: CompoundTag) {
+        super.readAdditionalSaveData(nbt)
         val hoverX = nbt.getInt("HoverPosX")
         val hoverY = nbt.getInt("HoverPosY")
         val hoverZ = nbt.getInt("HoverPosZ")
@@ -145,15 +145,15 @@ class VolaphyraEntity(entityType: EntityType<VolaphyraEntity>, world: World) :
 
     override fun setFlying(source: DamageSource, amount: Float) {
         if (amount >= 0) {
-            velocity = Vec3d.ZERO
-            val sourceEntity = source.source
-            val sourcePos = source.position
-            val velocity: Vec3d = if (source.source is ProjectileEntity) {
-                sourceEntity!!.velocity.multiply(-1.0)
+            setDeltaMovement(Vec3.ZERO)
+            val sourceEntity = source.directEntity
+            val sourcePos = source.sourcePosition
+            val velocity: Vec3 = if (source.directEntity is Projectile) {
+                sourceEntity!!.deltaMovement.scale(-1.0)
             } else if (sourcePos != null) {
-                sourcePos.subtract(pos)
+                sourcePos.subtract(position())
             } else {
-                Vec3d(0.0, 1.0, 0.0)
+                Vec3(0.0, 1.0, 0.0)
             }
             take3DKnockback(5.0, velocity.x, velocity.y, velocity.z)
         }
@@ -165,33 +165,33 @@ class VolaphyraEntity(entityType: EntityType<VolaphyraEntity>, world: World) :
     }
 
     override fun onDestroyed() {
-        val bombEntity = DuskEntities.VOLAPHYRA_CORE.create(this.world) as VolaphyraCoreEntity
-        if (this.isPersistent) {
-            bombEntity.setPersistent()
+        val bombEntity = DuskEntities.VOLAPHYRA_CORE.create(this.level()) as VolaphyraCoreEntity
+        if (this.isPersistenceRequired) {
+            bombEntity.setPersistenceRequired()
         }
         bombEntity.customName = this.customName
-        bombEntity.isAiDisabled = this.isAiDisabled
+        bombEntity.setNoAi(this.isNoAi)
         bombEntity.isInvulnerable = this.isInvulnerable
         bombEntity.target = target
         bombEntity.targetUuid = targetUuid
-        bombEntity.refreshPositionAndAngles(
-            this.x, this.y + this.height / 2 - bombEntity.height / 2, this.z,
+        bombEntity.moveTo(
+            this.x, this.y + this.bbHeight / 2 - bombEntity.bbHeight / 2, this.z,
             random.nextFloat() * 360.0f, 0.0f
         )
-        world.spawnEntity(bombEntity)
+        level().addFreshEntity(bombEntity)
         super.onDestroyed()
     }
 
     var isLaunched: Boolean
-        get() = dataTracker.get(LAUNCHED)
-        set(boolean) = dataTracker.set(LAUNCHED, boolean)
+        get() = entityData.get(LAUNCHED)
+        set(boolean) = entityData.set(LAUNCHED, boolean)
 
     var hoverPos: BlockPos
-        get() = dataTracker.get(HOVER_POS)
-        set(pos) = dataTracker.set(HOVER_POS, pos)
+        get() = entityData.get(HOVER_POS)
+        set(pos) = entityData.set(HOVER_POS, pos)
 
-    override fun chooseRandomAngerTime() {
-        this.angerTime = ANGER_TIME_RANGE[random]
+    override fun startPersistentAngerTimer() {
+        this.remainingPersistentAngerTime = ANGER_TIME_RANGE.sample(random)
     }
 
     override fun getAmbientSound(): SoundEvent? {
@@ -206,17 +206,17 @@ class VolaphyraEntity(entityType: EntityType<VolaphyraEntity>, world: World) :
         return null
     }
 
-    override fun pushAway(entity: Entity) {}
+    override fun doPush(entity: Entity) {}
 
-    override fun collidesWith(other: Entity): Boolean {
+    override fun canCollideWith(other: Entity): Boolean {
         return canCollide(this, other)
     }
 
     fun canCollide(entity: Entity, other: Entity): Boolean {
-        return other != this && (other.isCollidable || other.isPushable) && !entity.isConnectedThroughVehicle(other)
+        return other != this && (other.canBeCollidedWith() || other.isPushable) && !entity.isPassengerOfSameVehicle(other)
     }
 
-    override fun isCollidable(): Boolean {
+    override fun canBeCollidedWith(): Boolean {
         return this.isAlive && !this.isLaunched
     }
 
@@ -257,13 +257,13 @@ class VolaphyraEntity(entityType: EntityType<VolaphyraEntity>, world: World) :
 
 
     companion object {
-        private val LAUNCHED: TrackedData<Boolean> =
-            DataTracker.registerData(VolaphyraEntity::class.java, TrackedDataHandlerRegistry.BOOLEAN)
-        private val HOVER_POS: TrackedData<BlockPos> =
-            DataTracker.registerData(VolaphyraEntity::class.java, TrackedDataHandlerRegistry.BLOCK_POS)
+        private val LAUNCHED: EntityDataAccessor<Boolean> =
+            SynchedEntityData.defineId(VolaphyraEntity::class.java, EntityDataSerializers.BOOLEAN)
+        private val HOVER_POS: EntityDataAccessor<BlockPos> =
+            SynchedEntityData.defineId(VolaphyraEntity::class.java, EntityDataSerializers.BLOCK_POS)
 
-        private val ANGER_TIME_RANGE: UniformIntProvider = TimeHelper.betweenSeconds(10, 30)
-        fun createAttributes(): DefaultAttributeContainer.Builder {
+        private val ANGER_TIME_RANGE: UniformInt = TimeUtil.rangeOfSeconds(10, 30)
+        fun createAttributes(): AttributeSupplier.Builder {
             return AbstractVolaphyraEntity.createAttributes()
         }
     }

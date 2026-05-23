@@ -1,77 +1,83 @@
 package org.teamvoided.dusk_debris.block
 
 import com.mojang.serialization.MapCodec
-import net.minecraft.block.*
-import net.minecraft.entity.ai.pathing.NavigationType
-import net.minecraft.fluid.FluidState
-import net.minecraft.fluid.Fluids
-import net.minecraft.item.ItemPlacementContext
-import net.minecraft.state.StateManager
-import net.minecraft.state.property.BooleanProperty
-import net.minecraft.state.property.Properties
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Direction
-import net.minecraft.util.shape.VoxelShape
-import net.minecraft.world.BlockView
-import net.minecraft.world.WorldAccess
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
+import net.minecraft.world.item.context.BlockPlaceContext
+import net.minecraft.world.level.BlockGetter
+import net.minecraft.world.level.LevelAccessor
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.HorizontalDirectionalBlock
+import net.minecraft.world.level.block.SimpleWaterloggedBlock
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.block.state.StateDefinition
+import net.minecraft.world.level.block.state.properties.BlockStateProperties
+import net.minecraft.world.level.block.state.properties.BooleanProperty
+import net.minecraft.world.level.material.FluidState
+import net.minecraft.world.level.material.Fluids
+import net.minecraft.world.level.pathfinder.PathComputationType
+import net.minecraft.world.phys.shapes.CollisionContext
+import net.minecraft.world.phys.shapes.VoxelShape
 import org.teamvoided.dusk_debris.util.centerGravestoneShape
 import org.teamvoided.dusk_debris.util.gravestoneShape
 import org.teamvoided.dusk_debris.util.rotate
 
-open class GravestoneBlock(val shape: VoxelShape, val centerShape: VoxelShape, settings: Settings) :
-    HorizontalFacingBlock(settings), Waterloggable {
+open class GravestoneBlock(val shape: VoxelShape, val centerShape: VoxelShape, settings: Properties) :
+    HorizontalDirectionalBlock(settings), SimpleWaterloggedBlock {
     init {
-        this.defaultState = stateManager.defaultState
-            .with(Properties.WATERLOGGED, false)
-            .with(CENTERED, true)
-            .with(FACING, Direction.NORTH)
+        this.registerDefaultState(
+            stateDefinition.any()
+                .setValue(BlockStateProperties.WATERLOGGED, false)
+                .setValue(CENTERED, true)
+                .setValue(FACING, Direction.NORTH)
+        )
     }
 
-    public override fun getCodec(): MapCodec<GravestoneBlock> = CODEC
-    override fun appendProperties(builder: StateManager.Builder<Block, BlockState>) {
-        super.appendProperties(builder)
-        builder.add(Properties.WATERLOGGED)
+    public override fun codec(): MapCodec<GravestoneBlock> = CODEC
+    override fun createBlockStateDefinition(builder: StateDefinition.Builder<Block, BlockState>) {
+        super.createBlockStateDefinition(builder)
+        builder.add(BlockStateProperties.WATERLOGGED)
         builder.add(CENTERED)
         builder.add(FACING)
     }
 
-    override fun getStateForNeighborUpdate(
+    override fun updateShape(
         state: BlockState, direction: Direction, neighborState: BlockState,
-        world: WorldAccess, pos: BlockPos, neighborPos: BlockPos
+        world: LevelAccessor, pos: BlockPos, neighborPos: BlockPos
     ): BlockState {
-        if (state.get(Properties.WATERLOGGED)) {
-            world.scheduleFluidTick(pos, Fluids.WATER, Fluids.WATER.getTickRate(world))
+        if (state.getValue(BlockStateProperties.WATERLOGGED)) {
+            world.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(world))
         }
-        return super.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos)
+        return super.updateShape(state, direction, neighborState, world, pos, neighborPos)
     }
 
     override fun getFluidState(state: BlockState): FluidState {
-        return if (state.get(Properties.WATERLOGGED)) Fluids.WATER.getStill(false)
+        return if (state.getValue(BlockStateProperties.WATERLOGGED)) Fluids.WATER.getSource(false)
         else super.getFluidState(state)
     }
 
-    override fun getPlacementState(ctx: ItemPlacementContext): BlockState {
-        val fluidState = ctx.world.getFluidState(ctx.blockPos)
-        val player = ctx.player?.isSneaking == true
-        return defaultState
-            .with(Properties.WATERLOGGED, fluidState.isOf(Fluids.WATER))
-            .with(CENTERED, !player)
-            .with(FACING, ctx.playerFacing.opposite)
+    override fun getStateForPlacement(ctx: BlockPlaceContext): BlockState {
+        val fluidState = ctx.level.getFluidState(ctx.clickedPos)
+        val player = ctx.player?.isShiftKeyDown == true
+        return defaultBlockState()
+            .setValue(BlockStateProperties.WATERLOGGED, fluidState.`is`(Fluids.WATER))
+            .setValue(CENTERED, !player)
+            .setValue(FACING, ctx.horizontalDirection.opposite)
     }
 
-    override fun getOutlineShape(
-        state: BlockState, world: BlockView, pos: BlockPos, context: ShapeContext
+    override fun getShape(
+        state: BlockState, world: BlockGetter, pos: BlockPos, context: CollisionContext
     ): VoxelShape {
-        val rotations = state.get(FACING).horizontal
-        val shape = if (state.get(CENTERED)) centerShape else shape
+        val rotations = state.getValue(FACING).get2DDataValue()
+        val shape = if (state.getValue(CENTERED)) centerShape else shape
         return shape.rotate(rotations)
     }
 
-    override fun canPathfindThrough(state: BlockState, navigationType: NavigationType): Boolean = false
+    override fun isPathfindable(state: BlockState, navigationType: PathComputationType): Boolean = false
 
     companion object {
-        val CENTERED: BooleanProperty = BooleanProperty.of("centered")
+        val CENTERED: BooleanProperty = BooleanProperty.create("centered")
         val CODEC: MapCodec<GravestoneBlock> =
-            createCodec { GravestoneBlock(gravestoneShape, centerGravestoneShape, it) }
+            simpleCodec { GravestoneBlock(gravestoneShape, centerGravestoneShape, it) }
     }
 }

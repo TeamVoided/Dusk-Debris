@@ -1,87 +1,89 @@
 package org.teamvoided.dusk_debris.entity.projectile
 
-import net.minecraft.block.BlockState
-import net.minecraft.block.Blocks
-import net.minecraft.entity.EntityType
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.entity.projectile.PersistentProjectileEntity
-import net.minecraft.item.BlockItem
-import net.minecraft.item.ItemStack
-import net.minecraft.item.Items
-import net.minecraft.particle.BlockStateParticleEffect
-import net.minecraft.particle.ParticleTypes
-import net.minecraft.server.world.ServerWorld
-import net.minecraft.sound.SoundCategory
-import net.minecraft.sound.SoundEvent
-import net.minecraft.sound.SoundEvents
-import net.minecraft.util.hit.BlockHitResult
-import net.minecraft.util.math.Vec3d
-import net.minecraft.world.World
+import net.minecraft.core.particles.BlockParticleOption
+import net.minecraft.core.particles.ParticleTypes
+import net.minecraft.server.level.ServerLevel
+import net.minecraft.sounds.SoundEvent
+import net.minecraft.sounds.SoundEvents
+import net.minecraft.sounds.SoundSource
+import net.minecraft.world.entity.EntityType
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.entity.projectile.AbstractArrow
+import net.minecraft.world.item.BlockItem
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.Items
+import net.minecraft.world.level.Level
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.phys.BlockHitResult
+import net.minecraft.world.phys.Vec3
 import org.teamvoided.dusk_debris.entity.FlyingBlockItemEntity
 import org.teamvoided.dusk_debris.init.DuskEntities
 import org.teamvoided.dusk_debris.util.spawnParticles
 
-open class FlyingPumpkinProjectile : PersistentProjectileEntity, FlyingBlockItemEntity {
-    constructor(entityType: EntityType<out FlyingPumpkinProjectile>, world: World) : super(entityType, world)
-    constructor(owner: PlayerEntity, world: World, stack: ItemStack, weapon: ItemStack?) :
+open class FlyingPumpkinProjectile : AbstractArrow, FlyingBlockItemEntity {
+    constructor(entityType: EntityType<out FlyingPumpkinProjectile>, world: Level) : super(entityType, world)
+    constructor(owner: Player, world: Level, stack: ItemStack, weapon: ItemStack?) :
             super(DuskEntities.FLYING_PUMPKIN, owner, world, stack, weapon) {
         state = stack
     }
 
-    override fun onBlockHit(blockHitResult: BlockHitResult) {
-        super.onBlockHit(blockHitResult)
-        if (!world.isClient) {
-            particles(world)
+    override fun onHitBlock(blockHitResult: BlockHitResult) {
+        super.onHitBlock(blockHitResult)
+        if (!level().isClientSide) {
+            particles(level())
             this.discard()
         }
     }
 
-    override fun onRemoved() {
-        world.playSound(
-            pos.x,
-            pos.y,
-            pos.z,
-            SoundEvents.BLOCK_SLIME_BLOCK_BREAK,
-            SoundCategory.NEUTRAL,
+    override fun onClientRemoval() {
+        level().playLocalSound(
+            position().x,
+            position().y,
+            position().z,
+            SoundEvents.SLIME_BLOCK_BREAK,
+            SoundSource.NEUTRAL,
             1f,
             random.nextFloat() * 0.3f,
             false
         )
-        super.onRemoved()
+        super.onClientRemoval()
     }
 
-    fun particles(world: World) {
-        if (!world.isClient) {
-            val serverWorld = world as ServerWorld
+    fun particles(world: Level) {
+        if (!world.isClientSide) {
+            val serverWorld = world as ServerLevel
             repeat(90) {
                 serverWorld.spawnParticles(
-                    BlockStateParticleEffect(ParticleTypes.BLOCK, getState()),
-                    pos,
-                    Vec3d(
+                    BlockParticleOption(ParticleTypes.BLOCK, getState()),
+                    position(),
+                    Vec3(
                         (random.nextDouble() * 2.0 - 1.0),
                         (random.nextDouble() * 2.0 - 1.0),
                         (random.nextDouble() * 2.0 - 1.0)
-                    ).normalize().multiply(random.nextDouble() * 0.5)
+                    ).normalize().scale(random.nextDouble() * 0.5)
                 )
             }
         }
     }
 
-    override fun tryPickup(player: PlayerEntity?): Boolean {
+    override fun tryPickup(player: Player?): Boolean {
         return false
     }
 
-    override fun getHitSound(): SoundEvent = SoundEvents.BLOCK_WOOD_BREAK
-    override fun getDefaultItemStack(): ItemStack =
-        Items.HEAVY_CORE.defaultStack// DnDBlocks.SMALL_CARVED_PUMPKIN.asItem().defaultStack
+    override fun getDefaultHitGroundSoundEvent(): SoundEvent = SoundEvents.WOOD_BREAK
+    override fun getDefaultPickupItem(): ItemStack =
+        Items.HEAVY_CORE.defaultInstance// DnDBlocks.SMALL_CARVED_PUMPKIN.asItem().defaultStack
 
     override fun getState(): BlockState {
         return if (state.item is BlockItem) {
-            (state.item as BlockItem).block.defaultState
-        } else Blocks.HEAVY_CORE.defaultState//DnDBlocks.SMALL_CARVED_PUMPKIN.defaultState
+            (state.item as BlockItem).block.defaultBlockState()
+        } else Blocks.HEAVY_CORE.defaultBlockState()//DnDBlocks.SMALL_CARVED_PUMPKIN.defaultState
     }
 
+    override fun getItem(): ItemStack? = Items.HEAVY_CORE.defaultInstance
+
     companion object {
-        var state: ItemStack = Items.HEAVY_CORE.defaultStack //DnDBlocks.SMALL_CARVED_PUMPKIN.asItem().defaultStack
+        var state: ItemStack = Items.HEAVY_CORE.defaultInstance //DnDBlocks.SMALL_CARVED_PUMPKIN.asItem().defaultStack
     }
 }

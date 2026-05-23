@@ -1,9 +1,9 @@
 package org.teamvoided.dusk_debris.util.world_helper
 
 import com.mojang.serialization.MapCodec
-import net.minecraft.util.dynamic.CodecHolder
+import net.minecraft.util.KeyDispatchDataCodec
 
 
-fun <O> makeCodec(codec: MapCodec<O>): CodecHolder<O> {
-    return CodecHolder.method_42116(codec)
+fun <O> makeCodec(codec: MapCodec<O>): KeyDispatchDataCodec<O> {
+    return KeyDispatchDataCodec.of(codec)
 }

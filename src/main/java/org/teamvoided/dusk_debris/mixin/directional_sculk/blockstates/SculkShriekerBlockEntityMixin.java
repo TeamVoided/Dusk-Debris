@@ -1,15 +1,15 @@
 package org.teamvoided.dusk_debris.mixin.directional_sculk.blockstates;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.block.entity.SculkShriekerBlockEntity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.SpawnReason;
-import net.minecraft.registry.tag.BlockTags;
-import net.minecraft.server.world.ServerWorld;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.util.SpawnUtil;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.entity.SculkShriekerBlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -26,15 +26,15 @@ public class SculkShriekerBlockEntityMixin extends BlockEntity {
         super(type, pos, state);
     }
 
-    @Inject(method = "trySpawnWarden", at = @At("HEAD"), cancellable = true)
-    public void trySpawnWardenBelow(ServerWorld world, CallbackInfoReturnable<Boolean> cir) {
-        if (SculkDirectionalStuff.isNotUp(this.getCachedState())) {
+    @Inject(method = "trySummonWarden", at = @At("HEAD"), cancellable = true)
+    public void trySpawnWardenBelow(ServerLevel world, CallbackInfoReturnable<Boolean> cir) {
+        if (SculkDirectionalStuff.isNotUp(this.getBlockState())) {
             if (this.warningLevel >= 4) {
                 for (int down = 0; down < 30; down++) {
-                    var posDown = this.getPos().down(down);
-                    var stateDown = world.getBlockState(posDown.down());
-                    if (!stateDown.isIn(BlockTags.REPLACEABLE)) {
-                        cir.setReturnValue(SpawnUtil.method_42122(EntityType.WARDEN, SpawnReason.TRIGGERED, world, posDown, 20, 5, 6, SpawnUtil.Strategy.field_39401).isPresent());
+                    var posDown = this.getBlockPos().below(down);
+                    var stateDown = world.getBlockState(posDown.below());
+                    if (!stateDown.is(BlockTags.REPLACEABLE)) {
+                        cir.setReturnValue(SpawnUtil.trySpawnMob(EntityType.WARDEN, MobSpawnType.TRIGGERED, world, posDown, 20, 5, 6, SpawnUtil.Strategy.ON_TOP_OF_COLLIDER).isPresent());
                         break;
                     }
                 }

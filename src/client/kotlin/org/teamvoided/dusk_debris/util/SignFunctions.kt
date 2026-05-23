@@ -1,12 +1,12 @@
 package org.teamvoided.dusk_debris.util
 
-import net.minecraft.block.BlockState
-import net.minecraft.block.sign.WallSignBlock
-import net.minecraft.client.MinecraftClient
+import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphics
-import net.minecraft.client.render.OverlayTexture
-import net.minecraft.state.property.Properties
-import net.minecraft.util.math.Direction
+import net.minecraft.client.renderer.texture.OverlayTexture
+import net.minecraft.core.Direction
+import net.minecraft.world.level.block.WallSignBlock
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.block.state.properties.BlockStateProperties
 
 object SignFunctions {
 //    @JvmStatic
@@ -26,22 +26,22 @@ object SignFunctions {
     fun renderSignModelBackground(graphics: GuiGraphics, state: BlockState) {
         val scale = 90f
         if (state.block is WallSignBlock) {
-            graphics.matrices.translate(-scale / 2, scale * 0.484375f, 1f) // 7.75/16
+            graphics.pose().translate(-scale / 2, scale * 0.484375f, 1f) // 7.75/16
         } else {
-            graphics.matrices.translate(-scale / 2, scale * 0.734375f, 1f) // 11.75/16
+            graphics.pose().translate(-scale / 2, scale * 0.734375f, 1f) // 11.75/16
         }
-        graphics.matrices.scale(scale, -scale, 1f)
-        MinecraftClient.getInstance().blockRenderManager.renderBlockAsEntity(
-            state.block.defaultState.withIfExists(Properties.HORIZONTAL_FACING, Direction.SOUTH),
-            graphics.matrices,
-            graphics.vertexConsumers,
+        graphics.pose().scale(scale, -scale, 1f)
+        Minecraft.getInstance().blockRenderer.renderSingleBlock(
+            state.block.defaultBlockState().trySetValue(BlockStateProperties.HORIZONTAL_FACING, Direction.SOUTH),
+            graphics.pose(),
+            graphics.bufferSource(),
             15728880,
-            OverlayTexture.DEFAULT_UV
+            OverlayTexture.NO_OVERLAY
         )
     }
 
     @JvmStatic
     fun offsetSign(graphics: GuiGraphics, state: BlockState, width: Float) {
-        graphics.matrices.translate(width / 2f, 125f, 50f)
+        graphics.pose().translate(width / 2f, 125f, 50f)
     }
 }

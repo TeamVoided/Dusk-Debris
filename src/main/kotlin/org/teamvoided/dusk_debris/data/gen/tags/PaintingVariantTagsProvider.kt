@@ -2,24 +2,24 @@ package org.teamvoided.dusk_debris.data.gen.tags
 
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider
-import net.minecraft.entity.decoration.painting.PaintingVariant
-import net.minecraft.entity.decoration.painting.PaintingVariants
-import net.minecraft.registry.HolderLookup
-import net.minecraft.registry.RegistryKeys
+import net.minecraft.core.HolderLookup
+import net.minecraft.core.registries.Registries
+import net.minecraft.world.entity.decoration.PaintingVariant
+import net.minecraft.world.entity.decoration.PaintingVariants
 import org.teamvoided.dusk_debris.data.tags.DuskPaintingVariantTags
 import org.teamvoided.dusk_debris.data.variants.DuskPaintingVariants
 import java.util.concurrent.CompletableFuture
 
 class PaintingVariantTagsProvider(o: FabricDataOutput, r: CompletableFuture<HolderLookup.Provider>) :
-    FabricTagProvider<PaintingVariant>(o, RegistryKeys.PAINTING_VARIANT, r) {
-    override fun configure(arg: HolderLookup.Provider) {
+    FabricTagProvider<PaintingVariant>(o, Registries.PAINTING_VARIANT, r) {
+    override fun addTags(arg: HolderLookup.Provider) {
         duskTags()
         vanillaTags()
         conventionTags()
     }
 
     fun duskTags() {
-        getOrCreateTagBuilder(DuskPaintingVariantTags.DROPS_SELF)
+        tag(DuskPaintingVariantTags.DROPS_SELF)
             .add(DuskPaintingVariants.LIVE_BRIGGSY_REACTION)
             .add(DuskPaintingVariants.FLAMEHEART_APPEARS)
             .add(PaintingVariants.WATER)

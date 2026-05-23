@@ -3,12 +3,12 @@ package org.teamvoided.dusk_debris.particle
 import com.mojang.serialization.Codec
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
-import net.minecraft.network.RegistryByteBuf
-import net.minecraft.network.codec.PacketCodec
-import net.minecraft.network.codec.PacketCodecs
-import net.minecraft.particle.ParticleEffect
-import net.minecraft.particle.ParticleType
-import net.minecraft.util.math.Vec3d
+import net.minecraft.core.particles.ParticleOptions
+import net.minecraft.core.particles.ParticleType
+import net.minecraft.network.RegistryFriendlyByteBuf
+import net.minecraft.network.codec.ByteBufCodecs
+import net.minecraft.network.codec.StreamCodec
+import net.minecraft.world.phys.Vec3
 import org.teamvoided.dusk_debris.init.DuskParticles
 
 class BetweenPointsParticleEffect(
@@ -18,14 +18,14 @@ class BetweenPointsParticleEffect(
     val ominous: Boolean,
     val particleDistance: Int,
     val rate: Int
-) : ParticleEffect {
+) : ParticleOptions {
 
-    constructor(targetPos: Vec3d, ominous: Boolean, particleDistance: Int, rate: Int) :
+    constructor(targetPos: Vec3, ominous: Boolean, particleDistance: Int, rate: Int) :
             this(targetPos.x,targetPos.y,targetPos.z,ominous,particleDistance,rate)
 
     override fun getType(): ParticleType<BetweenPointsParticleEffect> = DuskParticles.BETWEEN_POINTS
 
-    fun getTargetPos(): Vec3d = Vec3d(targetPosX, targetPosY, targetPosZ)
+    fun getTargetPos(): Vec3 = Vec3(targetPosX, targetPosY, targetPosZ)
 
 
     companion object {
@@ -40,14 +40,14 @@ class BetweenPointsParticleEffect(
                     Codec.INT.fieldOf("rate").forGetter { it.rate }
                 ).apply(instance, ::BetweenPointsParticleEffect)
             }
-        val PACKET_CODEC: PacketCodec<RegistryByteBuf, BetweenPointsParticleEffect> =
-            PacketCodec.tuple(
-                PacketCodecs.DOUBLE, { it.targetPosX },
-                PacketCodecs.DOUBLE, { it.targetPosY },
-                PacketCodecs.DOUBLE, { it.targetPosZ },
-                PacketCodecs.BOOL, { it.ominous },
-                PacketCodecs.INT, { it.particleDistance },
-                PacketCodecs.INT, { it.rate },
+        val PACKET_CODEC: StreamCodec<RegistryFriendlyByteBuf, BetweenPointsParticleEffect> =
+            StreamCodec.composite(
+                ByteBufCodecs.DOUBLE, { it.targetPosX },
+                ByteBufCodecs.DOUBLE, { it.targetPosY },
+                ByteBufCodecs.DOUBLE, { it.targetPosZ },
+                ByteBufCodecs.BOOL, { it.ominous },
+                ByteBufCodecs.INT, { it.particleDistance },
+                ByteBufCodecs.INT, { it.rate },
                 ::BetweenPointsParticleEffect
             )
     }

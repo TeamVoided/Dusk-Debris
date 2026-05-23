@@ -1,10 +1,10 @@
 package org.teamvoided.dusk_debris.init
 
-import net.minecraft.registry.Holder
-import net.minecraft.registry.Registries
-import net.minecraft.registry.Registry
-import net.minecraft.sound.SoundEvent
-import net.minecraft.util.Identifier
+import net.minecraft.core.Holder
+import net.minecraft.core.Registry
+import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.sounds.SoundEvent
 import org.teamvoided.dusk_debris.DuskDebris.id
 
 object DuskSoundEvents {
@@ -26,15 +26,15 @@ object DuskSoundEvents {
     }
 
     private fun register(id: String): SoundEvent = register(id(id))
-    private fun register(id: Identifier): SoundEvent = register(id, id)
-    private fun register(id: Identifier, soundId: Identifier): SoundEvent =
-        Registry.register(Registries.SOUND_EVENT, id, SoundEvent.createVariableRangeEvent(soundId))
+    private fun register(id: ResourceLocation): SoundEvent = register(id, id)
+    private fun register(id: ResourceLocation, soundId: ResourceLocation): SoundEvent =
+        Registry.register(BuiltInRegistries.SOUND_EVENT, id, SoundEvent.createVariableRangeEvent(soundId))
     @Suppress("SameParameterValue")
     private fun registerHolder(id: String): Holder.Reference<SoundEvent> = registerHolder(id(id))
-    private fun registerHolder(id: Identifier): Holder.Reference<SoundEvent> = registerHolder(id, id)
-    private fun registerHolder(id: Identifier, soundId: Identifier): Holder.Reference<SoundEvent> =
-        Registry.registerHolder(Registries.SOUND_EVENT, id, SoundEvent.createVariableRangeEvent(soundId))
+    private fun registerHolder(id: ResourceLocation): Holder.Reference<SoundEvent> = registerHolder(id, id)
+    private fun registerHolder(id: ResourceLocation, soundId: ResourceLocation): Holder.Reference<SoundEvent> =
+        Registry.registerForHolder(BuiltInRegistries.SOUND_EVENT, id, SoundEvent.createVariableRangeEvent(soundId))
 
-    private fun registerHolder(id: Identifier, soundId: Identifier, range: Float): Holder<SoundEvent> =
-        Registry.registerHolder(Registries.SOUND_EVENT, id, SoundEvent.createFixedRangeEvent(soundId, range))
+    private fun registerHolder(id: ResourceLocation, soundId: ResourceLocation, range: Float): Holder<SoundEvent> =
+        Registry.registerForHolder(BuiltInRegistries.SOUND_EVENT, id, SoundEvent.createFixedRangeEvent(soundId, range))
 }

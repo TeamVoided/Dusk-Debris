@@ -1,60 +1,60 @@
 package org.teamvoided.dusk_debris.world.gen.configured_feature
 
 import com.mojang.serialization.Codec
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Direction
-import net.minecraft.util.random.RandomGenerator
-import net.minecraft.world.WorldAccess
-import net.minecraft.world.gen.feature.Feature
-import net.minecraft.world.gen.feature.util.FeatureContext
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
+import net.minecraft.util.RandomSource
+import net.minecraft.world.level.LevelAccessor
+import net.minecraft.world.level.levelgen.feature.Feature
+import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext
 import org.teamvoided.dusk_debris.world.gen.configured_feature.config.MushroomFeatureConfig
 
 open class AbstractHugeMushroomFeature<T: MushroomFeatureConfig>(codec: Codec<T>) :
     Feature<T>(codec) {
 
     open fun generateCap(
-        world: WorldAccess,
-        random: RandomGenerator,
+        world: LevelAccessor,
+        random: RandomSource,
         start: BlockPos,
         yStart: Int,
-        mutable: BlockPos.Mutable,
+        mutable: BlockPos.MutableBlockPos,
         config: T
     ) {
-        mutable[start, 0, yStart] = 0
-        if (world.getBlockState(mutable).isIn(config.replaceable)) {
-            this.setBlockState(world, mutable, config.capBlock.getBlockState(random, start))
+        mutable.setWithOffset(start, 0, yStart, 0)
+        if (world.getBlockState(mutable).`is`(config.replaceable)) {
+            this.setBlock(world, mutable, config.capBlock.getState(random, start))
         }
     }
 
     private fun generateStem(
-        world: WorldAccess,
-        random: RandomGenerator,
+        world: LevelAccessor,
+        random: RandomSource,
         pos: BlockPos,
         config: T,
         height: Int,
-        mutableBlockPos: BlockPos.Mutable
+        mutableBlockPos: BlockPos.MutableBlockPos
     ) {
         for (i in 0 until height) {
             mutableBlockPos.set(pos).move(Direction.UP, i)
-            if (world.getBlockState(mutableBlockPos).isIn(config.replaceable)) {
-                this.setBlockState(world, mutableBlockPos, config.stemBlock.getBlockState(random, pos))
+            if (world.getBlockState(mutableBlockPos).`is`(config.replaceable)) {
+                this.setBlock(world, mutableBlockPos, config.stemBlock.getState(random, pos))
             }
         }
     }
 
     private fun canGenerate(
-        world: WorldAccess,
-        random: RandomGenerator,
+        world: LevelAccessor,
+        random: RandomSource,
         pos: BlockPos,
         height: Int,
-        mutableBlockPos: BlockPos.Mutable,
+        mutableBlockPos: BlockPos.MutableBlockPos,
         config: T
     ): Boolean {
         val y = pos.y
-        if (y >= world.bottomY + 1 && y + height + 1 < world.topY) {
+        if (y >= world.minBuildHeight + 1 && y + height + 1 < world.maxBuildHeight) {
             for (j in 0..height) {
-                val blockState2 = world.getBlockState(mutableBlockPos.set(pos, 0, j, 0))
-                if (!blockState2.isIn(config.ignores)) {
+                val blockState2 = world.getBlockState(mutableBlockPos.setWithOffset(pos, 0, j, 0))
+                if (!blockState2.`is`(config.ignores)) {
                     return false
                 }
             }
@@ -64,13 +64,13 @@ open class AbstractHugeMushroomFeature<T: MushroomFeatureConfig>(codec: Codec<T>
         }
     }
 
-    override fun place(context: FeatureContext<T>): Boolean {
-        val structureWorldAccess = context.world
-        val blockPos = context.origin
-        val randomGenerator = context.random
-        val hugeNethershroomFeatureConfig = context.config
-        val i = hugeNethershroomFeatureConfig.stemSize[randomGenerator]
-        val mutable = BlockPos.Mutable()
+    override fun place(context: FeaturePlaceContext<T>): Boolean {
+        val structureWorldAccess = context.level()
+        val blockPos = context.origin()
+        val randomGenerator = context.random()
+        val hugeNethershroomFeatureConfig = context.config()
+        val i = hugeNethershroomFeatureConfig.stemSize.sample(randomGenerator)
+        val mutable = BlockPos.MutableBlockPos()
         if (!this.canGenerate(
                 structureWorldAccess,
                 randomGenerator,

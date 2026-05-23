@@ -1,15 +1,15 @@
 package org.teamvoided.dusk_debris.entity.throwable_bomb
 
-import net.minecraft.entity.EntityType
-import net.minecraft.entity.LivingEntity
-import net.minecraft.item.Item
-import net.minecraft.particle.ParticleTypes
-import net.minecraft.server.world.ServerWorld
-import net.minecraft.sound.SoundCategory
-import net.minecraft.sound.SoundEvents
-import net.minecraft.world.World
-import net.minecraft.world.explosion.Explosion
-import net.minecraft.world.explosion.ExplosionBehavior
+import net.minecraft.core.particles.ParticleTypes
+import net.minecraft.server.level.ServerLevel
+import net.minecraft.sounds.SoundEvents
+import net.minecraft.sounds.SoundSource
+import net.minecraft.world.entity.EntityType
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.item.Item
+import net.minecraft.world.level.Explosion
+import net.minecraft.world.level.ExplosionDamageCalculator
+import net.minecraft.world.level.Level
 import org.teamvoided.dusk_debris.block.throwable_bomb.AbstractThrwowableBombBlock
 import org.teamvoided.dusk_debris.data.tags.DuskBlockTags
 import org.teamvoided.dusk_debris.data.tags.DuskEntityTypeTags
@@ -22,65 +22,65 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 open class BlunderbombEntity : AbstractThrwowableBombEntity {
-    constructor(entityType: EntityType<out BlunderbombEntity>, world: World) : super(entityType, world)
-    constructor(entityType: EntityType<out BlunderbombEntity>, owner: LivingEntity?, world: World) :
+    constructor(entityType: EntityType<out BlunderbombEntity>, world: Level) : super(entityType, world)
+    constructor(entityType: EntityType<out BlunderbombEntity>, owner: LivingEntity?, world: Level) :
             super(entityType, owner, world)
 
-    constructor(entityType: EntityType<out BlunderbombEntity>, x: Double, y: Double, z: Double, world: World) :
+    constructor(entityType: EntityType<out BlunderbombEntity>, x: Double, y: Double, z: Double, world: Level) :
             super(entityType, x, y, z, world)
 
-    constructor(world: World, owner: LivingEntity?) : super(DuskEntities.BLUNDERBOMB, owner, world)
+    constructor(world: Level, owner: LivingEntity?) : super(DuskEntities.BLUNDERBOMB, owner, world)
 
-    constructor(world: World, x: Double, y: Double, z: Double) : super(DuskEntities.BLUNDERBOMB, x, y, z, world)
+    constructor(world: Level, x: Double, y: Double, z: Double) : super(DuskEntities.BLUNDERBOMB, x, y, z, world)
 
-    constructor(world: World, x: Double, y: Double, z: Double, customExplosionBehavior: ExplosionBehavior) :
+    constructor(world: Level, x: Double, y: Double, z: Double, customExplosionBehavior: ExplosionDamageCalculator) :
             this(DuskEntities.BLUNDERBOMB, world) {
         val randVelocity = world.random.nextDouble() * 6.3
-        this.setPosition(x, y, z)
-        this.setVelocity(-sin(randVelocity) * 0.02, 0.04, -cos(randVelocity) * 0.02)
-        this.prevX = x
-        this.prevY = y
-        this.prevZ = z
+        this.setPos(x, y, z)
+        this.setDeltaMovement(-sin(randVelocity) * 0.02, 0.04, -cos(randVelocity) * 0.02)
+        this.xo = x
+        this.yo = y
+        this.zo = z
     }
 
     override fun explode() {
-        val serverWorld = this.world as ServerWorld
-        serverWorld.spawnParticles(
+        val serverWorld = this.level() as ServerLevel
+        serverWorld.sendParticles(
             DuskParticles.BLUNDERBOMB,
             this.x, this.y, this.z,
             20,
             0.0, 0.0, 0.0,
             1.0
         )
-        serverWorld.spawnParticles(
+        serverWorld.sendParticles(
             FlashParticleEffect(0x603300),
             this.x, this.y, this.z,
             1,
             0.0, 0.0, 0.0,
             1.0
         )
-        world.playSound(
+        level().playSound(
             this,
-            this.blockPos,
-            SoundEvents.BLOCK_GLASS_BREAK,
-            SoundCategory.BLOCKS,
+            this.blockPosition(),
+            SoundEvents.GLASS_BREAK,
+            SoundSource.BLOCKS,
             0.7f,
-            0.9f + world.random.nextFloat() * 0.2f
+            0.9f + level().random.nextFloat() * 0.2f
         )
-        world.createExplosion(
-            this, Explosion.createDamageSource(
-                this.world,
+        level().explode(
+            this, Explosion.getDefaultDamageSource(
+                this.level(),
                 this
             ), getExplosionBehavior(),
             this.x,
-            this.getBodyY(0.0625),
+            this.getY(0.0625),
             this.z,
             DEFAULT_EXPLOSION_POWER,
             false,
-            World.ExplosionSourceType.TNT,
+            Level.ExplosionInteraction.TNT,
             DuskParticles.BLUNDERBOMB,
             ParticleTypes.FLASH,
-            SoundEvents.BLOCK_RESPAWN_ANCHOR_DEPLETE
+            SoundEvents.RESPAWN_ANCHOR_DEPLETE
         )
         super.explode()
     }
@@ -90,7 +90,7 @@ open class BlunderbombEntity : AbstractThrwowableBombEntity {
     }
 
     override fun getHitDamage(): Float = 5f
-    override fun getExplosionBehavior(): ExplosionBehavior = SpecialExplosionBehavior(
+    override fun getExplosionBehavior(): ExplosionDamageCalculator = SpecialExplosionBehavior(
         DuskBlockTags.BLUNDERBOMB_DESTROYS,
         DuskEntityTypeTags.BLUNDERBOMB_DOES_NOT_DAMAGE,
         7f,

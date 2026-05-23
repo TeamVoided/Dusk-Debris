@@ -1,81 +1,81 @@
 accessWidener v2 named
-accessible method net/minecraft/block/Blocks legacyStairsOf (Lnet/minecraft/block/Block;)Lnet/minecraft/block/Block;
-accessible method net/minecraft/util/Identifier <init> (Ljava/lang/String;Ljava/lang/String;)V
-accessible field net/minecraft/data/client/model/BlockStateModelGenerator sandstoneModels Ljava/util/Map;
-mutable field net/minecraft/data/client/model/BlockStateModelGenerator sandstoneModels Ljava/util/Map;
-accessible field net/minecraft/entity/Entity random Lnet/minecraft/util/random/RandomGenerator;
-accessible method net/minecraft/data/client/model/Models block (Ljava/lang/String;[Lnet/minecraft/data/client/model/TextureKey;)Lnet/minecraft/data/client/model/Model;
-accessible class net/minecraft/client/particle/ParticleManager$SpriteAwareFactory
-accessible method net/minecraft/client/particle/WaterSuspendParticle <init> (Lnet/minecraft/client/world/ClientWorld;Lnet/minecraft/client/particle/SpriteProvider;DDDDDD)V
-accessible field net/minecraft/client/particle/Particle gravityStrength F
-accessible method net/minecraft/util/SpawnUtil method_42121 (Lnet/minecraft/server/world/ServerWorld;ILnet/minecraft/util/math/BlockPos$Mutable;Lnet/minecraft/util/SpawnUtil$Strategy;)Z
-accessible method net/minecraft/entity/mob/AbstractSkeletonEntity getStepSound ()Lnet/minecraft/sound/SoundEvent;
-accessible method net/minecraft/block/WoodType register (Lnet/minecraft/block/WoodType;)Lnet/minecraft/block/WoodType;
-accessible field net/minecraft/entity/mob/SkeletonHorseEntity trapped Z
-accessible field net/minecraft/entity/ai/goal/SkeletonHorseTrapTriggerGoal skeletonHorse Lnet/minecraft/entity/mob/SkeletonHorseEntity;
-accessible method net/minecraft/entity/ai/goal/SkeletonHorseTrapTriggerGoal getHorse (Lnet/minecraft/world/LocalDifficulty;)Lnet/minecraft/entity/passive/AbstractHorseEntity;
-accessible method net/minecraft/entity/ai/goal/SkeletonHorseTrapTriggerGoal getSkeleton (Lnet/minecraft/world/LocalDifficulty;Lnet/minecraft/entity/passive/AbstractHorseEntity;)Lnet/minecraft/entity/mob/SkeletonEntity;
-accessible method net/minecraft/entity/ai/goal/SkeletonHorseTrapTriggerGoal equipSpawnEquipment (Lnet/minecraft/entity/mob/SkeletonEntity;Lnet/minecraft/entity/EquipmentSlot;Lnet/minecraft/world/LocalDifficulty;)V
+accessible method net/minecraft/world/level/block/Blocks legacyStair (Lnet/minecraft/world/level/block/Block;)Lnet/minecraft/world/level/block/Block;
+accessible method net/minecraft/resources/ResourceLocation <init> (Ljava/lang/String;Ljava/lang/String;)V
+accessible field net/minecraft/data/models/BlockModelGenerators texturedModels Ljava/util/Map;
+mutable field net/minecraft/data/models/BlockModelGenerators texturedModels Ljava/util/Map;
+accessible field net/minecraft/world/entity/Entity random Lnet/minecraft/util/RandomSource;
+accessible method net/minecraft/data/models/model/ModelTemplates create (Ljava/lang/String;[Lnet/minecraft/data/models/model/TextureSlot;)Lnet/minecraft/data/models/model/ModelTemplate;
+accessible class net/minecraft/client/particle/ParticleEngine$SpriteParticleRegistration
+accessible method net/minecraft/client/particle/SuspendedParticle <init> (Lnet/minecraft/client/multiplayer/ClientLevel;Lnet/minecraft/client/particle/SpriteSet;DDDDDD)V
+accessible field net/minecraft/client/particle/Particle gravity F
+accessible method net/minecraft/util/SpawnUtil moveToPossibleSpawnPosition (Lnet/minecraft/server/level/ServerLevel;ILnet/minecraft/core/BlockPos$MutableBlockPos;Lnet/minecraft/util/SpawnUtil$Strategy;)Z
+accessible method net/minecraft/world/entity/monster/AbstractSkeleton getStepSound ()Lnet/minecraft/sounds/SoundEvent;
+accessible method net/minecraft/world/level/block/state/properties/WoodType register (Lnet/minecraft/world/level/block/state/properties/WoodType;)Lnet/minecraft/world/level/block/state/properties/WoodType;
+accessible field net/minecraft/world/entity/animal/horse/SkeletonHorse isTrap Z
+accessible field net/minecraft/world/entity/animal/horse/SkeletonTrapGoal horse Lnet/minecraft/world/entity/animal/horse/SkeletonHorse;
+accessible method net/minecraft/world/entity/animal/horse/SkeletonTrapGoal createHorse (Lnet/minecraft/world/DifficultyInstance;)Lnet/minecraft/world/entity/animal/horse/AbstractHorse;
+accessible method net/minecraft/world/entity/animal/horse/SkeletonTrapGoal createSkeleton (Lnet/minecraft/world/DifficultyInstance;Lnet/minecraft/world/entity/animal/horse/AbstractHorse;)Lnet/minecraft/world/entity/monster/Skeleton;
+accessible method net/minecraft/world/entity/animal/horse/SkeletonTrapGoal enchant (Lnet/minecraft/world/entity/monster/Skeleton;Lnet/minecraft/world/entity/EquipmentSlot;Lnet/minecraft/world/DifficultyInstance;)V
 
-accessible method net/minecraft/client/particle/VibrationParticle <init> (Lnet/minecraft/client/world/ClientWorld;DDDLnet/minecraft/world/event/PositionSource;I)V
-accessible method net/minecraft/client/particle/Particle setColorAlpha (F)V
+accessible method net/minecraft/client/particle/VibrationSignalParticle <init> (Lnet/minecraft/client/multiplayer/ClientLevel;DDDLnet/minecraft/world/level/gameevent/PositionSource;I)V
+accessible method net/minecraft/client/particle/Particle setAlpha (F)V
 
-accessible class net/minecraft/client/render/BackgroundRenderer$FogEffect
-accessible class net/minecraft/client/render/BackgroundRenderer$FogParameters
+accessible class net/minecraft/client/renderer/FogRenderer$MobEffectFogFunction
+accessible class net/minecraft/client/renderer/FogRenderer$FogData
 
-accessible method net/minecraft/world/biome/OverworldBiomeCreator addBasicFeatures (Lnet/minecraft/world/biome/GenerationSettings$Builder;)V
-accessible method net/minecraft/world/biome/OverworldBiomeCreator create (ZFFLnet/minecraft/world/biome/SpawnSettings$Builder;Lnet/minecraft/world/biome/GenerationSettings$Builder;Lnet/minecraft/sound/MusicSound;)Lnet/minecraft/world/biome/Biome;
+accessible method net/minecraft/data/worldgen/biome/OverworldBiomes globalOverworldGeneration (Lnet/minecraft/world/level/biome/BiomeGenerationSettings$Builder;)V
+accessible method net/minecraft/data/worldgen/biome/OverworldBiomes biome (ZFFLnet/minecraft/world/level/biome/MobSpawnSettings$Builder;Lnet/minecraft/world/level/biome/BiomeGenerationSettings$Builder;Lnet/minecraft/sounds/Music;)Lnet/minecraft/world/level/biome/Biome;
 
-accessible class net/minecraft/world/biome/Biome$Weather
-accessible field net/minecraft/world/biome/Biome$Weather temperatureModifier Lnet/minecraft/world/biome/Biome$TemperatureModifier;
+accessible class net/minecraft/world/level/biome/Biome$ClimateSettings
+accessible field net/minecraft/world/level/biome/Biome$ClimateSettings temperatureModifier Lnet/minecraft/world/level/biome/Biome$TemperatureModifier;
 
-accessible method net/minecraft/entity/decoration/DisplayEntity$TextDisplayEntity setText (Lnet/minecraft/text/Text;)V
+accessible method net/minecraft/world/entity/Display$TextDisplay setText (Lnet/minecraft/network/chat/Component;)V
 
-accessible method net/minecraft/entity/LivingEntity swimUpward (Lnet/minecraft/registry/tag/TagKey;)V
+accessible method net/minecraft/world/entity/LivingEntity jumpInLiquid (Lnet/minecraft/tags/TagKey;)V
 
-accessible field net/minecraft/entity/EntityType spawnDimensionsScale F
+accessible field net/minecraft/world/entity/EntityType spawnDimensionsScale F
 
-accessible method net/minecraft/client/particle/BlockLeakParticle <init> (Lnet/minecraft/client/world/ClientWorld;DDDLnet/minecraft/fluid/Fluid;)V
-accessible method net/minecraft/client/particle/BlockLeakParticle$ContinuousFalling <init> (Lnet/minecraft/client/world/ClientWorld;DDDLnet/minecraft/fluid/Fluid;Lnet/minecraft/particle/ParticleEffect;)V
+accessible method net/minecraft/client/particle/DripParticle <init> (Lnet/minecraft/client/multiplayer/ClientLevel;DDDLnet/minecraft/world/level/material/Fluid;)V
+accessible method net/minecraft/client/particle/DripParticle$FallAndLandParticle <init> (Lnet/minecraft/client/multiplayer/ClientLevel;DDDLnet/minecraft/world/level/material/Fluid;Lnet/minecraft/core/particles/ParticleOptions;)V
 
-accessible method net/minecraft/world/gen/carver/Carver getDebugState (Lnet/minecraft/world/gen/carver/CarverConfig;Lnet/minecraft/block/BlockState;)Lnet/minecraft/block/BlockState;
-accessible method net/minecraft/world/gen/carver/Carver isDebug (Lnet/minecraft/world/gen/carver/CarverConfig;)Z
-accessible method net/minecraft/world/gen/carver/CarverDebugConfig <init> (ZLnet/minecraft/block/BlockState;Lnet/minecraft/block/BlockState;Lnet/minecraft/block/BlockState;Lnet/minecraft/block/BlockState;)V
+accessible method net/minecraft/world/level/levelgen/carver/WorldCarver getDebugState (Lnet/minecraft/world/level/levelgen/carver/CarverConfiguration;Lnet/minecraft/world/level/block/state/BlockState;)Lnet/minecraft/world/level/block/state/BlockState;
+accessible method net/minecraft/world/level/levelgen/carver/WorldCarver isDebugEnabled (Lnet/minecraft/world/level/levelgen/carver/CarverConfiguration;)Z
+accessible method net/minecraft/world/level/levelgen/carver/CarverDebugSettings <init> (ZLnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/BlockState;)V
 
-accessible method net/minecraft/util/math/Spline$Builder add (FLnet/minecraft/util/math/Spline;F)Lnet/minecraft/util/math/Spline$Builder;
+accessible method net/minecraft/util/CubicSpline$Builder addPoint (FLnet/minecraft/util/CubicSpline;F)Lnet/minecraft/util/CubicSpline$Builder;
 
-accessible method net/minecraft/world/gen/DensityFunctions$ShiftedNoise <init> (Lnet/minecraft/world/gen/DensityFunction;Lnet/minecraft/world/gen/DensityFunction;Lnet/minecraft/world/gen/DensityFunction;DDLnet/minecraft/world/gen/DensityFunction$NoiseHolder;)V
-accessible method net/minecraft/world/gen/noise/NoiseRouterData getFunction (Lnet/minecraft/registry/HolderProvider;Lnet/minecraft/registry/RegistryKey;)Lnet/minecraft/world/gen/DensityFunction;
-accessible field net/minecraft/world/gen/noise/NoiseRouterData SHIFT_Z Lnet/minecraft/registry/RegistryKey;
-accessible field net/minecraft/world/gen/noise/NoiseRouterData SHIFT_X Lnet/minecraft/registry/RegistryKey;
-accessible field net/minecraft/world/gen/noise/NoiseRouterData Y Lnet/minecraft/registry/RegistryKey;
-accessible field net/minecraft/world/gen/noise/NoiseRouterData CAVES_SPAGHETTI_2D_OVERWORLD Lnet/minecraft/registry/RegistryKey;
-accessible field net/minecraft/world/gen/noise/NoiseRouterData CAVES_SPAGHETTI_ROUGHNESS_FUNCTION_OVERWORLD Lnet/minecraft/registry/RegistryKey;
-accessible field net/minecraft/world/gen/noise/NoiseRouterData CAVES_NOODLE_OVERWORLD Lnet/minecraft/registry/RegistryKey;
-accessible field net/minecraft/world/gen/noise/NoiseRouterData CAVES_ENTRANCES_OVERWORLD Lnet/minecraft/registry/RegistryKey;
-accessible field net/minecraft/world/gen/noise/NoiseRouterData CAVES_PILLARS_OVERWORLD Lnet/minecraft/registry/RegistryKey;
-accessible field net/minecraft/world/gen/noise/NoiseRouterData BASE_3D_NOISE_NETHER Lnet/minecraft/registry/RegistryKey;
-accessible method net/minecraft/world/gen/noise/NoiseRouterData postProcess (Lnet/minecraft/world/gen/DensityFunction;)Lnet/minecraft/world/gen/DensityFunction;
-accessible method net/minecraft/world/gen/noise/NoiseRouterData noiseGradientDensity (Lnet/minecraft/world/gen/DensityFunction;Lnet/minecraft/world/gen/DensityFunction;)Lnet/minecraft/world/gen/DensityFunction;
-accessible method net/minecraft/world/gen/noise/NoiseRouterData splineWithBlending (Lnet/minecraft/world/gen/DensityFunction;Lnet/minecraft/world/gen/DensityFunction;)Lnet/minecraft/world/gen/DensityFunction;
-accessible class net/minecraft/world/biome/util/MultiNoiseBiomeSourceParameterList$Preset$SourceProvider
-accessible method net/minecraft/world/gen/noise/NoiseRouterData slide (Lnet/minecraft/world/gen/DensityFunction;IIIIDIID)Lnet/minecraft/world/gen/DensityFunction;
-accessible class net/minecraft/world/gen/OreVeinCreator$VeinType
-accessible field net/minecraft/world/gen/OreVeinCreator$VeinType minY I
-accessible field net/minecraft/world/gen/OreVeinCreator$VeinType maxY I
+accessible method net/minecraft/world/level/levelgen/DensityFunctions$ShiftedNoise <init> (Lnet/minecraft/world/level/levelgen/DensityFunction;Lnet/minecraft/world/level/levelgen/DensityFunction;Lnet/minecraft/world/level/levelgen/DensityFunction;DDLnet/minecraft/world/level/levelgen/DensityFunction$NoiseHolder;)V
+accessible method net/minecraft/world/level/levelgen/NoiseRouterData getFunction (Lnet/minecraft/core/HolderGetter;Lnet/minecraft/resources/ResourceKey;)Lnet/minecraft/world/level/levelgen/DensityFunction;
+accessible field net/minecraft/world/level/levelgen/NoiseRouterData SHIFT_Z Lnet/minecraft/resources/ResourceKey;
+accessible field net/minecraft/world/level/levelgen/NoiseRouterData SHIFT_X Lnet/minecraft/resources/ResourceKey;
+accessible field net/minecraft/world/level/levelgen/NoiseRouterData Y Lnet/minecraft/resources/ResourceKey;
+accessible field net/minecraft/world/level/levelgen/NoiseRouterData SPAGHETTI_2D Lnet/minecraft/resources/ResourceKey;
+accessible field net/minecraft/world/level/levelgen/NoiseRouterData SPAGHETTI_ROUGHNESS_FUNCTION Lnet/minecraft/resources/ResourceKey;
+accessible field net/minecraft/world/level/levelgen/NoiseRouterData NOODLE Lnet/minecraft/resources/ResourceKey;
+accessible field net/minecraft/world/level/levelgen/NoiseRouterData ENTRANCES Lnet/minecraft/resources/ResourceKey;
+accessible field net/minecraft/world/level/levelgen/NoiseRouterData PILLARS Lnet/minecraft/resources/ResourceKey;
+accessible field net/minecraft/world/level/levelgen/NoiseRouterData BASE_3D_NOISE_NETHER Lnet/minecraft/resources/ResourceKey;
+accessible method net/minecraft/world/level/levelgen/NoiseRouterData postProcess (Lnet/minecraft/world/level/levelgen/DensityFunction;)Lnet/minecraft/world/level/levelgen/DensityFunction;
+accessible method net/minecraft/world/level/levelgen/NoiseRouterData noiseGradientDensity (Lnet/minecraft/world/level/levelgen/DensityFunction;Lnet/minecraft/world/level/levelgen/DensityFunction;)Lnet/minecraft/world/level/levelgen/DensityFunction;
+accessible method net/minecraft/world/level/levelgen/NoiseRouterData splineWithBlending (Lnet/minecraft/world/level/levelgen/DensityFunction;Lnet/minecraft/world/level/levelgen/DensityFunction;)Lnet/minecraft/world/level/levelgen/DensityFunction;
+accessible class net/minecraft/world/level/biome/MultiNoiseBiomeSourceParameterList$Preset$SourceProvider
+accessible method net/minecraft/world/level/levelgen/NoiseRouterData slide (Lnet/minecraft/world/level/levelgen/DensityFunction;IIIIDIID)Lnet/minecraft/world/level/levelgen/DensityFunction;
+accessible class net/minecraft/world/level/levelgen/OreVeinifier$VeinType
+accessible field net/minecraft/world/level/levelgen/OreVeinifier$VeinType minY I
+accessible field net/minecraft/world/level/levelgen/OreVeinifier$VeinType maxY I
 
-accessible class net/minecraft/world/gen/DensityFunctions$PureTransformer
-accessible method net/minecraft/world/gen/DensityFunctions singleFunctionArgumentCodec (Ljava/util/function/Function;Ljava/util/function/Function;)Lnet/minecraft/util/dynamic/CodecHolder;
-accessible method net/minecraft/world/gen/DensityFunctions mapFromUnitToValue (Lnet/minecraft/world/gen/DensityFunction;DD)Lnet/minecraft/world/gen/DensityFunction;
+accessible class net/minecraft/world/level/levelgen/DensityFunctions$PureTransformer
+accessible method net/minecraft/world/level/levelgen/DensityFunctions singleFunctionArgumentCodec (Ljava/util/function/Function;Ljava/util/function/Function;)Lnet/minecraft/util/KeyDispatchDataCodec;
+accessible method net/minecraft/world/level/levelgen/DensityFunctions mapFromUnitTo (Lnet/minecraft/world/level/levelgen/DensityFunction;DD)Lnet/minecraft/world/level/levelgen/DensityFunction;
 
-accessible field net/minecraft/block/TrialSpawnerData currentMobs Ljava/util/Set;
+accessible field net/minecraft/world/level/block/entity/trialspawner/TrialSpawnerData currentMobs Ljava/util/Set;
 
-accessible method net/minecraft/world/gen/PillagerSpawner spawnPillager (Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/random/RandomGenerator;Z)Z
+accessible method net/minecraft/world/level/levelgen/PatrolSpawner spawnPatrolMember (Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;Lnet/minecraft/util/RandomSource;Z)Z
 
-accessible method net/minecraft/client/particle/ShriekParticle <init> (Lnet/minecraft/client/world/ClientWorld;DDDI)V
+accessible method net/minecraft/client/particle/ShriekParticle <init> (Lnet/minecraft/client/multiplayer/ClientLevel;DDDI)V
 accessible field net/minecraft/client/particle/ShriekParticle delay I
-accessible method net/minecraft/block/sculk/SculkBlock getRandomGrowthState (Lnet/minecraft/world/WorldAccess;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/random/RandomGenerator;Z)Lnet/minecraft/block/BlockState;
+accessible method net/minecraft/world/level/block/SculkBlock getRandomGrowthState (Lnet/minecraft/world/level/LevelAccessor;Lnet/minecraft/core/BlockPos;Lnet/minecraft/util/RandomSource;Z)Lnet/minecraft/world/level/block/state/BlockState;
 
-accessible class net/minecraft/world/gen/feature/JigsawFeature
+accessible class net/minecraft/world/level/levelgen/structure/structures/JigsawStructure
 
-accessible field net/minecraft/client/render/RenderLayer EYES Ljava/util/function/BiFunction;
+accessible field net/minecraft/client/renderer/RenderType EYES Ljava/util/function/BiFunction;

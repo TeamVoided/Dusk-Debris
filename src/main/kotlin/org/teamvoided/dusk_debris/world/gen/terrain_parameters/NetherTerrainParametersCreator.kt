@@ -1,7 +1,7 @@
 package org.teamvoided.dusk_debris.world.gen.terrain_parameters
 
-import net.minecraft.util.function.ToFloatFunction
-import net.minecraft.util.math.Spline
+import net.minecraft.util.CubicSpline
+import net.minecraft.util.ToFloatFunction
 import org.teamvoided.dusk_debris.util.world_helper.add
 import org.teamvoided.dusk_debris.world.gen.terrain_parameters.nether.OffsetFloor
 
@@ -39,7 +39,7 @@ object NetherTerrainParametersCreator {
         ridgesFolded: I,
         ridges: I,
         amplified: Boolean = false
-    ): Spline<C, I> {
+    ): CubicSpline<C, I> {
         val amplifiedTransformer = if (amplified) OFFSET_AMPLIFIED else NO_TRANSFORM
 
         val warpedIsland = OffsetFloor.createWarpedIsland(ridgesFolded, amplifiedTransformer)
@@ -50,7 +50,7 @@ object NetherTerrainParametersCreator {
 
 
         //OFFSET CONTINENTALNESS
-        return Spline.builder(continents, amplifiedTransformer)
+        return CubicSpline.builder(continents, amplifiedTransformer)
 //            .add(WARPED_ISLAND, nFloor(180))
 //            .add(LAVA_OCEAN_DEEP, nFloor(-18))
 //            .add(LAVA_OCEAN, nFloor(24))
@@ -67,9 +67,9 @@ object NetherTerrainParametersCreator {
         ridgesFolded: I,
         dropCeiling: I,
         amplified: Boolean
-    ): Spline<C, I> {
+    ): CubicSpline<C, I> {
         val amplifiedTransformer = if (amplified) OFFSET_AMPLIFIED else NO_TRANSFORM
-        return Spline.builder(dropCeiling, amplifiedTransformer)
+        return CubicSpline.builder(dropCeiling, amplifiedTransformer)
             .add(-1f, nCeil(224))
 //            .add(0f, nCeil(180))
 //            .add(1f, nCeil(0))
@@ -83,11 +83,11 @@ object NetherTerrainParametersCreator {
         ridges: I,
         ridgesFolded: I,
         amplified: Boolean
-    ): Spline<C, I> {
+    ): CubicSpline<C, I> {
         val amplifiedTransformer = if (amplified) FACTOR_AMPLIFIED else NO_TRANSFORM
-        val jaggedErosion = Spline.builder(erosion, amplifiedTransformer)
+        val jaggedErosion = CubicSpline.builder(erosion, amplifiedTransformer)
             .add(0f, 3f)
-        val jaggedRidgesFolded = Spline.builder(ridgesFolded, amplifiedTransformer)
+        val jaggedRidgesFolded = CubicSpline.builder(ridgesFolded, amplifiedTransformer)
             .add(-0.8f, 6f)
             .add(-0.7f, jaggedErosion.build())
         return jaggedRidgesFolded.build()
@@ -100,9 +100,9 @@ object NetherTerrainParametersCreator {
         ridgesFolded: I,
         jaggedness: I,
         amplified: Boolean
-    ): Spline<C, I> {
+    ): CubicSpline<C, I> {
         val amplifiedTransformer = if (amplified) JAGGEDNESS_AMPLIFIED else NO_TRANSFORM
-        val spline = Spline.builder(jaggedness, amplifiedTransformer)
+        val spline = CubicSpline.builder(jaggedness, amplifiedTransformer)
             .add(-1f, 0f)//-0.07f)
 //            .add(0f, 0f)
         return spline.build()
@@ -114,7 +114,7 @@ object NetherTerrainParametersCreator {
         ridges: I,
         ridgesFolded: I,
         amplifier: ToFloatFunction<Float>
-    ): Spline<C, I> {
+    ): CubicSpline<C, I> {
         val tallMountain = OffsetFloor.createMountain(0, 300, mult, ridgesFolded, amplifier)
         val mountain = OffsetFloor.createMountain(16, 200, mult, ridgesFolded, amplifier)
         val plateauTall = OffsetFloor.createPlateau(0, 144, mult, ridgesFolded, amplifier)
@@ -122,7 +122,7 @@ object NetherTerrainParametersCreator {
         val shelf = OffsetFloor.createShelfs(mult, ridgesFolded, amplifier)
         val flatsWithPoint = OffsetFloor.createFlatsWithPoint(mult, ridgesFolded, amplifier)
         val flats = OffsetFloor.createFlats(mult, ridgesFolded, amplifier)
-        val spline = Spline.builder(erosion, amplifier)
+        val spline = CubicSpline.builder(erosion, amplifier)
             .add(-1f, tallMountain)
             .add(-.75f, mountain)
             .add(-.4f, plateauTall)

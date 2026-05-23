@@ -1,42 +1,46 @@
 package org.teamvoided.dusk_debris.entity.block
 
-import net.minecraft.block.entity.BellBlockEntity
-import net.minecraft.client.model.*
-import net.minecraft.client.render.RenderLayer
-import net.minecraft.client.render.VertexConsumerProvider
-import net.minecraft.client.render.block.entity.BlockEntityRenderer
-import net.minecraft.client.render.block.entity.BlockEntityRendererFactory
-import net.minecraft.client.resource.Material
-import net.minecraft.client.util.math.MatrixStack
-import net.minecraft.screen.PlayerScreenHandler
-import net.minecraft.util.math.Direction
-import net.minecraft.util.math.MathHelper
+import com.mojang.blaze3d.vertex.PoseStack
+import net.minecraft.client.model.geom.ModelPart
+import net.minecraft.client.model.geom.PartPose
+import net.minecraft.client.model.geom.builders.CubeListBuilder
+import net.minecraft.client.model.geom.builders.LayerDefinition
+import net.minecraft.client.model.geom.builders.MeshDefinition
+import net.minecraft.client.renderer.MultiBufferSource
+import net.minecraft.client.renderer.RenderType
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderer
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider
+import net.minecraft.client.resources.model.Material
+import net.minecraft.core.Direction
+import net.minecraft.util.Mth
+import net.minecraft.world.inventory.InventoryMenu
+import net.minecraft.world.level.block.entity.BellBlockEntity
 import org.teamvoided.dusk_debris.DuskDebris.id
 import org.teamvoided.dusk_debris.entity.DuskEntityModelLayers.CELESTAL_BELL
 
 class CelestalBellBlockEntityRenderer(
-    ctx: BlockEntityRendererFactory.Context,
+    ctx: BlockEntityRendererProvider.Context,
 ) : BlockEntityRenderer<BellBlockEntity> {
     private val bellBody: ModelPart
     init {
-        val modelPart = ctx.getLayerModelPart(CELESTAL_BELL)
+        val modelPart = ctx.bakeLayer(CELESTAL_BELL)
         this.bellBody = modelPart.getChild("bell_body")
     }
 
     override fun render(
         bellBlockEntity: BellBlockEntity,
         f: Float,
-        matrices: MatrixStack,
-        vertexConsumers: VertexConsumerProvider,
+        matrices: PoseStack,
+        vertexConsumers: MultiBufferSource,
         i: Int,
         j: Int
     ) {
-        val g = bellBlockEntity.ringTicks.toFloat() + f
+        val g = bellBlockEntity.ticks.toFloat() + f
         var h = 0.0f
         var k = 0.0f
-        if (bellBlockEntity.ringing) {
-            val l = MathHelper.sin(g / Math.PI.toFloat()) / (4.0f + g / 3.0f)
-            when (bellBlockEntity.lastSideHit) {
+        if (bellBlockEntity.shaking) {
+            val l = Mth.sin(g / Math.PI.toFloat()) / (4.0f + g / 3.0f)
+            when (bellBlockEntity.clickDirection) {
                 Direction.NORTH -> h = -l
                 Direction.SOUTH -> h = l
                 Direction.EAST -> k = -l
@@ -44,30 +48,30 @@ class CelestalBellBlockEntityRenderer(
                 else -> Unit
             }
         }
-        bellBody.pitch = h
-        bellBody.roll = k
-        val vertexConsumer = CELESTAL_BELL_TEXTURE.getVertexConsumer(vertexConsumers, RenderLayer::getEntitySolid)
+        bellBody.xRot = h
+        bellBody.zRot = k
+        val vertexConsumer = CELESTAL_BELL_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid)
         bellBody.render(matrices, vertexConsumer, i, j)
     }
 
     companion object {
         val CELESTAL_BELL_TEXTURE: Material =
-            Material(PlayerScreenHandler.BLOCK_ATLAS_TEXTURE, id("entity/celestal_bell/celestal_bell_body"))
+            Material(InventoryMenu.BLOCK_ATLAS, id("entity/celestal_bell/celestal_bell_body"))
 
-        fun getTexturedModelData(): TexturedModelData {
-            val modelData = ModelData()
+        fun getTexturedModelData(): LayerDefinition {
+            val modelData = MeshDefinition()
             val modelPartData = modelData.root
-            val modelPartData2 = modelPartData.addChild(
+            val modelPartData2 = modelPartData.addOrReplaceChild(
                 "bell_body",
-                ModelPartBuilder.create().uv(0, 0).cuboid(-3.0f, -6.0f, -3.0f, 6.0f, 7.0f, 6.0f),
-                ModelTransform.pivot(8.0f, 12.0f, 8.0f)
+                CubeListBuilder.create().texOffs(0, 0).addBox(-3.0f, -6.0f, -3.0f, 6.0f, 7.0f, 6.0f),
+                PartPose.offset(8.0f, 12.0f, 8.0f)
             )
-            modelPartData2.addChild(
+            modelPartData2.addOrReplaceChild(
                 "bell_base",
-                ModelPartBuilder.create().uv(0, 13).cuboid(4.0f, 4.0f, 4.0f, 8.0f, 2.0f, 8.0f),
-                ModelTransform.pivot(-8.0f, -12.0f, -8.0f)
+                CubeListBuilder.create().texOffs(0, 13).addBox(4.0f, 4.0f, 4.0f, 8.0f, 2.0f, 8.0f),
+                PartPose.offset(-8.0f, -12.0f, -8.0f)
             )
-            return TexturedModelData.of(modelData, 32, 32)
+            return LayerDefinition.create(modelData, 32, 32)
         }
     }
 }

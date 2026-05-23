@@ -1,15 +1,15 @@
 package org.teamvoided.dusk_debris.block.not_blocks
 
-import net.minecraft.util.StringIdentifiable
+import net.minecraft.util.StringRepresentable
 
-enum class ChestPhase(val phaseName: String) : StringIdentifiable {
+enum class ChestPhase(val phaseName: String) : StringRepresentable {
     CLOSED("closed"),
     CLOSING("closing"),
     OPEN("open");
 
-    override fun toString(): String = asString()
+    override fun toString(): String = serializedName
 
-    override fun asString(): String = phaseName
+    override fun getSerializedName(): String = phaseName
 
     companion object {
         fun fromInt(int: Int): ChestPhase {

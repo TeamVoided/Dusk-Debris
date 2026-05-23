@@ -1,24 +1,24 @@
 package org.teamvoided.dusk_debris.block
 
-import net.minecraft.block.BlockState
-import net.minecraft.block.ShapeContext
-import net.minecraft.block.enums.DoubleBlockHalf
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Direction
-import net.minecraft.util.shape.VoxelShape
-import net.minecraft.util.shape.VoxelShapes
-import net.minecraft.world.BlockView
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
+import net.minecraft.world.level.BlockGetter
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.block.state.properties.DoubleBlockHalf
+import net.minecraft.world.phys.shapes.CollisionContext
+import net.minecraft.world.phys.shapes.Shapes
+import net.minecraft.world.phys.shapes.VoxelShape
 
-class SquashBlock(settings: Settings) : TallDirectionalBlock(settings) {
+class SquashBlock(settings: Properties) : TallDirectionalBlock(settings) {
 
-    override fun getOutlineShape(
+    override fun getShape(
         state: BlockState,
-        world: BlockView,
+        world: BlockGetter,
         pos: BlockPos,
-        context: ShapeContext
+        context: CollisionContext
     ): VoxelShape {
-        val direction = state.get(FACING).axis
-        return if (state.get(HALF) == DoubleBlockHalf.UPPER) VoxelShapes.fullCube()
+        val direction = state.getValue(FACING).axis
+        return if (state.getValue(HALF) == DoubleBlockHalf.UPPER) Shapes.block()
         else when (direction) {
             Direction.Axis.Z -> zShape
             Direction.Axis.X -> xShape
@@ -28,15 +28,15 @@ class SquashBlock(settings: Settings) : TallDirectionalBlock(settings) {
     }
 
     companion object {
-        val yShape = createCuboidShape(
+        val yShape = box(
             2.0, 0.0, 2.0,
             14.0, 16.0, 14.0
         )
-        val xShape = createCuboidShape(
+        val xShape = box(
             0.0, 2.0, 2.0,
             16.0, 14.0, 14.0
         )
-        val zShape = createCuboidShape(
+        val zShape = box(
             2.0, 2.0, 0.0,
             14.0, 14.0, 16.0
         )

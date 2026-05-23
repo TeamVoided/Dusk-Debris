@@ -2,18 +2,18 @@ package org.teamvoided.dusk_debris.world.gen.tree.trunk
 
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
-import net.minecraft.block.BlockState
-import net.minecraft.state.property.Properties
-import net.minecraft.util.dynamic.Codecs
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Direction
-import net.minecraft.util.math.int_provider.IntProvider
-import net.minecraft.util.random.RandomGenerator
-import net.minecraft.world.TestableWorld
-import net.minecraft.world.gen.feature.TreeFeatureConfig
-import net.minecraft.world.gen.foliage.FoliagePlacer
-import net.minecraft.world.gen.trunk.TrunkPlacer
-import net.minecraft.world.gen.trunk.TrunkPlacerType
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
+import net.minecraft.util.ExtraCodecs
+import net.minecraft.util.RandomSource
+import net.minecraft.util.valueproviders.IntProvider
+import net.minecraft.world.level.LevelSimulatedReader
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.block.state.properties.BlockStateProperties
+import net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration
+import net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacer
+import net.minecraft.world.level.levelgen.feature.trunkplacers.TrunkPlacer
+import net.minecraft.world.level.levelgen.feature.trunkplacers.TrunkPlacerType
 import java.util.function.BiConsumer
 
 class OvergrowthTrunkPlacer(
@@ -23,27 +23,27 @@ class OvergrowthTrunkPlacer(
     private val minHeightForLeaves: Int,
     private val bendLength: IntProvider
 ) : TrunkPlacer(baseHeight, firstRandomHeight, secondRandomHeight) {
-    override fun getType(): TrunkPlacerType<*> {
+    override fun type(): TrunkPlacerType<*> {
         return TrunkPlacerType.BENDING_TRUNK_PLACER
     }
 
-    override fun generate(
-        world: TestableWorld,
+    override fun placeTrunk(
+        world: LevelSimulatedReader,
         replacer: BiConsumer<BlockPos, BlockState>,
-        random: RandomGenerator,
+        random: RandomSource,
         height: Int,
         startPos: BlockPos,
-        config: TreeFeatureConfig
-    ): List<FoliagePlacer.TreeNode> {
-        val direction = Direction.Type.HORIZONTAL.random(random)
+        config: TreeConfiguration
+    ): List<FoliagePlacer.FoliageAttachment> {
+        val direction = Direction.Plane.HORIZONTAL.getRandomDirection(random)
         val treeHeight = height - 1
-        val mutable = startPos.mutableCopy()
+        val mutable = startPos.mutable()
         val saplingFacing: Direction
-        if (world.testBlockState(startPos) { it.contains(Properties.FACING) }) {
+        if (world.isStateAtPosition(startPos) { it.hasProperty(BlockStateProperties.FACING) }) {
             var f = Direction.DOWN
             for (i in 0..Direction.entries.size) {
-                val dir = Direction.byId(i)
-                if (world.testBlockState(startPos) { it.get(Properties.FACING) == dir }) {
+                val dir = Direction.from3DDataValue(i)
+                if (world.isStateAtPosition(startPos) { it.getValue(BlockStateProperties.FACING) == dir }) {
                     f = dir
                     break
                 }
@@ -54,9 +54,9 @@ class OvergrowthTrunkPlacer(
         }
 
         val dirtPos = mutable.move(saplingFacing)
-        setToDirt(world, replacer, random, dirtPos, config)
+        setDirtAt(world, replacer, random, dirtPos, config)
 
-        val list: MutableList<FoliagePlacer.TreeNode> = ArrayList()
+        val list: MutableList<FoliagePlacer.FoliageAttachment> = ArrayList()
 
 
 
@@ -67,11 +67,11 @@ class OvergrowthTrunkPlacer(
     companion object {
         val CODEC: MapCodec<OvergrowthTrunkPlacer> =
             RecordCodecBuilder.mapCodec { instance: RecordCodecBuilder.Instance<OvergrowthTrunkPlacer> ->
-                fillTrunkPlacerFields(instance).and(
+                trunkPlacerParts(instance).and(
                     instance.group(
-                        Codecs.POSITIVE_INT.optionalFieldOf("min_height_for_leaves", 1)
+                        ExtraCodecs.POSITIVE_INT.optionalFieldOf("min_height_for_leaves", 1)
                             .forGetter { placer: OvergrowthTrunkPlacer -> placer.minHeightForLeaves },
-                        IntProvider.method_35004(1, 64).fieldOf("bend_length")
+                        IntProvider.codec(1, 64).fieldOf("bend_length")
                             .forGetter { placer: OvergrowthTrunkPlacer -> placer.bendLength })
                 ).apply(instance, ::OvergrowthTrunkPlacer)
             }

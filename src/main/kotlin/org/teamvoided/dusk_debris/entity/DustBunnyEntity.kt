@@ -1,102 +1,101 @@
 package org.teamvoided.dusk_debris.entity
 
-import net.minecraft.entity.Entity
-import net.minecraft.entity.EntityType
-import net.minecraft.entity.MovementType
-import net.minecraft.entity.Ownable
-import net.minecraft.entity.ai.TargetPredicate
-import net.minecraft.entity.ai.control.MoveControl
-import net.minecraft.entity.ai.goal.*
-import net.minecraft.entity.attribute.DefaultAttributeContainer
-import net.minecraft.entity.attribute.EntityAttributes
-import net.minecraft.entity.damage.DamageSource
-import net.minecraft.entity.data.DataTracker
-import net.minecraft.entity.data.TrackedData
-import net.minecraft.entity.data.TrackedDataHandlerRegistry
-import net.minecraft.entity.mob.HostileEntity
-import net.minecraft.entity.mob.MobEntity
-import net.minecraft.entity.mob.PathAwareEntity
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.nbt.NbtCompound
-import net.minecraft.sound.SoundEvent
-import net.minecraft.sound.SoundEvents
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.MathHelper
-import net.minecraft.util.math.Vec3d
-import net.minecraft.world.World
+import net.minecraft.core.BlockPos
+import net.minecraft.nbt.CompoundTag
+import net.minecraft.network.syncher.EntityDataAccessor
+import net.minecraft.network.syncher.EntityDataSerializers
+import net.minecraft.network.syncher.SynchedEntityData
+import net.minecraft.sounds.SoundEvent
+import net.minecraft.sounds.SoundEvents
+import net.minecraft.util.Mth
+import net.minecraft.world.damagesource.DamageSource
+import net.minecraft.world.entity.*
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier
+import net.minecraft.world.entity.ai.attributes.Attributes
+import net.minecraft.world.entity.ai.control.MoveControl
+import net.minecraft.world.entity.ai.goal.FloatGoal
+import net.minecraft.world.entity.ai.goal.Goal
+import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal
+import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal
+import net.minecraft.world.entity.ai.goal.target.TargetGoal
+import net.minecraft.world.entity.ai.targeting.TargetingConditions
+import net.minecraft.world.entity.monster.Monster
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.level.Level
+import net.minecraft.world.phys.Vec3
 import org.teamvoided.dusk_debris.block.entity.BunnyGraveBlockEntity
 import org.teamvoided.dusk_debris.particle.color.DustBunnyParticleEffect
 import java.util.*
 import kotlin.jvm.optionals.getOrNull
 
-class DustBunnyEntity(entityType: EntityType<out DustBunnyEntity>, world: World) :
-    HostileEntity(entityType, world), Ownable {
-    var creator: MobEntity? = null
+class DustBunnyEntity(entityType: EntityType<out DustBunnyEntity>, world: Level) :
+    Monster(entityType, world), TraceableEntity {
+    var creator: Mob? = null
     private var alive = false
 
     init {
         this.moveControl = NoClipMoveControl(this)
-        this.experiencePoints = 3
+        this.xpReward = 3
     }
 
-    override fun initGoals() {
-        super.initGoals()
-        goalSelector.add(0, SwimGoal(this))
-        goalSelector.add(4, ChargeTargetGoal())
-        goalSelector.add(8, LookAtTargetGoal())
-        goalSelector.add(
-            9, LookAtEntityGoal(
+    override fun registerGoals() {
+        super.registerGoals()
+        goalSelector.addGoal(0, FloatGoal(this))
+        goalSelector.addGoal(4, ChargeTargetGoal())
+        goalSelector.addGoal(8, LookAtTargetGoal())
+        goalSelector.addGoal(
+            9, LookAtPlayerGoal(
                 this,
-                PlayerEntity::class.java, 3.0f, 1.0f
+                Player::class.java, 3.0f, 1.0f
             )
         )
-        goalSelector.add(
-            10, LookAtEntityGoal(
+        goalSelector.addGoal(
+            10, LookAtPlayerGoal(
                 this,
-                MobEntity::class.java, 8.0f
+                Mob::class.java, 8.0f
             )
         )
-        targetSelector.add(1, TrackOwnerTargetGoal(this))
-        targetSelector.add(
-            2, TargetGoal(
+        targetSelector.addGoal(1, TrackOwnerTargetGoal(this))
+        targetSelector.addGoal(
+            2, NearestAttackableTargetGoal(
                 this,
-                PlayerEntity::class.java, true
+                Player::class.java, true
             )
         )
     }
 
-    override fun initDataTracker(builder: DataTracker.Builder) {
-        super.initDataTracker(builder)
-        builder.add(TRACKER_CHARGING, false)
-        builder.add(TRACKER_SUMMON_POSITION, Optional.empty())
+    override fun defineSynchedData(builder: SynchedEntityData.Builder) {
+        super.defineSynchedData(builder)
+        builder.define(TRACKER_CHARGING, false)
+        builder.define(TRACKER_SUMMON_POSITION, Optional.empty())
     }
 
-    override fun readCustomDataFromNbt(nbt: NbtCompound) {
-        super.readCustomDataFromNbt(nbt)
+    override fun readAdditionalSaveData(nbt: CompoundTag) {
+        super.readAdditionalSaveData(nbt)
         this.isCharging = nbt.getBoolean("Charging")
     }
 
-    override fun writeCustomDataToNbt(nbt: NbtCompound) {
-        super.writeCustomDataToNbt(nbt)
+    override fun addAdditionalSaveData(nbt: CompoundTag) {
+        super.addAdditionalSaveData(nbt)
         nbt.putBoolean("Charging", this.isCharging)
     }
 
-    override fun copyFrom(original: Entity) {
-        super.copyFrom(original)
+    override fun restoreFrom(original: Entity) {
+        super.restoreFrom(original)
         if (original is DustBunnyEntity) {
             this.owner = original.owner
         }
     }
 
-    override fun move(movementType: MovementType, movement: Vec3d) {
+    override fun move(movementType: MoverType, movement: Vec3) {
         super.move(movementType, movement)
-        this.checkBlockCollision()
+        this.checkInsideBlocks()
     }
 
-    override fun onDeath(source: DamageSource) {
-        super.onDeath(source)
+    override fun die(source: DamageSource) {
+        super.die(source)
         if (summonedPos != null) {
-            val summonGrave = world.getBlockEntity(summonedPos)
+            val summonGrave = level().getBlockEntity(summonedPos)
             if (summonGrave is BunnyGraveBlockEntity) {
                 summonGrave.removeDustBunny(this)
             }
@@ -104,62 +103,62 @@ class DustBunnyEntity(entityType: EntityType<out DustBunnyEntity>, world: World)
     }
 
     override fun tick() {
-        this.noClip = true
+        this.noPhysics = true
         super.tick()
-        this.noClip = false
+        this.noPhysics = false
         this.setNoGravity(true)
-        particles(world, this, 1)
-        if (this.alive && !this.hasCustomName() && this.age >= 72000 && age % 20 == 0) {
-            this.damage(this.damageSources.starve(), 1.0f)
+        particles(level(), this, 1)
+        if (this.alive && !this.hasCustomName() && this.tickCount >= 72000 && tickCount % 20 == 0) {
+            this.hurt(this.damageSources().starve(), 1.0f)
         }
     }
 
-    override fun getOwner(): MobEntity? {
+    override fun getOwner(): Mob? {
         return this.creator
     }
 
     override fun isPushable(): Boolean = false
 
-    override fun pushAway(entity: Entity) {
+    override fun doPush(entity: Entity) {
     }
 
 
     var isCharging: Boolean
-        get() = dataTracker[TRACKER_CHARGING]
+        get() = entityData[TRACKER_CHARGING]
         set(charging) {
-            dataTracker[TRACKER_CHARGING] = charging
+            entityData[TRACKER_CHARGING] = charging
         }
 
 
     var summonedPos: BlockPos?
-        get() = dataTracker[TRACKER_SUMMON_POSITION].getOrNull()
+        get() = entityData[TRACKER_SUMMON_POSITION].getOrNull()
         set(pos) {
-            dataTracker[TRACKER_SUMMON_POSITION] = Optional.ofNullable(pos)
+            entityData[TRACKER_SUMMON_POSITION] = Optional.ofNullable(pos)
         }
 
-    fun setOwner(owner: MobEntity?) {
+    fun setOwner(owner: Mob?) {
         this.creator = owner
     }
 
     override fun getAmbientSound(): SoundEvent {
-        return SoundEvents.ENTITY_VEX_AMBIENT
+        return SoundEvents.VEX_AMBIENT
     }
 
     override fun getDeathSound(): SoundEvent {
-        return SoundEvents.ENTITY_VEX_DEATH
+        return SoundEvents.VEX_DEATH
     }
 
     override fun getHurtSound(source: DamageSource): SoundEvent {
-        return SoundEvents.ENTITY_VEX_HURT
+        return SoundEvents.VEX_HURT
     }
 
-    override fun getLightLevelDependentValue(): Float = 1.0f
+    override fun getLightLevelDependentMagicValue(): Float = 1.0f
 
-    fun particles(world: World, entity: Entity, count: Int, multiplier: Double = 0.1) {
+    fun particles(world: Level, entity: Entity, count: Int, multiplier: Double = 0.1) {
         val rand = world.random
-        val entityPos: Vec3d = entity.pos
+        val entityPos: Vec3 = entity.position()
         repeat(count) {
-            val velocity = Vec3d(
+            val velocity = Vec3(
                 (rand.nextDouble() - rand.nextDouble()) * multiplier,
                 (rand.nextDouble() - rand.nextDouble()) * multiplier,
                 (rand.nextDouble() - rand.nextDouble()) * multiplier,
@@ -167,9 +166,9 @@ class DustBunnyEntity(entityType: EntityType<out DustBunnyEntity>, world: World)
             world.addParticle(
                 DustBunnyParticleEffect(0xCCBA76, 0x896230),
                 true,
-                entityPos.x + ((rand.nextDouble() - rand.nextDouble()) * entity.width),
-                entityPos.y + (rand.nextDouble() * entity.height),
-                entityPos.z + ((rand.nextDouble() - rand.nextDouble()) * entity.width),
+                entityPos.x + ((rand.nextDouble() - rand.nextDouble()) * entity.bbWidth),
+                entityPos.y + (rand.nextDouble() * entity.bbHeight),
+                entityPos.z + ((rand.nextDouble() - rand.nextDouble()) * entity.bbWidth),
                 velocity.x,
                 velocity.y,
                 velocity.z,
@@ -179,28 +178,27 @@ class DustBunnyEntity(entityType: EntityType<out DustBunnyEntity>, world: World)
 
     private inner class NoClipMoveControl(bunnyEntity: DustBunnyEntity) : MoveControl(bunnyEntity) {
         override fun tick() {
-            if (this.state == State.MOVE_TO) {
-                val vec3d = Vec3d(
-                    this.targetX - this@DustBunnyEntity.x,
-                    this.targetY - this@DustBunnyEntity.y,
-                    this.targetZ - this@DustBunnyEntity.z
+            if (this.operation == Operation.MOVE_TO) {
+                val vec3d = Vec3(
+                    this.wantedX - this@DustBunnyEntity.x,
+                    this.wantedY - this@DustBunnyEntity.y,
+                    this.wantedZ - this@DustBunnyEntity.z
                 )
                 val distance = vec3d.length()
-                if (distance < bounds.averageSideLength / 2) {
-                    this.state = State.WAIT
-                    this@DustBunnyEntity.velocity = velocity.multiply(0.5)
+                if (distance < boundingBox.size / 2) {
+                    this.operation = Operation.WAIT
+                    this@DustBunnyEntity.setDeltaMovement(deltaMovement.scale(0.5))
                 } else {
-                    this@DustBunnyEntity.velocity =
-                        velocity.add(vec3d.multiply((this.speed * 0.05 / distance)))
+                    this@DustBunnyEntity.setDeltaMovement(deltaMovement.add(vec3d.scale((this.speedModifier * 0.05 / distance))))
                     if (this@DustBunnyEntity.target == null) {
-                        val velocity = this@DustBunnyEntity.velocity
-                        this@DustBunnyEntity.yaw = -(MathHelper.atan2(velocity.x, velocity.z).toFloat()) * 57.295776f
-                        this@DustBunnyEntity.bodyYaw = this@DustBunnyEntity.yaw
+                        val velocity = this@DustBunnyEntity.deltaMovement
+                        this@DustBunnyEntity.setYRot(-(Mth.atan2(velocity.x, velocity.z).toFloat()) * 57.295776f)
+                        this@DustBunnyEntity.yBodyRot = this@DustBunnyEntity.yRot
                     } else {
                         val e = target!!.x - this@DustBunnyEntity.x
                         val f = target!!.z - this@DustBunnyEntity.z
-                        this@DustBunnyEntity.yaw = -(MathHelper.atan2(e, f).toFloat()) * 57.295776f
-                        this@DustBunnyEntity.bodyYaw = this@DustBunnyEntity.yaw
+                        this@DustBunnyEntity.setYRot(-(Mth.atan2(e, f).toFloat()) * 57.295776f)
+                        this@DustBunnyEntity.yBodyRot = this@DustBunnyEntity.yRot
                     }
                 }
             }
@@ -209,23 +207,23 @@ class DustBunnyEntity(entityType: EntityType<out DustBunnyEntity>, world: World)
 
     private inner class ChargeTargetGoal : Goal() {
         init {
-            this.controls = EnumSet.of(Control.MOVE)
+            this.setFlags(EnumSet.of(Flag.MOVE))
         }
 
-        override fun canStart(): Boolean {
+        override fun canUse(): Boolean {
             val livingEntity = this@DustBunnyEntity.target
             return if (
-                (livingEntity != null && livingEntity.isAlive && !getMoveControl().isMoving) &&
-                random.nextInt(toGoalTicks(7)) == 0
+                (livingEntity != null && livingEntity.isAlive && !getMoveControl().hasWanted()) &&
+                random.nextInt(reducedTickDelay(7)) == 0
             ) {
-                this@DustBunnyEntity.squaredDistanceTo(livingEntity) > 8.0
+                this@DustBunnyEntity.distanceToSqr(livingEntity) > 8.0
             } else {
                 false
             }
         }
 
-        override fun shouldContinue(): Boolean {
-            return getMoveControl().isMoving &&
+        override fun canContinueToUse(): Boolean {
+            return getMoveControl().hasWanted() &&
                     this@DustBunnyEntity.isCharging &&
                     (this@DustBunnyEntity.target != null) &&
                     target!!.isAlive
@@ -234,12 +232,12 @@ class DustBunnyEntity(entityType: EntityType<out DustBunnyEntity>, world: World)
         override fun start() {
             val livingEntity = this@DustBunnyEntity.target
             if (livingEntity != null) {
-                val vec3d = livingEntity.eyePos
-                moveControl.moveTo(vec3d.x, vec3d.y, vec3d.z, 1.0)
+                val vec3d = livingEntity.eyePosition
+                moveControl.setWantedPosition(vec3d.x, vec3d.y, vec3d.z, 1.0)
             }
 
             this@DustBunnyEntity.isCharging = true
-            this@DustBunnyEntity.playSound(SoundEvents.ENTITY_VEX_CHARGE, 1.0f, 1.0f)
+            this@DustBunnyEntity.playSound(SoundEvents.VEX_CHARGE, 1.0f, 1.0f)
         }
 
         override fun stop() {
@@ -253,14 +251,14 @@ class DustBunnyEntity(entityType: EntityType<out DustBunnyEntity>, world: World)
         override fun tick() {
             val livingEntity = this@DustBunnyEntity.target
             if (livingEntity != null) {
-                if (getBounds().intersects(livingEntity.bounds)) {
-                    this@DustBunnyEntity.tryAttack(livingEntity)
+                if (boundingBox.intersects(livingEntity.boundingBox)) {
+                    this@DustBunnyEntity.doHurtTarget(livingEntity)
                     this@DustBunnyEntity.isCharging = false
                 } else {
-                    val d = this@DustBunnyEntity.squaredDistanceTo(livingEntity)
+                    val d = this@DustBunnyEntity.distanceToSqr(livingEntity)
                     if (d < 9.0) {
-                        val vec3d = livingEntity.eyePos
-                        moveControl.moveTo(vec3d.x, vec3d.y, vec3d.z, 1.0)
+                        val vec3d = livingEntity.eyePosition
+                        moveControl.setWantedPosition(vec3d.x, vec3d.y, vec3d.z, 1.0)
                     }
                 }
             }
@@ -269,37 +267,37 @@ class DustBunnyEntity(entityType: EntityType<out DustBunnyEntity>, world: World)
 
     private inner class LookAtTargetGoal : Goal() {
         init {
-            this.controls = EnumSet.of(Control.MOVE)
+            this.setFlags(EnumSet.of(Flag.MOVE))
         }
 
-        override fun canStart(): Boolean {
-            return !getMoveControl().isMoving && random.nextInt(toGoalTicks(7)) == 0
+        override fun canUse(): Boolean {
+            return !getMoveControl().hasWanted() && random.nextInt(reducedTickDelay(7)) == 0
         }
 
-        override fun shouldContinue(): Boolean {
+        override fun canContinueToUse(): Boolean {
             return false
         }
 
         override fun tick() {
-            val blockPos: BlockPos? = this@DustBunnyEntity.blockPos
+            val blockPos: BlockPos? = this@DustBunnyEntity.blockPosition()
 //            if (blockPos == null) {
 //                blockPos = this@NightmareEntity.blockPos
 //            }
 
             for (i in 0..2) {
-                val blockPos2 = blockPos!!.add(
+                val blockPos2 = blockPos!!.offset(
                     random.nextInt(15) - 7,
                     random.nextInt(11) - 5, random.nextInt(15) - 7
                 )
-                if (world.isAir(blockPos2)) {
-                    moveControl.moveTo(
+                if (level().isEmptyBlock(blockPos2)) {
+                    moveControl.setWantedPosition(
                         blockPos2.x.toDouble() + 0.5,
                         blockPos2.y.toDouble() + 0.5,
                         blockPos2.z.toDouble() + 0.5,
                         0.25
                     )
                     if (this@DustBunnyEntity.target == null) {
-                        getLookControl().lookAt(
+                        getLookControl().setLookAt(
                             blockPos2.x.toDouble() + 0.5,
                             blockPos2.y.toDouble() + 0.5,
                             blockPos2.z.toDouble() + 0.5,
@@ -313,12 +311,12 @@ class DustBunnyEntity(entityType: EntityType<out DustBunnyEntity>, world: World)
         }
     }
 
-    internal inner class TrackOwnerTargetGoal(mob: PathAwareEntity?) : TrackTargetGoal(mob, false) {
-        private val trackOwnerPredicate: TargetPredicate =
-            TargetPredicate.createNonAttackable().ignoreVisibility().ignoreDistanceScalingFactor()
+    internal inner class TrackOwnerTargetGoal(mob: PathfinderMob?) : TargetGoal(mob, false) {
+        private val trackOwnerPredicate: TargetingConditions =
+            TargetingConditions.forNonCombat().ignoreLineOfSight().ignoreInvisibilityTesting()
 
-        override fun canStart(): Boolean {
-            return this@DustBunnyEntity.owner != null && (owner!!.target != null) && this.canTrack(
+        override fun canUse(): Boolean {
+            return this@DustBunnyEntity.owner != null && (owner!!.target != null) && this.canAttack(
                 owner!!.target, this.trackOwnerPredicate
             )
         }
@@ -331,19 +329,19 @@ class DustBunnyEntity(entityType: EntityType<out DustBunnyEntity>, world: World)
 
     companion object {
 
-        val TRACKER_CHARGING: TrackedData<Boolean> = DataTracker.registerData(
-            DustBunnyEntity::class.java, TrackedDataHandlerRegistry.BOOLEAN
+        val TRACKER_CHARGING: EntityDataAccessor<Boolean> = SynchedEntityData.defineId(
+            DustBunnyEntity::class.java, EntityDataSerializers.BOOLEAN
         )
 
-        val TRACKER_SUMMON_POSITION: TrackedData<Optional<BlockPos>> = DataTracker.registerData(
-            DustBunnyEntity::class.java, TrackedDataHandlerRegistry.OPTIONAL_BLOCK_POS
+        val TRACKER_SUMMON_POSITION: EntityDataAccessor<Optional<BlockPos>> = SynchedEntityData.defineId(
+            DustBunnyEntity::class.java, EntityDataSerializers.OPTIONAL_BLOCK_POS
         )
 
-        fun createAttributes(): DefaultAttributeContainer.Builder {
-            return HostileEntity.createAttributes()
-                .add(EntityAttributes.GENERIC_MAX_HEALTH, 5.0)
-                .add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 1.0)
-                .add(EntityAttributes.GENERIC_ATTACK_KNOCKBACK, 5.0)
+        fun createAttributes(): AttributeSupplier.Builder {
+            return Monster.createMonsterAttributes()
+                .add(Attributes.MAX_HEALTH, 5.0)
+                .add(Attributes.ATTACK_DAMAGE, 1.0)
+                .add(Attributes.ATTACK_KNOCKBACK, 5.0)
         }
     }
 }

@@ -1,32 +1,32 @@
 package org.teamvoided.dusk_debris.entity.block.treasure_chest
 
+import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.blaze3d.vertex.VertexConsumer
+import com.mojang.math.Axis
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
-import net.minecraft.block.AbstractChestBlock
-import net.minecraft.block.Blocks
-import net.minecraft.block.ChestBlock
-import net.minecraft.block.entity.BlockEntity
-import net.minecraft.block.enums.ChestType
-import net.minecraft.client.block.ChestAnimationProgress
-import net.minecraft.client.model.ModelPart
-import net.minecraft.client.render.RenderLayer
-import net.minecraft.client.render.TexturedRenderLayers
-import net.minecraft.client.render.VertexConsumerProvider
-import net.minecraft.client.render.block.entity.BlockEntityRenderer
-import net.minecraft.client.render.block.entity.BlockEntityRendererFactory
-import net.minecraft.client.render.block.entity.LightmapCoordinatesRetriever
-import net.minecraft.client.util.math.MatrixStack
-import net.minecraft.util.math.Axis
-import net.minecraft.util.math.Direction
+import net.minecraft.client.model.geom.ModelPart
+import net.minecraft.client.renderer.MultiBufferSource
+import net.minecraft.client.renderer.RenderType
+import net.minecraft.client.renderer.Sheets
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderer
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider
+import net.minecraft.client.renderer.blockentity.BrightnessCombiner
+import net.minecraft.core.Direction
+import net.minecraft.world.level.block.AbstractChestBlock
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.block.ChestBlock
+import net.minecraft.world.level.block.entity.BlockEntity
+import net.minecraft.world.level.block.entity.LidBlockEntity
+import net.minecraft.world.level.block.state.properties.ChestType
 import org.teamvoided.dusk_debris.entity.DuskEntityModelLayers
 import org.teamvoided.dusk_debris.entity.block.treasure_chest.TreasureChestBlockEntityModel.Companion.BASE
 import org.teamvoided.dusk_debris.entity.block.treasure_chest.TreasureChestBlockEntityModel.Companion.LATCH
 import org.teamvoided.dusk_debris.entity.block.treasure_chest.TreasureChestBlockEntityModel.Companion.LID
 
 @Environment(EnvType.CLIENT)
-class TreasureChestBlockEntityRenderer<T>(ctx: BlockEntityRendererFactory.Context) :
-    BlockEntityRenderer<T> where T : BlockEntity, T : ChestAnimationProgress {
+class TreasureChestBlockEntityRenderer<T>(ctx: BlockEntityRendererProvider.Context) :
+    BlockEntityRenderer<T> where T : BlockEntity, T : LidBlockEntity {
     private val singleChestLid: ModelPart
     private val singleChestBase: ModelPart
     private val singleChestLatch: ModelPart
@@ -38,15 +38,15 @@ class TreasureChestBlockEntityRenderer<T>(ctx: BlockEntityRendererFactory.Contex
     private val doubleChestLeftLatch: ModelPart
 
     init {
-        val modelPart = ctx.getLayerModelPart(DuskEntityModelLayers.TREASURE_CHEST)
+        val modelPart = ctx.bakeLayer(DuskEntityModelLayers.TREASURE_CHEST)
         this.singleChestBase = modelPart.getChild(BASE)
         this.singleChestLid = modelPart.getChild(LID)
         this.singleChestLatch = modelPart.getChild(LATCH)
-        val modelPart2 = ctx.getLayerModelPart(DuskEntityModelLayers.TREASURE_CHEST_LEFT)
+        val modelPart2 = ctx.bakeLayer(DuskEntityModelLayers.TREASURE_CHEST_LEFT)
         this.doubleChestRightBase = modelPart2.getChild(BASE)
         this.doubleChestRightLid = modelPart2.getChild(LID)
         this.doubleChestRightLatch = modelPart2.getChild(LATCH)
-        val modelPart3 = ctx.getLayerModelPart(DuskEntityModelLayers.TREASURE_CHEST_RIGHT)
+        val modelPart3 = ctx.bakeLayer(DuskEntityModelLayers.TREASURE_CHEST_RIGHT)
         this.doubleChestLeftBase = modelPart3.getChild(BASE)
         this.doubleChestLeftLid = modelPart3.getChild(LID)
         this.doubleChestLeftLatch = modelPart3.getChild(LATCH)
@@ -55,35 +55,35 @@ class TreasureChestBlockEntityRenderer<T>(ctx: BlockEntityRendererFactory.Contex
     override fun render(
         entity: T,
         tickDelta: Float,
-        matrices: MatrixStack,
-        vertexConsumers: VertexConsumerProvider,
+        matrices: PoseStack,
+        vertexConsumers: MultiBufferSource,
         lightI: Int,
         overlay: Int
     ) {
-        val world = entity.world
+        val world = entity.level
         val bl = world != null
-        val blockState = if (bl) entity.cachedState
-        else Blocks.CHEST.defaultState.with(ChestBlock.FACING, Direction.SOUTH)
+        val blockState = if (bl) entity.blockState
+        else Blocks.CHEST.defaultBlockState().setValue(ChestBlock.FACING, Direction.SOUTH)
         val chestType =
-            if (blockState.contains(ChestBlock.CHEST_TYPE)) blockState.get(ChestBlock.CHEST_TYPE)
+            if (blockState.hasProperty(ChestBlock.TYPE)) blockState.getValue(ChestBlock.TYPE)
             else ChestType.SINGLE
         val block = blockState.block
         if (block is AbstractChestBlock<*>) {
             val bl2 = chestType != ChestType.SINGLE
-            matrices.push()
-            val f = (blockState.get(ChestBlock.FACING) as Direction).asRotation()
+            matrices.pushPose()
+            val f = (blockState.getValue(ChestBlock.FACING) as Direction).toYRot()
             matrices.translate(0.5f, 0.5f, 0.5f)
-            matrices.rotate(Axis.Y_POSITIVE.rotationDegrees(-f))
+            matrices.mulPose(Axis.YP.rotationDegrees(-f))
             matrices.translate(-0.5f, -0.5f, -0.5f)
-            val propertySource = block.getBlockEntitySource(blockState, world, entity.pos, true)
+            val propertySource = block.combine(blockState, world, entity.blockPos, true)
 
             var animationProgress =
-                (propertySource.apply(ChestBlock.getAnimationProgressRetriever(entity)))[tickDelta]
+                (propertySource.apply(ChestBlock.opennessCombiner(entity)))[tickDelta]
             animationProgress = 1.0f - animationProgress
             animationProgress = 1.0f - animationProgress * animationProgress * animationProgress
-            val light = (propertySource.apply(LightmapCoordinatesRetriever())).applyAsInt(lightI)
-            val material = TexturedRenderLayers.getChestTexture(entity, chestType, false)
-            val vertexConsumer = material.getVertexConsumer(vertexConsumers) { RenderLayer.getEntityCutout(it) }
+            val light = (propertySource.apply(BrightnessCombiner())).applyAsInt(lightI)
+            val material = Sheets.chooseMaterial(entity, chestType, false)
+            val vertexConsumer = material.buffer(vertexConsumers) { RenderType.entityCutout(it) }
             if (bl2) {
                 if (chestType == ChestType.LEFT) {
                     this.render(
@@ -121,12 +121,12 @@ class TreasureChestBlockEntityRenderer<T>(ctx: BlockEntityRendererFactory.Contex
                 )
             }
 
-            matrices.pop()
+            matrices.popPose()
         }
     }
 
     private fun render(
-        matrices: MatrixStack,
+        matrices: PoseStack,
         vertices: VertexConsumer,
         lid: ModelPart,
         latch: ModelPart,
@@ -135,8 +135,8 @@ class TreasureChestBlockEntityRenderer<T>(ctx: BlockEntityRendererFactory.Contex
         light: Int,
         overlay: Int
     ) {
-        lid.pitch = -(openFactor * 1.5708f)
-        latch.pitch = lid.pitch
+        lid.xRot = -(openFactor * 1.5708f)
+        latch.xRot = lid.xRot
         lid.render(matrices, vertices, light, overlay)
         latch.render(matrices, vertices, light, overlay)
         base.render(matrices, vertices, light, overlay)

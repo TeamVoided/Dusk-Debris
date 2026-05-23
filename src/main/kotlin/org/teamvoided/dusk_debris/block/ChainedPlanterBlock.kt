@@ -1,47 +1,50 @@
 package org.teamvoided.dusk_debris.block
 
 import com.mojang.serialization.MapCodec
-import net.fabricmc.fabric.api.tag.convention.v2.ConventionalBlockTags
-import net.minecraft.block.*
-import net.minecraft.item.ItemPlacementContext
-import net.minecraft.state.StateManager
-import net.minecraft.state.property.Properties
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Direction
-import net.minecraft.util.shape.VoxelShape
-import net.minecraft.util.shape.VoxelShapes
-import net.minecraft.world.BlockView
-import net.minecraft.world.WorldAccess
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
+import net.minecraft.world.item.context.BlockPlaceContext
+import net.minecraft.world.level.BlockGetter
+import net.minecraft.world.level.LevelAccessor
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.block.state.StateDefinition
+import net.minecraft.world.level.block.state.properties.BlockStateProperties
+import net.minecraft.world.phys.shapes.CollisionContext
+import net.minecraft.world.phys.shapes.Shapes
+import net.minecraft.world.phys.shapes.VoxelShape
 
-open class ChainedPlanterBlock(settings: Settings) : WaterloggableBlock(settings) {
-    public override fun getCodec(): MapCodec<ChainedPlanterBlock> {
+open class ChainedPlanterBlock(settings: Properties) : WaterloggableBlock(settings) {
+    public override fun codec(): MapCodec<ChainedPlanterBlock> {
         return CODEC
     }
 
     init {
-        this.defaultState = stateManager.defaultState
-            .with(Properties.HANGING, false)
+        this.registerDefaultState(
+            stateDefinition.any()
+                .setValue(BlockStateProperties.HANGING, false)
+        )
     }
 
-    override fun getOutlineShape(
+    override fun getShape(
         state: BlockState,
-        world: BlockView,
+        world: BlockGetter,
         pos: BlockPos,
-        context: ShapeContext
+        context: CollisionContext
     ): VoxelShape = SHAPE
 
-    override fun getPlacementState(ctx: ItemPlacementContext): BlockState =
-        super.getPlacementState(ctx).with(Properties.HANGING, shouldHang(ctx.world, ctx.blockPos))
+    override fun getStateForPlacement(ctx: BlockPlaceContext): BlockState =
+        super.getStateForPlacement(ctx).setValue(BlockStateProperties.HANGING, shouldHang(ctx.level, ctx.clickedPos))
 
-    override fun getStateForNeighborUpdate(
+    override fun updateShape(
         state: BlockState,
         direction: Direction,
         neighborState: BlockState,
-        world: WorldAccess,
+        world: LevelAccessor,
         pos: BlockPos,
         neighborPos: BlockPos
-    ): BlockState = super.getStateForNeighborUpdate(
-        state.with(Properties.HANGING, shouldHang(world, pos)),
+    ): BlockState = super.updateShape(
+        state.setValue(BlockStateProperties.HANGING, shouldHang(world, pos)),
         direction,
         neighborState,
         world,
@@ -49,25 +52,25 @@ open class ChainedPlanterBlock(settings: Settings) : WaterloggableBlock(settings
         neighborPos
     )
 
-    open fun shouldHang(world: WorldAccess, pos: BlockPos): Boolean {
-        return (sideCoversSmallSquare(world, pos.up(2), Direction.DOWN) &&
-                !sideCoversSmallSquare(world, pos, Direction.UP))
+    open fun shouldHang(world: LevelAccessor, pos: BlockPos): Boolean {
+        return (canSupportCenter(world, pos.above(2), Direction.DOWN) &&
+                !canSupportCenter(world, pos, Direction.UP))
         //val worldBlock = world.getBlockState(pos.up(2))
         //return (worldBlock.isIn(ConventionalBlockTags.CHAINS) &&
         //        !(worldBlock.contains(Properties.AXIS) && worldBlock.get(Properties.AXIS) != Direction.Axis.Y))
     }
 
-    override fun appendProperties(builder: StateManager.Builder<Block, BlockState>) {
-        builder.add(Properties.HANGING)
-        super.appendProperties(builder)
+    override fun createBlockStateDefinition(builder: StateDefinition.Builder<Block, BlockState>) {
+        builder.add(BlockStateProperties.HANGING)
+        super.createBlockStateDefinition(builder)
     }
 
     companion object {
-        val SHAPE: VoxelShape = VoxelShapes.union(
-            createCuboidShape(0.0, 4.0, 0.0, 16.0, 16.0, 16.0),
-            createCuboidShape(3.0, 0.0, 3.0, 13.0, 4.0, 13.0)
+        val SHAPE: VoxelShape = Shapes.or(
+            box(0.0, 4.0, 0.0, 16.0, 16.0, 16.0),
+            box(3.0, 0.0, 3.0, 13.0, 4.0, 13.0)
         )
 
-        val CODEC: MapCodec<ChainedPlanterBlock> = createCodec(::ChainedPlanterBlock)
+        val CODEC: MapCodec<ChainedPlanterBlock> = simpleCodec(::ChainedPlanterBlock)
     }
 }

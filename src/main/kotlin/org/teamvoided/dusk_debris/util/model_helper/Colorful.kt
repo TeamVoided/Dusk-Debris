@@ -1,72 +1,78 @@
 package org.teamvoided.dusk_debris.util.model_helper
 
-import net.minecraft.block.Block
-import net.minecraft.block.enums.StairShape
-import net.minecraft.data.client.model.*
-import net.minecraft.state.property.Properties
-import net.minecraft.util.Identifier
-import net.minecraft.util.math.Direction
+import net.minecraft.core.Direction
+import net.minecraft.data.models.BlockModelGenerators
+import net.minecraft.data.models.blockstates.Condition
+import net.minecraft.data.models.blockstates.MultiPartGenerator
+import net.minecraft.data.models.blockstates.Variant
+import net.minecraft.data.models.blockstates.VariantProperties
+import net.minecraft.data.models.model.TextureMapping
+import net.minecraft.data.models.model.TextureSlot
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.state.properties.BlockStateProperties
+import net.minecraft.world.level.block.state.properties.StairsShape
 import org.teamvoided.dusk_debris.util.block
 import org.teamvoided.dusk_debris.util.model
 
 
-fun BlockStateModelGenerator.carpetStairs(
+fun BlockModelGenerators.carpetStairs(
     carpetStair: Block, wool: Block
 ) {
 
-    val texture: Texture = Texture().put(TextureKey.WOOL, wool.model())
-    val ner: Identifier = block("parent/carpet_stairs", TextureKey.WOOL)
-        .upload(carpetStair, texture, this.modelCollector)
-    val inner: Identifier =
-        block("parent/inner_carpet_stairs", "_inner", TextureKey.WOOL)
-            .upload(carpetStair, texture, this.modelCollector)
-    val outer: Identifier =
-        block("parent/outer_carpet_stairs", "_outer", TextureKey.WOOL)
-            .upload(carpetStair, texture, this.modelCollector)
+    val texture: TextureMapping = TextureMapping().put(TextureSlot.WOOL, wool.model())
+    val ner: ResourceLocation = block("parent/carpet_stairs", TextureSlot.WOOL)
+        .create(carpetStair, texture, this.modelOutput)
+    val inner: ResourceLocation =
+        block("parent/inner_carpet_stairs", "_inner", TextureSlot.WOOL)
+            .create(carpetStair, texture, this.modelOutput)
+    val outer: ResourceLocation =
+        block("parent/outer_carpet_stairs", "_outer", TextureSlot.WOOL)
+            .create(carpetStair, texture, this.modelOutput)
     val directions = listOf(
-        (Direction.EAST to VariantSettings.Rotation.R0),
-        (Direction.SOUTH to VariantSettings.Rotation.R90),
-        (Direction.WEST to VariantSettings.Rotation.R180),
-        (Direction.NORTH to VariantSettings.Rotation.R270)
+        (Direction.EAST to VariantProperties.Rotation.R0),
+        (Direction.SOUTH to VariantProperties.Rotation.R90),
+        (Direction.WEST to VariantProperties.Rotation.R180),
+        (Direction.NORTH to VariantProperties.Rotation.R270)
     )
     val stairShape = listOf(
-        (StairShape.STRAIGHT to ner),
-        (StairShape.INNER_LEFT to inner),
-        (StairShape.INNER_RIGHT to inner),
-        (StairShape.OUTER_LEFT to outer),
-        (StairShape.OUTER_RIGHT to outer)
+        (StairsShape.STRAIGHT to ner),
+        (StairsShape.INNER_LEFT to inner),
+        (StairsShape.INNER_RIGHT to inner),
+        (StairsShape.OUTER_LEFT to outer),
+        (StairsShape.OUTER_RIGHT to outer)
     )
 
 
-    val model = MultipartBlockStateSupplier.create(carpetStair)
-    var rotatY: VariantSettings.Rotation
+    val model = MultiPartGenerator.multiPart(carpetStair)
+    var rotatY: VariantProperties.Rotation
 
     stairShape.forEach { (shape, models) ->
 //        if (!(shape == StairShape.INNER_LEFT || shape == StairShape.OUTER_LEFT)) {
 //
 //        }
         directions.forEach { (direction, rotationY) ->
-            rotatY = if (shape == StairShape.INNER_LEFT || shape == StairShape.OUTER_LEFT) {
+            rotatY = if (shape == StairsShape.INNER_LEFT || shape == StairsShape.OUTER_LEFT) {
                 when (rotationY) {
-                    VariantSettings.Rotation.R0 -> VariantSettings.Rotation.R270
-                    VariantSettings.Rotation.R90 -> VariantSettings.Rotation.R0
-                    VariantSettings.Rotation.R180 -> VariantSettings.Rotation.R90
-                    else -> VariantSettings.Rotation.R180
+                    VariantProperties.Rotation.R0 -> VariantProperties.Rotation.R270
+                    VariantProperties.Rotation.R90 -> VariantProperties.Rotation.R0
+                    VariantProperties.Rotation.R180 -> VariantProperties.Rotation.R90
+                    else -> VariantProperties.Rotation.R180
                 }
             } else {
                 rotationY
             }
-            val variant = BlockStateVariant.create()
-                .put(VariantSettings.MODEL, models)
-                .put(VariantSettings.UVLOCK, true)
-            if (rotatY != VariantSettings.Rotation.R0) variant.put(VariantSettings.Y, rotatY)
+            val variant = Variant.variant()
+                .with(VariantProperties.MODEL, models)
+                .with(VariantProperties.UV_LOCK, true)
+            if (rotatY != VariantProperties.Rotation.R0) variant.with(VariantProperties.Y_ROT, rotatY)
             model.with(
-                When.create()
-                    .set(Properties.HORIZONTAL_FACING, direction)
-                    .set(Properties.STAIR_SHAPE, shape),
+                Condition.condition()
+                    .term(BlockStateProperties.HORIZONTAL_FACING, direction)
+                    .term(BlockStateProperties.STAIRS_SHAPE, shape),
                 variant
             )
         }
     }
-    this.blockStateCollector.accept(model)
+    this.blockStateOutput.accept(model)
 }

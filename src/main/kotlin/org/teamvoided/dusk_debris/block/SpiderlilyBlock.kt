@@ -1,70 +1,72 @@
 package org.teamvoided.dusk_debris.block
 
-import net.minecraft.block.Block
-import net.minecraft.block.BlockState
-import net.minecraft.block.TallFlowerBlock
-import net.minecraft.block.enums.DoubleBlockHalf
-import net.minecraft.entity.Entity
-import net.minecraft.server.world.ServerWorld
-import net.minecraft.state.StateManager
-import net.minecraft.state.property.BooleanProperty
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.random.RandomGenerator
-import net.minecraft.world.World
+import net.minecraft.core.BlockPos
+import net.minecraft.server.level.ServerLevel
+import net.minecraft.util.RandomSource
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.level.Level
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.TallFlowerBlock
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.block.state.StateDefinition
+import net.minecraft.world.level.block.state.properties.BooleanProperty
+import net.minecraft.world.level.block.state.properties.DoubleBlockHalf
 import org.teamvoided.dusk_debris.init.DuskParticles
 
-class SpiderlilyBlock(settings: Settings) : TallFlowerBlock(settings) {
+class SpiderlilyBlock(settings: Properties) : TallFlowerBlock(settings) {
     init {
-        this.defaultState = stateManager.defaultState
-            .with(FLOWERING, true)
-            .with(HALF, DoubleBlockHalf.LOWER)
+        this.registerDefaultState(
+            stateDefinition.any()
+                .setValue(FLOWERING, true)
+                .setValue(HALF, DoubleBlockHalf.LOWER)
+        )
     }
 
-    override fun appendProperties(builder: StateManager.Builder<Block, BlockState>) {
+    override fun createBlockStateDefinition(builder: StateDefinition.Builder<Block, BlockState>) {
         builder.add(FLOWERING, HALF)
     }
 
-    override fun onEntityCollision(state: BlockState, world: World, pos: BlockPos, entity: Entity) {
-        val velocity = entity.velocity.length()
-        if (state.get(FLOWERING) && entity.velocity.length() > 0.2) {
+    override fun entityInside(state: BlockState, world: Level, pos: BlockPos, entity: Entity) {
+        val velocity = entity.deltaMovement.length()
+        if (state.getValue(FLOWERING) && entity.deltaMovement.length() > 0.2) {
             flower(world, pos, state, false, velocity)
         }
     }
 
-    override fun fertilize(world: ServerWorld, random: RandomGenerator, pos: BlockPos, state: BlockState) {
-        if (!state.get(FLOWERING)) flower(world, pos, state, true)
-        else super.fertilize(world, random, pos, state)
+    override fun performBonemeal(world: ServerLevel, random: RandomSource, pos: BlockPos, state: BlockState) {
+        if (!state.getValue(FLOWERING)) flower(world, pos, state, true)
+        else super.performBonemeal(world, random, pos, state)
     }
 
-    override fun randomTick(state: BlockState, world: ServerWorld, pos: BlockPos, random: RandomGenerator) {
+    override fun randomTick(state: BlockState, world: ServerLevel, pos: BlockPos, random: RandomSource) {
         if (random.nextInt(2) == 0) {
             flower(world, pos, state, true)
         }
     }
 
-    override fun getRandomTicks(state: BlockState): Boolean {
-        return if (!state.get(FLOWERING)) true else super.getRandomTicks(state)
+    override fun isRandomlyTicking(state: BlockState): Boolean {
+        return if (!state.getValue(FLOWERING)) true else super.isRandomlyTicking(state)
     }
 
     companion object {
-        val FLOWERING: BooleanProperty = BooleanProperty.of("flowering")
-        fun flower(world: World, pos: BlockPos, state: BlockState, flower: Boolean, speed: Double = 0.0) {
+        val FLOWERING: BooleanProperty = BooleanProperty.create("flowering")
+        fun flower(world: Level, pos: BlockPos, state: BlockState, flower: Boolean, speed: Double = 0.0) {
             var upperPos = pos
             var lowerPos = pos
-            if (state.get(HALF) == DoubleBlockHalf.LOWER) {
-                upperPos = pos.up()
+            if (state.getValue(HALF) == DoubleBlockHalf.LOWER) {
+                upperPos = pos.above()
             } else {
-                lowerPos = pos.down()
+                lowerPos = pos.below()
             }
             if (!flower) {
                 explode(world, upperPos, speed)
             }
-            world.setBlockState(upperPos, state.with(HALF, DoubleBlockHalf.UPPER).with(FLOWERING, flower))
-            world.setBlockState(lowerPos, state.with(HALF, DoubleBlockHalf.LOWER).with(FLOWERING, flower))
+            world.setBlockAndUpdate(upperPos, state.setValue(HALF, DoubleBlockHalf.UPPER).setValue(FLOWERING, flower))
+            world.setBlockAndUpdate(lowerPos, state.setValue(HALF, DoubleBlockHalf.LOWER).setValue(FLOWERING, flower))
 
         }
 
-        fun explode(world: World, pos: BlockPos, speed: Double) {
+        fun explode(world: Level, pos: BlockPos, speed: Double) {
             val random = world.random
             repeat(10) {
                 world.addParticle(

@@ -3,9 +3,9 @@ package org.teamvoided.dusk_debris.world.gen.density_functions
 import com.mojang.serialization.Codec
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
-import net.minecraft.util.dynamic.CodecHolder
-import net.minecraft.world.gen.DensityFunction
-import net.minecraft.world.gen.DensityFunction.ContextProvider
+import net.minecraft.util.KeyDispatchDataCodec
+import net.minecraft.world.level.levelgen.DensityFunction
+import net.minecraft.world.level.levelgen.DensityFunction.ContextProvider
 import org.teamvoided.dusk_debris.util.world_helper.makeCodec
 
 class NoiseRange(
@@ -27,7 +27,7 @@ class NoiseRange(
         val y: Double = y3 * this.verticalScale
         val z: Double = c.blockZ() * this.horizontalScale
 
-        return noise.sample(x, y, z)
+        return noise.getValue(x, y, z)
     }
 
     override fun fillArray(array: DoubleArray, context: ContextProvider) = context.fillAllDirectly(array, this)
@@ -46,9 +46,9 @@ class NoiseRange(
 
     override fun minValue(): Double = -this.maxValue()
 
-    override fun maxValue(): Double = noise.maxValue
+    override fun maxValue(): Double = noise.maxValue()
 
-    override fun codec(): CodecHolder<NoiseRange> = CODEC
+    override fun codec(): KeyDispatchDataCodec<NoiseRange> = CODEC
 
     companion object {
         private val DATA_CODEC: MapCodec<NoiseRange> =
@@ -62,6 +62,6 @@ class NoiseRange(
                     .apply(instance, ::NoiseRange)
             }
 
-        val CODEC: CodecHolder<NoiseRange> = makeCodec(DATA_CODEC)
+        val CODEC: KeyDispatchDataCodec<NoiseRange> = makeCodec(DATA_CODEC)
     }
 }

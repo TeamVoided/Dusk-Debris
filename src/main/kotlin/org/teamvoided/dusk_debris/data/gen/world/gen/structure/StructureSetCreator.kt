@@ -1,18 +1,22 @@
 package org.teamvoided.dusk_debris.data.gen.world.gen.structure
 
-import net.minecraft.registry.*
-import net.minecraft.structure.RandomSpreadStructurePlacement
-import net.minecraft.structure.RandomSpreadType
-import net.minecraft.world.biome.Biome
-import net.minecraft.world.gen.feature.StructureFeature
-import net.minecraft.world.gen.structure.StructureSet
+import net.minecraft.core.Holder
+import net.minecraft.core.HolderGetter
+import net.minecraft.core.registries.Registries
+import net.minecraft.data.worldgen.BootstrapContext
+import net.minecraft.resources.ResourceKey
+import net.minecraft.world.level.biome.Biome
+import net.minecraft.world.level.levelgen.structure.Structure
+import net.minecraft.world.level.levelgen.structure.StructureSet
+import net.minecraft.world.level.levelgen.structure.placement.RandomSpreadStructurePlacement
+import net.minecraft.world.level.levelgen.structure.placement.RandomSpreadType
 import org.teamvoided.dusk_debris.data.worldgen.structure.DuskStructureSets
 import org.teamvoided.dusk_debris.data.worldgen.structure.DuskStructures
 
 object StructureSetCreator {
     fun bootstrap(c: BootstrapContext<StructureSet>) {
-        val structures: HolderProvider<StructureFeature> = c.getRegistryLookup(RegistryKeys.STRUCTURE_FEATURE)
-        val biomes: HolderProvider<Biome> = c.getRegistryLookup(RegistryKeys.BIOME)
+        val structures: HolderGetter<Structure> = c.lookup(Registries.STRUCTURE)
+        val biomes: HolderGetter<Biome> = c.lookup(Registries.BIOME)
 
         //c.register(
         //    DuskStructureSets.TEST,
@@ -31,17 +35,17 @@ object StructureSetCreator {
     }
 
     fun BootstrapContext<StructureSet>.register(
-        key: RegistryKey<StructureSet>,
-        structure: RegistryKey<StructureFeature>,
+        key: ResourceKey<StructureSet>,
+        structure: ResourceKey<Structure>,
         spacing: Int,
         seperation: Int,
         salt: Int
     ): Holder.Reference<StructureSet> {
-        val structures: HolderProvider<StructureFeature> = this.getRegistryLookup(RegistryKeys.STRUCTURE_FEATURE)
+        val structures: HolderGetter<Structure> = this.lookup(Registries.STRUCTURE)
         return this.register(
             key,
             StructureSet(
-                structures.getHolderOrThrow(structure),
+                structures.getOrThrow(structure),
                 RandomSpreadStructurePlacement(
                     spacing,
                     seperation,
@@ -53,13 +57,13 @@ object StructureSetCreator {
     }
 
     fun BootstrapContext<StructureSet>.register(
-        key: RegistryKey<StructureSet>,
-        vararg structure: Pair<RegistryKey<StructureFeature>, Int>,
+        key: ResourceKey<StructureSet>,
+        vararg structure: Pair<ResourceKey<Structure>, Int>,
         spacing: Int,
         seperation: Int,
         salt: Int
     ): Holder.Reference<StructureSet> {
-        val structures: HolderProvider<StructureFeature> = this.getRegistryLookup(RegistryKeys.STRUCTURE_FEATURE)
+        val structures: HolderGetter<Structure> = this.lookup(Registries.STRUCTURE)
 
         val list: List<StructureSet.StructureSelectionEntry> = listOf()
 //        structure.forEach {

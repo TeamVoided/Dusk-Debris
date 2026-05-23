@@ -1,128 +1,130 @@
 package org.teamvoided.dusk_debris.entity
 
-import net.minecraft.client.util.ColorUtil
-import net.minecraft.component.type.DyedColorComponent
-import net.minecraft.entity.EntityType
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.data.DataTracker
-import net.minecraft.entity.data.TrackedData
-import net.minecraft.entity.data.TrackedDataHandlerRegistry
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.entity.projectile.PersistentProjectileEntity
-import net.minecraft.item.ItemStack
-import net.minecraft.nbt.NbtCompound
-import net.minecraft.util.ActionResult
-import net.minecraft.util.Hand
-import net.minecraft.util.hit.BlockHitResult
-import net.minecraft.util.math.Direction
-import net.minecraft.util.math.EulerAngle
-import net.minecraft.world.World
+import net.minecraft.core.Direction
+import net.minecraft.core.Rotations
+import net.minecraft.nbt.CompoundTag
+import net.minecraft.network.syncher.EntityDataAccessor
+import net.minecraft.network.syncher.EntityDataSerializers
+import net.minecraft.network.syncher.SynchedEntityData
+import net.minecraft.util.FastColor
+import net.minecraft.world.InteractionHand
+import net.minecraft.world.InteractionResult
+import net.minecraft.world.entity.EntityType
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.entity.projectile.AbstractArrow
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.component.DyedItemColor
+import net.minecraft.world.level.Level
+import net.minecraft.world.phys.BlockHitResult
 import org.teamvoided.dusk_debris.init.DuskEntities
 import org.teamvoided.dusk_debris.init.DuskItems
 
-class DiceEntity : PersistentProjectileEntity {
+class DiceEntity : AbstractArrow {
 
-    constructor(entityType: EntityType<out DiceEntity>, world: World) : super(entityType, world)
+    constructor(entityType: EntityType<out DiceEntity>, world: Level) : super(entityType, world)
 
-    constructor(world: World, owner: LivingEntity, stack: ItemStack) :
+    constructor(world: Level, owner: LivingEntity, stack: ItemStack) :
             super(DuskEntities.DIE, owner, world, stack, null as ItemStack?) {
         this.color = getDiceColor(stack)
     }
 
-    constructor(world: World, x: Double, y: Double, z: Double, stack: ItemStack) :
+    constructor(world: Level, x: Double, y: Double, z: Double, stack: ItemStack) :
             super(DuskEntities.DIE, x, y, z, world, stack, stack) {
         this.color = getDiceColor(stack)
     }
 
     var sideUp: Int
-        get() = dataTracker[TRACKER_SIDE_UP]
+        get() = entityData[TRACKER_SIDE_UP]
         set(sideUp) {
-            dataTracker[TRACKER_SIDE_UP] = sideUp
+            entityData[TRACKER_SIDE_UP] = sideUp
         }
 
-    var rotationVec: EulerAngle
-        get() = dataTracker[TRACKER_ROTATION]
+    var rotationVec: Rotations
+        get() = entityData[TRACKER_ROTATION]
         set(rotationVec) {
-            dataTracker[TRACKER_ROTATION] = rotationVec
+            entityData[TRACKER_ROTATION] = rotationVec
         }
 
     var timeSinceLastFall: Int
-        get() = dataTracker[TRACKER_TIME_SINCE_LAST_FALL]
+        get() = entityData[TRACKER_TIME_SINCE_LAST_FALL]
         set(timeSinceLastFall) {
-            dataTracker[TRACKER_TIME_SINCE_LAST_FALL] = timeSinceLastFall
+            entityData[TRACKER_TIME_SINCE_LAST_FALL] = timeSinceLastFall
         }
 
     var color: Int
-        get() = dataTracker[TRACKER_COLOR]
+        get() = entityData[TRACKER_COLOR]
         set(color) {
-            dataTracker[TRACKER_COLOR] = color
+            entityData[TRACKER_COLOR] = color
         }
 
     init {
         sideUp = 1
 //        rotationVec = EulerAngle(random.nextFloat(), random.nextFloat(), random.nextFloat())
-        rotationVec = EulerAngle(0f, 0f, 0f)
+        rotationVec = Rotations(0f, 0f, 0f)
         timeSinceLastFall = 20
     }
 
-    override fun initDataTracker(builder: DataTracker.Builder) {
-        super.initDataTracker(builder)
-        builder.add(TRACKER_SIDE_UP, 1)
-        builder.add(TRACKER_ROTATION, DEFAULT_ROTATION)
-        builder.add(TRACKER_TIME_SINCE_LAST_FALL, 20)
-        builder.add(TRACKER_COLOR, 0xFFFFFF)
+    override fun defineSynchedData(builder: SynchedEntityData.Builder) {
+        super.defineSynchedData(builder)
+        builder.define(TRACKER_SIDE_UP, 1)
+        builder.define(TRACKER_ROTATION, DEFAULT_ROTATION)
+        builder.define(TRACKER_TIME_SINCE_LAST_FALL, 20)
+        builder.define(TRACKER_COLOR, 0xFFFFFF)
     }
 
-    override fun writeCustomDataToNbt(nbt: NbtCompound) {
-        super.writeCustomDataToNbt(nbt)
+    override fun addAdditionalSaveData(nbt: CompoundTag) {
+        super.addAdditionalSaveData(nbt)
 
         nbt.putInt("SideUp", this.sideUp)
-        nbt.put("RotationVector", rotationVec.toNbt())
+        nbt.put("RotationVector", rotationVec.save())
         nbt.putInt("TimeSinceLastFall", this.timeSinceLastFall)
         nbt.putInt("Color", this.color)
     }
 
-    override fun readCustomDataFromNbt(nbt: NbtCompound) {
-        super.readCustomDataFromNbt(nbt)
+    override fun readAdditionalSaveData(nbt: CompoundTag) {
+        super.readAdditionalSaveData(nbt)
 
         val rotation = nbt.getList("RotationVector", 5)
 
         this.sideUp = nbt.getInt("SideUp")
-        this.rotationVec = (if (rotation.isEmpty()) DEFAULT_ROTATION else EulerAngle(rotation))
+        this.rotationVec = (if (rotation.isEmpty()) DEFAULT_ROTATION else Rotations(rotation))
         this.timeSinceLastFall = nbt.getInt("TimeSinceLastFall")
         this.color = nbt.getInt("Color")
     }
 
-    override fun getDefaultItemStack(): ItemStack = DuskItems.DIE_ITEM.defaultStack
+    override fun getDefaultPickupItem(): ItemStack = DuskItems.DIE_ITEM.defaultInstance
 
     override fun shouldRender(cameraX: Double, cameraY: Double, cameraZ: Double): Boolean {
         return true
     }
 
-    override fun onBlockHit(blockHitResult: BlockHitResult) {
-        if (world.isClient)
+    override fun onHitBlock(blockHitResult: BlockHitResult) {
+        if (level().isClientSide)
             sideUp = random.nextInt(5) + 1
-        if (timeSinceLastFall < 4 && blockHitResult.side == Direction.UP) {
+        if (timeSinceLastFall < 4 && blockHitResult.direction == Direction.UP) {
             rotationVec = rotationValues(sideUp)
-            super.onBlockHit(blockHitResult)
+            super.onHitBlock(blockHitResult)
         } else {
             //            rotationVec = EulerAngle(random.nextFloat(), random.nextFloat(), random.nextFloat())
-            velocity = when (blockHitResult.side) {
-                Direction.UP -> velocity.multiply(theEvil, theEvilY, theEvil)
-                Direction.DOWN -> velocity.multiply(theEvil, -theEvil, theEvil)
-                Direction.NORTH -> velocity.multiply(theEvil, theEvil, -theEvil)
-                Direction.SOUTH -> velocity.multiply(theEvil, theEvil, -theEvil)
-                Direction.EAST -> velocity.multiply(-theEvil, theEvil, theEvil)
-                Direction.WEST -> velocity.multiply(-theEvil, theEvil, theEvil)
-                else -> velocity
-            }
+            setDeltaMovement(
+                when (blockHitResult.direction) {
+                    Direction.UP -> deltaMovement.multiply(theEvil, theEvilY, theEvil)
+                    Direction.DOWN -> deltaMovement.multiply(theEvil, -theEvil, theEvil)
+                    Direction.NORTH -> deltaMovement.multiply(theEvil, theEvil, -theEvil)
+                    Direction.SOUTH -> deltaMovement.multiply(theEvil, theEvil, -theEvil)
+                    Direction.EAST -> deltaMovement.multiply(-theEvil, theEvil, theEvil)
+                    Direction.WEST -> deltaMovement.multiply(-theEvil, theEvil, theEvil)
+                    else -> deltaMovement
+                }
+            )
         }
         timeSinceLastFall = 0
     }
 
     override fun tick() {
         super.tick()
-        if (!isOnGround) {
+        if (!onGround()) {
 //            rotationVec = EulerAngle(
 //                rotationVec.pitch * tickRotateMult,
 //                rotationVec.yaw * tickRotateMult,
@@ -132,36 +134,36 @@ class DiceEntity : PersistentProjectileEntity {
         timeSinceLastFall++
     }
 
-    override fun interact(player: PlayerEntity, hand: Hand): ActionResult {
+    override fun interact(player: Player, hand: InteractionHand): InteractionResult {
         val superResult = super.interact(player, hand)
-        if (superResult == ActionResult.PASS)
+        if (superResult == InteractionResult.PASS)
             return superResult
-        if (player.getStackInHand(hand).isEmpty) {
-            player.giveItemStack(stack)
+        if (player.getItemInHand(hand).isEmpty) {
+            player.addItem(pickupItemStackOrigin)
             this.kill()
-            return ActionResult.success(world.isClient)
+            return InteractionResult.sidedSuccess(level().isClientSide)
         }
-        return ActionResult.PASS
+        return InteractionResult.PASS
     }
 
-    override fun tryPickup(player: PlayerEntity?): Boolean = false
+    override fun tryPickup(player: Player?): Boolean = false
     override fun checkDespawn() {
         super.checkDespawn()
     }
 
-    fun rotationValues(side: Int): EulerAngle {
+    fun rotationValues(side: Int): Rotations {
         if (!(side >= 1 && side <= 6)) {
             println("oopsie :) --------------------------------------------------------------")
             println(side)
         }
         return when (side) {
-            1 -> EulerAngle(rotate180, 0f, 0f)
-            2 -> EulerAngle(0f, 0f, rotate270)
-            3 -> EulerAngle(rotate90, 0f, 0f)
-            4 -> EulerAngle(rotate270, 0f, 0f)
-            5 -> EulerAngle(0f, 0f, rotate90)
-            6 -> EulerAngle(0f, 0f, 0f)
-            else -> EulerAngle(0f, 0f, 0f)
+            1 -> Rotations(rotate180, 0f, 0f)
+            2 -> Rotations(0f, 0f, rotate270)
+            3 -> Rotations(rotate90, 0f, 0f)
+            4 -> Rotations(rotate270, 0f, 0f)
+            5 -> Rotations(0f, 0f, rotate90)
+            6 -> Rotations(0f, 0f, 0f)
+            else -> Rotations(0f, 0f, 0f)
         }
     }
 
@@ -172,8 +174,8 @@ class DiceEntity : PersistentProjectileEntity {
     override fun isPushable(): Boolean = false
 
     fun getDiceColor(itemStack: ItemStack): Int {
-        return ColorUtil.Argb32.toOpaque(
-            DyedColorComponent.getColorOrDefault(
+        return FastColor.ARGB32.opaque(
+            DyedItemColor.getOrDefault(
                 itemStack,
                 0xFFFFFF
             )
@@ -219,18 +221,18 @@ class DiceEntity : PersistentProjectileEntity {
         val theEvil = 0.75
         val theEvilY = -0.2
         val tickRotateMult = 0.9f
-        private val DEFAULT_ROTATION = EulerAngle(0f, 0f, 0f)
-        val TRACKER_SIDE_UP: TrackedData<Int> = DataTracker.registerData(
-            DiceEntity::class.java, TrackedDataHandlerRegistry.INTEGER
+        private val DEFAULT_ROTATION = Rotations(0f, 0f, 0f)
+        val TRACKER_SIDE_UP: EntityDataAccessor<Int> = SynchedEntityData.defineId(
+            DiceEntity::class.java, EntityDataSerializers.INT
         )
-        val TRACKER_ROTATION: TrackedData<EulerAngle> = DataTracker.registerData(
-            DiceEntity::class.java, TrackedDataHandlerRegistry.ROTATION
+        val TRACKER_ROTATION: EntityDataAccessor<Rotations> = SynchedEntityData.defineId(
+            DiceEntity::class.java, EntityDataSerializers.ROTATIONS
         )
-        val TRACKER_TIME_SINCE_LAST_FALL: TrackedData<Int> = DataTracker.registerData(
-            DiceEntity::class.java, TrackedDataHandlerRegistry.INTEGER
+        val TRACKER_TIME_SINCE_LAST_FALL: EntityDataAccessor<Int> = SynchedEntityData.defineId(
+            DiceEntity::class.java, EntityDataSerializers.INT
         )
-        val TRACKER_COLOR: TrackedData<Int> = DataTracker.registerData(
-            DiceEntity::class.java, TrackedDataHandlerRegistry.INTEGER
+        val TRACKER_COLOR: EntityDataAccessor<Int> = SynchedEntityData.defineId(
+            DiceEntity::class.java, EntityDataSerializers.INT
         )
 
 

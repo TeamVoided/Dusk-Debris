@@ -1,18 +1,18 @@
 package org.teamvoided.dusk_debris.block.entity
 
-import net.minecraft.block.BlockState
-import net.minecraft.block.entity.BlockEntity
-import net.minecraft.entity.Entity
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.SpawnReason
-import net.minecraft.nbt.NbtCompound
-import net.minecraft.nbt.NbtElement
-import net.minecraft.nbt.NbtList
-import net.minecraft.nbt.NbtString
-import net.minecraft.registry.HolderLookup
-import net.minecraft.server.world.ServerWorld
-import net.minecraft.util.math.BlockPos
-import net.minecraft.world.World
+import net.minecraft.core.BlockPos
+import net.minecraft.core.HolderLookup
+import net.minecraft.nbt.CompoundTag
+import net.minecraft.nbt.ListTag
+import net.minecraft.nbt.StringTag
+import net.minecraft.nbt.Tag
+import net.minecraft.server.level.ServerLevel
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.MobSpawnType
+import net.minecraft.world.level.Level
+import net.minecraft.world.level.block.entity.BlockEntity
+import net.minecraft.world.level.block.state.BlockState
 import org.teamvoided.dusk_debris.block.BunnyGraveBlock
 import org.teamvoided.dusk_debris.entity.DustBunnyEntity
 import org.teamvoided.dusk_debris.init.DuskBlockEntities
@@ -24,39 +24,39 @@ open class BunnyGraveBlockEntity(pos: BlockPos?, state: BlockState?) :
     private val bunnyIds = mutableListOf<UUID>()
     var dustBunnies: MutableList<Entity> = mutableListOf()
         get() {
-            if (world is ServerWorld && field.isEmpty() && bunnyIds.isNotEmpty()) {
-                field = bunnyIds.mapNotNull { uuid -> (world as ServerWorld).getEntity(uuid) }.toMutableList()
+            if (level is ServerLevel && field.isEmpty() && bunnyIds.isNotEmpty()) {
+                field = bunnyIds.mapNotNull { uuid -> (level as ServerLevel).getEntity(uuid) }.toMutableList()
             }
             return field
         }
 
     private var timeSinceLastBunny = 0
 
-    override fun onSyncedBlockEvent(type: Int, data: Int): Boolean {
+    override fun triggerEvent(type: Int, data: Int): Boolean {
         if (type == 1) {
             summonBunny()
             return true
         } else {
-            return super.onSyncedBlockEvent(type, data)
+            return super.triggerEvent(type, data)
         }
     }
 
     fun summonBunny() {
-        val blockPos = this.getPos()
-        if (world != null) {
-            val entity = DustBunnyEntity(DuskEntities.DUST_BUNNY, world!!)
-            entity.refreshPositionAndAngles(blockPos.ofCenter(), 0f, 0f)
+        val blockPos = this.blockPos
+        if (level != null) {
+            val entity = DustBunnyEntity(DuskEntities.DUST_BUNNY, level!!)
+            entity.moveTo(blockPos.center, 0f, 0f)
             entity.summonedPos = blockPos
-            entity.initialize(
-                world as ServerWorld,
-                this.world?.getLocalDifficulty(blockPos),
-                SpawnReason.MOB_SUMMONED,
+            entity.finalizeSpawn(
+                level as ServerLevel,
+                this.level?.getCurrentDifficultyAt(blockPos),
+                MobSpawnType.MOB_SUMMONED,
                 null
             )
-            world!!.spawnEntity(entity)
+            level!!.addFreshEntity(entity)
             dustBunnies.addLast(entity)
             this.timeSinceLastBunny = 0
-            this.markDirty()
+            this.setChanged()
         }
     }
 
@@ -69,28 +69,28 @@ open class BunnyGraveBlockEntity(pos: BlockPos?, state: BlockState?) :
         bunnyIds.remove(entity.uuid)
     }
 
-    override fun toSyncedNbt(lookupProvider: HolderLookup.Provider): NbtCompound {
-        val nbt = NbtCompound()
+    override fun getUpdateTag(lookupProvider: HolderLookup.Provider): CompoundTag {
+        val nbt = CompoundTag()
         writeBunnies(nbt)
         return nbt
     }
 
-    override fun writeNbt(nbt: NbtCompound, lookupProvider: HolderLookup.Provider) {
-        super.writeNbt(nbt, lookupProvider)
+    override fun saveAdditional(nbt: CompoundTag, lookupProvider: HolderLookup.Provider) {
+        super.saveAdditional(nbt, lookupProvider)
         writeBunnies(nbt)
     }
 
-    private fun writeBunnies(nbt: NbtCompound) {
-        val list = NbtList()
-        dustBunnies.forEach { entity -> list.add(NbtString.of(entity.uuidAsString)) }
+    private fun writeBunnies(nbt: CompoundTag) {
+        val list = ListTag()
+        dustBunnies.forEach { entity -> list.add(StringTag.valueOf(entity.stringUUID)) }
         nbt.put(TAG_KEY, list)
     }
 
-    override fun readNbtImpl(nbt: NbtCompound, lookupProvider: HolderLookup.Provider) {
-        val list = nbt.getList(TAG_KEY, NbtElement.STRING_TYPE.toInt())
+    override fun loadAdditional(nbt: CompoundTag, lookupProvider: HolderLookup.Provider) {
+        val list = nbt.getList(TAG_KEY, Tag.TAG_STRING.toInt())
         bunnyIds.clear()
-        bunnyIds.addAll(list.map { UUID.fromString(it.asString()) })
-        super.readNbtImpl(nbt, lookupProvider)
+        bunnyIds.addAll(list.map { UUID.fromString(it.asString) })
+        super.loadAdditional(nbt, lookupProvider)
     }
 
     companion object {
@@ -98,7 +98,7 @@ open class BunnyGraveBlockEntity(pos: BlockPos?, state: BlockState?) :
 
         fun bunniesAmount(dustState: Int): Int = dustState * 3
         fun tick(
-            world: World,
+            world: Level,
             pos: BlockPos,
             state: BlockState,
             blockEntity: BunnyGraveBlockEntity
@@ -107,20 +107,20 @@ open class BunnyGraveBlockEntity(pos: BlockPos?, state: BlockState?) :
                 ++blockEntity.timeSinceLastBunny
             }
             if (blockEntity.timeSinceLastBunny % 20 == 0) {
-                val dustState = state.get(BunnyGraveBlock.DUST)
+                val dustState = state.getValue(BunnyGraveBlock.DUST)
                 val dustBunniesAmount = blockEntity.dustBunnies.size
                 if (dustBunniesAmount < bunniesAmount(dustState)) {
                     if (world.random.nextFloat() < dustState * 0.7) {
-                        blockEntity.onSyncedBlockEvent(1, 1)
+                        blockEntity.triggerEvent(1, 1)
                     }
                 } else if (dustBunniesAmount > bunniesAmount(dustState)) {
                     val entity = blockEntity.dustBunnies.first()
-                    entity.damage(entity.damageSources.starve(), 1.0f)
+                    entity.hurt(entity.damageSources().starve(), 1.0f)
                 }
             }
         }
 
-        fun serverTick(world: World, pos: BlockPos, state: BlockState, blockEntity: BunnyGraveBlockEntity) {
+        fun serverTick(world: Level, pos: BlockPos, state: BlockState, blockEntity: BunnyGraveBlockEntity) {
             tick(world, pos, state, blockEntity)
         }
     }

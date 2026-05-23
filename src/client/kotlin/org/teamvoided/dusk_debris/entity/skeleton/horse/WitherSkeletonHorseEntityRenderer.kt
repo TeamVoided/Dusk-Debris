@@ -1,30 +1,30 @@
 package org.teamvoided.dusk_debris.entity.skeleton.horse
 
-import net.minecraft.client.render.entity.EntityRendererFactory
-import net.minecraft.client.render.entity.MobEntityRenderer
-import net.minecraft.client.render.entity.model.HorseEntityModel
-import net.minecraft.client.util.math.MatrixStack
-import net.minecraft.util.Identifier
+import com.mojang.blaze3d.vertex.PoseStack
+import net.minecraft.client.model.HorseModel
+import net.minecraft.client.renderer.entity.EntityRendererProvider
+import net.minecraft.client.renderer.entity.MobRenderer
+import net.minecraft.resources.ResourceLocation
 import org.teamvoided.dusk_debris.DuskDebris
 import org.teamvoided.dusk_debris.entity.DuskEntityModelLayers
 import org.teamvoided.dusk_debris.entity.WitherSkeletonHorseEntity
 
-class WitherSkeletonHorseEntityRenderer(context: EntityRendererFactory.Context) :
-    MobEntityRenderer<WitherSkeletonHorseEntity, HorseEntityModel<WitherSkeletonHorseEntity>>(
+class WitherSkeletonHorseEntityRenderer(context: EntityRendererProvider.Context) :
+    MobRenderer<WitherSkeletonHorseEntity, HorseModel<WitherSkeletonHorseEntity>>(
         context,
-        HorseEntityModel(context.getPart(DuskEntityModelLayers.WITHER_SKELETON_HORSE)),
+        HorseModel(context.bakeLayer(DuskEntityModelLayers.WITHER_SKELETON_HORSE)),
         1.0f
     ) {
 
-    override fun scale(witherSkeletonEntity: WitherSkeletonHorseEntity, matrices: MatrixStack, f: Float) {
+    override fun scale(witherSkeletonEntity: WitherSkeletonHorseEntity, matrices: PoseStack, f: Float) {
         matrices.scale(1.2f, 1.2f, 1.2f)
     }
 
-    override fun getTexture(wolfEntity: WitherSkeletonHorseEntity): Identifier {
+    override fun getTextureLocation(wolfEntity: WitherSkeletonHorseEntity): ResourceLocation {
         return TEXTURE
     }
 
     companion object {
-        private val TEXTURE: Identifier = DuskDebris.id("textures/entity/horse/horse_wither_skeleton.png")
+        private val TEXTURE: ResourceLocation = DuskDebris.id("textures/entity/horse/horse_wither_skeleton.png")
     }
 }

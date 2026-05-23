@@ -3,14 +3,8 @@ package org.teamvoided.dusk_debris.block.attachments
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import com.mojang.serialization.codecs.UnboundedMapCodec
-import net.minecraft.registry.Holder
-import net.minecraft.registry.HolderSet
-import net.minecraft.registry.RegistryCodecs
-import net.minecraft.registry.RegistryKeys
-import net.minecraft.util.Identifier
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Direction
-import net.minecraft.world.biome.Biome
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
 import java.util.*
 import kotlin.jvm.optionals.getOrNull
 

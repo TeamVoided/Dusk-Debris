@@ -3,12 +3,12 @@ package org.teamvoided.dusk_debris.entity
 import com.google.common.collect.ImmutableList
 import com.google.common.collect.ImmutableSet
 import com.mojang.datafixers.util.Pair
-import net.minecraft.entity.ai.brain.Activity
-import net.minecraft.entity.ai.brain.Brain
-import net.minecraft.entity.ai.brain.MemoryModuleType
-import net.minecraft.entity.ai.brain.sensor.Sensor
-import net.minecraft.entity.ai.brain.sensor.SensorType
-import net.minecraft.entity.ai.brain.task.*
+import net.minecraft.world.entity.ai.Brain
+import net.minecraft.world.entity.ai.behavior.*
+import net.minecraft.world.entity.ai.memory.MemoryModuleType
+import net.minecraft.world.entity.ai.sensing.Sensor
+import net.minecraft.world.entity.ai.sensing.SensorType
+import net.minecraft.world.entity.schedule.Activity
 
 object TinyEnemyJellyfishBrain {
     private const val PANICKING_SPEED = 2f
@@ -24,7 +24,7 @@ object TinyEnemyJellyfishBrain {
         listOf(
             MemoryModuleType.WALK_TARGET,
             MemoryModuleType.LOOK_TARGET,
-            MemoryModuleType.VISIBLE_MOBS,
+            MemoryModuleType.NEAREST_VISIBLE_LIVING_ENTITIES,
             MemoryModuleType.CANT_REACH_WALK_TARGET_SINCE,
             MemoryModuleType.PATH,
             MemoryModuleType.IS_PANICKING
@@ -36,34 +36,34 @@ object TinyEnemyJellyfishBrain {
         addIdleActivities(brain)
         brain.setCoreActivities(ImmutableSet.of(Activity.CORE))
         brain.setDefaultActivity(Activity.IDLE)
-        brain.resetPossibleActivities()
+        brain.useDefaultActivity()
         return brain
     }
 
-    fun createProfile(): Brain.Profile<TinyEnemyJellyfishEntity> =
-        Brain.createProfile(MEMORY_MODULES, SENSORS)
+    fun createProfile(): Brain.Provider<TinyEnemyJellyfishEntity> =
+        Brain.provider(MEMORY_MODULES, SENSORS)
 
     private fun addCoreActivities(brain: Brain<TinyEnemyJellyfishEntity>) {
-        brain.setTaskList(
+        brain.addActivity(
             Activity.CORE, 0, ImmutableList.of(
-                WalkTask(PANICKING_SPEED),
-                LookAroundTask(45, 90),
-                WanderAroundTask()
+                AnimalPanic(PANICKING_SPEED),
+                LookAtTargetSink(45, 90),
+                MoveToTargetSink()
             )
         )
     }
 
     private fun addIdleActivities(brain: Brain<TinyEnemyJellyfishEntity>) {
-        brain.setTaskList(
+        brain.addActivity(
             Activity.IDLE,
             ImmutableList.of(
-                Pair.of(0, WanderAroundTask(20, 100)),
+                Pair.of(0, MoveToTargetSink(20, 100)),
                 Pair.of(
-                    1, RandomTask(
+                    1, RunOne(
                         ImmutableList.of(
-                            Pair.of(WaitTask(20, 100), 1),
-                            Pair.of(MeanderTask.create(1f), 2),
-                            Pair.of(GoTowardsLookTarget.create(1f, 3), 2)
+                            Pair.of(DoNothing(20, 100), 1),
+                            Pair.of(RandomStroll.stroll(1f), 2),
+                            Pair.of(SetWalkTargetFromLookTarget.create(1f, 3), 2)
                         )
                     )
                 ),
@@ -72,6 +72,6 @@ object TinyEnemyJellyfishBrain {
     }
 
     fun updateActivities(entity: TinyEnemyJellyfishEntity) {
-        entity.brain.resetPossibleActivities(ImmutableList.of(Activity.IDLE))
+        entity.brain.setActiveActivityToFirstValid(ImmutableList.of(Activity.IDLE))
     }
 }

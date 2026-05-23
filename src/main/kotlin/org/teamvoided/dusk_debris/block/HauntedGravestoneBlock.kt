@@ -1,73 +1,75 @@
 package org.teamvoided.dusk_debris.block
 
-import net.minecraft.block.Block
-import net.minecraft.block.BlockEntityProvider
-import net.minecraft.block.BlockState
-import net.minecraft.block.entity.BlockEntity
-import net.minecraft.block.entity.BlockEntityTicker
-import net.minecraft.block.entity.BlockEntityType
-import net.minecraft.particle.ParticleTypes
-import net.minecraft.sound.SoundCategory
-import net.minecraft.sound.SoundEvents
-import net.minecraft.state.StateManager
-import net.minecraft.state.property.BooleanProperty
-import net.minecraft.state.property.Properties
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Direction
-import net.minecraft.util.math.MathHelper
-import net.minecraft.util.random.RandomGenerator
-import net.minecraft.util.shape.VoxelShape
-import net.minecraft.world.World
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
+import net.minecraft.core.particles.ParticleTypes
+import net.minecraft.sounds.SoundEvents
+import net.minecraft.sounds.SoundSource
+import net.minecraft.util.Mth
+import net.minecraft.util.RandomSource
+import net.minecraft.world.level.Level
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.EntityBlock
+import net.minecraft.world.level.block.entity.BlockEntity
+import net.minecraft.world.level.block.entity.BlockEntityTicker
+import net.minecraft.world.level.block.entity.BlockEntityType
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.block.state.StateDefinition
+import net.minecraft.world.level.block.state.properties.BlockStateProperties
+import net.minecraft.world.level.block.state.properties.BooleanProperty
+import net.minecraft.world.phys.shapes.VoxelShape
 import org.teamvoided.dusk_debris.init.DuskBlockEntities
-import org.teamvoided.dusk_debris.mixin.BlockWithEntityAccessor
+import org.teamvoided.dusk_debris.mixin.BaseEntityBlockAccessor
 import org.teamvoided.dusks_and_dungeons.block.entity.HauntedGravestoneBlockEntity
 
-open class HauntedGravestoneBlock(shape: VoxelShape, centerShape: VoxelShape, settings: Settings) :
-    GravestoneBlock(shape, centerShape, settings), BlockEntityProvider {
+open class HauntedGravestoneBlock(shape: VoxelShape, centerShape: VoxelShape, settings: Properties) :
+    GravestoneBlock(shape, centerShape, settings), EntityBlock {
 
     init {
-        defaultState = stateManager.defaultState
-            .with(Properties.WATERLOGGED, false)
-            .with(CENTERED, true)
-            .with(FACING, Direction.NORTH)
-            .with(IS_ACTIVE, false)
+        registerDefaultState(
+            stateDefinition.any()
+                .setValue(BlockStateProperties.WATERLOGGED, false)
+                .setValue(CENTERED, true)
+                .setValue(FACING, Direction.NORTH)
+                .setValue(IS_ACTIVE, false)
+        )
     }
 
-    override fun createBlockEntity(pos: BlockPos, state: BlockState): BlockEntity {
+    override fun newBlockEntity(pos: BlockPos, state: BlockState): BlockEntity {
         return HauntedGravestoneBlockEntity(pos, state)
     }
 
-    override fun onSyncedBlockEvent(state: BlockState?, world: World, pos: BlockPos?, type: Int, data: Int): Boolean {
-        super.onSyncedBlockEvent(state, world, pos, type, data)
+    override fun triggerEvent(state: BlockState?, world: Level, pos: BlockPos?, type: Int, data: Int): Boolean {
+        super.triggerEvent(state, world, pos, type, data)
         val blockEntity: BlockEntity? = world.getBlockEntity(pos)
-        return if (blockEntity == null) false else blockEntity.onSyncedBlockEvent(type, data)
+        return if (blockEntity == null) false else blockEntity.triggerEvent(type, data)
     }
 
     override fun <T : BlockEntity> getTicker(
-        world: World,
+        world: Level,
         state: BlockState,
         type: BlockEntityType<T>
     ): BlockEntityTicker<T>? {
-        return BlockWithEntityAccessor.checkType(
+        return BaseEntityBlockAccessor.CreateTickerHelper(
             type,
             DuskBlockEntities.HAUNTED_GRAVESTONE_BLOCK,
             HauntedGravestoneBlockEntity::serverTick
         )
     }
 
-    override fun appendProperties(builder: StateManager.Builder<Block, BlockState>) {
-        super.appendProperties(builder)
+    override fun createBlockStateDefinition(builder: StateDefinition.Builder<Block, BlockState>) {
+        super.createBlockStateDefinition(builder)
         builder.add(IS_ACTIVE)
     }
 
-    override fun randomDisplayTick(state: BlockState, world: World, pos: BlockPos, random: RandomGenerator) {
-        if (state.get(IS_ACTIVE) && random.nextInt(25) == 0) {
-            world.playSound(
+    override fun animateTick(state: BlockState, world: Level, pos: BlockPos, random: RandomSource) {
+        if (state.getValue(IS_ACTIVE) && random.nextInt(25) == 0) {
+            world.playLocalSound(
                 pos.x + 0.5,
                 pos.y + 0.5,
                 pos.z + 0.5,
-                SoundEvents.ENTITY_VEX_AMBIENT,
-                SoundCategory.BLOCKS,
+                SoundEvents.VEX_AMBIENT,
+                SoundSource.BLOCKS,
                 0.5f + random.nextFloat(),
                 random.nextFloat() * 0.3f,
                 false
@@ -77,15 +79,15 @@ open class HauntedGravestoneBlock(shape: VoxelShape, centerShape: VoxelShape, se
                 pos.x + random.nextDouble(),
                 pos.y + random.nextDouble(),
                 pos.z + random.nextDouble(),
-                MathHelper.nextDouble(random, -0.01, 0.01),
-                MathHelper.nextDouble(random, 0.0, 0.2),
-                MathHelper.nextDouble(random, -0.01, 0.01)
+                Mth.nextDouble(random, -0.01, 0.01),
+                Mth.nextDouble(random, 0.0, 0.2),
+                Mth.nextDouble(random, -0.01, 0.01)
             )
         }
-        super.randomDisplayTick(state, world, pos, random)
+        super.animateTick(state, world, pos, random)
     }
 
     companion object {
-        val IS_ACTIVE: BooleanProperty = BooleanProperty.of("is_active")
+        val IS_ACTIVE: BooleanProperty = BooleanProperty.create("is_active")
     }
 }

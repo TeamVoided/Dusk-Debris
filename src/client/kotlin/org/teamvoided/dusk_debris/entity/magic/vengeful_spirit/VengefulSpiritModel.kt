@@ -1,15 +1,18 @@
 package org.teamvoided.dusk_debris.entity.magic.vengeful_spirit
 
+import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.blaze3d.vertex.VertexConsumer
-import net.minecraft.client.model.*
-import net.minecraft.client.render.entity.model.SinglePartEntityModel
-import net.minecraft.client.util.math.MatrixStack
-import net.minecraft.entity.Entity
-import net.minecraft.util.math.Vec3d
+import net.minecraft.client.model.HierarchicalModel
+import net.minecraft.client.model.geom.ModelPart
+import net.minecraft.client.model.geom.PartPose
+import net.minecraft.client.model.geom.builders.CubeListBuilder
+import net.minecraft.client.model.geom.builders.LayerDefinition
+import net.minecraft.client.model.geom.builders.MeshDefinition
+import net.minecraft.world.entity.Entity
 
-class VengefulSpiritModel(val root: ModelPart) : SinglePartEntityModel<Entity>() {
+class VengefulSpiritModel(val root: ModelPart) : HierarchicalModel<Entity>() {
     private val bone: ModelPart = root.getChild("bone")
-    override fun setAngles(
+    override fun setupAnim(
         entity: Entity,
         limbAngle: Float,
         limbDistance: Float,
@@ -18,40 +21,40 @@ class VengefulSpiritModel(val root: ModelPart) : SinglePartEntityModel<Entity>()
         headPitch: Float
     ) {
         val mult = if (animationProgress < 10) animationProgress / 10f else 1f
-        this.bone.yaw = -headYaw
-        this.bone.pitch = -headPitch
-        this.bone.pivotY = 8 * entity.height
-        this.bone.scaleX = 2 * entity.width * mult
-        this.bone.scaleY = 2 * entity.height * mult
-        this.bone.scaleZ = 2 * entity.width * mult
+        this.bone.yRot = -headYaw
+        this.bone.xRot = -headPitch
+        this.bone.y = 8 * entity.bbHeight
+        this.bone.xScale = 2 * entity.bbWidth * mult
+        this.bone.yScale = 2 * entity.bbHeight * mult
+        this.bone.zScale = 2 * entity.bbWidth * mult
     }
 
-    override fun method_2828(
-        matrices: MatrixStack,
+    override fun renderToBuffer(
+        matrices: PoseStack,
         vertexConsumer: VertexConsumer,
         light: Int,
         overlay: Int,
         color: Int
-    ) = root.method_22699(matrices, vertexConsumer, light, overlay, color)
+    ) = root.render(matrices, vertexConsumer, light, overlay, color)
 
-    override fun getPart(): ModelPart = this.root
+    override fun root(): ModelPart = this.root
 
     companion object {
-        val texturedModelData: TexturedModelData
+        val texturedModelData: LayerDefinition
             get() {
-                val modelData = ModelData()
+                val modelData = MeshDefinition()
                 val modelPartData = modelData.root
-                val bone = modelPartData.addChild(
+                val bone = modelPartData.addOrReplaceChild(
                     "bone",
-                    ModelPartBuilder.create()
-                        .uv(0, 0)
-                        .cuboid(
+                    CubeListBuilder.create()
+                        .texOffs(0, 0)
+                        .addBox(
                             -4f, -4f, -4f,
                             8f, 8f, 8f
                         ),
-                    ModelTransform.pivot(0f, 4f, 0f)
+                    PartPose.offset(0f, 4f, 0f)
                 )
-                return TexturedModelData.of(modelData, 32, 16)
+                return LayerDefinition.create(modelData, 32, 16)
             }
     }
 }

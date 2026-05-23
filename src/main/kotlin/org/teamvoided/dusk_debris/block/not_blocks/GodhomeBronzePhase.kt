@@ -1,8 +1,8 @@
 package org.teamvoided.dusk_debris.block.not_blocks
 
-import net.minecraft.util.StringIdentifiable
+import net.minecraft.util.StringRepresentable
 
-enum class GodhomeBronzePhase(val phaseName: String, val id: Int) : StringIdentifiable {
+enum class GodhomeBronzePhase(val phaseName: String, val id: Int) : StringRepresentable {
     SOMBER("somber", 0),
     SHINING("shining", 1),
     RADIANT("radiant", 2);
@@ -11,7 +11,7 @@ enum class GodhomeBronzePhase(val phaseName: String, val id: Int) : StringIdenti
         return phaseName
     }
 
-    override fun asString(): String {
+    override fun getSerializedName(): String {
         return phaseName
     }
 

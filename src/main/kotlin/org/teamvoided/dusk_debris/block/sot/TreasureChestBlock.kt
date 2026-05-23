@@ -1,96 +1,98 @@
 package org.teamvoided.dusk_debris.block.sot
 
 import com.mojang.serialization.MapCodec
-import net.minecraft.block.*
-import net.minecraft.block.entity.BlockEntity
-import net.minecraft.entity.ai.pathing.NavigationType
-import net.minecraft.entity.mob.PiglinBrain
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.server.world.ServerWorld
-import net.minecraft.state.StateManager
-import net.minecraft.state.property.Properties
-import net.minecraft.util.ActionResult
-import net.minecraft.util.ItemScatterer
-import net.minecraft.util.hit.BlockHitResult
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Direction
-import net.minecraft.util.random.RandomGenerator
-import net.minecraft.util.shape.VoxelShape
-import net.minecraft.world.BlockView
-import net.minecraft.world.World
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
+import net.minecraft.server.level.ServerLevel
+import net.minecraft.util.RandomSource
+import net.minecraft.world.Containers
+import net.minecraft.world.InteractionResult
+import net.minecraft.world.entity.monster.piglin.PiglinAi
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.level.BlockGetter
+import net.minecraft.world.level.Level
+import net.minecraft.world.level.block.*
+import net.minecraft.world.level.block.entity.BlockEntity
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.block.state.StateDefinition
+import net.minecraft.world.level.block.state.properties.BlockStateProperties
+import net.minecraft.world.level.pathfinder.PathComputationType
+import net.minecraft.world.phys.BlockHitResult
+import net.minecraft.world.phys.shapes.CollisionContext
+import net.minecraft.world.phys.shapes.VoxelShape
 import org.teamvoided.dusk_debris.block.entity.TreasureChestBlockEntity
 
-class TreasureChestBlock(settings: Settings) : BlockWithEntity(settings), Waterloggable {
+class TreasureChestBlock(settings: Properties) : BaseEntityBlock(settings), SimpleWaterloggedBlock {
 
     init {
-        this.defaultState.with(FACING, Direction.NORTH).with(WATERLOGGED, false)
+        this.defaultBlockState().setValue(FACING, Direction.NORTH).setValue(WATERLOGGED, false)
     }
 
-    override fun getCodec(): MapCodec<out BlockWithEntity> = CODEC
+    override fun codec(): MapCodec<out BaseEntityBlock> = CODEC
 
-    override fun createBlockEntity(pos: BlockPos, state: BlockState): BlockEntity {
+    override fun newBlockEntity(pos: BlockPos, state: BlockState): BlockEntity {
         return TreasureChestBlockEntity(pos, state)
     }
 
-    override fun getOutlineShape(
+    override fun getShape(
         state: BlockState?,
-        world: BlockView?,
+        world: BlockGetter?,
         pos: BlockPos?,
-        context: ShapeContext?
+        context: CollisionContext?
     ): VoxelShape {
         return SHAPE
     }
 
-    override fun getRenderType(state: BlockState): BlockRenderType = BlockRenderType.ANIMATED
-    override fun onUse(
+    override fun getRenderShape(state: BlockState): RenderShape = RenderShape.ENTITYBLOCK_ANIMATED
+    override fun useWithoutItem(
         state: BlockState,
-        world: World,
+        world: Level,
         pos: BlockPos,
-        entity: PlayerEntity,
+        entity: Player,
         hitResult: BlockHitResult
-    ): ActionResult {
-        if (world.isClient) {
-            return ActionResult.SUCCESS
+    ): InteractionResult {
+        if (world.isClientSide) {
+            return InteractionResult.SUCCESS
         } else {
             val blockEntity = world.getBlockEntity(pos)
             if (blockEntity is TreasureChestBlockEntity) {
-                entity.openHandledScreen(blockEntity)
-                PiglinBrain.onGuardedBlockInteracted(entity, true)
+                entity.openMenu(blockEntity)
+                PiglinAi.angerNearbyPiglins(entity, true)
             }
-            return ActionResult.CONSUME
+            return InteractionResult.CONSUME
         }
     }
 
-    override fun onStateReplaced(
+    override fun onRemove(
         state: BlockState,
-        world: World,
+        world: Level,
         pos: BlockPos,
         newState: BlockState,
         moved: Boolean
     ) {
-        ItemScatterer.scatterInventory(state, newState, world, pos)
-        super.onStateReplaced(state, world, pos, newState, moved)
+        Containers.dropContentsOnDestroy(state, newState, world, pos)
+        super.onRemove(state, world, pos, newState, moved)
     }
 
-    override fun scheduledTick(state: BlockState, world: ServerWorld, pos: BlockPos, random: RandomGenerator) {
+    override fun tick(state: BlockState, world: ServerLevel, pos: BlockPos, random: RandomSource) {
         val blockEntity = world.getBlockEntity(pos)!!
         if (blockEntity is TreasureChestBlockEntity) {
             blockEntity.tick()
         }
     }
-    override fun canPathfindThrough(state: BlockState, navigationType: NavigationType): Boolean {
+    override fun isPathfindable(state: BlockState, navigationType: PathComputationType): Boolean {
         return false
     }
 
-    override fun appendProperties(builder: StateManager.Builder<Block, BlockState>) {
+    override fun createBlockStateDefinition(builder: StateDefinition.Builder<Block, BlockState>) {
         builder.add(FACING, WATERLOGGED)
     }
 
     companion object {
-        val CODEC = createCodec(::TreasureChestBlock)
+        val CODEC = simpleCodec(::TreasureChestBlock)
         protected val SHAPE: VoxelShape =
-            createCuboidShape(1.0, 0.0, 1.0, 15.0, 14.0, 15.0)
-        val FACING = HorizontalFacingBlock.FACING
-        val WATERLOGGED = Properties.WATERLOGGED
+            box(1.0, 0.0, 1.0, 15.0, 14.0, 15.0)
+        val FACING = HorizontalDirectionalBlock.FACING
+        val WATERLOGGED = BlockStateProperties.WATERLOGGED
     }
 }

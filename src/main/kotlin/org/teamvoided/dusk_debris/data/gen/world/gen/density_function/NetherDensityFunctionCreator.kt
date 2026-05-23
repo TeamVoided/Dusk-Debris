@@ -1,18 +1,12 @@
 package org.teamvoided.dusk_debris.data.gen.world.gen.density_function
 
-import net.minecraft.registry.BootstrapContext
-import net.minecraft.registry.Holder
-import net.minecraft.registry.RegistryKey
-import net.minecraft.registry.RegistryKeys
-import net.minecraft.util.math.Direction
-import net.minecraft.world.biome.source.util.VanillaTerrainParametersCreator
-import net.minecraft.world.gen.DensityFunction
-import net.minecraft.world.gen.DensityFunctions
-import net.minecraft.world.gen.chunk.ChunkGeneratorSettings
-import net.minecraft.world.gen.noise.NoiseParametersKeys
-import net.minecraft.world.gen.noise.NoiseRouter
-import net.minecraft.world.gen.noise.NoiseRouterData
-import org.teamvoided.dusk_debris.data.gen.world.gen.DensityFunctionCreator
+import net.minecraft.core.Direction
+import net.minecraft.core.Holder
+import net.minecraft.core.registries.Registries
+import net.minecraft.data.worldgen.BootstrapContext
+import net.minecraft.data.worldgen.TerrainProvider
+import net.minecraft.resources.ResourceKey
+import net.minecraft.world.level.levelgen.*
 import org.teamvoided.dusk_debris.data.gen.world.gen.DensityFunctionCreator.dense
 import org.teamvoided.dusk_debris.data.gen.world.gen.DensityFunctionCreator.denseHold
 import org.teamvoided.dusk_debris.data.gen.world.gen.DensityFunctionCreator.floor
@@ -32,8 +26,8 @@ object NetherDensityFunctionCreator {
     private const val RANGES_DEBUG_WIDTH = 200
     private const val DEBUG_WIDTH = 200
     fun BootstrapContext<DensityFunction>.theNetherCreator() {
-        val noiseParameters = this.getRegistryLookup(RegistryKeys.NOISE_PARAMETERS)
-        val densityFunctions = this.getRegistryLookup(RegistryKeys.DENSITY_FUNCTION)
+        val noiseParameters = this.lookup(Registries.NOISE)
+        val densityFunctions = this.lookup(Registries.DENSITY_FUNCTION)
         this.parameters()
         this.shapers()
         this.pillar()
@@ -62,10 +56,10 @@ object NetherDensityFunctionCreator {
             DensityFunctions.cacheOnce(
                 if (LAVA) {
                     DensityFunctions.max(
-                        DensityFunctions.multiply(
-                            DensityFunctions.multiply(
+                        DensityFunctions.mul(
+                            DensityFunctions.mul(
                                 DensityFunctions.constant(32.0 / 4.0),
-                                DensityFunctions.mapFromUnitToValue(
+                                DensityFunctions.mapFromUnitTo(
                                     DensityFunctions.noise(
                                         this.noiseHold(DuskNoiseParametersKeys.LAVA_LEVEL),
                                         1.0,
@@ -196,7 +190,7 @@ object NetherDensityFunctionCreator {
             DensityFunctions.cacheOnce(
                 DensityFunctions.add(
                     this.dense(DuskDensityFunctions.OFFSET_FLOOR_NETHER),
-                    DensityFunctions.clampedGradientY(
+                    DensityFunctions.yClampedGradient(
                         -(256 + 256),
                         (256 + 256),
                         2.0,
@@ -210,7 +204,7 @@ object NetherDensityFunctionCreator {
             DensityFunctions.cacheOnce(
                 DensityFunctions.add(
                     this.dense(DuskDensityFunctions.OFFSET_CEILING_NETHER),
-                    DensityFunctions.clampedGradientY(
+                    DensityFunctions.yClampedGradient(
                         -(0 + 256),
                         512 + 256,
                         -2.0,
@@ -232,7 +226,7 @@ object NetherDensityFunctionCreator {
 
         val jaggedParameterFunction = this.register(
             DuskDensityFunctions.JAGGED_PARAMETER_NETHER,
-            DensityFunctions.noise(this.noiseHold(NoiseParametersKeys.JAGGED), 150.0, 15.0)
+            DensityFunctions.noise(this.noiseHold(Noises.JAGGED), 150.0, 15.0)
         )
         this.cheeseMaker(
             continents,
@@ -282,18 +276,18 @@ object NetherDensityFunctionCreator {
 
 
     fun BootstrapContext<DensityFunction>.pillar() {
-        val pillarNoise = DensityFunctions.noise(this.noiseHold(NoiseParametersKeys.PILLAR), 5.0, 0.1)
+        val pillarNoise = DensityFunctions.noise(this.noiseHold(Noises.PILLAR), 5.0, 0.1)
         val pillarRarenessNoise =
-            DensityFunctions.mappedNoise(this.noiseHold(NoiseParametersKeys.PILLAR_RARENESS), 1.0, 0.1, 0.0, -2.0)
+            DensityFunctions.mappedNoise(this.noiseHold(Noises.PILLAR_RARENESS), 1.0, 0.1, 0.0, -2.0)
         val pillarThicknessNoise =
-            DensityFunctions.mappedNoise(this.noiseHold(NoiseParametersKeys.PILLAR_THICKNESS), 0.75, 0.25, 0.5, 1.25)
+            DensityFunctions.mappedNoise(this.noiseHold(Noises.PILLAR_THICKNESS), 0.75, 0.25, 0.5, 1.25)
         val pillar = DensityFunctions.add(
-            DensityFunctions.multiply(pillarNoise, DensityFunctions.constant(2.0)),
+            DensityFunctions.mul(pillarNoise, DensityFunctions.constant(2.0)),
             pillarRarenessNoise
         )
         this.register(
             DuskDensityFunctions.NETHER_PILLARS,
-            DensityFunctions.cacheOnce(DensityFunctions.multiply(pillar, pillarThicknessNoise.cube()))
+            DensityFunctions.cacheOnce(DensityFunctions.mul(pillar, pillarThicknessNoise.cube()))
         )
     }
 
@@ -302,21 +296,21 @@ object NetherDensityFunctionCreator {
         erosionKey: Holder<DensityFunction>,
         dropCeilingKey: Holder<DensityFunction>,
         jaggedFunction: Holder<DensityFunction>,
-        offsetFloorKey: RegistryKey<DensityFunction>,
-        offsetCeilingKey: RegistryKey<DensityFunction>,
-        offsetKey: RegistryKey<DensityFunction>,
-        factorKey: RegistryKey<DensityFunction>,
-        jaggednessKey: RegistryKey<DensityFunction>,
-        floorKey: RegistryKey<DensityFunction>,
-        cheeseKey: RegistryKey<DensityFunction>,
+        offsetFloorKey: ResourceKey<DensityFunction>,
+        offsetCeilingKey: ResourceKey<DensityFunction>,
+        offsetKey: ResourceKey<DensityFunction>,
+        factorKey: ResourceKey<DensityFunction>,
+        jaggednessKey: ResourceKey<DensityFunction>,
+        floorKey: ResourceKey<DensityFunction>,
+        cheeseKey: ResourceKey<DensityFunction>,
         amplified: Boolean
     ) {
-        val continents = DensityFunctions.Spline.FunctionWrapper(continentsKey)
-        val erosion = DensityFunctions.Spline.FunctionWrapper(erosionKey)
-        val dropCeiling = DensityFunctions.Spline.FunctionWrapper(dropCeilingKey)
-        val ridges = DensityFunctions.Spline.FunctionWrapper(this.denseHold(DuskDensityFunctions.RIDGES_NETHER))
+        val continents = DensityFunctions.Spline.Coordinate(continentsKey)
+        val erosion = DensityFunctions.Spline.Coordinate(erosionKey)
+        val dropCeiling = DensityFunctions.Spline.Coordinate(dropCeilingKey)
+        val ridges = DensityFunctions.Spline.Coordinate(this.denseHold(DuskDensityFunctions.RIDGES_NETHER))
         val ridgesFolded =
-            DensityFunctions.Spline.FunctionWrapper(this.denseHold(DuskDensityFunctions.RIDGES_FOLDED_NETHER))
+            DensityFunctions.Spline.Coordinate(this.denseHold(DuskDensityFunctions.RIDGES_FOLDED_NETHER))
         val offsetFloorSpline = registerAndWrap(
             offsetFloorKey,
 //            add(
@@ -332,8 +326,8 @@ object NetherDensityFunctionCreator {
 //                )
             DensityFunctions.add(
                 DensityFunctions.constant(0.15),
-                DensityFunctions.copySpline(
-                    VanillaTerrainParametersCreator.method_42056(
+                DensityFunctions.spline(
+                    TerrainProvider.overworldOffset(
                         continents,
                         erosion,
                         ridgesFolded,
@@ -346,7 +340,7 @@ object NetherDensityFunctionCreator {
             offsetCeilingKey,
             DensityFunctions.add(
                 DensityFunctions.constant(0.125),
-                DensityFunctions.copySpline(
+                DensityFunctions.spline(
                     NetherTerrainParametersCreator.offsetCeilingSpline(
                         continents,
                         erosion,
@@ -359,7 +353,7 @@ object NetherDensityFunctionCreator {
         )
         val factorSpline = registerAndWrap(
             factorKey,
-            DensityFunctions.copySpline(
+            DensityFunctions.spline(
                 NetherTerrainParametersCreator.factorSpline(
                     continents,
                     erosion,
@@ -379,19 +373,19 @@ object NetherDensityFunctionCreator {
 
         val jaggednessSpline = this.registerAndWrap(
             jaggednessKey,
-            DensityFunctions.copySpline(
+            DensityFunctions.spline(
                 NetherTerrainParametersCreator.jaggednessSpline(
                     continents,
                     erosion,
                     ridges,
                     ridgesFolded,
-                    DensityFunctions.Spline.FunctionWrapper(jaggedFunction),
+                    DensityFunctions.Spline.Coordinate(jaggedFunction),
                     amplified
                 )
             )
         )
-        val jaggednessFunction = DensityFunctions.noise(this.noiseHold(NoiseParametersKeys.JAGGED), 1500.0, 150.0)
-        val jagged = DensityFunctions.multiply(jaggednessSpline, jaggednessFunction.halfNegative())
+        val jaggednessFunction = DensityFunctions.noise(this.noiseHold(Noises.JAGGED), 1500.0, 150.0)
+        val jagged = DensityFunctions.mul(jaggednessSpline, jaggednessFunction.halfNegative())
         val depthAndJaggedness = NoiseRouterData.noiseGradientDensity(
             factorSpline,
             DensityFunctions.add(depthFunction, jagged)

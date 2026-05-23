@@ -1,26 +1,26 @@
 package org.teamvoided.dusk_debris.entity.throwable_bomb
 
-import net.minecraft.entity.EntityType
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.effect.StatusEffect
-import net.minecraft.particle.ParticleEffect
-import net.minecraft.particle.ParticleTypes
-import net.minecraft.registry.Holder
-import net.minecraft.sound.SoundCategory
-import net.minecraft.sound.SoundEvents
-import net.minecraft.world.World
+import net.minecraft.core.Holder
+import net.minecraft.core.particles.ParticleOptions
+import net.minecraft.core.particles.ParticleTypes
+import net.minecraft.sounds.SoundEvents
+import net.minecraft.sounds.SoundSource
+import net.minecraft.world.effect.MobEffect
+import net.minecraft.world.entity.EntityType
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.level.Level
 import org.teamvoided.dusk_debris.block.NethershroomPlantBlock
 
 open class NethershroomThrowableEntity : AbstractThrwowableBombEntity {
 
     //    val replaceItem: Item by lazy {  DuskItems.ANCIENT_BLACK_POWDER_BARREL}
-    open var statusEffect: Holder<StatusEffect>? = null
+    open var statusEffect: Holder<MobEffect>? = null
     open var hasDoubleEffect: Boolean = false
 
 
-    constructor(entityType: EntityType<out NethershroomThrowableEntity>, world: World) : super(entityType, world)
+    constructor(entityType: EntityType<out NethershroomThrowableEntity>, world: Level) : super(entityType, world)
 
-    constructor(entity: EntityType<out NethershroomThrowableEntity>, owner: LivingEntity?, world: World) : super(
+    constructor(entity: EntityType<out NethershroomThrowableEntity>, owner: LivingEntity?, world: Level) : super(
         entity,
         owner,
         world
@@ -28,27 +28,27 @@ open class NethershroomThrowableEntity : AbstractThrwowableBombEntity {
 
     constructor(
         entity: EntityType<out NethershroomThrowableEntity>,
-        world: World,
+        world: Level,
         x: Double,
         y: Double,
         z: Double
     ) : super(entity, x, y, z, world)
 
     override fun explode() {
-        world.playSound(
+        level().playSound(
             this,
-            this.blockPos,
-            SoundEvents.BLOCK_GLASS_BREAK,
-            SoundCategory.BLOCKS,
+            this.blockPosition(),
+            SoundEvents.GLASS_BREAK,
+            SoundSource.BLOCKS,
             0.7f,
-            0.7f + world.random.nextFloat() * 0.2f
+            0.7f + level().random.nextFloat() * 0.2f
         )
         if (statusEffect == null) {
-            NethershroomPlantBlock.explode(world, this.blockPos, getTrailingParticle())
+            NethershroomPlantBlock.explode(level(), this.blockPosition(), getTrailingParticle())
         } else {
             NethershroomPlantBlock.explode(
-                world,
-                this.blockPos,
+                level(),
+                this.blockPosition(),
                 this.getTrailingParticle(),
                 this.statusEffect!!,
                 this.hasDoubleEffect
@@ -56,5 +56,5 @@ open class NethershroomThrowableEntity : AbstractThrwowableBombEntity {
         }
         super.explode()
     }
-    override fun getTrailingParticle(): ParticleEffect = ParticleTypes.SMOKE
+    override fun getTrailingParticle(): ParticleOptions = ParticleTypes.SMOKE
 }

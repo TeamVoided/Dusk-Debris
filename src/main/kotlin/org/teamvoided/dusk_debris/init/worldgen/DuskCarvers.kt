@@ -1,9 +1,9 @@
 package org.teamvoided.dusk_debris.init.worldgen
 
-import net.minecraft.registry.Registries
-import net.minecraft.registry.Registry
-import net.minecraft.world.gen.carver.Carver
-import net.minecraft.world.gen.carver.CarverConfig
+import net.minecraft.core.Registry
+import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.world.level.levelgen.carver.CarverConfiguration
+import net.minecraft.world.level.levelgen.carver.WorldCarver
 import org.teamvoided.dusk_debris.DuskDebris.id
 import org.teamvoided.dusk_debris.world.gen.configured_carver.GeodeCarver
 import org.teamvoided.dusk_debris.world.gen.configured_carver.LakeCarver
@@ -16,6 +16,6 @@ object DuskCarvers {
     val GEODE_CARVER = register("geode_carver", GeodeCarver(GeodeCarverConfig.CODEC))
 
     fun init() {}
-    private fun <C : CarverConfig, F : Carver<C>> register(name: String, carver: F): F =
-        Registry.register(Registries.CARVER, id(name), carver)
+    private fun <C : CarverConfiguration, F : WorldCarver<C>> register(name: String, carver: F): F =
+        Registry.register(BuiltInRegistries.CARVER, id(name), carver)
 }

@@ -2,18 +2,15 @@ package org.teamvoided.dusk_debris.world
 
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
-import net.minecraft.entity.EntityType
-import net.minecraft.entity.EquipmentTable
-import net.minecraft.nbt.NbtCompound
-import net.minecraft.util.Identifier
-import net.minecraft.util.collection.DataPool
-import java.util.*
+import net.minecraft.nbt.CompoundTag
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.world.entity.EntityType
 
-class StatueEntry(var entity: NbtCompound = NbtCompound()) {
+class StatueEntry(var entity: CompoundTag = CompoundTag()) {
 
     init {
         if (entity.contains("id")) {
-            val identifier = Identifier.tryParse(entity.getString("id"))
+            val identifier = ResourceLocation.tryParse(entity.getString("id"))
             if (identifier != null) {
                 entity.putString("id", identifier.toString())
             } else {
@@ -25,14 +22,14 @@ class StatueEntry(var entity: NbtCompound = NbtCompound()) {
     companion object {
 
         fun create(entityType: EntityType<*>): StatueEntry {
-            val nbtCompound = NbtCompound()
-            nbtCompound.putString("id", entityType.builtInRegistryHolder.key.get().value.toString())
+            val nbtCompound = CompoundTag()
+            nbtCompound.putString("id", entityType.builtInRegistryHolder().unwrapKey().get().location().toString())
             return StatueEntry(nbtCompound)
         }
 
         val CODEC: Codec<StatueEntry> = RecordCodecBuilder.create { instance ->
             instance.group(
-                NbtCompound.CODEC.fieldOf("entity").forGetter { it.entity },
+                CompoundTag.CODEC.fieldOf("entity").forGetter { it.entity },
             ).apply(instance, ::StatueEntry)
         }
     }

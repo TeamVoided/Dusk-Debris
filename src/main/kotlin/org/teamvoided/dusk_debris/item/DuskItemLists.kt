@@ -1,6 +1,6 @@
 package org.teamvoided.dusk_debris.item
 
-import net.minecraft.item.SpawnEggItem
+import net.minecraft.world.item.SpawnEggItem
 import org.teamvoided.dusk_debris.init.DuskBlocks
 import org.teamvoided.dusk_debris.init.DuskItems
 

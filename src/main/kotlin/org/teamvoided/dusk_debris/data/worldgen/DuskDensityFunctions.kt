@@ -1,8 +1,8 @@
 package org.teamvoided.dusk_debris.data.worldgen
 
-import net.minecraft.registry.RegistryKey
-import net.minecraft.registry.RegistryKeys
-import net.minecraft.world.gen.DensityFunction
+import net.minecraft.core.registries.Registries
+import net.minecraft.resources.ResourceKey
+import net.minecraft.world.level.levelgen.DensityFunction
 import org.teamvoided.dusk_debris.DuskDebris.id
 
 object DuskDensityFunctions {
@@ -110,14 +110,14 @@ object DuskDensityFunctions {
     val DEPTH_NETHER_AMPLIFIED = nether("parameters/amplified/depth")
     */
 
-    private fun nether(id: String): RegistryKey<DensityFunction> =
-        RegistryKey.of(RegistryKeys.DENSITY_FUNCTION, id("nether/$id"))
+    private fun nether(id: String): ResourceKey<DensityFunction> =
+        ResourceKey.create(Registries.DENSITY_FUNCTION, id("nether/$id"))
 
-    private fun router(id: String): RegistryKey<DensityFunction> =
-        RegistryKey.of(RegistryKeys.DENSITY_FUNCTION, id("parameters/router/$id"))
+    private fun router(id: String): ResourceKey<DensityFunction> =
+        ResourceKey.create(Registries.DENSITY_FUNCTION, id("parameters/router/$id"))
 
-    private fun shaper(id: String): RegistryKey<DensityFunction> =
-        RegistryKey.of(RegistryKeys.DENSITY_FUNCTION, id("parameters/shaper/$id"))
+    private fun shaper(id: String): ResourceKey<DensityFunction> =
+        ResourceKey.create(Registries.DENSITY_FUNCTION, id("parameters/shaper/$id"))
 
-    private fun create(id: String): RegistryKey<DensityFunction> = RegistryKey.of(RegistryKeys.DENSITY_FUNCTION, id(id))
+    private fun create(id: String): ResourceKey<DensityFunction> = ResourceKey.create(Registries.DENSITY_FUNCTION, id(id))
 }

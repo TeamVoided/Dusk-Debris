@@ -1,15 +1,20 @@
 package org.teamvoided.dusk_debris.entity.jellyfish.volaphyra.model
 
-import net.minecraft.client.model.*
-import net.minecraft.client.render.RenderLayer
-import net.minecraft.client.render.entity.model.SinglePartEntityModel
-import net.minecraft.util.math.Direction
-import net.minecraft.util.math.MathHelper
+import net.minecraft.client.model.HierarchicalModel
+import net.minecraft.client.model.geom.ModelPart
+import net.minecraft.client.model.geom.PartPose
+import net.minecraft.client.model.geom.builders.CubeListBuilder
+import net.minecraft.client.model.geom.builders.LayerDefinition
+import net.minecraft.client.model.geom.builders.MeshDefinition
+import net.minecraft.client.model.geom.builders.PartDefinition
+import net.minecraft.client.renderer.RenderType
+import net.minecraft.core.Direction
+import net.minecraft.util.Mth
 import org.teamvoided.dusk_debris.entity.AbstractVolaphyraEntity
 import org.teamvoided.dusk_debris.entity.jellyfish.volaphyra.animation.VolaphyraEntityAnimations
 
 class VolaphyraMesogleaModel(private val root: ModelPart) :
-    SinglePartEntityModel<AbstractVolaphyraEntity>(RenderLayer::getEntityTranslucent) {
+    HierarchicalModel<AbstractVolaphyraEntity>(RenderType::entityTranslucent) {
     val mesoglea: ModelPart = root.getChild(MESOGLEA)
     val mesogleaLower: ModelPart = mesoglea.getChild(MESOGLEA_LOWER)
     val armsNorth: ModelPart = mesoglea.getChild(ARMS_NORTH)
@@ -21,11 +26,11 @@ class VolaphyraMesogleaModel(private val root: ModelPart) :
     val armsEastLower: ModelPart = armsEast.getChild(ARMS_EAST_LOWER)
     val armsWestLower: ModelPart = armsWest.getChild(ARMS_WEST_LOWER)
 
-    override fun getPart(): ModelPart {
+    override fun root(): ModelPart {
         return this.root
     }
 
-    override fun setAngles(
+    override fun setupAnim(
         entity: AbstractVolaphyraEntity,
         limbAngle: Float, //f
         limbDistance: Float, //g
@@ -33,7 +38,7 @@ class VolaphyraMesogleaModel(private val root: ModelPart) :
         headYaw: Float, //i
         headPitch: Float //j
     ) {
-        this.part.traverse().forEach(ModelPart::resetTransform)
+        this.root().allParts.forEach(ModelPart::resetPose)
         this.animate(entity.idleAnimationState, VolaphyraEntityAnimations.IDLE, animationProgress, 1.0f)
         animateArms(
             limbAngle,
@@ -70,29 +75,29 @@ class VolaphyraMesogleaModel(private val root: ModelPart) :
         ) {
             val value: Float = animationProgress * 0.1f + limbAngle * 0.5f
             val mult: Float = 0.08f + limbDistance * speed
-            north.pitch += -MathHelper.cos(value * 0.5f) * mult
-            south.pitch += MathHelper.cos(value * 0.55f) * mult
-            east.roll += MathHelper.cos(value * 0.6f) * mult
-            west.roll += -MathHelper.cos(value * 0.65f) * mult
+            north.xRot += -Mth.cos(value * 0.5f) * mult
+            south.xRot += Mth.cos(value * 0.55f) * mult
+            east.zRot += Mth.cos(value * 0.6f) * mult
+            west.zRot += -Mth.cos(value * 0.65f) * mult
         }
 
-        val texturedModelData: TexturedModelData
+        val texturedModelData: LayerDefinition
             get() {
-                val modelData = ModelData()
+                val modelData = MeshDefinition()
                 val modelPartData = modelData.root
-                val mesoglea = modelPartData.addChild(
+                val mesoglea = modelPartData.addOrReplaceChild(
                     MESOGLEA,
-                    ModelPartBuilder.create()
-                        .uv(0, 0)
-                        .cuboid(-8f, -16f, -8f, 16f, 16f, 16f),
-                    ModelTransform.pivot(0f, 24f, 0f)
+                    CubeListBuilder.create()
+                        .texOffs(0, 0)
+                        .addBox(-8f, -16f, -8f, 16f, 16f, 16f),
+                    PartPose.offset(0f, 24f, 0f)
                 )
-                mesoglea.addChild(
+                mesoglea.addOrReplaceChild(
                     MESOGLEA_LOWER,
-                    ModelPartBuilder.create()
-                        .uv(1, 32)
-                        .cuboid(-7f, 0f, -7f, 14f, 4f, 14f),
-                    ModelTransform.pivot(0f, 0f, 0f)
+                    CubeListBuilder.create()
+                        .texOffs(1, 32)
+                        .addBox(-7f, 0f, -7f, 14f, 4f, 14f),
+                    PartPose.offset(0f, 0f, 0f)
                 )
 
                 val armsNorth = mesoglea.arms(ARMS_NORTH, Direction.NORTH)
@@ -103,27 +108,27 @@ class VolaphyraMesogleaModel(private val root: ModelPart) :
                 armsSouth.arms(ARMS_SOUTH_LOWER, Direction.SOUTH, true)
                 armsEast.arms(ARMS_EAST_LOWER, Direction.EAST, true)
                 armsWest.arms(ARMS_WEST_LOWER, Direction.WEST, true)
-                return TexturedModelData.of(modelData, 64, 128)
+                return LayerDefinition.create(modelData, 64, 128)
             }
 
-        private fun ModelPartData.arms(
+        private fun PartDefinition.arms(
             tendril: String, direction: Direction, bottom: Boolean = false
-        ): ModelPartData {
+        ): PartDefinition {
             val modelPart = if (direction.axis == Direction.Axis.Z) {
-                ModelPartBuilder.create()
-                    .uv(2, if (bottom) 66 else 50)
-                    .cuboid(-6f, 0f, 0f, 12f, 16f, 0f)
+                CubeListBuilder.create()
+                    .texOffs(2, if (bottom) 66 else 50)
+                    .addBox(-6f, 0f, 0f, 12f, 16f, 0f)
             } else {
-                ModelPartBuilder.create()
-                    .uv(34, if (bottom) 54 else 38)
-                    .cuboid(0f, 0f, -6f, 0f, 16f, 12f)
+                CubeListBuilder.create()
+                    .texOffs(34, if (bottom) 54 else 38)
+                    .addBox(0f, 0f, -6f, 0f, 16f, 12f)
             }
             val pivot = if (bottom) {
-                ModelTransform.pivot(0f, 16f, 0f)
+                PartPose.offset(0f, 16f, 0f)
             } else {
-                ModelTransform.pivot(direction.vector.x * -4f, 0f, direction.vector.z * 4f)
+                PartPose.offset(direction.normal.x * -4f, 0f, direction.normal.z * 4f)
             }
-            return this.addChild(tendril, modelPart, pivot)
+            return this.addOrReplaceChild(tendril, modelPart, pivot)
         }
     }
 }

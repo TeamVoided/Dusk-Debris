@@ -1,12 +1,12 @@
 package org.teamvoided.dusk_debris.mixin;
 
-import net.minecraft.client.render.CameraSubmersionType;
+import net.minecraft.world.level.material.FogType;
 import org.spongepowered.asm.mixin.Debug;
 import org.spongepowered.asm.mixin.Mixin;
 
 @Debug(export = true)
-@Mixin(CameraSubmersionType.class)
-public class CameraSubmersionTypeMixin {
+@Mixin(FogType.class)
+public class FogTypeMixin {
 //    @Mutable
 //    @Shadow
 //    @Final

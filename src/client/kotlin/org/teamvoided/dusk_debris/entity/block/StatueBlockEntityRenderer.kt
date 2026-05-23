@@ -1,76 +1,76 @@
 package org.teamvoided.dusk_debris.entity.block
 
-import net.minecraft.client.MinecraftClient
-import net.minecraft.client.render.RenderLayer
-import net.minecraft.client.render.VertexConsumerProvider
-import net.minecraft.client.render.block.entity.BlockEntityRenderer
-import net.minecraft.client.render.block.entity.BlockEntityRendererFactory
-import net.minecraft.client.render.entity.EntityRenderDispatcher
-import net.minecraft.client.render.entity.LivingEntityRenderer
-import net.minecraft.client.util.math.MatrixStack
-import net.minecraft.entity.Entity
-import net.minecraft.util.crash.CrashException
-import net.minecraft.util.crash.CrashReport
-import net.minecraft.util.crash.CrashReportSection
+import com.mojang.blaze3d.vertex.PoseStack
+import net.minecraft.CrashReport
+import net.minecraft.CrashReportCategory
+import net.minecraft.ReportedException
+import net.minecraft.client.Minecraft
+import net.minecraft.client.renderer.MultiBufferSource
+import net.minecraft.client.renderer.RenderType
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderer
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider
+import net.minecraft.client.renderer.entity.EntityRenderDispatcher
+import net.minecraft.client.renderer.entity.LivingEntityRenderer
+import net.minecraft.world.entity.Entity
 import org.teamvoided.dusk_debris.block.entity.StatueBlockEntity
 import org.teamvoided.dusk_debris.mixin.EntityRenderDispatcherAccessor
 
 class StatueBlockEntityRenderer(
-    ctx: BlockEntityRendererFactory.Context,
+    ctx: BlockEntityRendererProvider.Context,
 ) : BlockEntityRenderer<StatueBlockEntity> {
 
-    private val entitiesRenderer = ctx.entityRendererDispatcher
+    private val entitiesRenderer = ctx.entityRenderer
 
     override fun render(
         blockEntity: StatueBlockEntity,
         tickDelta: Float,
-        matrices: MatrixStack,
-        vertexConsumers: VertexConsumerProvider,
+        matrices: PoseStack,
+        vertexConsumers: MultiBufferSource,
         light: Int,
         overlay: Int,
     ) {
-        val world = blockEntity.world ?: return
+        val world = blockEntity.level ?: return
         val entity = blockEntity.entityType.create(world) ?: return
         renderEntity(0f, matrices, vertexConsumers, 255, entity, entitiesRenderer)
     }
 
     fun renderEntity(
         tickDelta: Float,
-        matrices: MatrixStack,
-        vertexConsumers: VertexConsumerProvider,
+        matrices: PoseStack,
+        vertexConsumers: MultiBufferSource,
         light: Int,
         entity: Entity,
         renderDispatcher: EntityRenderDispatcher,
     ) {
-        matrices.push()
+        matrices.pushPose()
         matrices.translate(0.5, 1.0, 0.5)
         renderDispatcher.render(entity, 0.0, 0.0, 0.0, 0.0f, tickDelta, matrices, vertexConsumers, light)
         val entityRenderer = entitiesRenderer.getRenderer(entity)
         try {
-            matrices.push()
+            matrices.pushPose()
             if (entityRenderer is LivingEntityRenderer<*, *>) {
                 entityRenderer.render(entity, 0f, tickDelta, matrices, vertexConsumers, light)
             }
-            if (entitiesRenderer.shouldRenderHitboxes() && !MinecraftClient.getInstance().hasReducedDebugInfo()) {
+            if (entitiesRenderer.shouldRenderHitBoxes() && !Minecraft.getInstance().showOnlyReducedInfo()) {
                 EntityRenderDispatcherAccessor.dnd_renderHitbox(
-                    matrices, vertexConsumers.getBuffer(RenderLayer.getLines()),
+                    matrices, vertexConsumers.getBuffer(RenderType.lines()),
                     entity, tickDelta, 1.0f, 1.0f, 1.0f
                 )
             }
 
-            matrices.pop()
+            matrices.popPose()
         } catch (var25: Throwable) {
-            val crashReport = CrashReport.create(var25, "Rendering Statue entity")
-            val crashReportSection = crashReport.addElement("Rendering entity being rendered")
-            entity.populateCrashReport(crashReportSection)
-            val crashReportSection2 = crashReport.addElement("Renderer details")
-            crashReportSection2.add("Assigned renderer", entityRenderer)
-            crashReportSection2.add("Location", CrashReportSection.createPositionString(entity.world, 0, 0, 0))
-            crashReportSection2.add("Rotation", 0f)
-            crashReportSection2.add("Delta", tickDelta)
-            throw CrashException(crashReport)
+            val crashReport = CrashReport.forThrowable(var25, "Rendering Statue entity")
+            val crashReportSection = crashReport.addCategory("Rendering entity being rendered")
+            entity.fillCrashReportCategory(crashReportSection)
+            val crashReportSection2 = crashReport.addCategory("Renderer details")
+            crashReportSection2.setDetail("Assigned renderer", entityRenderer)
+            crashReportSection2.setDetail("Location", CrashReportCategory.formatLocation(entity.level(), 0, 0, 0))
+            crashReportSection2.setDetail("Rotation", 0f)
+            crashReportSection2.setDetail("Delta", tickDelta)
+            throw ReportedException(crashReport)
         }
 
-        matrices.pop()
+        matrices.popPose()
     }
 }

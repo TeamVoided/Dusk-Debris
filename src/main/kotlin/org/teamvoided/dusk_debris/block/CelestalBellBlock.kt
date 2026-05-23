@@ -1,38 +1,38 @@
 package org.teamvoided.dusk_debris.block
 
-import net.minecraft.block.BellBlock
-import net.minecraft.block.BlockState
-import net.minecraft.block.entity.BlockEntity
-import net.minecraft.block.entity.BlockEntityTicker
-import net.minecraft.block.entity.BlockEntityType
-import net.minecraft.entity.Entity
-import net.minecraft.sound.SoundCategory
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Direction
-import net.minecraft.world.World
-import net.minecraft.world.event.GameEvent
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
+import net.minecraft.sounds.SoundSource
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.level.Level
+import net.minecraft.world.level.block.BellBlock
+import net.minecraft.world.level.block.entity.BlockEntity
+import net.minecraft.world.level.block.entity.BlockEntityTicker
+import net.minecraft.world.level.block.entity.BlockEntityType
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.gameevent.GameEvent
 import org.teamvoided.dusk_debris.init.DuskSoundEvents
 import org.teamvoided.dusks_and_dungeons.block.entity.CelestalBellBlockEntity
 
-class CelestalBellBlock(settings: Settings) : BellBlock(settings) {
-    override fun ring(entity: Entity?, world: World, pos: BlockPos, direction: Direction?): Boolean {
+class CelestalBellBlock(settings: Properties) : BellBlock(settings) {
+    override fun attemptToRing(entity: Entity?, world: Level, pos: BlockPos, direction: Direction?): Boolean {
         var direction2 = direction
         val blockEntity = world.getBlockEntity(pos)
-        if (!world.isClient && blockEntity is CelestalBellBlockEntity) {
+        if (!world.isClientSide && blockEntity is CelestalBellBlockEntity) {
             if (direction == null) {
-                direction2 = world.getBlockState(pos).get(FACING) as Direction
+                direction2 = world.getBlockState(pos).getValue(FACING) as Direction
             }
 
-            blockEntity.activate(direction2)
+            blockEntity.onHit(direction2)
             world.playSound(
                 null,
                 pos,
                 DuskSoundEvents.BLOCK_CELESTAL_BELL_USE,
-                SoundCategory.BLOCKS,
+                SoundSource.BLOCKS,
                 2.0f,
                 1.0f
             )
-            world.emitGameEvent(entity, GameEvent.BLOCK_CHANGE, pos)
+            world.gameEvent(entity, GameEvent.BLOCK_CHANGE, pos)
             return true
         } else {
             return false
@@ -40,12 +40,12 @@ class CelestalBellBlock(settings: Settings) : BellBlock(settings) {
     }
 
 
-    override fun createBlockEntity(pos: BlockPos, state: BlockState): BlockEntity {
+    override fun newBlockEntity(pos: BlockPos, state: BlockState): BlockEntity {
         return CelestalBellBlockEntity(pos, state)
     }
 
     override fun <T : BlockEntity> getTicker(
-        world: World,
+        world: Level,
         state: BlockState,
         type: BlockEntityType<T>
     ): BlockEntityTicker<T>? {

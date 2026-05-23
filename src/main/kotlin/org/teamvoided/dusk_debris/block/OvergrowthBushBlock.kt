@@ -1,81 +1,83 @@
 package org.teamvoided.dusk_debris.block
 
-import net.minecraft.block.AzaleaBlock
-import net.minecraft.block.Block
-import net.minecraft.block.BlockState
-import net.minecraft.block.ShapeContext
-import net.minecraft.block.Waterloggable
-import net.minecraft.block.sapling.TreeGrower
-import net.minecraft.fluid.FluidState
-import net.minecraft.fluid.Fluids
-import net.minecraft.item.ItemPlacementContext
-import net.minecraft.server.world.ServerWorld
-import net.minecraft.state.StateManager
-import net.minecraft.state.property.Properties
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Direction
-import net.minecraft.util.random.RandomGenerator
-import net.minecraft.util.shape.VoxelShape
-import net.minecraft.world.BlockView
-import net.minecraft.world.WorldAccess
-import net.minecraft.world.WorldView
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
+import net.minecraft.server.level.ServerLevel
+import net.minecraft.util.RandomSource
+import net.minecraft.world.item.context.BlockPlaceContext
+import net.minecraft.world.level.BlockGetter
+import net.minecraft.world.level.LevelAccessor
+import net.minecraft.world.level.LevelReader
+import net.minecraft.world.level.block.AzaleaBlock
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.SimpleWaterloggedBlock
+import net.minecraft.world.level.block.grower.TreeGrower
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.block.state.StateDefinition
+import net.minecraft.world.level.block.state.properties.BlockStateProperties
+import net.minecraft.world.level.material.FluidState
+import net.minecraft.world.level.material.Fluids
+import net.minecraft.world.phys.shapes.CollisionContext
+import net.minecraft.world.phys.shapes.VoxelShape
 import org.teamvoided.dusk_debris.util.rotateFromDown
 
-class OvergrowthBushBlock(settings: Settings) : AzaleaBlock(settings), Waterloggable {
+class OvergrowthBushBlock(settings: Properties) : AzaleaBlock(settings), SimpleWaterloggedBlock {
     init {
-        this.defaultState = stateManager.defaultState
-            .with(Properties.FACING, Direction.DOWN)
-            .with(Properties.WATERLOGGED, false)
+        this.registerDefaultState(
+            stateDefinition.any()
+                .setValue(BlockStateProperties.FACING, Direction.DOWN)
+                .setValue(BlockStateProperties.WATERLOGGED, false)
+        )
     }
 
-    override fun appendProperties(builder: StateManager.Builder<Block, BlockState>) {
-        builder.add(Properties.FACING, Properties.WATERLOGGED)
+    override fun createBlockStateDefinition(builder: StateDefinition.Builder<Block, BlockState>) {
+        builder.add(BlockStateProperties.FACING, BlockStateProperties.WATERLOGGED)
     }
 
-    override fun canPlaceAt(state: BlockState, world: WorldView, pos: BlockPos): Boolean {
-        val blockPos = pos.offset(state.get(Properties.FACING))
-        return this.canPlantOnTop(world.getBlockState(blockPos), world, blockPos)
+    override fun canSurvive(state: BlockState, world: LevelReader, pos: BlockPos): Boolean {
+        val blockPos = pos.relative(state.getValue(BlockStateProperties.FACING))
+        return this.mayPlaceOn(world.getBlockState(blockPos), world, blockPos)
     }
 
-    override fun isFertilizable(world: WorldView, pos: BlockPos, state: BlockState): Boolean {
-        return world.getBlockState(pos.offset(state.get(Properties.FACING).opposite)).materialReplaceable()
+    override fun isValidBonemealTarget(world: LevelReader, pos: BlockPos, state: BlockState): Boolean {
+        return world.getBlockState(pos.relative(state.getValue(BlockStateProperties.FACING).opposite)).canBeReplaced()
     }
 
-    override fun fertilize(world: ServerWorld, random: RandomGenerator, pos: BlockPos, state: BlockState) {
-        TreeGrower.AZALEA.growTree(world, world.chunkManager.chunkGenerator, pos, state, random)
+    override fun performBonemeal(world: ServerLevel, random: RandomSource, pos: BlockPos, state: BlockState) {
+        TreeGrower.AZALEA.growTree(world, world.chunkSource.generator, pos, state, random)
     }
 
-    override fun getOutlineShape(
+    override fun getShape(
         state: BlockState,
-        world: BlockView,
+        world: BlockGetter,
         pos: BlockPos,
-        context: ShapeContext
+        context: CollisionContext
     ): VoxelShape {
-        return super.getOutlineShape(state, world, pos, context).rotateFromDown(state.get(Properties.FACING))
+        return super.getShape(state, world, pos, context).rotateFromDown(state.getValue(BlockStateProperties.FACING))
     }
 
-    override fun getStateForNeighborUpdate(
+    override fun updateShape(
         state: BlockState,
         direction: Direction,
         neighborState: BlockState,
-        world: WorldAccess,
+        world: LevelAccessor,
         pos: BlockPos,
         neighborPos: BlockPos
     ): BlockState {
-        if (state.get(Properties.WATERLOGGED)) {
-            world.scheduleFluidTick(pos, Fluids.WATER, Fluids.WATER.getTickRate(world))
+        if (state.getValue(BlockStateProperties.WATERLOGGED)) {
+            world.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(world))
         }
-        return super.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos)
+        return super.updateShape(state, direction, neighborState, world, pos, neighborPos)
     }
 
-    override fun getPlacementState(ctx: ItemPlacementContext): BlockState {
-        return super.getPlacementState(ctx)!!
-            .with(Properties.WATERLOGGED, ctx.world.getFluidState(ctx.blockPos).fluid == Fluids.WATER)
-            .with(Properties.FACING, ctx.side.opposite)
+    override fun getStateForPlacement(ctx: BlockPlaceContext): BlockState {
+        return super.getStateForPlacement(ctx)!!
+            .setValue(BlockStateProperties.WATERLOGGED, ctx.level.getFluidState(ctx.clickedPos).type == Fluids.WATER)
+            .setValue(BlockStateProperties.FACING, ctx.clickedFace.opposite)
     }
 
     override fun getFluidState(state: BlockState): FluidState {
-        return if (state.get(Properties.WATERLOGGED)) Fluids.WATER.getStill(false)
+        return if (state.getValue(BlockStateProperties.WATERLOGGED)) Fluids.WATER.getSource(false)
         else super.getFluidState(state)
     }
 

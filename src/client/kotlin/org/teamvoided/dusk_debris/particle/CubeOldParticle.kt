@@ -1,34 +1,34 @@
 package org.teamvoided.dusk_debris.particle
 
 import com.mojang.blaze3d.vertex.VertexConsumer
-import net.minecraft.client.MinecraftClient
-import net.minecraft.client.particle.SpriteBillboardParticle
-import net.minecraft.client.render.Camera
-import net.minecraft.client.render.OverlayTexture
-import net.minecraft.client.render.RenderLayer
-import net.minecraft.client.world.ClientWorld
-import net.minecraft.util.math.MathHelper
+import net.minecraft.client.Camera
+import net.minecraft.client.Minecraft
+import net.minecraft.client.multiplayer.ClientLevel
+import net.minecraft.client.particle.TextureSheetParticle
+import net.minecraft.client.renderer.RenderType
+import net.minecraft.client.renderer.texture.OverlayTexture
+import net.minecraft.util.Mth
 import org.joml.Quaternionf
 import org.joml.Vector3f
 import org.teamvoided.dusk_debris.util.*
 
 abstract class CubeOldParticle(
-    world: ClientWorld, x: Double, y: Double, z: Double,
+    world: ClientLevel, x: Double, y: Double, z: Double,
     velocityX: Double, velocityY: Double, velocityZ: Double
-) : SpriteBillboardParticle(world, x, y, z, velocityX, velocityY, velocityZ) {
+) : TextureSheetParticle(world, x, y, z, velocityX, velocityY, velocityZ) {
 //    private var rotation: Vector3f = Vector3f()
 
-    override fun buildGeometry(vertexConsumer: VertexConsumer, camera: Camera, tickDelta: Float) {
+    override fun render(vertexConsumer: VertexConsumer, camera: Camera, tickDelta: Float) {
 
-//        this.method_60373(vertexConsumer, camera, Quaternionf(), tickDelta)
+//        this.renderRotatedQuad(vertexConsumer, camera, Quaternionf(), tickDelta)
 
 
-        val h = MathHelper.lerp(tickDelta.toDouble(), prevPosX, x)
-        val i = MathHelper.lerp(tickDelta.toDouble(), prevPosY, y)
-        val j = MathHelper.lerp(tickDelta.toDouble(), prevPosZ, z)
+        val h = Mth.lerp(tickDelta.toDouble(), xo, x)
+        val i = Mth.lerp(tickDelta.toDouble(), yo, y)
+        val j = Mth.lerp(tickDelta.toDouble(), zo, z)
         val vec = Vec3d(h, i, j)
-        val immediate = MinecraftClient.getInstance().bufferBuilders.entityVertexConsumers
-        val camPos = camera.pos
+        val immediate = Minecraft.getInstance().renderBuffers().bufferSource()
+        val camPos = camera.position
 //        MinecraftClient.getInstance().entityRenderDispatcher.render<Entity>(
 //            this.itemEntity, h - campPos.getX(), i - campPos.getY(), j - campPos.getZ(),
 //            this.itemEntity.getYaw(), tickDelta, MatrixStack(), immediate,
@@ -42,33 +42,33 @@ abstract class CubeOldParticle(
 
 //        val tessellator = Tessellator.getInstance()
         //tessellator.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR_TEXTURE_LIGHT_NORMAL)
-        val buffer = immediate.getBuffer(RenderLayer.getTranslucentMovingBlock())
+        val buffer = immediate.getBuffer(RenderType.translucentMovingBlock())
 
         buffer.xyz(Vec3d(0f).add(vec), camPos)
-            .color(colorRed, colorGreen, colorBlue, colorAlpha)
-            .uv0(1f, -1f)
+            .setColor(rCol, gCol, bCol, alpha)
+            .setUv(1f, -1f)
             .normal(UP)
-            .uv2(light)
+            .setLight(light)
         buffer.xyz(Vec3d(0, 0, 1).add(vec), camPos)
-            .color(colorRed, colorGreen, colorBlue, colorAlpha)
-            .uv0(1f, 1f)
+            .setColor(rCol, gCol, bCol, alpha)
+            .setUv(1f, 1f)
             .normal(UP)
-            .uv2(light)
+            .setLight(light)
         buffer.xyz(Vec3d(1, 0, 1).add(vec), camPos)
-            .color(colorRed, colorGreen, colorBlue, colorAlpha)
-            .uv0(-1f, 1f)
+            .setColor(rCol, gCol, bCol, alpha)
+            .setUv(-1f, 1f)
             .normal(UP)
-            .uv2(light)
+            .setLight(light)
         buffer.xyz(Vec3d(1, 0, 0).add(vec), camPos)
-            .color(colorRed, colorGreen, colorBlue, colorAlpha)
-            .uv0(-1f, -1.0f)
+            .setColor(rCol, gCol, bCol, alpha)
+            .setUv(-1f, -1.0f)
             .normal(UP)
-            .uv2(light)
+            .setLight(light)
 //        BufferRenderer.draw(buffer.end())
 //        RenderSystem.depthMask(false)
 //        RenderSystem.enableBlend()
 
-        immediate.draw()
+        immediate.endBatch()
 
         /*  val matrixStack = MatrixStack()
           val rot = Quaternionf()
@@ -124,7 +124,7 @@ abstract class CubeOldParticle(
           RenderSystem.enableBlend()*/
     }
 
-    override fun method_60373(
+    override fun renderRotatedQuad(
         vertexConsumer: VertexConsumer,
         camera: Camera,
         quaternionf: Quaternionf,
@@ -132,30 +132,30 @@ abstract class CubeOldParticle(
     ) = createCube(vertexConsumer, camera, quaternionf, tickDelta)
 
     fun createCube(vertexConsumer: VertexConsumer, camera: Camera, quaternionf: Quaternionf, tickDelta: Float) {
-        val cameraPos = camera.pos
-        val posX = (MathHelper.lerp(tickDelta.toDouble(), this.prevPosX, this.x) - cameraPos.x).toFloat()
-        val posY = (MathHelper.lerp(tickDelta.toDouble(), this.prevPosY, this.y) - cameraPos.y).toFloat()
-        val posZ = (MathHelper.lerp(tickDelta.toDouble(), this.prevPosZ, this.z) - cameraPos.z).toFloat()
+        val cameraPos = camera.position
+        val posX = (Mth.lerp(tickDelta.toDouble(), this.xo, this.x) - cameraPos.x).toFloat()
+        val posY = (Mth.lerp(tickDelta.toDouble(), this.yo, this.y) - cameraPos.y).toFloat()
+        val posZ = (Mth.lerp(tickDelta.toDouble(), this.zo, this.z) - cameraPos.z).toFloat()
 
         /* south planes */
-        this.method_60374(vertexConsumer, quaternionf, posX, posY, posZ - scale, tickDelta)
-        this.method_60374(vertexConsumer, quaternionf, posX, posY, posZ + scale, tickDelta)
+        this.renderRotatedQuad(vertexConsumer, quaternionf, posX, posY, posZ - quadSize, tickDelta)
+        this.renderRotatedQuad(vertexConsumer, quaternionf, posX, posY, posZ + quadSize, tickDelta)
 
         // region : pain
         /* north planes */
         quaternionf.rotationY(Utils.rotate180)
-        this.method_60374(vertexConsumer, quaternionf, posX, posY, posZ + scale, tickDelta)
-        this.method_60374(vertexConsumer, quaternionf, posX, posY, posZ - scale, tickDelta)
+        this.renderRotatedQuad(vertexConsumer, quaternionf, posX, posY, posZ + quadSize, tickDelta)
+        this.renderRotatedQuad(vertexConsumer, quaternionf, posX, posY, posZ - quadSize, tickDelta)
 
         /* east planes */
         quaternionf.rotationY(Utils.rotate90)
-        this.method_60374(vertexConsumer, quaternionf, posX + scale, posY, posZ, tickDelta)
-        this.method_60374(vertexConsumer, quaternionf, posX - scale, posY, posZ, tickDelta)
+        this.renderRotatedQuad(vertexConsumer, quaternionf, posX + quadSize, posY, posZ, tickDelta)
+        this.renderRotatedQuad(vertexConsumer, quaternionf, posX - quadSize, posY, posZ, tickDelta)
 
         /* west planes */
         quaternionf.rotationY(Utils.rotate270)
-        this.method_60374(vertexConsumer, quaternionf, posX + scale, posY, posZ, tickDelta)
-        this.method_60374(vertexConsumer, quaternionf, posX - scale, posY, posZ, tickDelta)
+        this.renderRotatedQuad(vertexConsumer, quaternionf, posX + quadSize, posY, posZ, tickDelta)
+        this.renderRotatedQuad(vertexConsumer, quaternionf, posX - quadSize, posY, posZ, tickDelta)
 
 //        /* down planes */
 //        quaternionf.rotateX(Utils.rotate90)
@@ -200,9 +200,9 @@ abstract class CubeOldParticle(
     fun VertexConsumer.drawFace(
         qRotation: Quaternionf, x: Float, y: Float, z: Float, delta: Float, rot2: Quaternionf = Quaternionf()
     ) {
-        val light = getBrightness(delta)
+        val light = getLightColor(delta)
 
-        val pos = Vector3f(x, y, z).rotate(rot2).mul(scale)
+        val pos = Vector3f(x, y, z).rotate(rot2).mul(quadSize)
         val normal = Vector3f(0f, 0f, 1f).rotate(rot2)
 
         this.drawVert(pos, 1f, -1.0f, normal, light)
@@ -211,10 +211,10 @@ abstract class CubeOldParticle(
         this.drawVert(pos, -1f, -1.0f, normal, light)
     }
 
-    fun VertexConsumer.drawVert(vec3: Vector3f, u: Float, v: Float, normal: Vector3f, light: Int) = this.xyz(vec3)
-        .color(-1)
-        .uv0(u, v)
-        .uv1(OverlayTexture.DEFAULT_UV)
-        .uv2(light)
-        .normal(normal.x(), normal.y(), normal.z())
+    fun VertexConsumer.drawVert(vec3: Vector3f, u: Float, v: Float, normal: Vector3f, light: Int) = this.addVertex(vec3)
+        .setColor(-1)
+        .setUv(u, v)
+        .setOverlay(OverlayTexture.NO_OVERLAY)
+        .setLight(light)
+        .setNormal(normal.x(), normal.y(), normal.z())
 }

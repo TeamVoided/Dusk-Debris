@@ -3,28 +3,28 @@ package org.teamvoided.dusk_debris.particle
 import com.mojang.blaze3d.vertex.VertexConsumer
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
-import net.minecraft.client.particle.BlockLeakParticle
+import net.minecraft.client.Camera
+import net.minecraft.client.multiplayer.ClientLevel
+import net.minecraft.client.particle.DripParticle
 import net.minecraft.client.particle.Particle
-import net.minecraft.client.particle.ParticleFactory
-import net.minecraft.client.particle.SpriteProvider
-import net.minecraft.client.render.Camera
-import net.minecraft.client.world.ClientWorld
-import net.minecraft.entity.Entity
-import net.minecraft.fluid.Fluid
-import net.minecraft.fluid.Fluids
-import net.minecraft.sound.SoundCategory
-import net.minecraft.sound.SoundEvents
-import net.minecraft.util.math.Direction
-import net.minecraft.util.math.MathHelper
-import net.minecraft.util.math.Vec3d
+import net.minecraft.client.particle.ParticleProvider
+import net.minecraft.client.particle.SpriteSet
+import net.minecraft.core.Direction
+import net.minecraft.sounds.SoundEvents
+import net.minecraft.sounds.SoundSource
+import net.minecraft.util.Mth
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.level.material.Fluid
+import net.minecraft.world.level.material.Fluids
+import net.minecraft.world.phys.Vec3
 import org.joml.Quaternionf
 import org.teamvoided.dusk_debris.util.Utils
 
-class AstrasStrangeGoopParticle(world: ClientWorld, x: Double, y: Double, z: Double, fluid: Fluid) :
-    BlockLeakParticle(world, x, y, z, fluid) {
+class AstrasStrangeGoopParticle(world: ClientLevel, x: Double, y: Double, z: Double, fluid: Fluid) :
+    DripParticle(world, x, y, z, fluid) {
 
     class FlyingGoop(
-        world: ClientWorld,
+        world: ClientLevel,
         x: Double,
         y: Double,
         z: Double,
@@ -33,9 +33,9 @@ class AstrasStrangeGoopParticle(world: ClientWorld, x: Double, y: Double, z: Dou
         velocityZ: Double,
         fluid: Fluid,
         particle: GoopFlyingParticleEffect
-    ) : ContinuousFalling(world, x, y, z, fluid, null) {
+    ) : FallAndLandParticle(world, x, y, z, fluid, null) {
         constructor(
-            world: ClientWorld,
+            world: ClientLevel,
             x: Double,
             y: Double,
             z: Double,
@@ -46,18 +46,18 @@ class AstrasStrangeGoopParticle(world: ClientWorld, x: Double, y: Double, z: Dou
         var stoppedInDirection: Direction? = null
 
         init {
-            maxAge = particle.maxAge() //(128.0 / (random.nextDouble() * 0.8 + 0.2)).toInt()
-            this.velocityX = velocityX
-            this.velocityY = velocityY
-            this.velocityZ = velocityZ
-            gravityStrength = 0.02f
+            lifetime = particle.maxAge() //(128.0 / (random.nextDouble() * 0.8 + 0.2)).toInt()
+            this.xd = velocityX
+            this.yd = velocityY
+            this.zd = velocityZ
+            gravity = 0.02f
         }
 
-        override fun updateVelocity() {
+        override fun postMoveUpdate() {
             if (this.stoppedInDirection != null) {
-                this.markDead()
-                world.addParticle(
-                    GoopLandedParticleEffect(maxAge, stoppedInDirection!!),
+                this.remove()
+                level.addParticle(
+                    GoopLandedParticleEffect(lifetime, stoppedInDirection!!),
                     this.x,
                     this.y,
                     this.z,
@@ -65,13 +65,13 @@ class AstrasStrangeGoopParticle(world: ClientWorld, x: Double, y: Double, z: Dou
                     0.0,
                     0.0
                 )
-                val volume = MathHelper.nextBetween(this.random, 0.3f, 1.0f)
-                world.playSound(
+                val volume = Mth.randomBetween(this.random, 0.3f, 1.0f)
+                level.playLocalSound(
                     this.x,
                     this.y,
                     this.z,
-                    SoundEvents.BLOCK_BEEHIVE_DRIP,
-                    SoundCategory.BLOCKS,
+                    SoundEvents.BEEHIVE_DRIP,
+                    SoundSource.BLOCKS,
                     volume,
                     1.0f,
                     false
@@ -85,10 +85,10 @@ class AstrasStrangeGoopParticle(world: ClientWorld, x: Double, y: Double, z: Dou
             var dy = y
             var dz = z
             if ((dx != 0.0 || dy != 0.0 || dz != 0.0) && (dx * dx + dy * dy + dz * dz < 10000)) {
-                val vec3d = Entity.adjustSingleAxisMovementForCollisions(
-                    null as Entity?, Vec3d(dx, dy, dz),
+                val vec3d = Entity.collideBoundingBox(
+                    null as Entity?, Vec3(dx, dy, dz),
                     this.boundingBox,
-                    this.world, listOf()
+                    this.level, listOf()
                 )
                 dx = vec3d.x
                 dy = vec3d.y
@@ -96,8 +96,8 @@ class AstrasStrangeGoopParticle(world: ClientWorld, x: Double, y: Double, z: Dou
             }
 
             if (dx != 0.0 || dy != 0.0 || dz != 0.0) {
-                this.boundingBox = boundingBox.offset(dx, dy, dz)
-                this.repositionFromBoundingBox()
+                this.boundingBox = boundingBox.move(dx, dy, dz)
+                this.setLocationFromBoundingbox()
             }
 
             if (x != dx) {
@@ -117,65 +117,65 @@ class AstrasStrangeGoopParticle(world: ClientWorld, x: Double, y: Double, z: Dou
 
     @Environment(EnvType.CLIENT)
     class LandedAndTransform(
-        world: ClientWorld,
+        world: ClientLevel,
         d: Double,
         e: Double,
         f: Double,
         fluid: Fluid,
         private val particle: GoopLandedParticleEffect
-    ) : BlockLeakParticle(world, d, e, f, fluid) {
+    ) : DripParticle(world, d, e, f, fluid) {
         private var stoppedInDirection: Direction
 
         init {
-            this.maxAge = this.particle.maxAge()
+            this.lifetime = this.particle.maxAge()
             this.stoppedInDirection = particle.direction()
-            this.gravityStrength = 0f
+            this.gravity = 0f
             this.onGround = true
-            this.angle = random.nextFloat() * Utils.rotate360
-            this.prevAngle = angle
+            this.roll = random.nextFloat() * Utils.rotate360
+            this.oRoll = roll
         }
 
-        override fun buildGeometry(vertexConsumer: VertexConsumer, camera: Camera, tickDelta: Float) {
+        override fun render(vertexConsumer: VertexConsumer, camera: Camera, tickDelta: Float) {
             val quaternionf = Quaternionf()
             //x is pitch, top and bottom
             //y is yaw, left to right
             //z is roll, side to side
             when (this.stoppedInDirection.axis) {
                 Direction.Axis.Y ->
-                    if (camera.pos.y < this.y) quaternionf.rotationX(Utils.rotate90)
+                    if (camera.position.y < this.y) quaternionf.rotationX(Utils.rotate90)
                     else quaternionf.rotationX(Utils.rotate270)
 
                 Direction.Axis.X ->
-                    if (camera.pos.x < this.x) quaternionf.rotationY(Utils.rotate270)
+                    if (camera.position.x < this.x) quaternionf.rotationY(Utils.rotate270)
                     else quaternionf.rotationY(Utils.rotate90)
 
                 Direction.Axis.Z ->
-                    if (camera.pos.z < this.z) quaternionf.rotationY(Utils.rotate180)
+                    if (camera.position.z < this.z) quaternionf.rotationY(Utils.rotate180)
             }
-            if (this.angle != 0f) {
-                quaternionf.rotateZ(MathHelper.lerp(tickDelta, this.prevAngle, this.angle))
+            if (this.roll != 0f) {
+                quaternionf.rotateZ(Mth.lerp(tickDelta, this.oRoll, this.roll))
             }
-            this.method_60373(vertexConsumer, camera, quaternionf, tickDelta)
+            this.renderRotatedQuad(vertexConsumer, camera, quaternionf, tickDelta)
         }
 
-        override fun method_60373(
+        override fun renderRotatedQuad(
             vertexConsumer: VertexConsumer,
             camera: Camera,
             quaternionf: Quaternionf,
             tickDelta: Float
         ) {
             if (stoppedInDirection == Direction.DOWN) {
-                val vec3d = camera.pos
-                val posX = (MathHelper.lerp(tickDelta.toDouble(), this.prevPosX, this.x) - vec3d.getX()).toFloat()
-                val posY = (MathHelper.lerp(tickDelta.toDouble(), this.prevPosY, this.y) - vec3d.getY()).toFloat()
-                val posZ = (MathHelper.lerp(tickDelta.toDouble(), this.prevPosZ, this.z) - vec3d.getZ()).toFloat()
-                this.method_60374(vertexConsumer, quaternionf, posX, posY + 0.0005f, posZ, tickDelta)
-            } else super.method_60373(vertexConsumer, camera, quaternionf, tickDelta)
+                val vec3d = camera.position
+                val posX = (Mth.lerp(tickDelta.toDouble(), this.xo, this.x) - vec3d.x()).toFloat()
+                val posY = (Mth.lerp(tickDelta.toDouble(), this.yo, this.y) - vec3d.y()).toFloat()
+                val posZ = (Mth.lerp(tickDelta.toDouble(), this.zo, this.z) - vec3d.z()).toFloat()
+                this.renderRotatedQuad(vertexConsumer, quaternionf, posX, posY + 0.0005f, posZ, tickDelta)
+            } else super.renderRotatedQuad(vertexConsumer, camera, quaternionf, tickDelta)
         }
 
         private fun fly() {
-            this.markDead()
-            world.addParticle(GoopFlyingParticleEffect(maxAge), this.x, this.y, this.z, 0.0, 0.0, 0.0)
+            this.remove()
+            level.addParticle(GoopFlyingParticleEffect(lifetime), this.x, this.y, this.z, 0.0, 0.0, 0.0)
         }
 
 //        override fun updateAge() {
@@ -185,12 +185,12 @@ class AstrasStrangeGoopParticle(world: ClientWorld, x: Double, y: Double, z: Dou
 
         override fun tick() {
             when (stoppedInDirection) {
-                Direction.EAST -> this.velocityX = 0.05
-                Direction.WEST -> this.velocityX = -0.05
-                Direction.SOUTH -> this.velocityZ = 0.05
-                Direction.NORTH -> this.velocityZ = -0.05
-                Direction.UP -> this.velocityY = 0.05
-                Direction.DOWN -> this.velocityY = -0.05
+                Direction.EAST -> this.xd = 0.05
+                Direction.WEST -> this.xd = -0.05
+                Direction.SOUTH -> this.zd = 0.05
+                Direction.NORTH -> this.zd = -0.05
+                Direction.UP -> this.yd = 0.05
+                Direction.DOWN -> this.yd = -0.05
             }
             super.tick()
         }
@@ -200,10 +200,10 @@ class AstrasStrangeGoopParticle(world: ClientWorld, x: Double, y: Double, z: Dou
             var dy = y
             var dz = z
             if ((dx != 0.0 || dy != 0.0 || dz != 0.0) && (dx * dx + dy * dy + dz * dz < 10000)) {
-                val vec3d = Entity.adjustSingleAxisMovementForCollisions(
-                    null as Entity?, Vec3d(dx, dy, dz),
+                val vec3d = Entity.collideBoundingBox(
+                    null as Entity?, Vec3(dx, dy, dz),
                     this.boundingBox,
-                    this.world, listOf()
+                    this.level, listOf()
                 )
                 dx = vec3d.x
                 dy = vec3d.y
@@ -211,8 +211,8 @@ class AstrasStrangeGoopParticle(world: ClientWorld, x: Double, y: Double, z: Dou
             }
 
             if (dx != 0.0 || dy != 0.0 || dz != 0.0) {
-                this.boundingBox = boundingBox.offset(dx, dy, dz)
-                this.repositionFromBoundingBox()
+                this.boundingBox = boundingBox.move(dx, dy, dz)
+                this.setLocationFromBoundingbox()
             }
 
 //            this.onGround = (y != dy && dy < 0.0)
@@ -226,11 +226,11 @@ class AstrasStrangeGoopParticle(world: ClientWorld, x: Double, y: Double, z: Dou
         }
     }
 
-    class FallingGoopFactory(private val spriteProvider: SpriteProvider) :
-        ParticleFactory<GoopFlyingParticleEffect> {
+    class FallingGoopFactory(private val spriteProvider: SpriteSet) :
+        ParticleProvider<GoopFlyingParticleEffect> {
         override fun createParticle(
             particleEffect: GoopFlyingParticleEffect,
-            clientWorld: ClientWorld,
+            clientWorld: ClientLevel,
             x: Double,
             y: Double,
             z: Double,
@@ -240,16 +240,16 @@ class AstrasStrangeGoopParticle(world: ClientWorld, x: Double, y: Double, z: Dou
         ): Particle {
             val particle =
                 FlyingGoop(clientWorld, x, y, z, velocityX, velocityY, velocityZ, Fluids.EMPTY, particleEffect)
-            particle.setSprite(spriteProvider)
+            particle.pickSprite(spriteProvider)
             return particle
         }
     }
 
-    class LandedGoopFactory(private val spriteProvider: SpriteProvider) :
-        ParticleFactory<GoopLandedParticleEffect> {
+    class LandedGoopFactory(private val spriteProvider: SpriteSet) :
+        ParticleProvider<GoopLandedParticleEffect> {
         override fun createParticle(
             particleEffect: GoopLandedParticleEffect,
-            clientWorld: ClientWorld,
+            clientWorld: ClientLevel,
             x: Double,
             y: Double,
             z: Double,
@@ -257,8 +257,8 @@ class AstrasStrangeGoopParticle(world: ClientWorld, x: Double, y: Double, z: Dou
             velocityY: Double,
             velocityZ: Double
         ): Particle {
-            val particle: BlockLeakParticle = LandedAndTransform(clientWorld, x, y, z, Fluids.EMPTY, particleEffect)
-            particle.setSprite(spriteProvider)
+            val particle: DripParticle = LandedAndTransform(clientWorld, x, y, z, Fluids.EMPTY, particleEffect)
+            particle.pickSprite(spriteProvider)
             return particle
         }
     }

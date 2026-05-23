@@ -2,17 +2,17 @@ package org.teamvoided.dusk_debris.particle
 
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
+import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.client.particle.*
-import net.minecraft.client.world.ClientWorld
-import net.minecraft.entity.Entity
-import net.minecraft.util.math.Vec3d
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.phys.Vec3
 import org.teamvoided.dusk_debris.particle.entity.EntityTestParticleEffect
 import org.teamvoided.dusk_debris.util.Utils.rotate360
 import kotlin.math.cos
 import kotlin.math.sin
 
 class EntityTestParticle(
-    world: ClientWorld,
+    world: ClientLevel,
     posX: Double,
     posY: Double,
     posZ: Double,
@@ -20,61 +20,61 @@ class EntityTestParticle(
     velY: Double,
     velZ: Double,
     val entity: Entity?
-) : SpriteBillboardParticle(world, posX, posY, posZ, velX, velY, velZ) {
+) : TextureSheetParticle(world, posX, posY, posZ, velX, velY, velZ) {
     var rotationOffset = 0f
 
     init {
-        this.maxAge = 50 + random.nextInt(50)
-        this.scale = random.nextFloat() * 0.1f + 0.01f
-        this.prevAngle = angle
-        this.velocityMultiplier = 0.9f
-        this.velocityX = velX
-        this.velocityY = velY
-        this.velocityZ = velZ
+        this.lifetime = 50 + random.nextInt(50)
+        this.quadSize = random.nextFloat() * 0.1f + 0.01f
+        this.oRoll = roll
+        this.friction = 0.9f
+        this.xd = velX
+        this.yd = velY
+        this.zd = velZ
         rotationOffset = random.nextFloat()*rotate360
     }
 
-    override fun getType(): ParticleTextureSheet {
-        return ParticleTextureSheet.PARTICLE_SHEET_LIT
+    override fun getRenderType(): ParticleRenderType {
+        return ParticleRenderType.PARTICLE_SHEET_LIT
     }
 
-    public override fun getBrightness(tint: Float): Int {
+    public override fun getLightColor(tint: Float): Int {
         return 15728880
     }
 
     override fun tick() {
-        if (age++ >= this.maxAge) {
-            this.markDead()
+        if (age++ >= this.lifetime) {
+            this.remove()
         } else {
-            this.prevPosX = this.x
-            this.prevPosY = this.y
-            this.prevPosZ = this.z
-            velocityX *= velocityMultiplier
-            velocityY *= velocityMultiplier
-            velocityZ *= velocityMultiplier
+            this.xo = this.x
+            this.yo = this.y
+            this.zo = this.z
+            xd *= friction
+            yd *= friction
+            zd *= friction
             if (this.age % 3 == 0 && entity != null) {
-                val orbitOffsetXZ = (entity.width) + 1
-                val orbitOffsetY = (entity.height) * (age.toDouble() / maxAge)
-                val velocity = Vec3d(
+                val orbitOffsetXZ = (entity.bbWidth) + 1
+                val orbitOffsetY = (entity.bbHeight) * (age.toDouble() / lifetime)
+                val velocity = Vec3(
                     orbitOffsetXZ * sin((age.toDouble() / 10)),
                     orbitOffsetY,
                     orbitOffsetXZ * cos((age.toDouble() / 10))
-                ).add(entity.pos).subtract(Vec3d(this.x, this.y, this.z)).multiply(0.1)
-                velocityX += velocity.x
-                velocityY += velocity.y
-                velocityZ += velocity.z
+                ).add(entity.position()).subtract(Vec3(this.x, this.y, this.z)).scale(0.1)
+                xd += velocity.x
+                yd += velocity.y
+                zd += velocity.z
             }
-            this.x += this.velocityX
-            this.y += this.velocityY
-            this.z += this.velocityZ
+            this.x += this.xd
+            this.y += this.yd
+            this.z += this.zd
         }
     }
 
     @Environment(EnvType.CLIENT)
-    class Factory(private val spriteProvider: SpriteProvider) : ParticleFactory<EntityTestParticleEffect> {
+    class Factory(private val spriteProvider: SpriteSet) : ParticleProvider<EntityTestParticleEffect> {
         override fun createParticle(
             type: EntityTestParticleEffect,
-            world: ClientWorld,
+            world: ClientLevel,
             posX: Double,
             posY: Double,
             posZ: Double,
@@ -84,10 +84,10 @@ class EntityTestParticle(
         ): Particle {
             val entity = type.entity
             val target = if (entity != null) {
-                world.getEntityById(entity)
+                world.getEntity(entity)
             } else null
             val particle = EntityTestParticle(world, posX, posY, posZ, velX, velY, velZ, target)
-            particle.setSprite(spriteProvider)
+            particle.pickSprite(spriteProvider)
             return particle
         }
     }

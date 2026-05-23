@@ -1,50 +1,49 @@
 package org.teamvoided.dusk_debris.world.gen.configured_carver
 
 import com.mojang.serialization.Codec
-import net.minecraft.block.BlockState
-import net.minecraft.block.Blocks
-import net.minecraft.registry.Holder
-import net.minecraft.state.property.Properties
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.ChunkPos
-import net.minecraft.util.math.Direction
-import net.minecraft.util.math.MathHelper
-import net.minecraft.util.math.noise.DoublePerlinNoiseSampler
-import net.minecraft.util.random.LegacySimpleRandom
-import net.minecraft.util.random.RandomGenerator
-import net.minecraft.world.biome.Biome
-import net.minecraft.world.chunk.Chunk
-import net.minecraft.world.gen.ChunkRandom
-import net.minecraft.world.gen.DensityFunction
-import net.minecraft.world.gen.carver.Carver
-import net.minecraft.world.gen.carver.CarverContext
-import net.minecraft.world.gen.carver.CarvingMask
-import net.minecraft.world.gen.chunk.AquiferSampler
-import org.teamvoided.dusk_debris.world.gen.configured_carver.GeodeCarver.SkipOrWaterPredicate
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
+import net.minecraft.core.Holder
+import net.minecraft.util.Mth
+import net.minecraft.util.RandomSource
+import net.minecraft.world.level.ChunkPos
+import net.minecraft.world.level.biome.Biome
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.block.state.properties.BlockStateProperties
+import net.minecraft.world.level.chunk.CarvingMask
+import net.minecraft.world.level.chunk.ChunkAccess
+import net.minecraft.world.level.levelgen.Aquifer
+import net.minecraft.world.level.levelgen.DensityFunction
+import net.minecraft.world.level.levelgen.LegacyRandomSource
+import net.minecraft.world.level.levelgen.WorldgenRandom
+import net.minecraft.world.level.levelgen.carver.CarvingContext
+import net.minecraft.world.level.levelgen.carver.WorldCarver
+import net.minecraft.world.level.levelgen.synth.NormalNoise
 import org.teamvoided.dusk_debris.world.gen.configured_carver.config.GeodeCarverConfig
 import java.util.function.Function
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
-class GeodeCarver(codec: Codec<GeodeCarverConfig>) : Carver<GeodeCarverConfig>(codec) {
-    override fun shouldCarve(ravineCarverConfig: GeodeCarverConfig, random: RandomGenerator): Boolean {
+class GeodeCarver(codec: Codec<GeodeCarverConfig>) : WorldCarver<GeodeCarverConfig>(codec) {
+    override fun isStartChunk(ravineCarverConfig: GeodeCarverConfig, random: RandomSource): Boolean {
         return random.nextFloat() <= ravineCarverConfig.probability
     }
 
     override fun carve(
-        carverContext: CarverContext,
+        carverContext: CarvingContext,
         config: GeodeCarverConfig,
-        chunk: Chunk,
+        chunk: ChunkAccess,
         function: Function<BlockPos, Holder<Biome>>,
-        random: RandomGenerator,
-        aquiferSampler: AquiferSampler,
+        random: RandomSource,
+        aquiferSampler: Aquifer,
         chunkPos: ChunkPos,
         carvingMask: CarvingMask
     ): Boolean {
-        val posX: Double = chunkPos.getOffsetX(random.nextInt(16)).toDouble()
-        val posY: Double = config.y.get(random, carverContext).toDouble()
-        val posZ: Double = chunkPos.getOffsetZ(random.nextInt(16)).toDouble()
+        val posX: Double = chunkPos.getBlockX(random.nextInt(16)).toDouble()
+        val posY: Double = config.y.sample(random, carverContext).toDouble()
+        val posZ: Double = chunkPos.getBlockZ(random.nextInt(16)).toDouble()
 
 
 //        chunk.setBlockState(Vec3d(posX, posY, posZ).toBlockPos(), Blocks.GLOWSTONE.defaultState, false)
@@ -54,8 +53,8 @@ class GeodeCarver(codec: Codec<GeodeCarverConfig>) : Carver<GeodeCarverConfig>(c
                 getState(scaledRelativeX, scaledRelativeY, scaledRelativeZ, dps)
             }
 
-        val height: Double = config.yScale.get(random).toDouble()
-        val radius: Float = config.horizontalRadius.get(random).toFloat()
+        val height: Double = config.yScale.sample(random).toDouble()
+        val radius: Float = config.horizontalRadius.sample(random).toFloat()
         this.carveCave(
             carverContext,
             config,
@@ -75,11 +74,11 @@ class GeodeCarver(codec: Codec<GeodeCarverConfig>) : Carver<GeodeCarverConfig>(c
     }
 
     protected fun carveCave(
-        context: CarverContext,
+        context: CarvingContext,
         config: GeodeCarverConfig,
-        chunk: Chunk,
-        aquiferSampler: AquiferSampler,
-        random: RandomGenerator,
+        chunk: ChunkAccess,
+        aquiferSampler: Aquifer,
+        random: RandomSource,
         x: Double,
         y: Double,
         z: Double,
@@ -108,11 +107,11 @@ class GeodeCarver(codec: Codec<GeodeCarverConfig>) : Carver<GeodeCarverConfig>(c
 
     //overide but custom predicate
     private fun carveRegion(
-        context: CarverContext,
+        context: CarvingContext,
         config: GeodeCarverConfig,
-        chunk: Chunk,
-        sampler: AquiferSampler,
-        random: RandomGenerator,
+        chunk: ChunkAccess,
+        sampler: Aquifer,
+        random: RandomSource,
         x: Double,
         y: Double,
         z: Double,
@@ -122,44 +121,44 @@ class GeodeCarver(codec: Codec<GeodeCarverConfig>) : Carver<GeodeCarverConfig>(c
         predicate: SkipOrWaterPredicate
     ): Boolean {
         val chunkPos = chunk.pos
-        val posX = chunkPos.centerX.toDouble()
-        val posZ = chunkPos.centerZ.toDouble()
+        val posX = chunkPos.middleBlockX.toDouble()
+        val posZ = chunkPos.middleBlockZ.toDouble()
         val f = 16.0 + horizontalScale * 2.0
         if (!(abs(x - posX) > f) && !(abs(z - posZ) > f)) {
-            val startX = chunkPos.startX
-            val startZ = chunkPos.startZ
-            val xMin = max((MathHelper.floor(x - horizontalScale) - startX - 1.0), 0.0).toInt()
-            val xMax = min((MathHelper.floor(x + horizontalScale) - startX).toDouble(), 15.0).toInt()
-            val yMin = max((MathHelper.floor(y - verticalScale) - 1.0), (context.minY + 1.0)).toInt()
-            val n = if (chunk.hasBelowZeroRetrogen()) 0 else 7
+            val startX = chunkPos.minBlockX
+            val startZ = chunkPos.minBlockZ
+            val xMin = max((Mth.floor(x - horizontalScale) - startX - 1.0), 0.0).toInt()
+            val xMax = min((Mth.floor(x + horizontalScale) - startX).toDouble(), 15.0).toInt()
+            val yMin = max((Mth.floor(y - verticalScale) - 1.0), (context.minGenY + 1.0)).toInt()
+            val n = if (chunk.isUpgrading) 0 else 7
             val yMax =
                 min(
-                    (MathHelper.floor(y + verticalScale) + 1.0),
-                    (context.minY + context.height - 1.0 - n)
+                    (Mth.floor(y + verticalScale) + 1.0),
+                    (context.minGenY + context.genDepth - 1.0 - n)
                 ).toInt()
-            val zMin = max((MathHelper.floor(z - horizontalScale) - startZ - 1.0), 0.0).toInt()
-            val zMax = min((MathHelper.floor(z + horizontalScale) - startZ).toDouble(), 15.0).toInt()
+            val zMin = max((Mth.floor(z - horizontalScale) - startZ - 1.0), 0.0).toInt()
+            val zMax = min((Mth.floor(z + horizontalScale) - startZ).toDouble(), 15.0).toInt()
             var bl = false
-            val mutable = BlockPos.Mutable()
+            val mutable = BlockPos.MutableBlockPos()
 
-            val chunkRandom = ChunkRandom(LegacySimpleRandom(0)) ////////HOW TO GET SEED OF WORLD
-            val dps = DoublePerlinNoiseSampler.create(chunkRandom, -4, 2.0, 1.0, 0.0)
+            val chunkRandom = WorldgenRandom(LegacyRandomSource(0)) ////////HOW TO GET SEED OF WORLD
+            val dps = NormalNoise.create(chunkRandom, -4, 2.0, 1.0, 0.0)
 
             for (loopX in xMin..xMax) {
-                val chunkX = chunkPos.getOffsetX(loopX)
+                val chunkX = chunkPos.getBlockX(loopX)
                 val funX = (chunkX + 0.5 - x) / horizontalScale
 
                 for (loopZ in zMin..zMax) {
-                    val chunkZ = chunkPos.getOffsetZ(loopZ)
+                    val chunkZ = chunkPos.getBlockZ(loopZ)
                     val funZ = (chunkZ + 0.5 - z) / horizontalScale
                     if (!(funX * funX + funZ * funZ >= 1.0)) {
 
                         for (loopY in yMax downTo yMin + 1) {
                             val funY = (loopY - 0.5 - y) / verticalScale
 
-                            val sample = dps.sample(chunkX.toDouble(), loopY * 0.25, chunkZ.toDouble())
+                            val sample = dps.getValue(chunkX.toDouble(), loopY * 0.25, chunkZ.toDouble())
                             val output = predicate.shouldSkip(funX, funY, funZ, sample)
-                            if (output != 0 && (!mask[loopX, loopY, loopZ] || isDebug(config))) {
+                            if (output != 0 && (!mask[loopX, loopY, loopZ] || isDebugEnabled(config))) {
                                 mask[loopX, loopY] = loopZ
                                 mutable[chunkX, loopY] = chunkZ
                                 bl = bl or carveAtPoint(
@@ -183,36 +182,36 @@ class GeodeCarver(codec: Codec<GeodeCarverConfig>) : Carver<GeodeCarverConfig>(c
     }
 
     private fun carveAtPoint(
-        context: CarverContext,
+        context: CarvingContext,
         config: GeodeCarverConfig,
-        chunk: Chunk,
-        random: RandomGenerator,
-        pos: BlockPos.Mutable,
-        sampler: AquiferSampler,
+        chunk: ChunkAccess,
+        random: RandomSource,
+        pos: BlockPos.MutableBlockPos,
+        sampler: Aquifer,
         predicateResult: Int,
     ): Boolean {
         val blockState = chunk.getBlockState(pos)
-        if (!this.canReplaceBlock(config, blockState) && !isDebug(config)) {
+        if (!this.canReplaceBlock(config, blockState) && !isDebugEnabled(config)) {
             return false
         } else {
             var blockState2 = this.getState(context, config, random, pos, sampler, predicateResult)
             if (blockState2 == null) {
                 return false
             } else {
-                if (predicateResult == 4 && random.nextInt(20) == 0 && !blockState2.isOf(Blocks.LAVA)) {
+                if (predicateResult == 4 && random.nextInt(20) == 0 && !blockState2.`is`(Blocks.LAVA)) {
                     val crysDir = crystalDirection(
                         chunk,
                         pos,
-                        config.extraInnerBlock.getBlockState(random, pos),
-                        blockState2 == Blocks.WATER.defaultState
+                        config.extraInnerBlock.getState(random, pos),
+                        blockState2 == Blocks.WATER.defaultBlockState()
                     )
                     if (crysDir != null)
                         blockState2 = crysDir
                 }
 
                 chunk.setBlockState(pos, blockState2, false)
-                if (sampler.needsFluidTick() && !blockState2.fluidState.isEmpty) {
-                    chunk.markBlockForPostProcessing(pos)
+                if (sampler.shouldScheduleFluidUpdate() && !blockState2.fluidState.isEmpty) {
+                    chunk.markPosForPostprocessing(pos)
                 }
                 return true
             }
@@ -221,31 +220,31 @@ class GeodeCarver(codec: Codec<GeodeCarverConfig>) : Carver<GeodeCarverConfig>(c
 
 
     private fun getState(
-        context: CarverContext,
+        context: CarvingContext,
         config: GeodeCarverConfig,
-        random: RandomGenerator,
+        random: RandomSource,
         pos: BlockPos,
-        sampler: AquiferSampler,
+        sampler: Aquifer,
         predicateResult: Int,
     ): BlockState? {
         val state = when (predicateResult) {
-            1 -> config.outerLayerBlock.getBlockState(random, pos)
-            2 -> config.middleLayerBlock.getBlockState(random, pos)
-            3 -> config.innerLayerBlock.getBlockState(random, pos)
-            4, 5 -> Blocks.CAVE_AIR.defaultState
-            else -> Blocks.CAVE_AIR.defaultState
+            1 -> config.outerLayerBlock.getState(random, pos)
+            2 -> config.middleLayerBlock.getState(random, pos)
+            3 -> config.innerLayerBlock.getState(random, pos)
+            4, 5 -> Blocks.CAVE_AIR.defaultBlockState()
+            else -> Blocks.CAVE_AIR.defaultBlockState()
         }
 
-        val debug = isDebug(config)
-        if (state.isAir && pos.y <= config.lavaLevel.getY(context)) {
-            return LAVA.blockState
+        val debug = isDebugEnabled(config)
+        if (state.isAir && pos.y <= config.lavaLevel.resolveY(context)) {
+            return LAVA.createLegacyBlock()
         } else {
-            val aquiferState = sampler.apply(DensityFunction.SinglePointContext(pos.x, pos.y, pos.z), 0.0)
+            val aquiferState = sampler.computeSubstance(DensityFunction.SinglePointContext(pos.x, pos.y, pos.z), 0.0)
             return if (aquiferState == null) {
                 if (debug)
-                    config.debugConfig.barrierState
+                    config.debugSettings.barrierState
                 else if (state.isAir)
-                    config.innerLayerBlock.getBlockState(random, pos)
+                    config.innerLayerBlock.getState(random, pos)
                 else
                     state
             } else {
@@ -259,20 +258,20 @@ class GeodeCarver(codec: Codec<GeodeCarverConfig>) : Carver<GeodeCarverConfig>(c
     }
 
     private fun crystalDirection(
-        chunk: Chunk,
+        chunk: ChunkAccess,
         pos: BlockPos,
         crystal: BlockState,
         waterlogged: Boolean = false
     ): BlockState? {
         var retorn = crystal
         Direction.entries.forEach {
-            if (chunk.getBlockState(pos.offset(it.opposite)).isFullCube(chunk, pos)) {
-                if (crystal.contains(Properties.FACING)) {
-                    retorn = retorn.with(Properties.FACING, it)
+            if (chunk.getBlockState(pos.relative(it.opposite)).isCollisionShapeFullBlock(chunk, pos)) {
+                if (crystal.hasProperty(BlockStateProperties.FACING)) {
+                    retorn = retorn.setValue(BlockStateProperties.FACING, it)
                 }
 
-                if (crystal.contains(Properties.WATERLOGGED)) {
-                    retorn = retorn.with(Properties.WATERLOGGED, waterlogged)
+                if (crystal.hasProperty(BlockStateProperties.WATERLOGGED)) {
+                    retorn = retorn.setValue(BlockStateProperties.WATERLOGGED, waterlogged)
                 }
 
                 return retorn

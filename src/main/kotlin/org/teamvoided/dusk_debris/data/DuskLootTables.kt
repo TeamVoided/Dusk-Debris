@@ -1,8 +1,8 @@
 package org.teamvoided.dusk_debris.data
 
-import net.minecraft.loot.LootTable
-import net.minecraft.registry.RegistryKey
-import net.minecraft.registry.RegistryKeys
+import net.minecraft.core.registries.Registries
+import net.minecraft.resources.ResourceKey
+import net.minecraft.world.level.storage.loot.LootTable
 import org.teamvoided.dusk_debris.DuskDebris.id
 
 object DuskLootTables {
@@ -17,6 +17,6 @@ object DuskLootTables {
     val ENDERMAN_OVERWORLD_BADLANDS = createEntity("enderman/overworld_badlands")
     val ENDERMAN_OVERWORLD_ICE = createEntity("enderman/overworld_ice")
     val ENDERMAN_OVERWORLD_FLOWER = createEntity("enderman/overworld_flower")
-    fun createEntity(id: String): RegistryKey<LootTable> = create("entity/$id")
-    fun create(id: String): RegistryKey<LootTable> = RegistryKey.of(RegistryKeys.LOOT_TABLE, id(id))
+    fun createEntity(id: String): ResourceKey<LootTable> = create("entity/$id")
+    fun create(id: String): ResourceKey<LootTable> = ResourceKey.create(Registries.LOOT_TABLE, id(id))
 }

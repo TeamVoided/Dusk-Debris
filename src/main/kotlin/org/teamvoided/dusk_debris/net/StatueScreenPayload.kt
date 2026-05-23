@@ -1,22 +1,22 @@
 package org.teamvoided.dusk_debris.net
 
-import net.minecraft.network.PacketByteBuf
-import net.minecraft.network.codec.PacketCodec
-import net.minecraft.network.packet.payload.CustomPayload
-import net.minecraft.util.math.BlockPos
+import net.minecraft.core.BlockPos
+import net.minecraft.network.FriendlyByteBuf
+import net.minecraft.network.codec.StreamCodec
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload
 import org.teamvoided.dusk_debris.DuskDebris.id
 
-class StatueScreenPayload(val pos: BlockPos) : CustomPayload {
-    constructor(buf: PacketByteBuf) : this(buf.readPos())
+class StatueScreenPayload(val pos: BlockPos) : CustomPacketPayload {
+    constructor(buf: FriendlyByteBuf) : this(buf.readBlockPos())
 
-    override fun getId() = ID
-    fun write(buf: PacketByteBuf) {
-        buf.writePos(pos)
+    override fun type() = ID
+    fun write(buf: FriendlyByteBuf) {
+        buf.writeBlockPos(pos)
     }
 
     companion object {
-        val CODEC: PacketCodec<PacketByteBuf, StatueScreenPayload> =
-            CustomPayload.create<PacketByteBuf, StatueScreenPayload>(StatueScreenPayload::write, ::StatueScreenPayload)
-        val ID = CustomPayload.Id<StatueScreenPayload>(id("statue_screen_payload"))
+        val CODEC: StreamCodec<FriendlyByteBuf, StatueScreenPayload> =
+            CustomPacketPayload.codec<FriendlyByteBuf, StatueScreenPayload>(StatueScreenPayload::write, ::StatueScreenPayload)
+        val ID = CustomPacketPayload.Type<StatueScreenPayload>(id("statue_screen_payload"))
     }
 }

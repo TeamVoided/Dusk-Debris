@@ -2,57 +2,57 @@ package org.teamvoided.dusk_debris.particle.emmiter
 
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
+import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.client.particle.NoRenderParticle
 import net.minecraft.client.particle.Particle
-import net.minecraft.client.particle.ParticleFactory
-import net.minecraft.client.world.ClientWorld
-import net.minecraft.particle.ParticleEffect
-import net.minecraft.particle.ParticleTypes
-import net.minecraft.util.math.MathHelper
-import net.minecraft.util.math.Vec3d
+import net.minecraft.client.particle.ParticleProvider
+import net.minecraft.core.particles.ParticleOptions
+import net.minecraft.core.particles.ParticleTypes
+import net.minecraft.util.Mth
+import net.minecraft.world.phys.Vec3
 import org.teamvoided.dusk_debris.particle.BetweenPointsParticleEffect
 
 class BetweenPointsParticle(
-    world: ClientWorld,
+    world: ClientLevel,
     x: Double,
     y: Double,
     z: Double,
     velocityX: Double,
     velocityY: Double,
     velocityZ: Double,
-    private val targetPos: Vec3d,
+    private val targetPos: Vec3,
     isOminous: Boolean,
     particleDistance: Int,
     private val rate: Int,
 ) : NoRenderParticle(world, x, y, z, velocityX, velocityY, velocityZ) {
-    private val startPos: Vec3d = Vec3d(x, y, z)
-    private val particle: ParticleEffect
+    private val startPos: Vec3 = Vec3(x, y, z)
+    private val particle: ParticleOptions
 
     init {
         val distance = (startPos.distanceTo(targetPos) * particleDistance)
-        this.maxAge = (rate * distance).toInt()
+        this.lifetime = (rate * distance).toInt()
         particle = if (isOminous) ParticleTypes.SOUL_FIRE_FLAME else ParticleTypes.FLAME
     }
 
     override fun tick() {
-        if (age++ >= maxAge) {
-            world.addParticle(
+        if (age++ >= lifetime) {
+            level.addParticle(
                 particle,
                 targetPos.x, targetPos.y, targetPos.z,
                 0.0, 0.0, 0.0
             )
-            this.markDead()
+            this.remove()
         } else if (age % rate == 0) {
 
-            val lerp = this.age.toDouble() / this.maxAge
-            this.prevPosX = this.x
-            this.prevPosY = this.y
-            this.prevPosZ = this.z
-            this.x = MathHelper.lerp(lerp, startPos.x, targetPos.getX())
-            this.y = MathHelper.lerp(lerp, startPos.y, targetPos.getY())
-            this.z = MathHelper.lerp(lerp, startPos.z, targetPos.getZ())
+            val lerp = this.age.toDouble() / this.lifetime
+            this.xo = this.x
+            this.yo = this.y
+            this.zo = this.z
+            this.x = Mth.lerp(lerp, startPos.x, targetPos.x())
+            this.y = Mth.lerp(lerp, startPos.y, targetPos.y())
+            this.z = Mth.lerp(lerp, startPos.z, targetPos.z())
 
-            world.addParticle(
+            level.addParticle(
                 particle,
                 this.x + (random.nextDouble() - 0.5),
                 this.y + (random.nextDouble() - 0.5),
@@ -63,10 +63,10 @@ class BetweenPointsParticle(
     }
 
     @Environment(EnvType.CLIENT)
-    class Factory : ParticleFactory<BetweenPointsParticleEffect> {
+    class Factory : ParticleProvider<BetweenPointsParticleEffect> {
         override fun createParticle(
             particleEffect: BetweenPointsParticleEffect,
-            world: ClientWorld,
+            world: ClientLevel,
             x: Double, y: Double, z: Double,
             velocityX: Double, velocityY: Double, velocityZ: Double
         ): Particle {

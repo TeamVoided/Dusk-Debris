@@ -1,8 +1,8 @@
 package org.teamvoided.dusk_debris.data.tags
 
-import net.minecraft.block.Block
-import net.minecraft.registry.RegistryKeys
-import net.minecraft.registry.tag.TagKey
+import net.minecraft.core.registries.Registries
+import net.minecraft.tags.TagKey
+import net.minecraft.world.level.block.Block
 import org.teamvoided.dusk_debris.DuskDebris
 
 object DuskBlockTags {
@@ -43,9 +43,9 @@ object DuskBlockTags {
     val GROUND_AND_REPLACEABLE = create("ground_and_replaceable")
 
 
-    fun create(id: String): TagKey<Block> = TagKey.of(RegistryKeys.BLOCK, DuskDebris.id(id))
-    fun create(modId: String, path: String): TagKey<Block> = TagKey.of(
-        RegistryKeys.BLOCK,
+    fun create(id: String): TagKey<Block> = TagKey.create(Registries.BLOCK, DuskDebris.id(id))
+    fun create(modId: String, path: String): TagKey<Block> = TagKey.create(
+        Registries.BLOCK,
         DuskDebris.id(modId, path)
     )
 

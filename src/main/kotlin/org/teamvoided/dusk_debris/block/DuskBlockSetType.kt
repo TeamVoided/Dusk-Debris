@@ -2,11 +2,11 @@ package org.teamvoided.dusk_debris.block
 
 import net.fabricmc.fabric.api.`object`.builder.v1.block.type.BlockSetTypeBuilder
 import net.fabricmc.fabric.api.`object`.builder.v1.block.type.WoodTypeBuilder
-import net.minecraft.block.BlockSetType
-import net.minecraft.block.WoodType
-import net.minecraft.sound.BlockSoundGroup
-import net.minecraft.sound.SoundEvents
-import net.minecraft.util.Identifier
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.sounds.SoundEvents
+import net.minecraft.world.level.block.SoundType
+import net.minecraft.world.level.block.state.properties.BlockSetType
+import net.minecraft.world.level.block.state.properties.WoodType
 import org.teamvoided.dusk_debris.DuskDebris.id
 
 object DuskBlockSetType {
@@ -15,15 +15,15 @@ object DuskBlockSetType {
             .openableByHand(true)
             .openableByWindCharge(true)
             .buttonActivatedByArrows(true)
-            .soundGroup(BlockSoundGroup.COPPER)
-            .doorOpenSound(SoundEvents.BLOCK_COPPER_DOOR_OPEN)
-            .doorCloseSound(SoundEvents.BLOCK_COPPER_DOOR_CLOSE)
-            .trapdoorOpenSound(SoundEvents.BLOCK_COPPER_TRAPDOOR_OPEN)
-            .trapdoorCloseSound(SoundEvents.BLOCK_COPPER_TRAPDOOR_CLOSE)
-            .pressurePlateClickOnSound(SoundEvents.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON)
-            .pressurePlateClickOffSound(SoundEvents.BLOCK_METAL_PRESSURE_PLATE_CLICK_OFF)
-            .buttonClickOnSound(SoundEvents.BLOCK_STONE_BUTTON_CLICK_ON)
-            .buttonClickOffSound(SoundEvents.BLOCK_STONE_BUTTON_CLICK_OFF)
+            .soundGroup(SoundType.COPPER)
+            .doorOpenSound(SoundEvents.COPPER_DOOR_OPEN)
+            .doorCloseSound(SoundEvents.COPPER_DOOR_CLOSE)
+            .trapdoorOpenSound(SoundEvents.COPPER_TRAPDOOR_OPEN)
+            .trapdoorCloseSound(SoundEvents.COPPER_TRAPDOOR_CLOSE)
+            .pressurePlateClickOnSound(SoundEvents.METAL_PRESSURE_PLATE_CLICK_ON)
+            .pressurePlateClickOffSound(SoundEvents.METAL_PRESSURE_PLATE_CLICK_OFF)
+            .buttonClickOnSound(SoundEvents.STONE_BUTTON_CLICK_ON)
+            .buttonClickOffSound(SoundEvents.STONE_BUTTON_CLICK_OFF)
             .pressurePlateActivationRule(BlockSetType.PressurePlateSensitivity.EVERYTHING)
             .register(id("copper"))
 
@@ -33,15 +33,15 @@ object DuskBlockSetType {
             .openableByHand(true)
             .openableByWindCharge(true)
             .buttonActivatedByArrows(true)
-            .soundGroup(BlockSoundGroup.WOOD)
-            .doorOpenSound(SoundEvents.BLOCK_CHERRY_WOOD_DOOR_OPEN)
-            .doorCloseSound(SoundEvents.BLOCK_CHERRY_WOOD_DOOR_CLOSE)
-            .trapdoorOpenSound(SoundEvents.BLOCK_CHERRY_WOOD_TRAPDOOR_OPEN)
-            .trapdoorCloseSound(SoundEvents.BLOCK_CHERRY_WOOD_TRAPDOOR_CLOSE)
-            .pressurePlateClickOnSound(SoundEvents.BLOCK_CHERRY_WOOD_PRESSURE_PLATE_CLICK_ON)
-            .pressurePlateClickOffSound(SoundEvents.BLOCK_CHERRY_WOOD_PRESSURE_PLATE_CLICK_OFF)
-            .buttonClickOnSound(SoundEvents.BLOCK_CHERRY_WOOD_BUTTON_CLICK_ON)
-            .buttonClickOffSound(SoundEvents.BLOCK_CHERRY_WOOD_BUTTON_CLICK_OFF)
+            .soundGroup(SoundType.WOOD)
+            .doorOpenSound(SoundEvents.CHERRY_WOOD_DOOR_OPEN)
+            .doorCloseSound(SoundEvents.CHERRY_WOOD_DOOR_CLOSE)
+            .trapdoorOpenSound(SoundEvents.CHERRY_WOOD_TRAPDOOR_OPEN)
+            .trapdoorCloseSound(SoundEvents.CHERRY_WOOD_TRAPDOOR_CLOSE)
+            .pressurePlateClickOnSound(SoundEvents.CHERRY_WOOD_PRESSURE_PLATE_CLICK_ON)
+            .pressurePlateClickOffSound(SoundEvents.CHERRY_WOOD_PRESSURE_PLATE_CLICK_OFF)
+            .buttonClickOnSound(SoundEvents.CHERRY_WOOD_BUTTON_CLICK_ON)
+            .buttonClickOffSound(SoundEvents.CHERRY_WOOD_BUTTON_CLICK_OFF)
             .pressurePlateActivationRule(BlockSetType.PressurePlateSensitivity.EVERYTHING)
             .register(id("cypress"))
     val CYPRESS_WOOD_TYPE: WoodType = WoodType.register(WoodType(id("cypress"), CYPRESS_BLOCK_SET_TYPE))
@@ -54,15 +54,15 @@ object DuskBlockSetType {
             .openableByHand(true)
             .openableByWindCharge(true)
             .buttonActivatedByArrows(true)
-            .soundGroup(BlockSoundGroup.WOOD)
-            .doorOpenSound(SoundEvents.BLOCK_WOODEN_DOOR_OPEN)
-            .doorCloseSound(SoundEvents.BLOCK_WOODEN_DOOR_CLOSE)
-            .trapdoorOpenSound(SoundEvents.BLOCK_WOODEN_TRAPDOOR_OPEN)
-            .trapdoorCloseSound(SoundEvents.BLOCK_WOODEN_TRAPDOOR_CLOSE)
-            .pressurePlateClickOnSound(SoundEvents.BLOCK_WOODEN_PRESSURE_PLATE_CLICK_ON)
-            .pressurePlateClickOffSound(SoundEvents.BLOCK_WOODEN_PRESSURE_PLATE_CLICK_OFF)
-            .buttonClickOnSound(SoundEvents.BLOCK_WOODEN_BUTTON_CLICK_ON)
-            .buttonClickOffSound(SoundEvents.BLOCK_WOODEN_BUTTON_CLICK_OFF)
+            .soundGroup(SoundType.WOOD)
+            .doorOpenSound(SoundEvents.WOODEN_DOOR_OPEN)
+            .doorCloseSound(SoundEvents.WOODEN_DOOR_CLOSE)
+            .trapdoorOpenSound(SoundEvents.WOODEN_TRAPDOOR_OPEN)
+            .trapdoorCloseSound(SoundEvents.WOODEN_TRAPDOOR_CLOSE)
+            .pressurePlateClickOnSound(SoundEvents.WOODEN_PRESSURE_PLATE_CLICK_ON)
+            .pressurePlateClickOffSound(SoundEvents.WOODEN_PRESSURE_PLATE_CLICK_OFF)
+            .buttonClickOnSound(SoundEvents.WOODEN_BUTTON_CLICK_ON)
+            .buttonClickOffSound(SoundEvents.WOODEN_BUTTON_CLICK_OFF)
             .pressurePlateActivationRule(BlockSetType.PressurePlateSensitivity.EVERYTHING)
             .register(id("charred"))
     val CHARRED_WOOD_TYPE: WoodType = WoodType.register(WoodType(id("charred"), CHARRED_BLOCK_SET_TYPE))
@@ -80,7 +80,7 @@ object DuskBlockSetType {
     private fun registerWoodType(id: String, woodType: WoodType, blockSet: BlockSetType): WoodType =
         WoodTypeBuilder.copyOf(woodType).register(id(id), blockSet)
 
-    private fun WoodType(id: Identifier, blockSetType: BlockSetType): WoodType =
+    private fun WoodType(id: ResourceLocation, blockSetType: BlockSetType): WoodType =
         WoodType.register(WoodType(id.toString(), blockSetType))
 
     private fun WoodType(id: String, woodType: WoodType, blockSet: BlockSetType): WoodType =

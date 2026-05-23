@@ -1,8 +1,8 @@
 package org.teamvoided.dusk_debris.init
 
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry
-import net.minecraft.client.render.entity.EmptyEntityRenderer
-import net.minecraft.client.render.entity.FlyingItemEntityRenderer
+import net.minecraft.client.renderer.entity.NoopRenderer
+import net.minecraft.client.renderer.entity.ThrownItemRenderer
 import org.teamvoided.dusk_debris.entity.DuskEntityLists
 import org.teamvoided.dusk_debris.entity.chill_charge.ChillChargeEntityRenderer
 import org.teamvoided.dusk_debris.entity.dice.DiceEntityRenderer
@@ -16,15 +16,15 @@ import org.teamvoided.dusk_debris.entity.lazer.LazerEntityRenderer
 import org.teamvoided.dusk_debris.entity.magic.vengeful_spirit.VengefulSpiritRenderer
 import org.teamvoided.dusk_debris.entity.piffling.PifflingPumpkinEntityRenderer
 import org.teamvoided.dusk_debris.entity.skeleton.gloom.GloomEntityRenderer
-import org.teamvoided.dusk_debris.entity.skeleton.wolf.SkeletonWolfEntityRenderer
 import org.teamvoided.dusk_debris.entity.skeleton.horse.WitherSkeletonHorseEntityRenderer
+import org.teamvoided.dusk_debris.entity.skeleton.wolf.SkeletonWolfEntityRenderer
 import org.teamvoided.dusk_debris.entity.skeleton.wolf.WitherSkeletonWolfEntityRenderer
 import org.teamvoided.dusk_debris.entity.tuff_golem.TuffGolemEntityRenderer
 
 object DuskEntitiesClient {
     fun init() {
-        EntityRendererRegistry.register(DuskEntities.BOX_AREA_EFFECT_CLOUD, ::EmptyEntityRenderer)
-        EntityRendererRegistry.register(DuskEntities.LIGHTNING_CLOUD, ::EmptyEntityRenderer)
+        EntityRendererRegistry.register(DuskEntities.BOX_AREA_EFFECT_CLOUD, ::NoopRenderer)
+        EntityRendererRegistry.register(DuskEntities.LIGHTNING_CLOUD, ::NoopRenderer)
         EntityRendererRegistry.register(DuskEntities.LAZER_ENTITY, ::LazerEntityRenderer)
         EntityRendererRegistry.register(DuskEntities.GUNPOWDER_BARREL, ::GunpowderBarrelEntityRenderer)
         EntityRendererRegistry.register(DuskEntities.GLOOM, ::GloomEntityRenderer)
@@ -32,7 +32,7 @@ object DuskEntitiesClient {
         EntityRendererRegistry.register(DuskEntities.WITHER_SKELETON_WOLF, ::WitherSkeletonWolfEntityRenderer)
         EntityRendererRegistry.register(DuskEntities.WITHER_SKELETON_HORSE, ::WitherSkeletonHorseEntityRenderer)
         EntityRendererRegistry.register(DuskEntities.TUFF_GOLEM, ::TuffGolemEntityRenderer)
-        EntityRendererRegistry.register(DuskEntities.TWISTING_SOUL_CHARGE, ::EmptyEntityRenderer)
+        EntityRendererRegistry.register(DuskEntities.TWISTING_SOUL_CHARGE, ::NoopRenderer)
         EntityRendererRegistry.register(DuskEntities.VOLAPHYRA, ::VolaphyraEntityRenderer)
         EntityRendererRegistry.register(DuskEntities.VOLAPHYRA_CORE, ::VolaphyraCoreEntityRenderer)
         EntityRendererRegistry.register(DuskEntities.TINY_ENEMY_JELLYFISH, ::TinyEnemyJellyfishEntityRenderer)
@@ -40,7 +40,7 @@ object DuskEntitiesClient {
         EntityRendererRegistry.register(DuskEntities.VENGEFUL_SPIRIT, ::VengefulSpiritRenderer)
 
         DuskEntityLists.THROWABLE_BOMB_ENTITIES.forEach {
-            EntityRendererRegistry.register(it, ::FlyingItemEntityRenderer)
+            EntityRendererRegistry.register(it, ::ThrownItemRenderer)
         }
 
         // DnD

@@ -1,15 +1,15 @@
 package org.teamvoided.dusk_debris.block.not_blocks
 
-import net.minecraft.util.StringIdentifiable
+import net.minecraft.util.StringRepresentable
 
-enum class ActiveState(val phaseName: String, val id: Int) : StringIdentifiable {
+enum class ActiveState(val phaseName: String, val id: Int) : StringRepresentable {
     COOLDOWN("cooldown", 0),
     IDLE("idle", 1),
     ACTIVE("active", 2);
 
     override fun toString(): String = phaseName
 
-    override fun asString(): String = phaseName
+    override fun getSerializedName(): String = phaseName
 
     companion object {
         fun fromInt(int: Int): ActiveState {

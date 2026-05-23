@@ -2,52 +2,52 @@ package org.teamvoided.dusk_debris.particle.emmiter
 
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
+import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.client.particle.NoRenderParticle
 import net.minecraft.client.particle.Particle
-import net.minecraft.client.particle.ParticleFactory
-import net.minecraft.client.world.ClientWorld
-import net.minecraft.particle.ParticleEffect
+import net.minecraft.client.particle.ParticleProvider
+import net.minecraft.core.particles.ParticleOptions
 import org.teamvoided.dusk_debris.particle.StationaryEmitterParticleEffect
 
 class StationaryEmitterParticle(
-    world: ClientWorld,
+    world: ClientLevel,
     posX: Double,
     posY: Double,
     posZ: Double,
     velX: Double,
     velY: Double,
     velZ: Double,
-    private val particle: ParticleEffect,
+    private val particle: ParticleOptions,
     maxAge: Int,
     private val delayBetween: Int
 ) : NoRenderParticle(world, posX, posY, posZ) {
     init {
-        this.maxAge = maxAge
-        this.prevAngle = angle
-        this.velocityMultiplier = 0.9f
-        this.velocityX = velX
-        this.velocityY = velY
-        this.velocityZ = velZ
+        this.lifetime = maxAge
+        this.oRoll = roll
+        this.friction = 0.9f
+        this.xd = velX
+        this.yd = velY
+        this.zd = velZ
 
     }
 
     override fun tick() {
-        if (age++ >= this.maxAge) {
-            this.markDead()
+        if (age++ >= this.lifetime) {
+            this.remove()
         } else if (age % delayBetween == 0) {
-            world.addParticle(
+            level.addParticle(
                 particle,
                 x, y, z,
-                velocityX, velocityY, velocityZ
+                xd, yd, zd
             )
         }
     }
 
     @Environment(EnvType.CLIENT)
-    class Factory : ParticleFactory<StationaryEmitterParticleEffect> {
+    class Factory : ParticleProvider<StationaryEmitterParticleEffect> {
         override fun createParticle(
             particleEffect: StationaryEmitterParticleEffect,
-            world: ClientWorld,
+            world: ClientLevel,
             posX: Double, posY: Double, posZ: Double,
             velX: Double, velY: Double, velZ: Double,
         ): Particle {

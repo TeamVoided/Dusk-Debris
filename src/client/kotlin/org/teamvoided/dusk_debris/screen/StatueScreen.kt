@@ -1,11 +1,11 @@
 package org.teamvoided.dusk_debris.screen
 
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
-import net.minecraft.client.gui.screen.Screen
-import net.minecraft.client.gui.widget.layout.HeaderFooterLayoutWidget
-import net.minecraft.entity.Entity
-import net.minecraft.registry.Registries
-import net.minecraft.text.Text
+import net.minecraft.client.gui.layouts.HeaderAndFooterLayout
+import net.minecraft.client.gui.screens.Screen
+import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.network.chat.Component
+import net.minecraft.world.entity.Entity
 import org.teamvoided.dusk_debris.block.entity.StatueBlockEntity
 import org.teamvoided.dusk_debris.net.StatueUpdatePayload
 import org.teamvoided.dusk_debris.screen.widget.EntityModelListWidget
@@ -15,18 +15,18 @@ class StatueScreen(val statue: StatueBlockEntity) : Screen(TITLE) {
     var entity: Entity? = null
     var entityWidget: EntityModelWidget? = null
 //    var test: EntityModelWidget? = null
-    val layout: HeaderFooterLayoutWidget = HeaderFooterLayoutWidget(this)
+    val layout: HeaderAndFooterLayout = HeaderAndFooterLayout(this)
     var modelList: EntityModelListWidget? = null
 
 
     override fun init() {
         super.init()
-        entity = statue.entityType.create(client!!.world)
+        entity = statue.entityType.create(minecraft!!.level)
         entityWidget = EntityModelWidget(48, 48, entity, true)
         entityWidget?.let { entityWidget ->
             entityWidget.x = 16
             entityWidget.y = 16
-            addDrawableSelectableElement(entityWidget)
+            addRenderableWidget(entityWidget)
         }
         /*test = EntityModelWidget(48, 48, EntityType.SKELETON, true)
         test?.let { test ->
@@ -39,12 +39,12 @@ class StatueScreen(val statue: StatueBlockEntity) : Screen(TITLE) {
             test.y = (height / 2) - 24
             addDrawableSelectableElement(test)
         }*/
-        modelList = this.layout.addToContents(EntityModelListWidget(client, this.width, this))
+        modelList = this.layout.addToContents(EntityModelListWidget(minecraft, this.width, this))
         modelList?.let { list ->
-            list.addEntries(Registries.ENTITY_TYPE.map { type ->
+            list.addEntries(BuiltInRegistries.ENTITY_TYPE.map { type ->
                 EntityModelWidget(128, 48, type, true).let { widget ->
                     widget.isDisplay { button->
-                        ClientPlayNetworking.send(StatueUpdatePayload(statue.pos, type))
+                        ClientPlayNetworking.send(StatueUpdatePayload(statue.blockPos, type))
                         entity = button.entity
                         entityWidget?.let { ew -> ew.entity = button.entity }
                     }
@@ -53,16 +53,16 @@ class StatueScreen(val statue: StatueBlockEntity) : Screen(TITLE) {
                 }
             })
         }
-        layout.visitWidgets(::addDrawableSelectableElement)
+        layout.visitWidgets(::addRenderableWidget)
         repositionElements()
     }
 
     override fun repositionElements() {
         this.layout.arrangeElements()
-        this.modelList?.setDimensionsWithLayout(this.width, this.layout)
+        this.modelList?.updateSize(this.width, this.layout)
     }
 
     companion object {
-        val TITLE = Text.literal("Gay Screen")
+        val TITLE = Component.literal("Gay Screen")
     }
 }

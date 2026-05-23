@@ -1,36 +1,36 @@
 package org.teamvoided.dusk_debris.entity
 
-import net.minecraft.entity.*
-import net.minecraft.entity.effect.StatusEffectInstance
-import net.minecraft.entity.effect.StatusEffects
-import net.minecraft.world.World
+import net.minecraft.world.effect.MobEffectInstance
+import net.minecraft.world.effect.MobEffects
+import net.minecraft.world.entity.*
+import net.minecraft.world.level.Level
 import org.teamvoided.dusk_debris.data.tags.DuskEntityTypeTags
 import org.teamvoided.dusk_debris.init.DuskEntities
 
 open class WitherSkeletonWolfEntity(
     entityType: EntityType<out SkeletonWolfEntity>,
-    world: World
+    world: Level
 ) : SkeletonWolfEntity(entityType, world) {
     override var fleeEntity = DuskEntityTypeTags.DUSK_SKELETON_RETREATS
     override var attackEntity = DuskEntityTypeTags.DUSK_SKELETON_ATTACKS
 
-    override fun tryAttack(target: Entity?): Boolean {
-        if (!super.tryAttack(target)) {
+    override fun doHurtTarget(target: Entity?): Boolean {
+        if (!super.doHurtTarget(target)) {
             return false
         } else {
             if (target is LivingEntity) {
-                target.addStatusEffect(StatusEffectInstance(StatusEffects.WITHER, 200), this)
+                target.addEffect(MobEffectInstance(MobEffects.WITHER, 200), this)
             }
             return true
         }
     }
 
-    override fun getDefaultDimensions(pose: EntityPose): EntityDimensions {
+    override fun getDefaultDimensions(pose: Pose): EntityDimensions {
         return if (this.isBaby) WITHER_BABY_DIMENSIONS else super.getDefaultDimensions(pose)
     }
 
     companion object {
         private val WITHER_BABY_DIMENSIONS: EntityDimensions =
-            DuskEntities.WITHER_SKELETON_WOLF.dimensions.scaled(0.5f).withEyeHeight(0.41f)
+            DuskEntities.WITHER_SKELETON_WOLF.dimensions.scale(0.5f).withEyeHeight(0.41f)
     }
 }

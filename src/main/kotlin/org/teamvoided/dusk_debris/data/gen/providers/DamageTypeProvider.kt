@@ -1,8 +1,8 @@
 package org.teamvoided.dusk_debris.data.gen.providers
 
-import net.minecraft.entity.damage.DamageScalingType
-import net.minecraft.entity.damage.DamageType
-import net.minecraft.registry.BootstrapContext
+import net.minecraft.data.worldgen.BootstrapContext
+import net.minecraft.world.damagesource.DamageScaling
+import net.minecraft.world.damagesource.DamageType
 import org.teamvoided.dusk_debris.data.DuskDamageTypes
 
 object DamageTypeProvider {
@@ -37,6 +37,6 @@ object DamageTypeProvider {
 //    }
 
     private fun DamageType(messageId: String, exhaustion: Float): DamageType {
-        return DamageType(messageId, DamageScalingType.WHEN_CAUSED_BY_LIVING_NON_PLAYER, exhaustion)
+        return DamageType(messageId, DamageScaling.WHEN_CAUSED_BY_LIVING_NON_PLAYER, exhaustion)
     }
 }

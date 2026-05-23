@@ -1,10 +1,10 @@
 package org.teamvoided.dusk_debris.init.worldgen
 
 import com.mojang.serialization.MapCodec
-import net.minecraft.registry.Registries
-import net.minecraft.registry.Registry
-import net.minecraft.util.dynamic.CodecHolder
-import net.minecraft.world.gen.DensityFunction
+import net.minecraft.core.Registry
+import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.util.KeyDispatchDataCodec
+import net.minecraft.world.level.levelgen.DensityFunction
 import org.teamvoided.dusk_debris.DuskDebris.id
 import org.teamvoided.dusk_debris.world.gen.density_functions.*
 
@@ -21,6 +21,6 @@ object DuskDensityFunction {
 
 
     fun init() {}
-    private fun <C : DensityFunction, F : CodecHolder<C>> register(id: String, densityFunction: F): MapCodec<C> =
-        Registry.register(Registries.DENSITY_FUNCTION, id(id), densityFunction.codec())
+    private fun <C : DensityFunction, F : KeyDispatchDataCodec<C>> register(id: String, densityFunction: F): MapCodec<C> =
+        Registry.register(BuiltInRegistries.DENSITY_FUNCTION_TYPE, id(id), densityFunction.codec())
 }

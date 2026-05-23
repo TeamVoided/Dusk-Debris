@@ -1,30 +1,26 @@
 package org.teamvoided.dusk_debris.entity
 
-import net.minecraft.block.Blocks
-import net.minecraft.enchantment.EnchantmentHelper
-import net.minecraft.entity.Entity
-import net.minecraft.entity.EntityType
-import net.minecraft.entity.FlyingItemEntity
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.damage.DamageSource
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.entity.projectile.ExplosiveProjectileEntity
-import net.minecraft.item.ItemStack
-import net.minecraft.particle.ParticleEffect
-import net.minecraft.registry.Registries
-import net.minecraft.registry.tag.BlockTags
-import net.minecraft.registry.tag.EntityTypeTags
-import net.minecraft.server.world.ServerWorld
-import net.minecraft.state.property.Properties
-import net.minecraft.util.hit.BlockHitResult
-import net.minecraft.util.hit.EntityHitResult
-import net.minecraft.util.hit.HitResult
-import net.minecraft.util.math.Box
-import net.minecraft.util.math.Direction
-import net.minecraft.util.math.Vec3d
-import net.minecraft.world.World
-import net.minecraft.world.explosion.ExplosionBehavior
-import net.minecraft.world.explosion.SimpleExplosionBehavior
+import net.minecraft.core.Direction
+import net.minecraft.core.particles.ParticleOptions
+import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.server.level.ServerLevel
+import net.minecraft.tags.BlockTags
+import net.minecraft.tags.EntityTypeTags
+import net.minecraft.world.damagesource.DamageSource
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.EntityType
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.entity.projectile.AbstractHurtingProjectile
+import net.minecraft.world.entity.projectile.ItemSupplier
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.enchantment.EnchantmentHelper
+import net.minecraft.world.level.ExplosionDamageCalculator
+import net.minecraft.world.level.Level
+import net.minecraft.world.level.SimpleExplosionDamageCalculator
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.block.state.properties.BlockStateProperties
+import net.minecraft.world.phys.*
 import org.teamvoided.dusk_debris.data.tags.DuskEntityTypeTags
 import org.teamvoided.dusk_debris.init.DuskEntities
 import org.teamvoided.dusk_debris.init.DuskItems
@@ -32,64 +28,64 @@ import java.util.*
 import java.util.function.Function
 import kotlin.math.max
 
-class ChillChargeEntity : ExplosiveProjectileEntity, FlyingItemEntity {
-    constructor(entityType: EntityType<out ChillChargeEntity>, world: World) : super(entityType, world) {
+class ChillChargeEntity : AbstractHurtingProjectile, ItemSupplier {
+    constructor(entityType: EntityType<out ChillChargeEntity>, world: Level) : super(entityType, world) {
         this.accelerationPower = 0.0
     }
 
-    constructor(type: EntityType<out ChillChargeEntity>, world: World, entity: Entity, x: Double, y: Double, z: Double)
+    constructor(type: EntityType<out ChillChargeEntity>, world: Level, entity: Entity, x: Double, y: Double, z: Double)
             : super(type, x, y, z, world) {
         this.owner = entity
         this.accelerationPower = 0.0
     }
 
-    constructor(world: World, d: Double, e: Double, f: Double, vec3d: Vec3d)
+    constructor(world: Level, d: Double, e: Double, f: Double, vec3d: Vec3)
             : super(DuskEntities.CHILL_CHARGE, d, e, f, vec3d, world)
 
 
-    constructor(player: PlayerEntity, world: World, x: Double, y: Double, z: Double)
+    constructor(player: Player, world: Level, x: Double, y: Double, z: Double)
             : this(DuskEntities.CHILL_CHARGE, world, player, x, y, z)
 
-    override fun calculateBoundingBox(): Box {
+    override fun makeBoundingBox(): AABB {
         val width = type.dimensions.width() / 2.0f
         val height = type.dimensions.height()
         val heightOffset = 0.15f
-        return Box(
-            pos.x - width.toDouble(), pos.y - heightOffset, pos.z - width.toDouble(),
-            pos.x + width.toDouble(), pos.y - heightOffset + height.toDouble(), pos.z + width.toDouble()
+        return AABB(
+            position().x - width.toDouble(), position().y - heightOffset, position().z - width.toDouble(),
+            position().x + width.toDouble(), position().y - heightOffset + height.toDouble(), position().z + width.toDouble()
         )
     }
 
-    override fun collidesWith(other: Entity): Boolean =
-        if (other is ChillChargeEntity) false else super.collidesWith(other)
+    override fun canCollideWith(other: Entity): Boolean =
+        if (other is ChillChargeEntity) false else super.canCollideWith(other)
 
-    override fun canHit(entity: Entity): Boolean {
-        return if (entity.type.isIn(DuskEntityTypeTags.CHILL_CHARGE_GOES_THROUGH)) false
-        else super.canHit(entity)
+    override fun canHitEntity(entity: Entity): Boolean {
+        return if (entity.type.`is`(DuskEntityTypeTags.CHILL_CHARGE_GOES_THROUGH)) false
+        else super.canHitEntity(entity)
     }
 
-    override fun onEntityHit(entityHitResult: EntityHitResult) {
-        super.onEntityHit(entityHitResult)
-        if (!world.isClient) {
+    override fun onHitEntity(entityHitResult: EntityHitResult) {
+        super.onHitEntity(entityHitResult)
+        if (!level().isClientSide) {
             val owner = this.owner
             val var10000: LivingEntity? = owner as? LivingEntity
             val entity = entityHitResult.entity
-            var10000?.onAttacking(entity)
-            val damageSource = this.damageSources.windCharge(this, var10000)
-            if (entity.damage(damageSource, 1.0f) && entity is LivingEntity) {
-                EnchantmentHelper.onEntityDamaged(world as ServerWorld, entity, damageSource)
+            var10000?.setLastHurtMob(entity)
+            val damageSource = this.damageSources().windCharge(this, var10000)
+            if (entity.hurt(damageSource, 1.0f) && entity is LivingEntity) {
+                EnchantmentHelper.doPostAttackEffects(level() as ServerLevel, entity, damageSource)
             }
-            this.freeze(world, defaultRange)
+            this.freeze(level(), defaultRange)
         }
     }
 
     override fun tick() {
-        if ((!world.isClient && this.blockY > world.topY + 30) || isOnFire) {
-            this.freeze(world, defaultRange)
+        if ((!level().isClientSide && this.blockY > level().maxBuildHeight + 30) || isOnFire) {
+            this.freeze(level(), defaultRange)
             this.discard()
         } else {
             super.tick()
-            if (world is ServerWorld && world.isChunkLoaded(this.blockPos)) {
+            if (level() is ServerLevel && level().hasChunkAt(this.blockPosition())) {
                 // TODO replace with voidlib
 //                (world as ServerWorld).spawnParticles(
 //                    DuskParticles.SNOWFLAKE, pos, Vec3d(
@@ -102,9 +98,9 @@ class ChillChargeEntity : ExplosiveProjectileEntity, FlyingItemEntity {
         }
     }
 
-    private fun freeze(world: World, radius: Int) {
-        if (!world.isClient) {
-            val serverWorld = world as ServerWorld
+    private fun freeze(world: Level, radius: Int) {
+        if (!world.isClientSide) {
+            val serverWorld = world as ServerLevel
             // TODO replace with voidlib
 //            repeat(90) {
 //                serverWorld.spawnParticles(
@@ -116,65 +112,66 @@ class ChillChargeEntity : ExplosiveProjectileEntity, FlyingItemEntity {
 //                )
 //            }
         }
-        val entitiesNearby = world.getOtherEntities(
-            this, Box(
+        val entitiesNearby = world.getEntities(
+            this, AABB(
                 this.x - radius, this.y - radius, this.z - radius,
                 this.x + radius, this.y + radius, this.z + radius
             )
-        ) { obj: Entity -> obj.isAlive && !obj.type.isIn(EntityTypeTags.FREEZE_IMMUNE_ENTITY_TYPES) }
+        ) { obj: Entity -> obj.isAlive && !obj.type.`is`(EntityTypeTags.FREEZE_IMMUNE_ENTITY_TYPES) }
         entitiesNearby.forEach {
-            it.frozenTicks = max(it.frozenTicks, it.maxFreezeTicks + random.rangeInclusive(450, 500))
+            it.ticksFrozen = max(it.ticksFrozen, it.ticksRequiredToFreeze + random.nextIntBetweenInclusive(450, 500))
         }
         for (x in -radius..radius) {
             for (y in -radius..radius) {
                 for (z in -radius..radius) {
-                    val blockPos = blockPos
-                        .offset(Direction.Axis.X, x)
-                        .offset(Direction.Axis.Y, y)
-                        .offset(Direction.Axis.Z, z)
+                    val blockPos = blockPosition()
+                        .relative(Direction.Axis.X, x)
+                        .relative(Direction.Axis.Y, y)
+                        .relative(Direction.Axis.Z, z)
                     val state = world.getBlockState(blockPos)
-                    if (((state.isOf(Blocks.WATER) && state.get(Properties.LEVEL_15) == 0) &&
-                                (world.height < blockPos.y + 1 || world.getBlockState(blockPos.up())
-                                    .isIn(BlockTags.AIR)))
+                    if (((state.`is`(Blocks.WATER) && state.getValue(BlockStateProperties.LEVEL) == 0) &&
+                                (world.height < blockPos.y + 1 || world.getBlockState(blockPos.above())
+                                    .`is`(BlockTags.AIR)))
                     ) {
-                        world.setBlockState(blockPos, Blocks.FROSTED_ICE.defaultState)
-                    } else if (state.isOf(Blocks.FROSTED_ICE)) {
-                        world.setBlockState(blockPos, Blocks.FROSTED_ICE.defaultState)
-                    } else if (/*state.isIn(DuskBlockTags.CHILL_CHARGE_AFFECTS) &&*/ state.contains(Properties.LIT)) {
-                        world.setBlockState(blockPos, state.with(Properties.LIT, false))
+                        world.setBlockAndUpdate(blockPos, Blocks.FROSTED_ICE.defaultBlockState())
+                    } else if (state.`is`(Blocks.FROSTED_ICE)) {
+                        world.setBlockAndUpdate(blockPos, Blocks.FROSTED_ICE.defaultBlockState())
+                    } else if (/*state.isIn(DuskBlockTags.CHILL_CHARGE_AFFECTS) &&*/ state.hasProperty(
+                            BlockStateProperties.LIT)) {
+                        world.setBlockAndUpdate(blockPos, state.setValue(BlockStateProperties.LIT, false))
                     }
                 }
             }
         }
     }
 
-    override fun addVelocity(deltaX: Double, deltaY: Double, deltaZ: Double) = Unit
-    override fun onBlockHit(blockHitResult: BlockHitResult) {
-        super.onBlockHit(blockHitResult)
-        if (!world.isClient) {
-            this.freeze(world, defaultRange)
+    override fun push(deltaX: Double, deltaY: Double, deltaZ: Double) = Unit
+    override fun onHitBlock(blockHitResult: BlockHitResult) {
+        super.onHitBlock(blockHitResult)
+        if (!level().isClientSide) {
+            this.freeze(level(), defaultRange)
             this.discard()
         }
     }
 
-    override fun onCollision(hitResult: HitResult) {
-        super.onCollision(hitResult)
-        if (!world.isClient) this.discard()
+    override fun onHit(hitResult: HitResult) {
+        super.onHit(hitResult)
+        if (!level().isClientSide) this.discard()
     }
 
-    override fun isBurning(): Boolean = false
-    override fun getStack(): ItemStack = DuskItems.CHILL_CHARGE.defaultStack
-    override fun getDrag(): Float = 1.0f
-    override fun drag(): Float = this.drag
-    override fun getParticleType(): ParticleEffect? = null //this places the particle half a block above the entity
-    override fun damage(source: DamageSource, amount: Float): Boolean = false
+    override fun shouldBurn(): Boolean = false
+    override fun getItem(): ItemStack = DuskItems.CHILL_CHARGE.defaultInstance
+    override fun getInertia(): Float = 1.0f
+    override fun getLiquidInertia(): Float = this.getInertia()
+    override fun getTrailParticle(): ParticleOptions? = null //this places the particle half a block above the entity
+    override fun hurt(source: DamageSource, amount: Float): Boolean = false
 
     companion object {
         val defaultRange = 3
-        val chillExplosionBehavior: ExplosionBehavior =
-            SimpleExplosionBehavior(
+        val chillExplosionBehavior: ExplosionDamageCalculator =
+            SimpleExplosionDamageCalculator(
                 true, false, Optional.empty(),
-                Registries.BLOCK.getTag(BlockTags.BLOCKS_WIND_CHARGE_EXPLOSIONS).map(Function.identity())
+                BuiltInRegistries.BLOCK.getTag(BlockTags.BLOCKS_WIND_CHARGE_EXPLOSIONS).map(Function.identity())
             )
         const val explosionOffsetMult: Double = 0.25
     }

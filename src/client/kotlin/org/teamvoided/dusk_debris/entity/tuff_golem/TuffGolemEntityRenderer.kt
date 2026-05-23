@@ -1,8 +1,8 @@
 package org.teamvoided.dusk_debris.entity.tuff_golem
 
-import net.minecraft.client.render.entity.EntityRendererFactory
-import net.minecraft.client.render.entity.MobEntityRenderer
-import net.minecraft.util.Identifier
+import net.minecraft.client.renderer.entity.EntityRendererProvider
+import net.minecraft.client.renderer.entity.MobRenderer
+import net.minecraft.resources.ResourceLocation
 import org.teamvoided.dusk_debris.DuskDebris.id
 import org.teamvoided.dusk_debris.entity.DuskEntityModelLayers
 import org.teamvoided.dusk_debris.entity.TuffGolemEntity
@@ -12,20 +12,20 @@ import org.teamvoided.dusk_debris.entity.tuff_golem.render.TuffGolemEyesFeatureR
 import org.teamvoided.dusk_debris.entity.tuff_golem.render.TuffGolemHatFeatureRenderer
 import org.teamvoided.dusk_debris.entity.tuff_golem.render.TuffGolemHeldItemFeatureRenderer
 
-class TuffGolemEntityRenderer(context: EntityRendererFactory.Context) :
-    MobEntityRenderer<TuffGolemEntity, TuffGolemEntityModel>(
+class TuffGolemEntityRenderer(context: EntityRendererProvider.Context) :
+    MobRenderer<TuffGolemEntity, TuffGolemEntityModel>(
         context,
-        TuffGolemEntityModel(context.getPart(DuskEntityModelLayers.TUFF_GOLEM)),
+        TuffGolemEntityModel(context.bakeLayer(DuskEntityModelLayers.TUFF_GOLEM)),
         0.45f //shadowRadius
     ) {
     init {
-        this.addFeature(TuffGolemEyesFeatureRenderer(this))
-        this.addFeature(TuffGolemHeldItemFeatureRenderer(this, context.heldItemRenderer))
-        this.addFeature(TuffGolemCloakFeatureRenderer(this, context.modelLoader))
-        this.addFeature(TuffGolemHatFeatureRenderer(this, context.itemRenderer))
+        this.addLayer(TuffGolemEyesFeatureRenderer(this))
+        this.addLayer(TuffGolemHeldItemFeatureRenderer(this, context.itemInHandRenderer))
+        this.addLayer(TuffGolemCloakFeatureRenderer(this, context.modelSet))
+        this.addLayer(TuffGolemHatFeatureRenderer(this, context.itemRenderer))
     }
 
-    override fun getTexture(tuffGolemEntity: TuffGolemEntity): Identifier = TEXTURE
+    override fun getTextureLocation(tuffGolemEntity: TuffGolemEntity): ResourceLocation = TEXTURE
 
     override fun isShaking(tuffGolemEntity: TuffGolemEntity): Boolean {
         return super.isShaking(tuffGolemEntity) ||
@@ -33,6 +33,6 @@ class TuffGolemEntityRenderer(context: EntityRendererFactory.Context) :
     }
 
     companion object {
-        private val TEXTURE: Identifier = id("textures/entity/tuff_golem/tuff_golem.png")
+        private val TEXTURE: ResourceLocation = id("textures/entity/tuff_golem/tuff_golem.png")
     }
 }

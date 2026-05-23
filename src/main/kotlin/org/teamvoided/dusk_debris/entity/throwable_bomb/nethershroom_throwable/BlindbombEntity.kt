@@ -1,25 +1,25 @@
 package org.teamvoided.dusk_debris.entity.throwable_bomb.nethershroom_throwable
 
-import net.minecraft.entity.EntityType
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.effect.StatusEffect
-import net.minecraft.entity.effect.StatusEffects
-import net.minecraft.item.Item
-import net.minecraft.registry.Holder
-import net.minecraft.world.World
+import net.minecraft.core.Holder
+import net.minecraft.world.effect.MobEffect
+import net.minecraft.world.effect.MobEffects
+import net.minecraft.world.entity.EntityType
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.item.Item
+import net.minecraft.world.level.Level
 import org.teamvoided.dusk_debris.entity.throwable_bomb.NethershroomThrowableEntity
 import org.teamvoided.dusk_debris.init.DuskBlocks
 import org.teamvoided.dusk_debris.init.DuskEntities
 import org.teamvoided.dusk_debris.util.purpleNethershroomSmoke
 
 class BlindbombEntity : NethershroomThrowableEntity {
-    constructor(entityType: EntityType<out BlindbombEntity>, world: World) : super(entityType, world)
+    constructor(entityType: EntityType<out BlindbombEntity>, world: Level) : super(entityType, world)
 
-    constructor(world: World, owner: LivingEntity?) : super(DuskEntities.BLINDBOMB, owner, world)
+    constructor(world: Level, owner: LivingEntity?) : super(DuskEntities.BLINDBOMB, owner, world)
 
-    constructor(world: World, x: Double, y: Double, z: Double) : super(DuskEntities.BLINDBOMB, world, x, y, z)
+    constructor(world: Level, x: Double, y: Double, z: Double) : super(DuskEntities.BLINDBOMB, world, x, y, z)
 
-    override var statusEffect: Holder<StatusEffect>? = StatusEffects.BLINDNESS
+    override var statusEffect: Holder<MobEffect>? = MobEffects.BLINDNESS
 
 
     override fun getDefaultItem(): Item {

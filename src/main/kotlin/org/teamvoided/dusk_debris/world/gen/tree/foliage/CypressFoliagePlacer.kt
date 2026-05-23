@@ -2,62 +2,62 @@ package org.teamvoided.dusk_debris.world.gen.tree.foliage
 
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
-import net.minecraft.util.math.int_provider.IntProvider
-import net.minecraft.util.random.RandomGenerator
-import net.minecraft.world.TestableWorld
-import net.minecraft.world.gen.feature.TreeFeatureConfig
-import net.minecraft.world.gen.foliage.FoliagePlacer
-import net.minecraft.world.gen.foliage.FoliagePlacerType
+import net.minecraft.util.RandomSource
+import net.minecraft.util.valueproviders.IntProvider
+import net.minecraft.world.level.LevelSimulatedReader
+import net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration
+import net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacer
+import net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacerType
 import org.teamvoided.dusk_debris.init.worldgen.trees.DuskTreeStuff
 
 class CypressFoliagePlacer(intProvider: IntProvider, intProvider2: IntProvider) :
     FoliagePlacer(intProvider, intProvider2) {
-    override fun getType(): FoliagePlacerType<*> {
+    override fun type(): FoliagePlacerType<*> {
         return DuskTreeStuff.CYPRESS_FOLIAGE_PLACER
     }
 
     override fun createFoliage(
-        world: TestableWorld,
-        placer: Placer,
-        random: RandomGenerator,
-        treeFeatureConfig: TreeFeatureConfig,
+        world: LevelSimulatedReader,
+        placer: FoliageSetter,
+        random: RandomSource,
+        treeFeatureConfig: TreeConfiguration,
         i: Int,
-        treeNode: TreeNode,
+        treeNode: FoliageAttachment,
         j: Int,
         k: Int,
         l: Int
     ) {
-        val bl = treeNode.isGiantTrunk
-        val blockPos = treeNode.center.up(l)
-        this.generateSquare(
+        val bl = treeNode.doubleTrunk()
+        val blockPos = treeNode.pos().above(l)
+        this.placeLeavesRow(
             world,
             placer,
             random,
             treeFeatureConfig,
             blockPos,
-            k + treeNode.foliageRadius,
+            k + treeNode.radiusOffset(),
             -1 - j,
             bl
         )
-        this.generateSquare(world, placer, random, treeFeatureConfig, blockPos, k - 1, -j, bl)
-        this.generateSquare(
+        this.placeLeavesRow(world, placer, random, treeFeatureConfig, blockPos, k - 1, -j, bl)
+        this.placeLeavesRow(
             world,
             placer,
             random,
             treeFeatureConfig,
             blockPos,
-            k + treeNode.foliageRadius - 1,
+            k + treeNode.radiusOffset() - 1,
             0,
             bl
         )
     }
 
-    override fun getRandomHeight(random: RandomGenerator, trunkHeight: Int, config: TreeFeatureConfig): Int {
+    override fun foliageHeight(random: RandomSource, trunkHeight: Int, config: TreeConfiguration): Int {
         return 0
     }
 
-    override fun isInvalidForLeaves(
-        random: RandomGenerator,
+    override fun shouldSkipLocation(
+        random: RandomSource,
         dx: Int,
         y: Int,
         dz: Int,
@@ -74,7 +74,7 @@ class CypressFoliagePlacer(intProvider: IntProvider, intProvider2: IntProvider) 
     companion object {
         val CODEC: MapCodec<CypressFoliagePlacer> =
             RecordCodecBuilder.mapCodec { instance: RecordCodecBuilder.Instance<CypressFoliagePlacer> ->
-                fillFoliagePlacerFields(instance).apply(
+                foliagePlacerParts(instance).apply(
                     instance
                 ) { intProvider: IntProvider, intProvider2: IntProvider ->
                     CypressFoliagePlacer(

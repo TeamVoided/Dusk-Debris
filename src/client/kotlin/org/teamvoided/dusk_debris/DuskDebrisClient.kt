@@ -1,8 +1,8 @@
 package org.teamvoided.dusk_debris
 
 import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRendererRegistrationCallback
-import net.minecraft.client.render.entity.SnifferEntityRenderer
-import net.minecraft.entity.EntityType
+import net.minecraft.client.renderer.entity.SnifferRenderer
+import net.minecraft.world.entity.EntityType
 import org.teamvoided.dusk_debris.DuskDebris.log
 import org.teamvoided.dusk_debris.entity.DuskEntityModelLayers
 import org.teamvoided.dusk_debris.entity.variant.SnifferOverlayFeatureRenderer
@@ -25,7 +25,7 @@ object DuskDebrisClient {
 
         LivingEntityFeatureRendererRegistrationCallback.EVENT.register { entityType, entityRenderer, registrationHelper, context ->
             if (entityType != EntityType.SNIFFER) return@register
-            if (entityRenderer !is SnifferEntityRenderer) return@register
+            if (entityRenderer !is SnifferRenderer) return@register
             registrationHelper.register(SnifferOverlayFeatureRenderer(entityRenderer))
         }
         //ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(WaterColormapResourceSupplier())

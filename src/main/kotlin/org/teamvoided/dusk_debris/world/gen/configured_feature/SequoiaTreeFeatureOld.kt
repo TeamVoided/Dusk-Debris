@@ -1,21 +1,21 @@
 package org.teamvoided.dusk_debris.world.gen.configured_feature
 
 import com.mojang.serialization.Codec
-import net.minecraft.block.Blocks
-import net.minecraft.registry.tag.BlockTags
-import net.minecraft.state.property.Properties
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Direction
-import net.minecraft.util.math.MathHelper
-import net.minecraft.util.math.noise.DoublePerlinNoiseSampler
-import net.minecraft.util.random.LegacySimpleRandom
-import net.minecraft.util.random.RandomGenerator
-import net.minecraft.world.StructureWorldAccess
-import net.minecraft.world.gen.ChunkRandom
-import net.minecraft.world.gen.feature.DefaultFeatureConfig
-import net.minecraft.world.gen.feature.Feature
-import net.minecraft.world.gen.feature.util.FeatureContext
-import net.minecraft.world.gen.stateprovider.SimpleBlockStateProvider
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
+import net.minecraft.tags.BlockTags
+import net.minecraft.util.Mth
+import net.minecraft.util.RandomSource
+import net.minecraft.world.level.WorldGenLevel
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.block.state.properties.BlockStateProperties
+import net.minecraft.world.level.levelgen.LegacyRandomSource
+import net.minecraft.world.level.levelgen.WorldgenRandom
+import net.minecraft.world.level.levelgen.feature.Feature
+import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext
+import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration
+import net.minecraft.world.level.levelgen.feature.stateproviders.SimpleStateProvider
+import net.minecraft.world.level.levelgen.synth.NormalNoise
 import org.teamvoided.dusk_debris.init.DuskBlocks
 import org.teamvoided.dusk_debris.util.Utils.PI
 import org.teamvoided.dusk_debris.util.Utils.rotate135
@@ -28,29 +28,29 @@ import kotlin.math.sqrt
 
 typealias ShapePredicate = (dx: Int, dz: Int) -> Boolean
 
-class SequoiaTreeFeatureOld(codec: Codec<DefaultFeatureConfig>) : Feature<DefaultFeatureConfig>(codec) {
+class SequoiaTreeFeatureOld(codec: Codec<NoneFeatureConfiguration>) : Feature<NoneFeatureConfiguration>(codec) {
 
-    override fun place(context: FeatureContext<DefaultFeatureConfig>): Boolean {
-        val origin = context.origin
-        val random = context.random
-        val world = context.world
-        val config = context.config
+    override fun place(context: FeaturePlaceContext<NoneFeatureConfiguration>): Boolean {
+        val origin = context.origin()
+        val random = context.random()
+        val world = context.level()
+        val config = context.config()
 
         val width = 6//random.nextInt(5) + 1
         val height = width * 10 + (random.nextInt(width * 4) - width * 2)
 
-        if (origin.y + height > world.topY) return false
+        if (origin.y + height > world.maxBuildHeight) return false
 
         val logPositions: MutableList<BlockPos> = mutableListOf()
 
-        val mutable = BlockPos.Mutable()
+        val mutable = BlockPos.MutableBlockPos()
 
         var cornerNW = true
         var cornerNE = true
         var cornerSW = true
         var cornerSE = true
 
-        val logBlock = SimpleBlockStateProvider.of(DuskBlocks.SEQUOIA_LOG.defaultState)
+        val logBlock = SimpleStateProvider.simple(DuskBlocks.SEQUOIA_LOG.defaultBlockState())
 
         val cone = 10 * width //10 * width * width
 
@@ -92,12 +92,12 @@ class SequoiaTreeFeatureOld(codec: Codec<DefaultFeatureConfig>) : Feature<Defaul
                             }
                         }
                         val pos = origin
-                            .offset(Direction.UP, y)
-                            .offset(Direction.EAST, x)
-                            .offset(Direction.SOUTH, z)
+                            .relative(Direction.UP, y)
+                            .relative(Direction.EAST, x)
+                            .relative(Direction.SOUTH, z)
                         mutable.set(pos)
                         if (width <= 2 || (x == 0 && z == 0)) {
-                            if (world.getBlockState(mutable).isIn(BlockTags.REPLACEABLE)) {
+                            if (world.getBlockState(mutable).`is`(BlockTags.REPLACEABLE)) {
                                 logPositions.add(pos)
                             } else return false
                         } else {
@@ -105,7 +105,7 @@ class SequoiaTreeFeatureOld(codec: Codec<DefaultFeatureConfig>) : Feature<Defaul
                             val dz = z - if (isEven) 0.5 else 0.0
                             val the = -(sqrt((cone * (dx * dx + dz * dz))) - height)
                             if (the >= y) {
-                                if (world.getBlockState(mutable).isIn(BlockTags.REPLACEABLE)) {
+                                if (world.getBlockState(mutable).`is`(BlockTags.REPLACEABLE)) {
                                     logPositions.add(pos)
                                 } else return false
                             }
@@ -115,8 +115,8 @@ class SequoiaTreeFeatureOld(codec: Codec<DefaultFeatureConfig>) : Feature<Defaul
             }
         }
         if (width == 2) {
-            mutable.set(origin.add(0, height, 0))
-            if (world.getBlockState(mutable).isIn(BlockTags.REPLACEABLE)) {
+            mutable.set(origin.offset(0, height, 0))
+            if (world.getBlockState(mutable).`is`(BlockTags.REPLACEABLE)) {
                 logPositions.add(mutable)
             }
         }
@@ -129,9 +129,9 @@ class SequoiaTreeFeatureOld(codec: Codec<DefaultFeatureConfig>) : Feature<Defaul
     }
 
     fun setLeavesBlocks(
-        config: DefaultFeatureConfig,
-        world: StructureWorldAccess,
-        random: RandomGenerator,
+        config: NoneFeatureConfiguration,
+        world: WorldGenLevel,
+        random: RandomSource,
         origin: BlockPos,
         trunkHeight: Int,
         trunkWidth: Int
@@ -142,8 +142,8 @@ class SequoiaTreeFeatureOld(codec: Codec<DefaultFeatureConfig>) : Feature<Defaul
         val isEven = trunkWidth % 2 == 0
 
 
-        val chunkRandom = ChunkRandom(LegacySimpleRandom(world.seed))
-        val dps = DoublePerlinNoiseSampler.create(chunkRandom, -2, *doubleArrayOf(1.0, 2.0))
+        val chunkRandom = WorldgenRandom(LegacyRandomSource(world.seed))
+        val dps = NormalNoise.create(chunkRandom, -2, *doubleArrayOf(1.0, 2.0))
 
         for (j in blockPos.y - foliageHeight..blockPos.y) {
             val k: Int = (blockPos.y - j)
@@ -155,7 +155,7 @@ class SequoiaTreeFeatureOld(codec: Codec<DefaultFeatureConfig>) : Feature<Defaul
                         ((foliageHeight - k) * (1.0 / foliageHeight) * -1.5 + 1.5)
                     ).toInt()
             var foliagePos = BlockPos(blockPos.x, j + trunkHeight, blockPos.z)
-            if (!isEven) foliagePos = foliagePos.add(1, 0, 1)
+            if (!isEven) foliagePos = foliagePos.offset(1, 0, 1)
             coneLeaves(
                 world,
                 random,
@@ -170,18 +170,18 @@ class SequoiaTreeFeatureOld(codec: Codec<DefaultFeatureConfig>) : Feature<Defaul
 
 
     fun coneLeaves(
-        world: StructureWorldAccess,
-        random: RandomGenerator,
+        world: WorldGenLevel,
+        random: RandomSource,
         centerPos: BlockPos,
         isEven: Boolean,
         y: Int,
         radius: Int,
-        dps: DoublePerlinNoiseSampler
+        dps: NormalNoise
     ) {
         val i = if (isEven) 1 else 0
-        val mutable = BlockPos.Mutable()
-        val leafBlock = SimpleBlockStateProvider.of(Blocks.GREEN_STAINED_GLASS.defaultState)
-        val leafBlock2 = SimpleBlockStateProvider.of(Blocks.RED_STAINED_GLASS.defaultState)
+        val mutable = BlockPos.MutableBlockPos()
+        val leafBlock = SimpleStateProvider.simple(Blocks.GREEN_STAINED_GLASS.defaultBlockState())
+        val leafBlock2 = SimpleStateProvider.simple(Blocks.RED_STAINED_GLASS.defaultBlockState())
         val radiu = Math.min(radius, 16)
         for (x in -radiu..radiu + i) {
             for (z in -radiu..radiu + i) {
@@ -189,11 +189,11 @@ class SequoiaTreeFeatureOld(codec: Codec<DefaultFeatureConfig>) : Feature<Defaul
                 val dz = if (isEven) min(abs(z), abs(z - 1)) else abs(z)
                 val tre = (dx * dx + dz * dz)
                 if (tre < radius * radius) {
-                    mutable.set(centerPos, x, y, z)
-                    if (world.getBlockState(mutable).isIn(BlockTags.REPLACEABLE))
-                        this.setBlockState(
+                    mutable.setWithOffset(centerPos, x, y, z)
+                    if (world.getBlockState(mutable).`is`(BlockTags.REPLACEABLE))
+                        this.setBlock(
                             world, mutable,
-                            leafBlock.getBlockState(random, mutable)
+                            leafBlock.getState(random, mutable)
                         )
                 }
             }
@@ -201,15 +201,15 @@ class SequoiaTreeFeatureOld(codec: Codec<DefaultFeatureConfig>) : Feature<Defaul
     }
 
     fun branch(
-        config: DefaultFeatureConfig,
-        world: StructureWorldAccess,
-        random: RandomGenerator,
+        config: NoneFeatureConfiguration,
+        world: WorldGenLevel,
+        random: RandomSource,
         origin: BlockPos,
         trunkWidth: Int,
         trunkHeight: Int
     ) {
-        val logBlock = SimpleBlockStateProvider.of(DuskBlocks.SEQUOIA_LOG.defaultState)
-        val logBlock2 = SimpleBlockStateProvider.of(Blocks.RED_CONCRETE.defaultState)
+        val logBlock = SimpleStateProvider.simple(DuskBlocks.SEQUOIA_LOG.defaultBlockState())
+        val logBlock2 = SimpleStateProvider.simple(Blocks.RED_CONCRETE.defaultBlockState())
         val isEven = trunkWidth % 2 == 0
         var posY = trunkHeight
         val height3 = trunkHeight / 3
@@ -230,24 +230,24 @@ class SequoiaTreeFeatureOld(codec: Codec<DefaultFeatureConfig>) : Feature<Defaul
                 val start = if (isEven || (rotation >= rotate135 && rotation < rotate315)) 2 else 1
                 if (posY + trunkWidth < trunkHeight) {
                     for (offset in start..start + (trunkWidth / 2) + (0.3 * (trunkHeight - posY)).toInt()) {
-                        rotX = (1.5f + MathHelper.cos(rotation) * offset).toInt()
-                        rotZ = (1.5f + MathHelper.sin(rotation) * offset).toInt()
+                        rotX = (1.5f + Mth.cos(rotation) * offset).toInt()
+                        rotZ = (1.5f + Mth.sin(rotation) * offset).toInt()
 
-                        val blockPos = origin.add(rotX, posY - (offset / angleY) + posY2, rotZ)
+                        val blockPos = origin.offset(rotX, posY - (offset / angleY) + posY2, rotZ)
                         if (origin.x - blockPos.x > 15 ||
                             origin.z - blockPos.z > 15 ||
                             origin.x - blockPos.x < -15 ||
                             origin.z - blockPos.z < -15
                         ) {
-                            this.setBlockState(
+                            this.setBlock(
                                 world, blockPos,
-                                logBlock2.getBlockState(random, blockPos)
+                                logBlock2.getState(random, blockPos)
                             )
                         } else
-                            this.setBlockState(
+                            this.setBlock(
                                 world, blockPos,
-                                logBlock.getBlockState(random, blockPos)
-                                    .withIfExists(Properties.AXIS, axis)
+                                logBlock.getState(random, blockPos)
+                                    .trySetValue(BlockStateProperties.AXIS, axis)
                             )
 //                this.placeTrunkBlock(world, replacer, random, blockPos, config)
                     }
@@ -262,14 +262,14 @@ class SequoiaTreeFeatureOld(codec: Codec<DefaultFeatureConfig>) : Feature<Defaul
 
 
     fun setTrunkBlocks(
-        config: DefaultFeatureConfig,
-        world: StructureWorldAccess,
-        random: RandomGenerator,
+        config: NoneFeatureConfiguration,
+        world: WorldGenLevel,
+        random: RandomSource,
         positions: MutableList<BlockPos>
     ) {
-        val logBlock = SimpleBlockStateProvider.of(DuskBlocks.SEQUOIA_LOG.defaultState)
+        val logBlock = SimpleStateProvider.simple(DuskBlocks.SEQUOIA_LOG.defaultBlockState())
         positions.forEach {
-            this.setBlockState(world, it, logBlock.getBlockState(random, it))
+            this.setBlock(world, it, logBlock.getState(random, it))
         }
     }
 

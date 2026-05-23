@@ -2,16 +2,10 @@ package org.teamvoided.dusk_debris.world.gen.configured_feature.config
 
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
-import net.minecraft.block.Block
-import net.minecraft.block.Blocks
-import net.minecraft.registry.RegistryKeys
-import net.minecraft.registry.tag.TagKey
-import net.minecraft.util.math.int_provider.IntProvider
-import net.minecraft.world.gen.feature.FeatureConfig
-import net.minecraft.world.gen.stateprovider.BlockStateProvider
-import net.minecraft.world.gen.stateprovider.SimpleBlockStateProvider
-import org.teamvoided.dusk_debris.world.gen.configured_feature.config.rock_spires.RockFormationFeatureConfig
-import org.teamvoided.dusk_debris.world.gen.configured_feature.config.rock_spires.SurfaceFormationFeatureConfig
+import net.minecraft.tags.TagKey
+import net.minecraft.util.valueproviders.IntProvider
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider
 
 class HugeNethershroomFeatureConfig(
     replaceable: TagKey<Block>,
@@ -46,9 +40,9 @@ class HugeNethershroomFeatureConfig(
         val CODEC: Codec<HugeNethershroomFeatureConfig> =
             RecordCodecBuilder.create { instance ->
                 instance.group(
-                    IntProvider.method_35004(1, 8).fieldOf("cap_radius").forGetter { it.capRadius },
-                    IntProvider.method_35004(0, 8).fieldOf("cap_xz_inlet_offset").forGetter { it.capXZInletOffset },
-                    IntProvider.method_35004(0, 8).fieldOf("cap_y_inlet_offset").forGetter { it.capYInletOffset },
+                    IntProvider.codec(1, 8).fieldOf("cap_radius").forGetter { it.capRadius },
+                    IntProvider.codec(0, 8).fieldOf("cap_xz_inlet_offset").forGetter { it.capXZInletOffset },
+                    IntProvider.codec(0, 8).fieldOf("cap_y_inlet_offset").forGetter { it.capYInletOffset },
                     MushroomFeatureConfig.MAP_CODEC.forGetter { it }
                 ).apply(instance, ::HugeNethershroomFeatureConfig)
             }

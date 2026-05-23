@@ -1,7 +1,7 @@
 package org.teamvoided.dusk_debris.util.world_helper
 
-import net.minecraft.util.function.ToFloatFunction
-import net.minecraft.util.math.Spline
+import net.minecraft.util.CubicSpline
+import net.minecraft.util.ToFloatFunction
 
 /* - - MATH - -*/
 fun calculateSlope(value1: Float, value2: Float, point1: Float, point2: Float): Float {
@@ -14,8 +14,8 @@ fun calculateSlope(pair1: Pair<Float, Float>, pair2: Pair<Float, Float>): Float 
 
 
 /* - - VANILLA MAPPED - -*/
-fun <C, I : ToFloatFunction<C>> Spline.Builder<C, I>.add(location: Float, value: Float): Spline.Builder<C, I> =
-    this.method_41294(location, value)
+fun <C, I : ToFloatFunction<C>> CubicSpline.Builder<C, I>.add(location: Float, value: Float): CubicSpline.Builder<C, I> =
+    this.addPoint(location, value)
 
 //fun <C, I : ToFloatFunction<C>> Spline.Builder<C, I>.add(
 //    location: Float,
@@ -25,15 +25,15 @@ fun <C, I : ToFloatFunction<C>> Spline.Builder<C, I>.add(location: Float, value:
 //    return this.add(location, value, derivative)
 //}
 
-fun <C, I : ToFloatFunction<C>> Spline.Builder<C, I>.add(location: Float, value: Spline<C, I>): Spline.Builder<C, I> =
-    this.method_41295(location, value)
+fun <C, I : ToFloatFunction<C>> CubicSpline.Builder<C, I>.add(location: Float, value: CubicSpline<C, I>): CubicSpline.Builder<C, I> =
+    this.addPoint(location, value)
 
 
 /* - - CUSTOM - -*/
-fun <C, I : ToFloatFunction<C>> Spline.Builder<C, I>.add(
+fun <C, I : ToFloatFunction<C>> CubicSpline.Builder<C, I>.add(
     input: Pair<Float, Float>,
     derivative: Float = 0f
-): Spline.Builder<C, I> = this.add(input.first, input.second, derivative)
+): CubicSpline.Builder<C, I> = this.addPoint(input.first, input.second, derivative)
 
 //HOW IS THIS THE SAME AS ABOVE????
 //Platform declaration clash: The following declarations have the same JVM signature (add(Lnet/minecraft/util/math/Spline$Builder;Lkotlin/Pair;F)Lnet/minecraft/util/math/Spline$Builder;):

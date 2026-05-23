@@ -1,27 +1,27 @@
 package org.teamvoided.dusk_debris.world.gen.configured_feature
 
 import com.mojang.serialization.Codec
-import net.minecraft.block.MushroomBlock
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.random.RandomGenerator
-import net.minecraft.world.WorldAccess
+import net.minecraft.core.BlockPos
+import net.minecraft.util.RandomSource
+import net.minecraft.world.level.LevelAccessor
+import net.minecraft.world.level.block.HugeMushroomBlock
 import org.teamvoided.dusk_debris.world.gen.configured_feature.config.HugeNethershroomFeatureConfig
 
 open class HugeBlueNethershroomFeature(codec: Codec<HugeNethershroomFeatureConfig>) :
     AbstractHugeMushroomFeature<HugeNethershroomFeatureConfig>(codec) {
 
     override fun generateCap(
-        world: WorldAccess,
-        random: RandomGenerator,
+        world: LevelAccessor,
+        random: RandomSource,
         start: BlockPos,
         yStart: Int,
-        mutable: BlockPos.Mutable,
+        mutable: BlockPos.MutableBlockPos,
         config: HugeNethershroomFeatureConfig
     ) {
-        val radius = config.capRadius[random]
-        val height = config.capHeight[random]
-        val offsetXZ = config.capXZInletOffset[random]
-        val offsetY = config.capYInletOffset[random]
+        val radius = config.capRadius.sample(random)
+        val height = config.capHeight.sample(random)
+        val offsetXZ = config.capXZInletOffset.sample(random)
+        val offsetY = config.capYInletOffset.sample(random)
         val heightUpper = 0
         val heightLower = -height
         for (x in -radius..radius) {
@@ -45,23 +45,23 @@ open class HugeBlueNethershroomFeature(codec: Codec<HugeNethershroomFeatureConfi
                         else
                             !(edgeNegY && !edgePosY && !((x <= -radius + offsetXZ - 1 || x >= radius - offsetXZ + 1) || (z <= -radius + offsetXZ - 1 || z >= radius - offsetXZ + 1)))
                     if (isNotBottomInlet) {
-                        mutable[start, x, y + yStart] = z
-                        if (world.getBlockState(mutable).isIn(config.replaceable)) {
-                            var blockState = config.capBlock.getBlockState(random, start)
-                            if (blockState.contains(MushroomBlock.WEST) &&
-                                blockState.contains(MushroomBlock.EAST) &&
-                                blockState.contains(MushroomBlock.NORTH) &&
-                                blockState.contains(MushroomBlock.SOUTH) &&
-                                blockState.contains(MushroomBlock.UP)
+                        mutable.setWithOffset(start, x, y + yStart, z)
+                        if (world.getBlockState(mutable).`is`(config.replaceable)) {
+                            var blockState = config.capBlock.getState(random, start)
+                            if (blockState.hasProperty(HugeMushroomBlock.WEST) &&
+                                blockState.hasProperty(HugeMushroomBlock.EAST) &&
+                                blockState.hasProperty(HugeMushroomBlock.NORTH) &&
+                                blockState.hasProperty(HugeMushroomBlock.SOUTH) &&
+                                blockState.hasProperty(HugeMushroomBlock.UP)
                             ) {
                                 blockState = blockState
-                                    .with(MushroomBlock.WEST, edgeNegX)
-                                    .with(MushroomBlock.EAST, edgePosX)
-                                    .with(MushroomBlock.NORTH, edgeNegZ)
-                                    .with(MushroomBlock.SOUTH, edgePosZ)
-                                    .with(MushroomBlock.UP, edgePosY)
+                                    .setValue(HugeMushroomBlock.WEST, edgeNegX)
+                                    .setValue(HugeMushroomBlock.EAST, edgePosX)
+                                    .setValue(HugeMushroomBlock.NORTH, edgeNegZ)
+                                    .setValue(HugeMushroomBlock.SOUTH, edgePosZ)
+                                    .setValue(HugeMushroomBlock.UP, edgePosY)
                             }
-                            this.setBlockState(world, mutable, blockState)
+                            this.setBlock(world, mutable, blockState)
                         }
                     }
                 }

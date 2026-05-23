@@ -1,36 +1,36 @@
 package org.teamvoided.dusk_debris.entity.spell
 
-import net.minecraft.enchantment.EnchantmentHelper
-import net.minecraft.entity.EntityDimensions
-import net.minecraft.entity.EntityPose
-import net.minecraft.entity.EntityType
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.damage.DamageSource
-import net.minecraft.entity.data.DataTracker
-import net.minecraft.entity.data.TrackedData
-import net.minecraft.entity.data.TrackedDataHandlerRegistry
-import net.minecraft.entity.projectile.ExplosiveProjectileEntity
-import net.minecraft.entity.projectile.ProjectileUtil
-import net.minecraft.nbt.NbtCompound
-import net.minecraft.particle.ParticleEffect
-import net.minecraft.server.world.ServerWorld
-import net.minecraft.util.hit.BlockHitResult
-import net.minecraft.util.hit.EntityHitResult
-import net.minecraft.util.hit.HitResult
-import net.minecraft.util.math.MathHelper
-import net.minecraft.util.math.Vec3d
-import net.minecraft.world.World
+import net.minecraft.core.particles.ParticleOptions
+import net.minecraft.nbt.CompoundTag
+import net.minecraft.network.syncher.EntityDataAccessor
+import net.minecraft.network.syncher.EntityDataSerializers
+import net.minecraft.network.syncher.SynchedEntityData
+import net.minecraft.server.level.ServerLevel
+import net.minecraft.util.Mth
+import net.minecraft.world.damagesource.DamageSource
+import net.minecraft.world.entity.EntityDimensions
+import net.minecraft.world.entity.EntityType
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.Pose
+import net.minecraft.world.entity.projectile.AbstractHurtingProjectile
+import net.minecraft.world.entity.projectile.ProjectileUtil
+import net.minecraft.world.item.enchantment.EnchantmentHelper
+import net.minecraft.world.level.Level
+import net.minecraft.world.phys.BlockHitResult
+import net.minecraft.world.phys.EntityHitResult
+import net.minecraft.world.phys.HitResult
+import net.minecraft.world.phys.Vec3
 import org.teamvoided.dusk_debris.init.DuskEntities
 import org.teamvoided.dusk_debris.init.DuskParticles
 import kotlin.math.sqrt
 
-class VengefulSpiritEntity : ExplosiveProjectileEntity {
-    constructor(entityType: EntityType<out ExplosiveProjectileEntity>, world: World) : super(entityType, world)
+class VengefulSpiritEntity : AbstractHurtingProjectile {
+    constructor(entityType: EntityType<out AbstractHurtingProjectile>, world: Level) : super(entityType, world)
 
-    constructor(world: World, owner: LivingEntity, velocity: Vec3d) :
+    constructor(world: Level, owner: LivingEntity, velocity: Vec3) :
             super(DuskEntities.VENGEFUL_SPIRIT, owner, velocity, world)
 
-    constructor(world: World, x: Double, y: Double, z: Double, velocity: Vec3d) :
+    constructor(world: Level, x: Double, y: Double, z: Double, velocity: Vec3) :
             super(DuskEntities.VENGEFUL_SPIRIT, x, y, z, velocity, world)
 
     private var despawnDistance: Int
@@ -41,38 +41,38 @@ class VengefulSpiritEntity : ExplosiveProjectileEntity {
     }
 
 
-    override fun initDataTracker(builder: DataTracker.Builder) {
-        super.initDataTracker(builder)
-        builder.add(SIZE, SIZE_DEFAULT)
+    override fun defineSynchedData(builder: SynchedEntityData.Builder) {
+        super.defineSynchedData(builder)
+        builder.define(SIZE, SIZE_DEFAULT)
     }
 
-    override fun readCustomDataFromNbt(nbt: NbtCompound) {
-        super.readCustomDataFromNbt(nbt)
+    override fun readAdditionalSaveData(nbt: CompoundTag) {
+        super.readAdditionalSaveData(nbt)
         if (nbt.contains(SIZE_KEY))
             this.size = nbt.getFloat(SIZE_KEY)
     }
 
-    override fun writeCustomDataToNbt(nbt: NbtCompound) {
-        super.writeCustomDataToNbt(nbt)
+    override fun addAdditionalSaveData(nbt: CompoundTag) {
+        super.addAdditionalSaveData(nbt)
         nbt.putFloat(SIZE_KEY, size)
     }
 
     override fun tick() {
         ProjectileUtil.rotateTowardsMovement(this, 1f)
         super.tick()
-        if (distanceTraveled > despawnDistance) {
-            world.sendEntityStatus(this, 60.toByte())
-            if (!this.world.isClient)
+        if (moveDist > despawnDistance) {
+            level().broadcastEntityEvent(this, 60.toByte())
+            if (!this.level().isClientSide)
                 this.discard()
-        } else if (world.isClient) {
+        } else if (level().isClientSide) {
             repeat(random.nextInt(3) + 1) {
-                val pos = Vec3d(
+                val pos = Vec3(
                     (random.nextDouble() - 0.5),
                     (random.nextDouble() - 0.5),
                     (random.nextDouble() - 0.5)
-                ).normalize().multiply(this.size * 1.25).add(this.x, this.eyeY, this.z)
-                val velocity = velocity.multiply(-0.1)
-                world.addParticle(
+                ).normalize().scale(this.size * 1.25).add(this.x, this.eyeY, this.z)
+                val velocity = deltaMovement.scale(-0.1)
+                level().addParticle(
                     getParticle(),
                     pos.x, pos.y, pos.z,
                     velocity.x, velocity.y, velocity.z
@@ -80,45 +80,45 @@ class VengefulSpiritEntity : ExplosiveProjectileEntity {
             }
         }
 
-        val x = this.x - this.prevX
-        val y = this.y - this.prevY
-        val z = this.z - this.prevZ
-        this.distanceTraveled += sqrt(x * x + y * y + z * z).toFloat()
+        val x = this.x - this.xo
+        val y = this.y - this.yo
+        val z = this.z - this.zo
+        this.moveDist += sqrt(x * x + y * y + z * z).toFloat()
     }
 
-    override fun onCollision(hitResult: HitResult) {
-        super.onCollision(hitResult)
-        if (!world.isClient) {
-            if (noClip) {
+    override fun onHit(hitResult: HitResult) {
+        super.onHit(hitResult)
+        if (!level().isClientSide) {
+            if (noPhysics) {
                 despawnDistance = NO_CLIPPED_DESPAWN_DISTANCE
             } else {
-                world.sendEntityStatus(this, 60.toByte())
+                level().broadcastEntityEvent(this, 60.toByte())
                 this.discard()
             }
         }
     }
 
-    override fun onEntityHit(entityHitResult: EntityHitResult) {
-        super.onEntityHit(entityHitResult)
-        if (world is ServerWorld) {
+    override fun onHitEntity(entityHitResult: EntityHitResult) {
+        super.onHitEntity(entityHitResult)
+        if (level() is ServerLevel) {
             val entity = entityHitResult.entity
             if (entity != null) {
-                val fireTicks = entity.fireTicks
-                entity.setOnFireForSeconds(5f)
-                val damageSource = this.damageSources.indirectMagic(this, owner)
-                if (!entity.damage(damageSource, 5f)) {
-                    entity.fireTicks = fireTicks
+                val fireTicks = entity.remainingFireTicks
+                entity.igniteForSeconds(5f)
+                val damageSource = this.damageSources().indirectMagic(this, owner)
+                if (!entity.hurt(damageSource, 5f)) {
+                    entity.setRemainingFireTicks(fireTicks)
                 } else {
-                    val serverWorld = world as ServerWorld
-                    EnchantmentHelper.onEntityDamaged(serverWorld, entity, damageSource)
+                    val serverWorld = level() as ServerLevel
+                    EnchantmentHelper.doPostAttackEffects(serverWorld, entity, damageSource)
                 }
             }
         }
     }
 
-    override fun onBlockHit(blockHitResult: BlockHitResult) {
-        super.onBlockHit(blockHitResult)
-        if (!this.world.isClient) {
+    override fun onHitBlock(blockHitResult: BlockHitResult) {
+        super.onHitBlock(blockHitResult)
+        if (!this.level().isClientSide) {
             //if ((owner !is MobEntity || this.world.gameRules.getBooleanValue(GameRules.DO_MOB_GRIEFING))) {
             //    val blockPos = blockHitResult.blockPos.offset(blockHitResult.side)
             //    if (this.world.isAir(blockPos)) {
@@ -130,16 +130,16 @@ class VengefulSpiritEntity : ExplosiveProjectileEntity {
 
     fun addExplosionParticles() {
         val radius = 0.3
-        if (world.isClient) {
+        if (level().isClientSide) {
             repeat(60) {
-                val rand = Vec3d(
+                val rand = Vec3(
                     (random.nextDouble() - 0.5),
                     (random.nextDouble() - 0.5),
                     (random.nextDouble() - 0.5)
                 ).normalize()
-                val pos = rand.multiply(this.size * 1.25).add(this.x, this.eyeY, this.z)
-                val velocity = rand.multiply(radius)
-                world.addParticle(
+                val pos = rand.scale(this.size * 1.25).add(this.x, this.eyeY, this.z)
+                val velocity = rand.scale(radius)
+                level().addParticle(
                     getParticle(),
                     pos.x, pos.y, pos.z,
                     velocity.x, velocity.y, velocity.z,
@@ -148,44 +148,44 @@ class VengefulSpiritEntity : ExplosiveProjectileEntity {
         }
     }
 
-    override fun handleStatus(status: Byte) {
+    override fun handleEntityEvent(status: Byte) {
         if (status.toInt() == 60) addExplosionParticles()
-        else super.handleStatus(status)
+        else super.handleEntityEvent(status)
     }
 
     var size: Float
-        get() = getDataTracker().get(SIZE) as Float
+        get() = entityData.get(SIZE) as Float
         set(float) {
             val old = size
-            val new = MathHelper.clamp(float, SIZE_BOUNDS.first, SIZE_BOUNDS.second)
-            this.lastRenderY = this.y
-            this.setPosition(this.x, this.y - (new - old), this.z)
-            getDataTracker().set(SIZE, new)
+            val new = Mth.clamp(float, SIZE_BOUNDS.first, SIZE_BOUNDS.second)
+            this.yOld = this.y
+            this.setPos(this.x, this.y - (new - old), this.z)
+            entityData.set(SIZE, new)
         }
 
-    fun getParticle(): ParticleEffect = DuskParticles.SPELL
+    fun getParticle(): ParticleOptions = DuskParticles.SPELL
 
-    override fun isBurning(): Boolean = false
-    override fun getParticleType(): ParticleEffect? = null
-    override fun damage(source: DamageSource, amount: Float): Boolean = false
+    override fun shouldBurn(): Boolean = false
+    override fun getTrailParticle(): ParticleOptions? = null
+    override fun hurt(source: DamageSource, amount: Float): Boolean = false
 
-    override fun getDimensions(pose: EntityPose): EntityDimensions {
+    override fun getDimensions(pose: Pose): EntityDimensions {
         val supr = super.getDimensions(pose)
         val width = size * supr.width
         val height = size * supr.height
-        return EntityDimensions.changing(width, height).withEyeHeight(height / 2)
+        return EntityDimensions.scalable(width, height).withEyeHeight(height / 2)
     }
 
-    override fun onTrackedDataSet(data: TrackedData<*>) {
+    override fun onSyncedDataUpdated(data: EntityDataAccessor<*>) {
         if (SIZE == data) {
-            this.calculateDimensions()
+            this.refreshDimensions()
         }
-        super.onTrackedDataSet(data)
+        super.onSyncedDataUpdated(data)
     }
 
     companion object {
-        private val SIZE: TrackedData<Float> =
-            DataTracker.registerData(VengefulSpiritEntity::class.java, TrackedDataHandlerRegistry.FLOAT)
+        private val SIZE: EntityDataAccessor<Float> =
+            SynchedEntityData.defineId(VengefulSpiritEntity::class.java, EntityDataSerializers.FLOAT)
         private const val SIZE_DEFAULT = 0.5f
         private val SIZE_BOUNDS = (0.1f to 30f)
         private const val SIZE_KEY = "size"

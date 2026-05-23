@@ -1,58 +1,58 @@
 package org.teamvoided.dusk_debris.block
 
 import com.mojang.serialization.MapCodec
-import net.minecraft.block.Block
-import net.minecraft.block.BlockState
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.particle.ParticleTypes
-import net.minecraft.server.world.ServerWorld
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Direction
-import net.minecraft.util.random.RandomGenerator
-import net.minecraft.world.World
-import net.minecraft.world.WorldView
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
+import net.minecraft.core.particles.ParticleTypes
+import net.minecraft.server.level.ServerLevel
+import net.minecraft.util.RandomSource
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.level.Level
+import net.minecraft.world.level.LevelReader
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.state.BlockState
 import org.teamvoided.dusk_debris.block.not_blocks.DuskProperties
 
-class GoldenCocoonBlock(settings: Settings) : Block(settings) {
-    public override fun getCodec(): MapCodec<out GoldenCocoonBlock> = CODEC
+class GoldenCocoonBlock(settings: Properties) : Block(settings) {
+    public override fun codec(): MapCodec<out GoldenCocoonBlock> = CODEC
 
     init {
-        this.defaultState = stateManager.defaultState.with(DuskProperties.COCOON, false)
+        this.registerDefaultState(stateDefinition.any().setValue(DuskProperties.COCOON, false))
     }
 
-    override fun canPlaceAt(state: BlockState, world: WorldView, pos: BlockPos): Boolean =
-        sideCoversSmallSquare(world, pos.up(), Direction.DOWN)
+    override fun canSurvive(state: BlockState, world: LevelReader, pos: BlockPos): Boolean =
+        canSupportCenter(world, pos.above(), Direction.DOWN)
 
-    override fun getRandomTicks(state: BlockState): Boolean = !state.get(DuskProperties.COCOON)
+    override fun isRandomlyTicking(state: BlockState): Boolean = !state.getValue(DuskProperties.COCOON)
 
-    override fun randomTick(state: BlockState, world: ServerWorld, pos: BlockPos, random: RandomGenerator) {
-        if (random.nextInt(CHANCE) == 0) world.setBlockState(pos, state.with(DuskProperties.COCOON, true), 2)
+    override fun randomTick(state: BlockState, world: ServerLevel, pos: BlockPos, random: RandomSource) {
+        if (random.nextInt(CHANCE) == 0) world.setBlock(pos, state.setValue(DuskProperties.COCOON, true), 2)
         super.randomTick(state, world, pos, random)
     }
 
-    override fun randomDisplayTick(state: BlockState, world: World, pos: BlockPos, random: RandomGenerator) {
-        if (state.get(DuskProperties.COCOON)) {
-            val direction = Direction.random(random)
+    override fun animateTick(state: BlockState, world: Level, pos: BlockPos, random: RandomSource) {
+        if (state.getValue(DuskProperties.COCOON)) {
+            val direction = Direction.getRandom(random)
             if (direction != Direction.UP) {
-                val directionPos = pos.offset(direction)
+                val directionPos = pos.relative(direction)
                 val directionWorldState = world.getBlockState(directionPos)
-                if (!directionWorldState.isSideSolidFullSquare(world, directionPos, direction.opposite)) {
-                    val x = if (direction.offsetX == 0) random.nextDouble() else 0.5 + direction.offsetX * 0.6
-                    val y = if (direction.offsetY == 0) random.nextDouble() else 0.5 + direction.offsetY * 0.6
-                    val z = if (direction.offsetZ == 0) random.nextDouble() else 0.5 + direction.offsetZ * 0.6
+                if (!directionWorldState.isFaceSturdy(world, directionPos, direction.opposite)) {
+                    val x = if (direction.stepX == 0) random.nextDouble() else 0.5 + direction.stepX * 0.6
+                    val y = if (direction.stepY == 0) random.nextDouble() else 0.5 + direction.stepY * 0.6
+                    val z = if (direction.stepZ == 0) random.nextDouble() else 0.5 + direction.stepZ * 0.6
                     world.addParticle(ParticleTypes.DRIPPING_HONEY, pos.x + x, pos.y + y, pos.z + z, 0.0, 0.0, 0.0)
                 }
             }
         }
     }
 
-    override fun onBreak(world: World, pos: BlockPos, state: BlockState, player: PlayerEntity): BlockState {
-        if (state.get(DuskProperties.COCOON)) {
+    override fun playerWillDestroy(world: Level, pos: BlockPos, state: BlockState, player: Player): BlockState {
+        if (state.getValue(DuskProperties.COCOON)) {
             addAbsorbtion(player)
-            return state.with(DuskProperties.COCOON, false)
+            return state.setValue(DuskProperties.COCOON, false)
         }
-        return super.onBreak(world, pos, state, player)
+        return super.playerWillDestroy(world, pos, state, player)
     }
 
     fun addAbsorbtion(entity: LivingEntity? = null) {
@@ -61,7 +61,7 @@ class GoldenCocoonBlock(settings: Settings) : Block(settings) {
     }
 
     companion object {
-        val CODEC: MapCodec<GoldenCocoonBlock> = createCodec(::GoldenCocoonBlock)
+        val CODEC: MapCodec<GoldenCocoonBlock> = simpleCodec(::GoldenCocoonBlock)
         const val CHANCE = 128
     }
 }

@@ -1,30 +1,30 @@
 package org.teamvoided.dusk_debris.entity
 
-import net.minecraft.entity.*
-import net.minecraft.entity.ai.goal.*
-import net.minecraft.entity.attribute.DefaultAttributeContainer
-import net.minecraft.entity.attribute.EntityAttributes
-import net.minecraft.entity.damage.DamageSource
-import net.minecraft.entity.data.DataTracker
-import net.minecraft.entity.data.TrackedData
-import net.minecraft.entity.data.TrackedDataHandlerRegistry
-import net.minecraft.entity.effect.StatusEffectInstance
-import net.minecraft.entity.effect.StatusEffects
-import net.minecraft.entity.mob.MobEntity
-import net.minecraft.entity.passive.GolemEntity
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.item.ItemStack
-import net.minecraft.nbt.NbtCompound
-import net.minecraft.registry.Registries
-import net.minecraft.sound.SoundEvent
-import net.minecraft.sound.SoundEvents
-import net.minecraft.util.ActionResult
-import net.minecraft.util.Hand
-import net.minecraft.util.math.BlockPos
-import net.minecraft.world.LocalDifficulty
-import net.minecraft.world.ServerWorldAccess
-import net.minecraft.world.World
-import net.minecraft.world.event.GameEvent
+import net.minecraft.core.BlockPos
+import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.nbt.CompoundTag
+import net.minecraft.network.syncher.EntityDataAccessor
+import net.minecraft.network.syncher.EntityDataSerializers
+import net.minecraft.network.syncher.SynchedEntityData
+import net.minecraft.sounds.SoundEvent
+import net.minecraft.sounds.SoundEvents
+import net.minecraft.world.DifficultyInstance
+import net.minecraft.world.InteractionHand
+import net.minecraft.world.InteractionResult
+import net.minecraft.world.damagesource.DamageSource
+import net.minecraft.world.effect.MobEffectInstance
+import net.minecraft.world.effect.MobEffects
+import net.minecraft.world.entity.*
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier
+import net.minecraft.world.entity.ai.attributes.Attributes
+import net.minecraft.world.entity.ai.goal.*
+import net.minecraft.world.entity.animal.AbstractGolem
+import net.minecraft.world.entity.item.ItemEntity
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.level.Level
+import net.minecraft.world.level.ServerLevelAccessor
+import net.minecraft.world.level.gameevent.GameEvent
 import org.teamvoided.dusk_debris.data.tags.DuskEntityTypeTags
 import org.teamvoided.dusk_debris.data.tags.DuskItemTags
 import org.teamvoided.dusk_debris.entity.ai.goal.PickupAndDropItemGoal
@@ -32,7 +32,7 @@ import org.teamvoided.dusk_debris.entity.ai.goal.ShowOffGoal
 import org.teamvoided.dusk_debris.entity.ai.goal.TuffGolemHome
 import java.util.*
 
-class TuffGolemEntity(entityType: EntityType<out TuffGolemEntity>, world: World) : GolemEntity(entityType, world) {
+class TuffGolemEntity(entityType: EntityType<out TuffGolemEntity>, world: Level) : AbstractGolem(entityType, world) {
     var stateTicks: Int = 0
     val statueAnimationState: AnimationState = AnimationState()
     val risingAnimationState: AnimationState = AnimationState()
@@ -44,34 +44,34 @@ class TuffGolemEntity(entityType: EntityType<out TuffGolemEntity>, world: World)
         this.bodyArmorDropChance = 2f
     }
 
-    override fun initGoals() {
-        goalSelector.add(0, EscapeDangerGoal(this, 2.0))
-        goalSelector.add(1, TuffGolemHome(this, 1.0))
-        goalSelector.add(2, WanderAroundFarGoal(this, 1.0, 1f))
-        goalSelector.add(
+    override fun registerGoals() {
+        goalSelector.addGoal(0, PanicGoal(this, 2.0))
+        goalSelector.addGoal(1, TuffGolemHome(this, 1.0))
+        goalSelector.addGoal(2, WaterAvoidingRandomStrollGoal(this, 1.0, 1f))
+        goalSelector.addGoal(
             3, ShowOffGoal(
                 this,
                 this.isHoldingItem() && this.state < 1,
-                { entity -> entity.type.isIn(DuskEntityTypeTags.DUSK_SKELETON_RETREATS) },
+                { entity -> entity.type.`is`(DuskEntityTypeTags.DUSK_SKELETON_RETREATS) },
                 0.01
             )
         )
-        goalSelector.add(4, LookAtEntityGoal(this, PlayerEntity::class.java, 6f))
-        goalSelector.add(5, LookAroundGoal(this))
-        goalSelector.add(10, PickupAndDropItemGoal(this, canPickUpItem() && navigation.isIdle, 0.001))
+        goalSelector.addGoal(4, LookAtPlayerGoal(this, Player::class.java, 6f))
+        goalSelector.addGoal(5, RandomLookAroundGoal(this))
+        goalSelector.addGoal(10, PickupAndDropItemGoal(this, canPickUpItem() && navigation.isDone, 0.001))
     }
 
-    override fun initialize(
-        world: ServerWorldAccess,
-        difficulty: LocalDifficulty,
-        spawnReason: SpawnReason,
-        entityData: EntityData?
-    ): EntityData? {
-        summonedPos = this.blockPos
+    override fun finalizeSpawn(
+        world: ServerLevelAccessor,
+        difficulty: DifficultyInstance,
+        spawnReason: MobSpawnType,
+        entityData: SpawnGroupData?
+    ): SpawnGroupData? {
+        summonedPos = this.blockPosition()
 //        if (this.getStackInHand(Hand.MAIN_HAND) == ItemStack.EMPTY && !SpawnReason.isSpawner(spawnReason)) {
 //            getLootTableHand(world.toServerWorld(), this)
 //        }
-        return super.initialize(world, difficulty, spawnReason, entityData)
+        return super.finalizeSpawn(world, difficulty, spawnReason, entityData)
     }
 //
 //    private fun getLootTableHand(world: ServerWorld, golem: TuffGolemEntity) {
@@ -88,17 +88,17 @@ class TuffGolemEntity(entityType: EntityType<out TuffGolemEntity>, world: World)
 //        }
 //    }
 
-    override fun initDataTracker(builder: DataTracker.Builder) {
-        super.initDataTracker(builder)
-        builder.add(GOLEM_STATE, statueState)
-        builder.add(STATUE_TICKS, 100)
-        builder.add(SUMMON_POS, BlockPos.ORIGIN)
-        builder.add(WAS_GIVEN_ITEM, false)
-        builder.add(EYE_BLOCK, "water_bucket")
+    override fun defineSynchedData(builder: SynchedEntityData.Builder) {
+        super.defineSynchedData(builder)
+        builder.define(GOLEM_STATE, statueState)
+        builder.define(STATUE_TICKS, 100)
+        builder.define(SUMMON_POS, BlockPos.ZERO)
+        builder.define(WAS_GIVEN_ITEM, false)
+        builder.define(EYE_BLOCK, "water_bucket")
     }
 
-    override fun writeCustomDataToNbt(nbt: NbtCompound) {
-        super.writeCustomDataToNbt(nbt)
+    override fun addAdditionalSaveData(nbt: CompoundTag) {
+        super.addAdditionalSaveData(nbt)
         nbt.putInt("StatueTicks", this.statueTicks)
         nbt.putInt("GolemState", this.state)
         nbt.putInt("SummonedPosX", this.summonedPos.x)
@@ -108,8 +108,8 @@ class TuffGolemEntity(entityType: EntityType<out TuffGolemEntity>, world: World)
         nbt.putString("EyeBlock", this.eyeBlock)
     }
 
-    override fun readCustomDataFromNbt(nbt: NbtCompound) {
-        super.readCustomDataFromNbt(nbt)
+    override fun readAdditionalSaveData(nbt: CompoundTag) {
+        super.readAdditionalSaveData(nbt)
         if (nbt.contains("GolemState")) {
             this.state = nbt.getInt("GolemState")
         }
@@ -131,19 +131,19 @@ class TuffGolemEntity(entityType: EntityType<out TuffGolemEntity>, world: World)
     }
 
     override fun tick() {
-        if (world.isClient()) {
+        if (level().isClientSide) {
             this.updateAnimationStates()
         }
         if (state == statueState) {
             if (statueTicks > 0) {
-                val ticks = dataTracker.get(STATUE_TICKS)
+                val ticks = entityData.get(STATUE_TICKS)
                 statueTicks = ticks - 1
                 if (statueTicks % 200 == 0 &&
                     this.health < this.maxHealth &&
-                    !this.hasStatusEffect(StatusEffects.REGENERATION) &&
+                    !this.hasEffect(MobEffects.REGENERATION) &&
                     random.nextInt(100) == 0
                 ) {
-                    this.addStatusEffect(StatusEffectInstance(StatusEffects.REGENERATION, 200))
+                    this.addEffect(MobEffectInstance(MobEffects.REGENERATION, 200))
                 }
             } else {
                 setStateRise()
@@ -158,120 +158,120 @@ class TuffGolemEntity(entityType: EntityType<out TuffGolemEntity>, world: World)
         super.tick()
     }
 
-    override fun updateGoalControls() {
-        val bl = this.primaryPassenger !is MobEntity
+    override fun updateControlFlags() {
+        val bl = this.controllingPassenger !is Mob
         val bl2 = state < 1
-        goalSelector.setControlEnabled(Goal.Control.MOVE, bl)
-        goalSelector.setControlEnabled(Goal.Control.JUMP, bl && bl2)
-        goalSelector.setControlEnabled(Goal.Control.LOOK, bl && bl2)
+        goalSelector.setControlFlag(Goal.Flag.MOVE, bl)
+        goalSelector.setControlFlag(Goal.Flag.JUMP, bl && bl2)
+        goalSelector.setControlFlag(Goal.Flag.LOOK, bl && bl2)
     }
 
-    override fun interactMob(player: PlayerEntity, hand: Hand): ActionResult {
+    override fun mobInteract(player: Player, hand: InteractionHand): InteractionResult {
         //hand MAIN_HAND, drops
         //cloak CHEST, drops
         //head HEAD, drops
         //eyes custom, does not drop
-        val playerHandStack = player.getStackInHand(hand)
-        val golemHandStack = this.getStackInHand(Hand.MAIN_HAND)
-        val golemHatStack = this.getEquippedStack(EquipmentSlot.HEAD)
-        val golemChestStack = this.getEquippedStack(EquipmentSlot.CHEST)
+        val playerHandStack = player.getItemInHand(hand)
+        val golemHandStack = this.getItemInHand(InteractionHand.MAIN_HAND)
+        val golemHatStack = this.getItemBySlot(EquipmentSlot.HEAD)
+        val golemChestStack = this.getItemBySlot(EquipmentSlot.CHEST)
         if (!playerHandStack.isEmpty) {
             if (golemHandStack.isEmpty && !golemChestStack.isEmpty) {
                 //give golem item
-                this.setStackInHand(Hand.MAIN_HAND, playerHandStack.copyWithCount(1))
+                this.setItemInHand(InteractionHand.MAIN_HAND, playerHandStack.copyWithCount(1))
                 playerHandStack.consume(1, player)
-                this.playSound(SoundEvents.ENTITY_ITEM_PICKUP, 1f, 1f)
+                this.playSound(SoundEvents.ITEM_PICKUP, 1f, 1f)
                 wasGivenItem = true
-                return ActionResult.SUCCESS
-            } else if (golemHatStack.isEmpty && getPreferredEquipmentSlot(playerHandStack) == EquipmentSlot.HEAD) {
+                return InteractionResult.SUCCESS
+            } else if (golemHatStack.isEmpty && getEquipmentSlotForItem(playerHandStack) == EquipmentSlot.HEAD) {
                 //give golem hat
-                this.equipStack(EquipmentSlot.HEAD, playerHandStack.copyWithCount(1))
+                this.setItemSlot(EquipmentSlot.HEAD, playerHandStack.copyWithCount(1))
                 playerHandStack.consume(1, player)
-                this.playSound(SoundEvents.ENTITY_ITEM_PICKUP, 1f, 1f)
-                return ActionResult.SUCCESS
-            } else if (playerHandStack.isIn(DuskItemTags.TUFF_GOLEM_CLOAK) && playerHandStack != golemChestStack) {
+                this.playSound(SoundEvents.ITEM_PICKUP, 1f, 1f)
+                return InteractionResult.SUCCESS
+            } else if (playerHandStack.`is`(DuskItemTags.TUFF_GOLEM_CLOAK) && playerHandStack != golemChestStack) {
                 //give golem cloak
                 this.spit(golemChestStack)
-                this.equipStack(EquipmentSlot.CHEST, playerHandStack.copyWithCount(1))
+                this.setItemSlot(EquipmentSlot.CHEST, playerHandStack.copyWithCount(1))
                 playerHandStack.consume(1, player)
-                this.playSound(SoundEvents.ENTITY_ITEM_PICKUP, 1f, 1f)
-                return ActionResult.SUCCESS
-            } else if (playerHandStack.isIn(DuskItemTags.TUFF_GOLEM_EYES)) {
+                this.playSound(SoundEvents.ITEM_PICKUP, 1f, 1f)
+                return InteractionResult.SUCCESS
+            } else if (playerHandStack.`is`(DuskItemTags.TUFF_GOLEM_EYES)) {
                 //give golem eye color
                 setEyeBlock(playerHandStack)
-                return ActionResult.SUCCESS_NO_ITEM_USED
+                return InteractionResult.SUCCESS_NO_ITEM_USED
             }
-        } else if (hand == Hand.MAIN_HAND && playerHandStack.isEmpty) {
+        } else if (hand == InteractionHand.MAIN_HAND && playerHandStack.isEmpty) {
             if (!golemHandStack.isEmpty) {
                 //take golem item
-                this.equipStack(EquipmentSlot.MAINHAND, ItemStack.EMPTY)
-                this.swingHand(Hand.MAIN_HAND)
-                player.giveItemStack(golemHandStack)
+                this.setItemSlot(EquipmentSlot.MAINHAND, ItemStack.EMPTY)
+                this.swing(InteractionHand.MAIN_HAND)
+                player.addItem(golemHandStack)
                 wasGivenItem = false
-                this.playSound(SoundEvents.ENTITY_ITEM_PICKUP, 1f, 0f)
-                return ActionResult.SUCCESS
+                this.playSound(SoundEvents.ITEM_PICKUP, 1f, 0f)
+                return InteractionResult.SUCCESS
             } else if (!golemHatStack.isEmpty) {
                 //take golem hat
-                this.equipStack(EquipmentSlot.HEAD, ItemStack.EMPTY)
-                player.giveItemStack(golemHatStack)
-                this.playSound(SoundEvents.ENTITY_ITEM_PICKUP, 1f, 0f)
-                return ActionResult.SUCCESS
+                this.setItemSlot(EquipmentSlot.HEAD, ItemStack.EMPTY)
+                player.addItem(golemHatStack)
+                this.playSound(SoundEvents.ITEM_PICKUP, 1f, 0f)
+                return InteractionResult.SUCCESS
             }
         }
-        return super.interactMob(player, hand)
+        return super.mobInteract(player, hand)
     }
 
-    override fun canEquip(stack: ItemStack): Boolean {
-        val equipmentSlot = this.getPreferredEquipmentSlot(stack)
-        return if (!getEquippedStack(equipmentSlot).isEmpty) {
+    override fun canTakeItem(stack: ItemStack): Boolean {
+        val equipmentSlot = this.getEquipmentSlotForItem(stack)
+        return if (!getItemBySlot(equipmentSlot).isEmpty) {
             false
         } else {
-            equipmentSlot == EquipmentSlot.MAINHAND && super.canEquip(stack)
+            equipmentSlot == EquipmentSlot.MAINHAND && super.canTakeItem(stack)
         }
     }
 
-    override fun canPickupItem(stack: ItemStack): Boolean = canPickUpItem()
+    override fun canHoldItem(stack: ItemStack): Boolean = canPickUpItem()
 
     fun canPickUpItem(): Boolean =
         state == wanderingState &&
                 !wasGivenItem &&
-                this.getEquippedStack(EquipmentSlot.MAINHAND).isEmpty &&
-                !this.getEquippedStack(EquipmentSlot.CHEST).isEmpty
+                this.getItemBySlot(EquipmentSlot.MAINHAND).isEmpty &&
+                !this.getItemBySlot(EquipmentSlot.CHEST).isEmpty
 
-    override fun loot(item: ItemEntity) {
-        val itemStack = item.stack
-        if (this.canPickupItem(itemStack)) {
+    override fun pickUpItem(item: ItemEntity) {
+        val itemStack = item.item
+        if (this.canHoldItem(itemStack)) {
             val i = itemStack.count
             if (i > 1) {
                 this.dropItem(itemStack.split(i - 1))
             }
-            this.spit(this.getEquippedStack(EquipmentSlot.MAINHAND))
-            this.triggerItemPickedUpByEntityCriteria(item)
-            this.equipStack(EquipmentSlot.MAINHAND, itemStack.split(1))
-            this.updateDropChances(EquipmentSlot.MAINHAND)
-            this.sendPickup(item, itemStack.count)
-            this.playSound(SoundEvents.ENTITY_ITEM_PICKUP, 1f, 1f)
+            this.spit(this.getItemBySlot(EquipmentSlot.MAINHAND))
+            this.onItemPickup(item)
+            this.setItemSlot(EquipmentSlot.MAINHAND, itemStack.split(1))
+            this.setGuaranteedDrop(EquipmentSlot.MAINHAND)
+            this.take(item, itemStack.count)
+            this.playSound(SoundEvents.ITEM_PICKUP, 1f, 1f)
             item.discard()
         }
     }
 
     private fun dropItem(stack: ItemStack) {
-        val itemEntity = ItemEntity(this.world, this.x, this.y, this.z, stack)
-        world.spawnEntity(itemEntity)
+        val itemEntity = ItemEntity(this.level(), this.x, this.y, this.z, stack)
+        level().addFreshEntity(itemEntity)
     }
 
     fun spit(stack: ItemStack) {
-        if (!stack.isEmpty && !world.isClient) {
+        if (!stack.isEmpty && !level().isClientSide) {
             val itemEntity = ItemEntity(
-                this.world,
-                this.x + this.rotationVector.x,
+                this.level(),
+                this.x + this.lookAngle.x,
                 this.y + 1.0,
-                this.z + this.rotationVector.z, stack
+                this.z + this.lookAngle.z, stack
             )
-            itemEntity.setPickupDelay(40)
+            itemEntity.setPickUpDelay(40)
             itemEntity.setThrower(this)
-            this.playSound(SoundEvents.ENTITY_ITEM_PICKUP, 1f, 0f)
-            world.spawnEntity(itemEntity)
+            this.playSound(SoundEvents.ITEM_PICKUP, 1f, 0f)
+            level().addFreshEntity(itemEntity)
         }
     }
 
@@ -280,42 +280,42 @@ class TuffGolemEntity(entityType: EntityType<out TuffGolemEntity>, world: World)
     }
 
     fun isHoldingItem(): Boolean {
-        return this.hasStackEquipped(EquipmentSlot.MAINHAND)
+        return this.hasItemInSlot(EquipmentSlot.MAINHAND)
     }
 
     var summonedPos: BlockPos
-        get() = dataTracker[SUMMON_POS]
+        get() = entityData[SUMMON_POS]
         set(summonedPos) {
-            dataTracker[SUMMON_POS] = summonedPos
+            entityData[SUMMON_POS] = summonedPos
         }
 
     var wasGivenItem: Boolean
-        get() = dataTracker[WAS_GIVEN_ITEM]
+        get() = entityData[WAS_GIVEN_ITEM]
         set(wasGivenItem) {
-            dataTracker[WAS_GIVEN_ITEM] = wasGivenItem
+            entityData[WAS_GIVEN_ITEM] = wasGivenItem
         }
     var eyeBlock: String
-        get() = dataTracker[EYE_BLOCK]
+        get() = entityData[EYE_BLOCK]
         set(eyeBlock) {
-            dataTracker[EYE_BLOCK] = eyeBlock
+            entityData[EYE_BLOCK] = eyeBlock
         }
 
     private fun setEyeBlock(item: ItemStack) {
-        dataTracker.set(EYE_BLOCK, Registries.ITEM.getId(item.item).path)
+        entityData.set(EYE_BLOCK, BuiltInRegistries.ITEM.getKey(item.item).path)
     }
 
     var statueTicks: Int
-        get() = dataTracker[STATUE_TICKS]
+        get() = entityData[STATUE_TICKS]
         set(statueTicks) {
-            dataTracker[STATUE_TICKS] = statueTicks
+            entityData[STATUE_TICKS] = statueTicks
         }
 
     override fun getHurtSound(source: DamageSource): SoundEvent? {
-        return SoundEvents.ENTITY_IRON_GOLEM_HURT
+        return SoundEvents.IRON_GOLEM_HURT
     }
 
     override fun getDeathSound(): SoundEvent? {
-        return SoundEvents.ENTITY_IRON_GOLEM_DEATH
+        return SoundEvents.IRON_GOLEM_DEATH
     }
 
     val wanderingState = 0
@@ -324,9 +324,9 @@ class TuffGolemEntity(entityType: EntityType<out TuffGolemEntity>, world: World)
     val statueState = 3
 
     var state: Int
-        get() = dataTracker[GOLEM_STATE]
+        get() = entityData[GOLEM_STATE]
         set(state) {
-            dataTracker[GOLEM_STATE] = state
+            entityData[GOLEM_STATE] = state
         }
 
     private fun updateAnimationStates() {
@@ -338,14 +338,14 @@ class TuffGolemEntity(entityType: EntityType<out TuffGolemEntity>, world: World)
 
             risingState -> {
                 statueAnimationState.stop()
-                risingAnimationState.start(this.age)
+                risingAnimationState.startIfStopped(this.tickCount)
             }
 
             statueState -> {
-                if (this.age < 20)
+                if (this.tickCount < 20)
                     statueAnimationState.fastForward(1, 100f)
                 else
-                    statueAnimationState.start(this.age)
+                    statueAnimationState.startIfStopped(this.tickCount)
                 risingAnimationState.stop()
             }
 
@@ -357,13 +357,13 @@ class TuffGolemEntity(entityType: EntityType<out TuffGolemEntity>, world: World)
     }
 
     fun setStateStatue() {
-        this.emitGameEvent(GameEvent.ENTITY_ACTION)
+        this.gameEvent(GameEvent.ENTITY_ACTION)
         state = statueState
         this.stateTicks = 0
     }
 
     fun setStateRise() {
-        this.emitGameEvent(GameEvent.ENTITY_ACTION)
+        this.gameEvent(GameEvent.ENTITY_ACTION)
         state = risingState
         statueTicks = 0
         this.stateTicks = 0
@@ -381,26 +381,26 @@ class TuffGolemEntity(entityType: EntityType<out TuffGolemEntity>, world: World)
     }
 
     companion object {
-        private val GOLEM_STATE: TrackedData<Int> =
-            DataTracker.registerData(TuffGolemEntity::class.java, TrackedDataHandlerRegistry.INTEGER)
+        private val GOLEM_STATE: EntityDataAccessor<Int> =
+            SynchedEntityData.defineId(TuffGolemEntity::class.java, EntityDataSerializers.INT)
 
-        private val STATUE_TICKS: TrackedData<Int> =
-            DataTracker.registerData(TuffGolemEntity::class.java, TrackedDataHandlerRegistry.INTEGER)
-        private val SUMMON_POS: TrackedData<BlockPos> =
-            DataTracker.registerData(TuffGolemEntity::class.java, TrackedDataHandlerRegistry.BLOCK_POS)
-        private val WAS_GIVEN_ITEM: TrackedData<Boolean> =
-            DataTracker.registerData(TuffGolemEntity::class.java, TrackedDataHandlerRegistry.BOOLEAN)
-        private val EYE_BLOCK: TrackedData<String> =
-            DataTracker.registerData(TuffGolemEntity::class.java, TrackedDataHandlerRegistry.STRING)
+        private val STATUE_TICKS: EntityDataAccessor<Int> =
+            SynchedEntityData.defineId(TuffGolemEntity::class.java, EntityDataSerializers.INT)
+        private val SUMMON_POS: EntityDataAccessor<BlockPos> =
+            SynchedEntityData.defineId(TuffGolemEntity::class.java, EntityDataSerializers.BLOCK_POS)
+        private val WAS_GIVEN_ITEM: EntityDataAccessor<Boolean> =
+            SynchedEntityData.defineId(TuffGolemEntity::class.java, EntityDataSerializers.BOOLEAN)
+        private val EYE_BLOCK: EntityDataAccessor<String> =
+            SynchedEntityData.defineId(TuffGolemEntity::class.java, EntityDataSerializers.STRING)
 
         val risingLength = 20
 
-        fun createAttributes(): DefaultAttributeContainer.Builder {
-            return MobEntity.createAttributes()
-                .add(EntityAttributes.GENERIC_MAX_HEALTH, 10.0)
-                .add(EntityAttributes.GENERIC_ARMOR, 10.0)
-                .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.15)
-                .add(EntityAttributes.GENERIC_KNOCKBACK_RESISTANCE, 1.0)
+        fun createAttributes(): AttributeSupplier.Builder {
+            return Mob.createMobAttributes()
+                .add(Attributes.MAX_HEALTH, 10.0)
+                .add(Attributes.ARMOR, 10.0)
+                .add(Attributes.MOVEMENT_SPEED, 0.15)
+                .add(Attributes.KNOCKBACK_RESISTANCE, 1.0)
         }
     }
 }

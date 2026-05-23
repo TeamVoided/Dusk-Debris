@@ -1,13 +1,13 @@
 package org.teamvoided.dusk_debris.entity.throwable_bomb.bonecaller
 
-import net.minecraft.entity.EntityType
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.SpawnReason
-import net.minecraft.item.Item
-import net.minecraft.scoreboard.Team
-import net.minecraft.server.world.ServerWorld
+import net.minecraft.server.level.ServerLevel
 import net.minecraft.util.SpawnUtil
-import net.minecraft.world.World
+import net.minecraft.world.entity.EntityType
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.MobSpawnType
+import net.minecraft.world.item.Item
+import net.minecraft.world.level.Level
+import net.minecraft.world.scores.PlayerTeam
 import org.teamvoided.dusk_debris.entity.GloomEntity
 import org.teamvoided.dusk_debris.entity.throwable_bomb.BonecallerEntity
 import org.teamvoided.dusk_debris.init.DuskBlocks
@@ -16,40 +16,40 @@ import java.awt.Color
 
 open class ShadecallerEntity : BonecallerEntity {
 
-    constructor(entityType: EntityType<out ShadecallerEntity>, world: World) : super(entityType, world)
+    constructor(entityType: EntityType<out ShadecallerEntity>, world: Level) : super(entityType, world)
 
-    constructor(world: World) : super(DuskEntities.SHADECALLER, world)
-    constructor(owner: LivingEntity?, world: World) :
+    constructor(world: Level) : super(DuskEntities.SHADECALLER, world)
+    constructor(owner: LivingEntity?, world: Level) :
             super(DuskEntities.SHADECALLER, owner, world) {
         this.owner = owner
     }
 
-    constructor(x: Double, y: Double, z: Double, world: World) :
+    constructor(x: Double, y: Double, z: Double, world: Level) :
             super(DuskEntities.SHADECALLER, x, y, z, world)
 
-    override fun getCalledEntity(serverWorld: ServerWorld, bandanaColor: Int, team: Team?) {
-        val GloomEntity = GloomEntity(DuskEntities.GLOOM as EntityType<out GloomEntity>, world)
+    override fun getCalledEntity(serverWorld: ServerLevel, bandanaColor: Int, team: PlayerTeam?) {
+        val GloomEntity = GloomEntity(DuskEntities.GLOOM as EntityType<out GloomEntity>, level())
         val spawnPos = getSummonPos(
             GloomEntity,
-            SpawnReason.MOB_SUMMONED,
+            MobSpawnType.MOB_SUMMONED,
             serverWorld,
-            blockPos,
+            blockPosition(),
             20,
             3,
             6,
-            SpawnUtil.Strategy.field_39401
+            SpawnUtil.Strategy.ON_TOP_OF_COLLIDER
         )
-        GloomEntity.refreshPositionAndAngles(spawnPos, 0f, 0.0f)
-        GloomEntity.initialize(
+        GloomEntity.moveTo(spawnPos, 0f, 0.0f)
+        GloomEntity.finalizeSpawn(
             serverWorld,
-            this.world.getLocalDifficulty(this.blockPos),
-            SpawnReason.MOB_SUMMONED,
+            this.level().getCurrentDifficultyAt(this.blockPosition()),
+            MobSpawnType.MOB_SUMMONED,
             null
         )
         if (team != null) {
-            serverWorld.scoreboard.addPlayerToTeam(GloomEntity.profileName, team)
+            serverWorld.scoreboard.addPlayerToTeam(GloomEntity.scoreboardName, team)
         }
-        serverWorld.spawnParticles(
+        serverWorld.sendParticles(
             getTrailingParticle(),
             spawnPos.x + 0.5,
             spawnPos.y.toDouble(),
@@ -60,7 +60,7 @@ open class ShadecallerEntity : BonecallerEntity {
             0.0,
             1.0
         )
-        world.spawnEntity(GloomEntity)
+        level().addFreshEntity(GloomEntity)
     }
 
     override val color1: Color = Color(0x2B2B2B)

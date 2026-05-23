@@ -1,111 +1,109 @@
 package org.teamvoided.dusk_debris.block.temp
 
 import com.mojang.serialization.MapCodec
-import net.minecraft.block.Block
-import net.minecraft.block.BlockRenderType
-import net.minecraft.block.BlockState
-import net.minecraft.block.BlockWithEntity
-import net.minecraft.block.entity.BlockEntity
-import net.minecraft.entity.mob.PiglinBrain
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.item.ItemPlacementContext
-import net.minecraft.screen.ScreenHandler
-import net.minecraft.server.world.ServerWorld
-import net.minecraft.stat.Stats
-import net.minecraft.state.StateManager
-import net.minecraft.state.property.BooleanProperty
-import net.minecraft.state.property.DirectionProperty
-import net.minecraft.state.property.Properties
-import net.minecraft.util.ActionResult
-import net.minecraft.util.BlockMirror
-import net.minecraft.util.BlockRotation
-import net.minecraft.util.ItemScatterer
-import net.minecraft.util.hit.BlockHitResult
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Direction
-import net.minecraft.util.random.RandomGenerator
-import net.minecraft.world.World
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
+import net.minecraft.server.level.ServerLevel
+import net.minecraft.stats.Stats
+import net.minecraft.util.RandomSource
+import net.minecraft.world.Containers
+import net.minecraft.world.InteractionResult
+import net.minecraft.world.entity.monster.piglin.PiglinAi
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.inventory.AbstractContainerMenu
+import net.minecraft.world.item.context.BlockPlaceContext
+import net.minecraft.world.level.Level
+import net.minecraft.world.level.block.*
+import net.minecraft.world.level.block.entity.BlockEntity
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.block.state.StateDefinition
+import net.minecraft.world.level.block.state.properties.BlockStateProperties
+import net.minecraft.world.level.block.state.properties.BooleanProperty
+import net.minecraft.world.level.block.state.properties.DirectionProperty
+import net.minecraft.world.phys.BlockHitResult
 import org.teamvoided.dusk_debris.block.temp.entity.BarrelDBlockEntity
 
-class BarrelDBlock(settings: Settings) : BlockWithEntity(settings) {
-    public override fun getCodec(): MapCodec<BarrelDBlock> {
+class BarrelDBlock(settings: Properties) : BaseEntityBlock(settings) {
+    public override fun codec(): MapCodec<BarrelDBlock> {
         return CODEC
     }
 
-    override fun onUse(
+    override fun useWithoutItem(
         state: BlockState,
-        world: World,
+        world: Level,
         pos: BlockPos,
-        entity: PlayerEntity,
+        entity: Player,
         hitResult: BlockHitResult
-    ): ActionResult {
-        if (world.isClient) {
-            return ActionResult.SUCCESS
+    ): InteractionResult {
+        if (world.isClientSide) {
+            return InteractionResult.SUCCESS
         } else {
             val blockEntity = world.getBlockEntity(pos)
             if (blockEntity is BarrelDBlockEntity) {
-                entity.openHandledScreen(blockEntity)
-                entity.incrementStat(Stats.OPEN_BARREL)
-                PiglinBrain.onGuardedBlockInteracted(entity, true)
+                entity.openMenu(blockEntity)
+                entity.awardStat(Stats.OPEN_BARREL)
+                PiglinAi.angerNearbyPiglins(entity, true)
             }
 
-            return ActionResult.CONSUME
+            return InteractionResult.CONSUME
         }
     }
 
-    override fun onStateReplaced(state: BlockState, world: World, pos: BlockPos, newState: BlockState, moved: Boolean) {
-        ItemScatterer.scatterInventory(state, newState, world, pos)
-        super.onStateReplaced(state, world, pos, newState, moved)
+    override fun onRemove(state: BlockState, world: Level, pos: BlockPos, newState: BlockState, moved: Boolean) {
+        Containers.dropContentsOnDestroy(state, newState, world, pos)
+        super.onRemove(state, world, pos, newState, moved)
     }
 
-    override fun scheduledTick(state: BlockState, world: ServerWorld, pos: BlockPos, random: RandomGenerator) {
+    override fun tick(state: BlockState, world: ServerLevel, pos: BlockPos, random: RandomSource) {
         val blockEntity = world.getBlockEntity(pos)!!
         if (blockEntity is BarrelDBlockEntity) {
             blockEntity.tick()
         }
     }
 
-    override fun createBlockEntity(pos: BlockPos, state: BlockState): BlockEntity {
+    override fun newBlockEntity(pos: BlockPos, state: BlockState): BlockEntity {
         return BarrelDBlockEntity(pos, state)
     }
 
-    override fun getRenderType(state: BlockState): BlockRenderType {
-        return BlockRenderType.MODEL
+    override fun getRenderShape(state: BlockState): RenderShape {
+        return RenderShape.MODEL
     }
 
-    override fun hasComparatorOutput(state: BlockState): Boolean {
+    override fun hasAnalogOutputSignal(state: BlockState): Boolean {
         return true
     }
 
-    override fun getComparatorOutput(state: BlockState, world: World, pos: BlockPos): Int {
-        return ScreenHandler.calculateComparatorOutput(world.getBlockEntity(pos))
+    override fun getAnalogOutputSignal(state: BlockState, world: Level, pos: BlockPos): Int {
+        return AbstractContainerMenu.getRedstoneSignalFromBlockEntity(world.getBlockEntity(pos))
     }
 
-    override fun rotate(state: BlockState, rotation: BlockRotation): BlockState {
-        return state.with(FACING, rotation.rotate(state.get(FACING)))
+    override fun rotate(state: BlockState, rotation: Rotation): BlockState {
+        return state.setValue(FACING, rotation.rotate(state.getValue(FACING)))
     }
 
-    override fun mirror(state: BlockState, mirror: BlockMirror): BlockState {
-        return state.rotate(mirror.getRotation(state.get(FACING)))
+    override fun mirror(state: BlockState, mirror: Mirror): BlockState {
+        return state.rotate(mirror.getRotation(state.getValue(FACING)))
     }
 
-    override fun appendProperties(builder: StateManager.Builder<Block, BlockState>) {
+    override fun createBlockStateDefinition(builder: StateDefinition.Builder<Block, BlockState>) {
         builder.add(FACING, OPEN)
     }
 
-    override fun getPlacementState(ctx: ItemPlacementContext): BlockState {
-        return defaultState.with(FACING, ctx.playerLookDirection.opposite)
+    override fun getStateForPlacement(ctx: BlockPlaceContext): BlockState {
+        return defaultBlockState().setValue(FACING, ctx.nearestLookingDirection.opposite)
     }
 
     init {
-        this.defaultState = stateManager.defaultState
-            .with(FACING, Direction.NORTH)
-            .with(OPEN, false)
+        this.registerDefaultState(
+            stateDefinition.any()
+                .setValue(FACING, Direction.NORTH)
+                .setValue(OPEN, false)
+        )
     }
 
     companion object {
-        val CODEC: MapCodec<BarrelDBlock> = createCodec(::BarrelDBlock)
-        val FACING: DirectionProperty = Properties.FACING
-        val OPEN: BooleanProperty = Properties.OPEN
+        val CODEC: MapCodec<BarrelDBlock> = simpleCodec(::BarrelDBlock)
+        val FACING: DirectionProperty = BlockStateProperties.FACING
+        val OPEN: BooleanProperty = BlockStateProperties.OPEN
     }
 }

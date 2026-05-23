@@ -1,6 +1,6 @@
 package org.teamvoided.dusk_debris.world.gen.surface_builders
 
-import net.minecraft.util.math.noise.DoublePerlinNoiseSampler
+import net.minecraft.world.level.levelgen.synth.NormalNoise
 
 object SurfaceBuilderHelpers {
 
@@ -10,7 +10,7 @@ object SurfaceBuilderHelpers {
         return if (double < 0) double / 2 else double
     }
 
-    fun DoublePerlinNoiseSampler.sample(x: Number, y: Number, z: Number): Double {
-        return this.sample(x.toDouble(), y.toDouble(), z.toDouble())
+    fun NormalNoise.sample(x: Number, y: Number, z: Number): Double {
+        return this.getValue(x.toDouble(), y.toDouble(), z.toDouble())
     }
 }

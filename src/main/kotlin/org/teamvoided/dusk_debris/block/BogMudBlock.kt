@@ -4,85 +4,95 @@
 package net.minecraft.block
 
 import com.mojang.serialization.MapCodec
-import net.minecraft.entity.Entity
-import net.minecraft.entity.FallingBlockEntity
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.ai.pathing.NavigationType
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.item.ItemStack
-import net.minecraft.item.Items
-import net.minecraft.particle.ParticleTypes
-import net.minecraft.registry.tag.EntityTypeTags
-import net.minecraft.sound.SoundEvent
-import net.minecraft.sound.SoundEvents
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Direction
-import net.minecraft.util.math.MathHelper
-import net.minecraft.util.math.Vec3d
-import net.minecraft.util.shape.VoxelShape
-import net.minecraft.util.shape.VoxelShapes
-import net.minecraft.world.*
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
+import net.minecraft.core.particles.ParticleTypes
+import net.minecraft.sounds.SoundEvent
+import net.minecraft.sounds.SoundEvents
+import net.minecraft.tags.EntityTypeTags
+import net.minecraft.util.Mth
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.item.FallingBlockEntity
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.Items
+import net.minecraft.world.level.BlockGetter
+import net.minecraft.world.level.GameRules
+import net.minecraft.world.level.Level
+import net.minecraft.world.level.LevelAccessor
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.block.BucketPickup
+import net.minecraft.world.level.block.LevelEvent
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.pathfinder.PathComputationType
+import net.minecraft.world.phys.Vec3
+import net.minecraft.world.phys.shapes.CollisionContext
+import net.minecraft.world.phys.shapes.EntityCollisionContext
+import net.minecraft.world.phys.shapes.Shapes
+import net.minecraft.world.phys.shapes.VoxelShape
 import java.util.*
 
 class BogMudBlock
-    (settings: Settings) : Block(settings), FluidDrainable {
-    public override fun getCodec(): MapCodec<BogMudBlock> {
+    (settings: Properties) : Block(settings), BucketPickup {
+    public override fun codec(): MapCodec<BogMudBlock> {
         return CODEC
     }
 
-    override fun isSideInvisible(state: BlockState, stateFrom: BlockState, direction: Direction): Boolean {
-        if (stateFrom.isOf(this)) {
+    override fun skipRendering(state: BlockState, stateFrom: BlockState, direction: Direction): Boolean {
+        if (stateFrom.`is`(this)) {
             return true
         }
-        return super.isSideInvisible(state, stateFrom, direction)
+        return super.skipRendering(state, stateFrom, direction)
     }
 
-    override fun getCullingShape(state: BlockState, world: BlockView, pos: BlockPos): VoxelShape {
-        return VoxelShapes.empty()
+    override fun getOcclusionShape(state: BlockState, world: BlockGetter, pos: BlockPos): VoxelShape {
+        return Shapes.empty()
     }
 
-    override fun onEntityCollision(state: BlockState, world: World, pos: BlockPos, entity: Entity) {
-        if (entity !is LivingEntity || entity.getBlockStateAtPos().isOf(this)) {
-            entity.setMovementMultiplier(
+    override fun entityInside(state: BlockState, world: Level, pos: BlockPos, entity: Entity) {
+        if (entity !is LivingEntity || entity.inBlockState.`is`(this)) {
+            entity.makeStuckInBlock(
                 state,
-                Vec3d(
+                Vec3(
                     HORIZONTAL_SPEED_MULTIPLIER,
                     VERTICAL_SPEED_MULTIPLIER,
                     HORIZONTAL_SPEED_MULTIPLIER
                 )
             )
-            if (world.isClient) {
+            if (world.isClientSide) {
                 val randomGenerator = world.getRandom()
-                val bl = entity.lastRenderX != entity.x || entity.lastRenderZ != entity.z
+                val bl = entity.xOld != entity.x || entity.zOld != entity.z
                 if (bl && randomGenerator.nextBoolean()) {
                     world.addParticle(
                         ParticleTypes.SNOWFLAKE,
                         entity.x,
                         (pos.y + 1).toDouble(),
                         entity.z,
-                        (MathHelper.nextBetween(
+                        (Mth.randomBetween(
                             randomGenerator,
                             -1.0f,
                             1.0f
                         ) * HORIZONTAL_PARTICLE_MOMENTUM).toDouble(),
                         0.05,
-                        (MathHelper.nextBetween(randomGenerator, -1.0f, 1.0f) * HORIZONTAL_PARTICLE_MOMENTUM).toDouble()
+                        (Mth.randomBetween(randomGenerator, -1.0f, 1.0f) * HORIZONTAL_PARTICLE_MOMENTUM).toDouble()
                     )
                 }
             }
         }
-        if (!world.isClient) {
+        if (!world.isClientSide) {
             if (entity.isOnFire &&
-                (world.gameRules.getBooleanValue(GameRules.DO_MOB_GRIEFING) || entity is PlayerEntity) &&
-                entity.canModifyAt(world, pos)
+                (world.gameRules.getBoolean(GameRules.RULE_MOBGRIEFING) || entity is Player) &&
+                entity.mayInteract(world, pos)
             ) {
-                world.breakBlock(pos, false)
+                world.destroyBlock(pos, false)
             }
-            entity.isOnFire = false
+            entity.setSharedFlagOnFire(false)
         }
     }
 
-    override fun onLandedUpon(world: World, state: BlockState, pos: BlockPos, entity: Entity, fallDistance: Float) {
+    override fun fallOn(world: Level, state: BlockState, pos: BlockPos, entity: Entity, fallDistance: Float) {
         if (fallDistance.toDouble() < MIN_FALL_DIST_FOR_SOUND || entity !is LivingEntity) {
             return
         }
@@ -94,11 +104,11 @@ class BogMudBlock
 
     override fun getCollisionShape(
         state: BlockState,
-        world: BlockView,
+        world: BlockGetter,
         pos: BlockPos,
-        context: ShapeContext
+        context: CollisionContext,
     ): VoxelShape {
-        if (context is EntityShapeContext) {
+        if (context is EntityCollisionContext) {
             if (context.entity != null) {
                 val entity: Entity = context.entity!!
                 if (entity.fallDistance > NUM_BLOCKS_TO_FALL_INTO_BLOCK) {
@@ -106,7 +116,7 @@ class BogMudBlock
                 }
                 val bl = entity is FallingBlockEntity
                 if (bl || canWalkOnBogMud(entity) && context.isAbove(
-                        VoxelShapes.fullCube(),
+                        Shapes.block(),
                         pos,
                         false
                     ) && !context.isDescending()
@@ -115,47 +125,47 @@ class BogMudBlock
                 }
             }
         }
-        return VoxelShapes.empty()
+        return Shapes.empty()
     }
 
-    override fun getCameraCollisionShape(
+    override fun getVisualShape(
         state: BlockState,
-        world: BlockView,
+        world: BlockGetter,
         pos: BlockPos,
-        context: ShapeContext
+        context: CollisionContext,
     ): VoxelShape {
-        return VoxelShapes.empty()
+        return Shapes.empty()
     }
 
-    override fun tryDrainFluid(player: PlayerEntity?, world: WorldAccess, pos: BlockPos, state: BlockState): ItemStack {
-        world.setBlockState(pos, Blocks.AIR.defaultState, NOTIFY_ALL or REDRAW_ON_MAIN_THREAD)
-        if (!world.isClient) {
-            world.syncWorldEvent(WorldEvents.BLOCK_BROKEN, pos, getRawIdFromState(state))
+    override fun pickupBlock(player: Player?, world: LevelAccessor, pos: BlockPos, state: BlockState): ItemStack {
+        world.setBlock(pos, Blocks.AIR.defaultBlockState(), UPDATE_ALL or UPDATE_IMMEDIATE)
+        if (!world.isClientSide) {
+            world.levelEvent(LevelEvent.PARTICLES_DESTROY_BLOCK, pos, getId(state))
         }
         return ItemStack(Items.POWDER_SNOW_BUCKET)
     }
 
-    override fun getBucketFillSound(): Optional<SoundEvent> {
-        return Optional.of(SoundEvents.ITEM_BUCKET_FILL)
+    override fun getPickupSound(): Optional<SoundEvent> {
+        return Optional.of(SoundEvents.BUCKET_FILL)
     }
 
-    override fun canPathfindThrough(state: BlockState, navigationType: NavigationType): Boolean {
+    override fun isPathfindable(state: BlockState, navigationType: PathComputationType): Boolean {
         return true
     }
 
     companion object {
-        val CODEC: MapCodec<BogMudBlock> = createCodec(::BogMudBlock)
+        val CODEC: MapCodec<BogMudBlock> = simpleCodec(::BogMudBlock)
         private const val HORIZONTAL_PARTICLE_MOMENTUM = 0.083333336f
         private const val HORIZONTAL_SPEED_MULTIPLIER = 0.2
         private const val VERTICAL_SPEED_MULTIPLIER = 2.5
         private const val NUM_BLOCKS_TO_FALL_INTO_BLOCK = 2.5f
-        private val SHAPE: VoxelShape = createCuboidShape(0.0, 0.0, 0.0, 16.0, 14.0, 16.0)
-        private val FALLING_SHAPE: VoxelShape = VoxelShapes.cuboid(0.0, 0.0, 0.0, 1.0, 0.9, 1.0)
+        private val SHAPE: VoxelShape = box(0.0, 0.0, 0.0, 16.0, 14.0, 16.0)
+        private val FALLING_SHAPE: VoxelShape = Shapes.box(0.0, 0.0, 0.0, 1.0, 0.9, 1.0)
         private const val MIN_FALL_DIST_FOR_SOUND = 4.0
         private const val MIN_FALL_DIST_FOR_BIG_SOUND = 7.0
 
         fun canWalkOnBogMud(entity: Entity): Boolean {
-            if (entity.type.isIn(EntityTypeTags.POWDER_SNOW_WALKABLE_MOBS)) {
+            if (entity.type.`is`(EntityTypeTags.POWDER_SNOW_WALKABLE_MOBS)) {
                 return true
             }
 //            if (entity is LivingEntity) {

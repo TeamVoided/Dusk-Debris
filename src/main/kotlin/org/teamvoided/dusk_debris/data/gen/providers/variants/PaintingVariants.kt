@@ -1,8 +1,8 @@
 package org.teamvoided.dusk_debris.data.gen.providers.variants
 
-import net.minecraft.entity.decoration.painting.PaintingVariant
-import net.minecraft.registry.BootstrapContext
-import net.minecraft.registry.RegistryKey
+import net.minecraft.data.worldgen.BootstrapContext
+import net.minecraft.resources.ResourceKey
+import net.minecraft.world.entity.decoration.PaintingVariant
 import org.teamvoided.dusk_debris.data.variants.DuskPaintingVariants.FLAMEHEART_APPEARS
 import org.teamvoided.dusk_debris.data.variants.DuskPaintingVariants.LIVE_BRIGGSY_REACTION
 
@@ -13,10 +13,10 @@ object PaintingVariants {
     }
 
     private fun BootstrapContext<PaintingVariant>.registerPaintingVariant(
-        registryKey: RegistryKey<PaintingVariant>,
+        registryKey: ResourceKey<PaintingVariant>,
         width: Int,
         height: Int
     ) {
-        this.register(registryKey, PaintingVariant(width, height, registryKey.value))
+        this.register(registryKey, PaintingVariant(width, height, registryKey.location()))
     }
 }

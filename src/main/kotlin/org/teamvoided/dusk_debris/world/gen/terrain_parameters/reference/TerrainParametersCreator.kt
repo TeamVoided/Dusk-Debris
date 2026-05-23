@@ -1,9 +1,9 @@
 package org.teamvoided.nether_flame.world.biome.source.util.future_reference
 
-import net.minecraft.util.function.ToFloatFunction
-import net.minecraft.util.math.MathHelper
-import net.minecraft.util.math.Spline
-import net.minecraft.world.gen.noise.NoiseRouterData
+import net.minecraft.util.CubicSpline
+import net.minecraft.util.Mth
+import net.minecraft.util.ToFloatFunction
+import net.minecraft.world.level.levelgen.NoiseRouterData
 import org.teamvoided.dusk_debris.util.world_helper.add
 import kotlin.math.max
 import kotlin.math.min
@@ -46,7 +46,7 @@ object TerrainParametersCreator {
         erosion: I,
         ridgesFolded: I,
         amplified: Boolean
-    ): Spline<C, I> {
+    ): CubicSpline<C, I> {
 //toFloatFunction4
         val amplifiedTransformer = if (amplified) OFFSET_AMPLIFIED else NO_TRANSFORM
 
@@ -103,17 +103,17 @@ object TerrainParametersCreator {
             amplifiedTransformer
         )
 //OFFSET CONTINENTALNESS
-        return Spline.builder(continents, amplifiedTransformer)
-            .method_41294(warpedIsland, 0.044f)
-            .method_41294(deepLavaOceanDistant, -0.2222f)
-            .method_41294(deepLavaOcean, -0.2222f)
-            .method_41294(lavaOceanDistant, -0.12f)
-            .method_41294(lavaOcean, -0.12f)
-            .method_41295(-0.16f, shorelineSpline)
-            .method_41295(shoreline, shorelineSpline)
-            .method_41295(outland, outlandSpline)
-            .method_41295(inland, inlandSpline)
-            .method_41295(inlandExtreme, inlandExtremeSpline)
+        return CubicSpline.builder(continents, amplifiedTransformer)
+            .addPoint(warpedIsland, 0.044f)
+            .addPoint(deepLavaOceanDistant, -0.2222f)
+            .addPoint(deepLavaOcean, -0.2222f)
+            .addPoint(lavaOceanDistant, -0.12f)
+            .addPoint(lavaOcean, -0.12f)
+            .addPoint(-0.16f, shorelineSpline)
+            .addPoint(shoreline, shorelineSpline)
+            .addPoint(outland, outlandSpline)
+            .addPoint(inland, inlandSpline)
+            .addPoint(inlandExtreme, inlandExtremeSpline)
             .build()
     }
 
@@ -124,23 +124,23 @@ object TerrainParametersCreator {
         ridges: I,
         ridgesFolded: I,
         amplified: Boolean
-    ): Spline<C, I> {
+    ): CubicSpline<C, I> {
         val toFloatFunction5 = if (amplified) FACTOR_AMPLIFIED else NO_TRANSFORM
-        return Spline.builder(continents, NO_TRANSFORM)
-            .method_41294(-0.19f, 3.95f)
-            .method_41295(
+        return CubicSpline.builder(continents, NO_TRANSFORM)
+            .addPoint(-0.19f, 3.95f)
+            .addPoint(
                 -0.15f,
                 factorErosion(erosion, ridges, ridgesFolded, 6.25f, true, NO_TRANSFORM)
             )
-            .method_41295(
+            .addPoint(
                 -0.1f,
                 factorErosion(erosion, ridges, ridgesFolded, 5.47f, true, toFloatFunction5)
             )
-            .method_41295(
+            .addPoint(
                 0.03f,
                 factorErosion(erosion, ridges, ridgesFolded, 5.08f, true, toFloatFunction5)
             )
-            .method_41295(
+            .addPoint(
                 0.06f,
                 factorErosion(erosion, ridges, ridgesFolded, 4.69f, false, toFloatFunction5)
             )
@@ -154,11 +154,11 @@ object TerrainParametersCreator {
         ridges: I,
         ridgesFolded: I,
         amplified: Boolean
-    ): Spline<C, I> {
+    ): CubicSpline<C, I> {
         val toFloatFunction5 = if (amplified) JAGGEDNESS_AMPLIFIED else NO_TRANSFORM
-        return Spline.builder(continents, toFloatFunction5)
-            .method_41294(-0.11f, 0.0f)
-            .method_41295(
+        return CubicSpline.builder(continents, toFloatFunction5)
+            .addPoint(-0.11f, 0.0f)
+            .addPoint(
                 0.03f,
                 jaggednessErosion(
                     erosion,
@@ -171,7 +171,7 @@ object TerrainParametersCreator {
                     toFloatFunction5
                 )
             )
-            .method_41295(
+            .addPoint(
                 0.65f,
                 jaggednessErosion(
                     erosion,
@@ -197,15 +197,15 @@ object TerrainParametersCreator {
         h: Float,
         i: Float,
         amplifier: ToFloatFunction<Float>
-    ): Spline<C, I> {
+    ): CubicSpline<C, I> {
         val j = -0.5775f
         val jaggedExtreme = jaggednessRidges(ridges, ridgesFolded, f, h, amplifier)
         val jagged = jaggednessRidges(ridges, ridgesFolded, g, i, amplifier)
-        return Spline.builder(erosion, amplifier)
-            .method_41295(-1.0f, jaggedExtreme)
-            .method_41295(-0.78f, jagged)
-            .method_41295(-0.5775f, jagged)
-            .method_41294(-0.375f, 0.0f)
+        return CubicSpline.builder(erosion, amplifier)
+            .addPoint(-1.0f, jaggedExtreme)
+            .addPoint(-0.78f, jagged)
+            .addPoint(-0.5775f, jagged)
+            .addPoint(-0.375f, 0.0f)
             .build()
     }
 
@@ -216,22 +216,22 @@ object TerrainParametersCreator {
         f: Float,
         g: Float,
         amplifier: ToFloatFunction<Float>
-    ): Spline<C, I> {
-        val h = NoiseRouterData.getPeaksAndValleys(0.4f)
-        val i = NoiseRouterData.getPeaksAndValleys(0.56666666f)
+    ): CubicSpline<C, I> {
+        val h = NoiseRouterData.peaksAndValleys(0.4f)
+        val i = NoiseRouterData.peaksAndValleys(0.56666666f)
         val j = (h + i) / 2.0f
-        val builder = Spline.builder(ridgesFolded, amplifier)
-        builder.method_41294(h, 0.0f)
+        val builder = CubicSpline.builder(ridgesFolded, amplifier)
+        builder.addPoint(h, 0.0f)
         if (g > 0.0f) {
-            builder.method_41295(j, jaggednessWeirdness(ridges, g, amplifier))
+            builder.addPoint(j, jaggednessWeirdness(ridges, g, amplifier))
         } else {
-            builder.method_41294(j, 0.0f)
+            builder.addPoint(j, 0.0f)
         }
 
         if (f > 0.0f) {
-            builder.method_41295(1.0f, jaggednessWeirdness(ridges, f, amplifier))
+            builder.addPoint(1.0f, jaggednessWeirdness(ridges, f, amplifier))
         } else {
-            builder.method_41294(1.0f, 0.0f)
+            builder.addPoint(1.0f, 0.0f)
         }
         return builder.build()
     }
@@ -241,12 +241,12 @@ object TerrainParametersCreator {
         ridgesFolded: I,
         f: Float,
         amplifier: ToFloatFunction<Float>
-    ): Spline<C, I> {
+    ): CubicSpline<C, I> {
         val g = 0.63f * f
         val h = 0.3f * f
-        return Spline.builder(ridgesFolded, amplifier)
-            .method_41294(-0.01f, g)
-            .method_41294(0.01f, h)
+        return CubicSpline.builder(ridgesFolded, amplifier)
+            .addPoint(-0.01f, g)
+            .addPoint(0.01f, h)
             .build()
     }
 
@@ -258,62 +258,62 @@ object TerrainParametersCreator {
         f: Float,
         isOutland: Boolean,
         amplifier: ToFloatFunction<Float>
-    ): Spline<C, I> {
-        val spline = Spline.builder(ridges, amplifier)
-            .method_41294(-0.2f, 6.3f)
-            .method_41294(0.2f, f)
+    ): CubicSpline<C, I> {
+        val spline = CubicSpline.builder(ridges, amplifier)
+            .addPoint(-0.2f, 6.3f)
+            .addPoint(0.2f, f)
             .build()
-        val builder = Spline.builder(erosion, amplifier)
-            .method_41295(-0.6f, spline)
-            .method_41295(
+        val builder = CubicSpline.builder(erosion, amplifier)
+            .addPoint(-0.6f, spline)
+            .addPoint(
                 -0.5f,
-                Spline.builder(ridges, amplifier)
-                    .method_41294(-0.05f, 6.3f)
-                    .method_41294(0.05f, 2.67f)
+                CubicSpline.builder(ridges, amplifier)
+                    .addPoint(-0.05f, 6.3f)
+                    .addPoint(0.05f, 2.67f)
                     .build()
             )
-            .method_41295(-0.35f, spline)
-            .method_41295(-0.25f, spline)
-            .method_41295(
+            .addPoint(-0.35f, spline)
+            .addPoint(-0.25f, spline)
+            .addPoint(
                 -0.1f,
-                Spline.builder(ridges, amplifier)
-                    .method_41294(-0.05f, 2.67f)
-                    .method_41294(0.05f, 6.3f)
+                CubicSpline.builder(ridges, amplifier)
+                    .addPoint(-0.05f, 2.67f)
+                    .addPoint(0.05f, 6.3f)
                     .build()
             )
-            .method_41295(0.03f, spline)
-        val spline2: Spline<*, *>
-        val spline3: Spline<*, *>
+            .addPoint(0.03f, spline)
+        val spline2: CubicSpline<*, *>
+        val spline3: CubicSpline<*, *>
         if (isOutland) {
             spline2 =
-                Spline.builder(ridges, amplifier)
-                    .method_41294(0.0f, f)
-                    .method_41294(0.1f, 0.625f)
+                CubicSpline.builder(ridges, amplifier)
+                    .addPoint(0.0f, f)
+                    .addPoint(0.1f, 0.625f)
                     .build()
             spline3 =
-                Spline.builder(ridgesFolded, amplifier)
-                    .method_41294(-0.9f, f)
-                    .method_41295(-0.69f, spline2)
+                CubicSpline.builder(ridgesFolded, amplifier)
+                    .addPoint(-0.9f, f)
+                    .addPoint(-0.69f, spline2)
                     .build()
-            builder.method_41294(0.35f, f)
-                .method_41295(0.45f, spline3)
-                .method_41295(0.55f, spline3)
-                .method_41294(0.62f, f)
+            builder.addPoint(0.35f, f)
+                .addPoint(0.45f, spline3)
+                .addPoint(0.55f, spline3)
+                .addPoint(0.62f, f)
         } else {
-            spline2 = Spline.builder(ridgesFolded, amplifier)
-                .method_41295(-0.7f, spline)
-                .method_41294(-0.15f, 1.37f)
+            spline2 = CubicSpline.builder(ridgesFolded, amplifier)
+                .addPoint(-0.7f, spline)
+                .addPoint(-0.15f, 1.37f)
                 .build()
             spline3 =
-                Spline.builder(ridgesFolded, amplifier)
-                    .method_41295(0.45f, spline)
-                    .method_41294(0.7f, 1.56f)
+                CubicSpline.builder(ridgesFolded, amplifier)
+                    .addPoint(0.45f, spline)
+                    .addPoint(0.7f, 1.56f)
                     .build()
-            builder.method_41295(0.05f, spline3)
-                .method_41295(0.4f, spline3)
-                .method_41295(0.45f, spline2)
-                .method_41295(0.55f, spline2)
-                .method_41294(0.58f, f)
+            builder.addPoint(0.05f, spline3)
+                .addPoint(0.4f, spline3)
+                .addPoint(0.45f, spline2)
+                .addPoint(0.55f, spline2)
+                .addPoint(0.58f, f)
         }
 
         return builder.build()
@@ -330,8 +330,8 @@ object TerrainParametersCreator {
         input: Float,
         inland: Boolean,
         amplifier: ToFloatFunction<Float>
-    ): Spline<C, I> {
-        val spline = Spline.builder(ridgesFolded, amplifier)
+    ): CubicSpline<C, I> {
+        val spline = CubicSpline.builder(ridgesFolded, amplifier)
         val g = -0.7f
         val h = -1.0f
         val i = getOffsetValue(h, input, g)
@@ -344,24 +344,24 @@ object TerrainParametersCreator {
             val o = -0.75f
             val p = getOffsetValue(o, input, g)
             val q = calculateSlope(i, p, h, o)
-            spline.add(h, i, q)
+            spline.addPoint(h, i, q)
             spline.add(o, p)
             spline.add(m, n)
             val r = getOffsetValue(l, input, g)
             val s = calculateSlope(r, k, l, i)
             spline.add(l - 0.01f, r)
-            spline.add(l, r, s)
-            spline.add(i, k, s)
+            spline.addPoint(l, r, s)
+            spline.addPoint(i, k, s)
         } else {
             n = calculateSlope(i, k, h, i)
             if (inland) {
                 spline.add(h, max(0.2, i.toDouble()).toFloat())
-                spline.add(0.0f, MathHelper.lerp(0.5f, i, k), n)
+                spline.addPoint(0.0f, Mth.lerp(0.5f, i, k), n)
             } else {
-                spline.add(h, i, n)
+                spline.addPoint(h, i, n)
             }
 
-            spline.add(i, k, n)
+            spline.addPoint(i, k, n)
         }
 
         return spline.build()
@@ -400,19 +400,19 @@ object TerrainParametersCreator {
         inland: Boolean,
         inlandMountain: Boolean,
         amplifier: ToFloatFunction<Float>
-    ): Spline<C, I> {
+    ): CubicSpline<C, I> {
         val l = 0.6f
         val m = 0.5f
         val n = 0.5f
         val mountainTallest = buildMountainRidgeSplineWithPoints(
             ridgesFolded,
-            MathHelper.lerp(highestValue, 0.6f, 1.5f),
+            Mth.lerp(highestValue, 0.6f, 1.5f),
             inlandMountain,
             amplifier
         )
         val mountain = buildMountainRidgeSplineWithPoints(
             ridgesFolded,
-            MathHelper.lerp(highestValue, 0.6f, 1.0f),
+            Mth.lerp(highestValue, 0.6f, 1.0f),
             inlandMountain,
             amplifier
         )
@@ -426,7 +426,7 @@ object TerrainParametersCreator {
             ridgesFolded,
             continentalness - 0.15f,
             0.5f * highestValue,
-            MathHelper.lerp(0.5f, 0.5f, 0.5f) * highestValue,
+            Mth.lerp(0.5f, 0.5f, 0.5f) * highestValue,
             0.5f * highestValue,
             0.6f * highestValue,
             0.5f,
@@ -452,10 +452,10 @@ object TerrainParametersCreator {
             0.5f,
             amplifier
         )
-        val windsweptHill = Spline.builder(ridgesFolded, amplifier)
-            .method_41294(-1.0f, continentalness)
-            .method_41295(-0.4f, flatlands)
-            .method_41294(0.0f, highValue + 0.07f)
+        val windsweptHill = CubicSpline.builder(ridgesFolded, amplifier)
+            .addPoint(-1.0f, continentalness)
+            .addPoint(-0.4f, flatlands)
+            .addPoint(0.0f, highValue + 0.07f)
             .build()
         val swamp = ridgeSpline(
             ridgesFolded,
@@ -468,21 +468,21 @@ object TerrainParametersCreator {
             amplifier
         )
         val erosionSplineBuilder =
-            Spline.builder(erosion, amplifier)
-                .method_41295(-0.85f, mountainTallest)
-                .method_41295(-0.7f, mountain)
-                .method_41295(-0.4f, mountainInland)
-                .method_41295(-0.35f, plateau)
-                .method_41295(-0.1f, plateauInland)
-                .method_41295(0.2f, flatlands)
+            CubicSpline.builder(erosion, amplifier)
+                .addPoint(-0.85f, mountainTallest)
+                .addPoint(-0.7f, mountain)
+                .addPoint(-0.4f, mountainInland)
+                .addPoint(-0.35f, plateau)
+                .addPoint(-0.1f, plateauInland)
+                .addPoint(0.2f, flatlands)
         if (inland) {
             erosionSplineBuilder
-                .method_41295(0.4f, flatlands)
-                .method_41295(0.45f, windsweptHill)
-                .method_41295(0.55f, windsweptHill)
-                .method_41295(0.58f, flatlands)
+                .addPoint(0.4f, flatlands)
+                .addPoint(0.45f, windsweptHill)
+                .addPoint(0.55f, windsweptHill)
+                .addPoint(0.58f, flatlands)
         }
-        erosionSplineBuilder.method_41295(0.7f, swamp)
+        erosionSplineBuilder.addPoint(0.7f, swamp)
         return erosionSplineBuilder.build()
     }
 
@@ -496,15 +496,15 @@ object TerrainParametersCreator {
         j: Float,
         b: Float,
         amplifier: ToFloatFunction<Float>
-    ): Spline<C, I> {
+    ): CubicSpline<C, I> {
         val k = max((0.5f * (g - continentalness)).toDouble(), b.toDouble()).toFloat()
         val l = 5.0f * (h - g)
-        return Spline.builder(ridgesFolded, amplifier)
-            .add(-1.0f, continentalness, k)
-            .add(-0.4f, g, min(k, l))
-            .add(0.0f, h, l)
-            .add(0.4f, i, 2.0f * (i - h))
-            .add(1.0f, j, 0.7f * (j - i))
+        return CubicSpline.builder(ridgesFolded, amplifier)
+            .addPoint(-1.0f, continentalness, k)
+            .addPoint(-0.4f, g, min(k, l))
+            .addPoint(0.0f, h, l)
+            .addPoint(0.4f, i, 2.0f * (i - h))
+            .addPoint(1.0f, j, 0.7f * (j - i))
             .build()
     }
 

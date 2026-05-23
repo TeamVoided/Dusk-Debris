@@ -2,18 +2,18 @@ package org.teamvoided.dusk_debris.data.gen.tags
 
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider
-import net.minecraft.fluid.Fluid
-import net.minecraft.fluid.Fluids
-import net.minecraft.registry.HolderLookup
-import net.minecraft.registry.RegistryKeys
-import net.minecraft.registry.tag.FluidTags
+import net.minecraft.core.HolderLookup
+import net.minecraft.core.registries.Registries
+import net.minecraft.tags.FluidTags
+import net.minecraft.world.level.material.Fluid
+import net.minecraft.world.level.material.Fluids
 import org.teamvoided.dusk_debris.data.tags.DuskFluidTags
 import org.teamvoided.dusk_debris.init.DuskFluids
 import java.util.concurrent.CompletableFuture
 
 class FluidTagsProvider(o: FabricDataOutput, r: CompletableFuture<HolderLookup.Provider>) :
-    FabricTagProvider<Fluid>(o, RegistryKeys.FLUID, r) {
-    override fun configure(wrapperLookup: HolderLookup.Provider) {
+    FabricTagProvider<Fluid>(o, Registries.FLUID, r) {
+    override fun addTags(wrapperLookup: HolderLookup.Provider) {
         duskTags()
         vanillaTags()
         conventionTags()

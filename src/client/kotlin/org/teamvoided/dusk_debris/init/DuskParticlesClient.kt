@@ -3,12 +3,12 @@ package org.teamvoided.dusk_debris.init
 import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry
 import net.minecraft.client.particle.BubblePopParticle
 import org.teamvoided.dusk_debris.particle.*
+import org.teamvoided.dusk_debris.particle.cube_particles.CubeParticle
+import org.teamvoided.dusk_debris.particle.cube_particles.EinsteinOrbitParticle
 import org.teamvoided.dusk_debris.particle.emmiter.BetweenPointsParticle
 import org.teamvoided.dusk_debris.particle.emmiter.BlunderbombParticle
 import org.teamvoided.dusk_debris.particle.emmiter.FirebombParticle
 import org.teamvoided.dusk_debris.particle.emmiter.GunpowderExplosionEmitterParticle
-import org.teamvoided.dusk_debris.particle.cube_particles.CubeParticle
-import org.teamvoided.dusk_debris.particle.cube_particles.EinsteinOrbitParticle
 import org.teamvoided.dusk_debris.particle.vanilla.AdditionalWaterSuspendParticle
 
 object DuskParticlesClient {
@@ -40,7 +40,7 @@ object DuskParticlesClient {
         ins.register(DuskParticles.SPARK, ElectricityParticle::Factory)
 
         ins.register(DuskParticles.UNDERACID, AdditionalWaterSuspendParticle::UnderacidFactory)
-        ins.register(DuskParticles.ACID_BUBBLE_POP, BubblePopParticle::Factory)
+        ins.register(DuskParticles.ACID_BUBBLE_POP, BubblePopParticle::Provider)
 
         ins.register(DuskParticles.FLASH, FlashParticle::Factory)
         ins.register(DuskParticles.RISING_EMBER, RisingEmberParticle::Factory)

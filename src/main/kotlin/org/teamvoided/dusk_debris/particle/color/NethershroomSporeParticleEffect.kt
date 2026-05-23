@@ -4,17 +4,17 @@ import com.mojang.serialization.Codec
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.fabricmc.fabric.api.particle.v1.FabricParticleTypes
-import net.minecraft.network.RegistryByteBuf
-import net.minecraft.network.codec.PacketCodec
-import net.minecraft.network.codec.PacketCodecs
-import net.minecraft.particle.ParticleEffect
-import net.minecraft.particle.ParticleType
+import net.minecraft.core.particles.ParticleOptions
+import net.minecraft.core.particles.ParticleType
+import net.minecraft.network.RegistryFriendlyByteBuf
+import net.minecraft.network.codec.ByteBufCodecs
+import net.minecraft.network.codec.StreamCodec
 import org.teamvoided.dusk_debris.init.DuskParticles
 import java.awt.Color
 
 class NethershroomSporeParticleEffect(
     val color: Color
-) : ParticleEffect {
+) : ParticleOptions {
     constructor(
         color: Int
     ) : this(Color(color))
@@ -29,9 +29,9 @@ class NethershroomSporeParticleEffect(
                     Codec.INT.fieldOf("color").forGetter { it.color.rgb }
                 ).apply(instance, ::NethershroomSporeParticleEffect)
             }
-        val PACKET_CODEC: PacketCodec<RegistryByteBuf, NethershroomSporeParticleEffect> =
-            PacketCodec.tuple(
-                PacketCodecs.INT, { it.color.rgb },
+        val PACKET_CODEC: StreamCodec<RegistryFriendlyByteBuf, NethershroomSporeParticleEffect> =
+            StreamCodec.composite(
+                ByteBufCodecs.INT, { it.color.rgb },
                 ::NethershroomSporeParticleEffect
             )
         val REGISTER = FabricParticleTypes.complex(CODEC, PACKET_CODEC)

@@ -1,6 +1,6 @@
 package org.teamvoided.dusk_debris.particle.cube_particles.models
 
-import net.minecraft.util.math.Direction
+import net.minecraft.core.Direction
 import kotlin.math.abs
 
 class CubeUnwrapped(

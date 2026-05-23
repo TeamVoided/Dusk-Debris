@@ -1,8 +1,8 @@
 package org.teamvoided.dusk_debris.entity.helper
 
-import net.minecraft.util.math.Vec3d
+import net.minecraft.world.phys.Vec3
 
 interface DuskVelocityWind {
-    fun setWind(wind: Vec3d)
-    fun getWind(): Vec3d
+    fun setWind(wind: Vec3)
+    fun getWind(): Vec3
 }

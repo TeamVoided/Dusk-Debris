@@ -1,10 +1,10 @@
 package org.teamvoided.dusk_debris.init.worldgen
 
-import net.minecraft.registry.Registries
-import net.minecraft.registry.Registry
-import net.minecraft.world.gen.feature.DefaultFeatureConfig
-import net.minecraft.world.gen.feature.Feature
-import net.minecraft.world.gen.feature.FeatureConfig
+import net.minecraft.core.Registry
+import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.world.level.levelgen.feature.Feature
+import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration
+import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration
 import org.teamvoided.dusk_debris.DuskDebris.id
 import org.teamvoided.dusk_debris.world.gen.configured_feature.*
 import org.teamvoided.dusk_debris.world.gen.configured_feature.config.*
@@ -24,18 +24,18 @@ object DuskFeatures {
 
     val RANDOM_NOISE_SELECTOR = register("random_noise_selector", RandomNoiseFeature(NoiseFeatureConfig.CODEC))
 
-    val SEQUOIA_TREE = register("sequoia_tree", SequoiaTreeFeature(DefaultFeatureConfig.CODEC))
+    val SEQUOIA_TREE = register("sequoia_tree", SequoiaTreeFeature(NoneFeatureConfiguration.CODEC))
 
     val ROCK_SPIRE = register("rock_spire", RockFormationFeature(RockFormationFeatureConfig.CODEC))
     val SURFACE_SPIRE = register("surface_spire", SurfaceFormationFeature(SurfaceFormationFeatureConfig.CODEC))
 
     val NOISE_SURFACE = register("noise_surface", NoiseSurfaceFeature(NoiseSurfaceFeatureConfig.CODEC))
 
-    val ROCK = register("rock", RockFeature(DefaultFeatureConfig.CODEC))
+    val ROCK = register("rock", RockFeature(NoneFeatureConfiguration.CODEC))
     val HUGE_GOLDEN_MUSHROOM = register("huge_golden_mushroom", HugeGoldMushroomFeature(MushroomFeatureConfig.CODEC))
 
     fun init() {}
 
-    private fun <C : FeatureConfig, F : Feature<C>> register(name: String, feature: F): F =
-        Registry.register(Registries.FEATURE, id(name), feature)
+    private fun <C : FeatureConfiguration, F : Feature<C>> register(name: String, feature: F): F =
+        Registry.register(BuiltInRegistries.FEATURE, id(name), feature)
 }

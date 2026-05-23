@@ -1,74 +1,74 @@
 package org.teamvoided.dusk_debris.data.gen.world.gen.biome.creators
 
-import net.minecraft.client.sound.MusicType
-import net.minecraft.entity.EntityType
-import net.minecraft.entity.SpawnGroup
-import net.minecraft.registry.BootstrapContext
-import net.minecraft.registry.RegistryKeys
-import net.minecraft.sound.BiomeMoodSound
-import net.minecraft.sound.SoundEvents
-import net.minecraft.world.biome.*
-import net.minecraft.world.gen.feature.DefaultBiomeFeatures
+import net.minecraft.core.registries.Registries
+import net.minecraft.data.worldgen.BiomeDefaultFeatures
+import net.minecraft.data.worldgen.BootstrapContext
+import net.minecraft.data.worldgen.biome.OverworldBiomes
+import net.minecraft.sounds.Musics
+import net.minecraft.sounds.SoundEvents
+import net.minecraft.world.entity.EntityType
+import net.minecraft.world.entity.MobCategory
+import net.minecraft.world.level.biome.*
 import org.teamvoided.dusk_debris.init.DuskParticles
 
 object HollowKnightBiomeCreators {
     fun BootstrapContext<Biome>.createFogCanyon(): Biome {
-        val spawnSettings = SpawnSettings.Builder()
-        val generationSettings = GenerationSettings.Builder(
-            this.getRegistryLookup(RegistryKeys.PLACED_FEATURE),
-            this.getRegistryLookup(RegistryKeys.CONFIGURED_CARVER)
+        val spawnSettings = MobSpawnSettings.Builder()
+        val generationSettings = BiomeGenerationSettings.Builder(
+            this.lookup(Registries.PLACED_FEATURE),
+            this.lookup(Registries.CONFIGURED_CARVER)
         )
-        spawnSettings.spawn(SpawnGroup.WATER_AMBIENT, SpawnSettings.SpawnEntry(EntityType.TROPICAL_FISH, 25, 8, 8))
-        DefaultBiomeFeatures.addBatsAndMonsters(spawnSettings)
-        OverworldBiomeCreator.addBasicFeatures(generationSettings)
-        DefaultBiomeFeatures.addPlainsTallGrass(generationSettings)
-        DefaultBiomeFeatures.addDefaultOres(generationSettings)
-        DefaultBiomeFeatures.addClayOre(generationSettings)
-        DefaultBiomeFeatures.addDefaultDisks(generationSettings)
-        return Biome.Builder()
+        spawnSettings.addSpawn(MobCategory.WATER_AMBIENT, MobSpawnSettings.SpawnerData(EntityType.TROPICAL_FISH, 25, 8, 8))
+        BiomeDefaultFeatures.commonSpawns(spawnSettings)
+        OverworldBiomes.globalOverworldGeneration(generationSettings)
+        BiomeDefaultFeatures.addPlainGrass(generationSettings)
+        BiomeDefaultFeatures.addDefaultOres(generationSettings)
+        BiomeDefaultFeatures.addLushCavesSpecialOres(generationSettings)
+        BiomeDefaultFeatures.addDefaultSoftDisks(generationSettings)
+        return Biome.BiomeBuilder()
             .temperature(0.25f)
             .downfall(0.6f)
-            .effects(
-                BiomeEffects.Builder()
-                    .grassColor(0x329270)
-                    .foliageColor(0x329270)
+            .specialEffects(
+                BiomeSpecialEffects.Builder()
+                    .grassColorOverride(0x329270)
+                    .foliageColorOverride(0x329270)
                     .waterColor(6254825)
                     .waterFogColor(1836338)
                     .fogColor(0xC196E0)
                     .skyColor(0x774E96)
-                    .particleConfig(BiomeParticleConfig(DuskParticles.PURPLE_BIOME_BUBBLE, 0.00025f))
-                    .moodSound(BiomeMoodSound.CAVE)
-                    .music(MusicType.createIngameMusic(SoundEvents.MUSIC_OVERWORLD_LUSH_CAVES))
+                    .ambientParticle(AmbientParticleSettings(DuskParticles.PURPLE_BIOME_BUBBLE, 0.00025f))
+                    .ambientMoodSound(AmbientMoodSettings.LEGACY_CAVE_SETTINGS)
+                    .backgroundMusic(Musics.createGameMusic(SoundEvents.MUSIC_BIOME_LUSH_CAVES))
                     .build()
-            ).spawnSettings(spawnSettings.build()).generationSettings(generationSettings.build()).build()
+            ).mobSpawnSettings(spawnSettings.build()).generationSettings(generationSettings.build()).build()
     }
     fun BootstrapContext<Biome>.createQueensGardens(): Biome {
-        val spawnSettings = SpawnSettings.Builder()
-        val generationSettings = GenerationSettings.Builder(
-            this.getRegistryLookup(RegistryKeys.PLACED_FEATURE),
-            this.getRegistryLookup(RegistryKeys.CONFIGURED_CARVER)
+        val spawnSettings = MobSpawnSettings.Builder()
+        val generationSettings = BiomeGenerationSettings.Builder(
+            this.lookup(Registries.PLACED_FEATURE),
+            this.lookup(Registries.CONFIGURED_CARVER)
         )
-        DefaultBiomeFeatures.addBatsAndMonsters(spawnSettings)
-        OverworldBiomeCreator.addBasicFeatures(generationSettings)
-        DefaultBiomeFeatures.addPlainsTallGrass(generationSettings)
-        DefaultBiomeFeatures.addDefaultOres(generationSettings)
-        DefaultBiomeFeatures.addClayOre(generationSettings)
-        DefaultBiomeFeatures.addDefaultDisks(generationSettings)
-        return Biome.Builder()
+        BiomeDefaultFeatures.commonSpawns(spawnSettings)
+        OverworldBiomes.globalOverworldGeneration(generationSettings)
+        BiomeDefaultFeatures.addPlainGrass(generationSettings)
+        BiomeDefaultFeatures.addDefaultOres(generationSettings)
+        BiomeDefaultFeatures.addLushCavesSpecialOres(generationSettings)
+        BiomeDefaultFeatures.addDefaultSoftDisks(generationSettings)
+        return Biome.BiomeBuilder()
             .temperature(0.25f)
             .downfall(0.6f)
-            .effects(
-                BiomeEffects.Builder()
-                    .grassColor(0x329270)
-                    .foliageColor(0x329270)
+            .specialEffects(
+                BiomeSpecialEffects.Builder()
+                    .grassColorOverride(0x329270)
+                    .foliageColorOverride(0x329270)
                     .waterColor(6254825)
                     .waterFogColor(1836338)
                     .fogColor(0x1B9E7D)
                     .skyColor(12308479)
 //                    .particleConfig(BiomeParticleConfig(DuskParticles.PURPLE_BIOME_BUBBLE, 0.00025f))
-                    .moodSound(BiomeMoodSound.CAVE)
-                    .music(MusicType.createIngameMusic(SoundEvents.MUSIC_OVERWORLD_LUSH_CAVES))
+                    .ambientMoodSound(AmbientMoodSettings.LEGACY_CAVE_SETTINGS)
+                    .backgroundMusic(Musics.createGameMusic(SoundEvents.MUSIC_BIOME_LUSH_CAVES))
                     .build()
-            ).spawnSettings(spawnSettings.build()).generationSettings(generationSettings.build()).build()
+            ).mobSpawnSettings(spawnSettings.build()).generationSettings(generationSettings.build()).build()
     }
 }

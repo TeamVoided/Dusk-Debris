@@ -1,39 +1,45 @@
 package org.teamvoided.dusk_debris.data.gen.providers
 
-import net.minecraft.block.Block
-import net.minecraft.block.Blocks
-import net.minecraft.component.EnchantmentEffectComponentTypes
-import net.minecraft.enchantment.Enchantment
-import net.minecraft.enchantment.LevelBasedValue
-import net.minecraft.enchantment.effect.*
-import net.minecraft.entity.EntityType
-import net.minecraft.entity.EquipmentSlotGroup
-import net.minecraft.entity.damage.DamageType
-import net.minecraft.entity.damage.DamageTypes
-import net.minecraft.fluid.Fluid
-import net.minecraft.item.Item
-import net.minecraft.loot.condition.*
-import net.minecraft.loot.context.LootContext
-import net.minecraft.loot.provider.number.EnchantmentLevelNumberProvider
-import net.minecraft.particle.BlockStateParticleEffect
-import net.minecraft.particle.DustParticleEffect
-import net.minecraft.particle.ParticleEffect
-import net.minecraft.particle.ParticleTypes
-import net.minecraft.predicate.entity.EntityEquipmentPredicate
-import net.minecraft.predicate.entity.EntityPredicate
-import net.minecraft.predicate.entity.LocationPredicate
-import net.minecraft.predicate.item.ItemPredicate
-import net.minecraft.registry.*
-import net.minecraft.registry.tag.*
-import net.minecraft.sound.SoundEvents
-import net.minecraft.util.math.Vec3d
-import net.minecraft.util.math.Vec3i
-import net.minecraft.util.math.float_provider.ConstantFloatProvider
-import net.minecraft.util.math.float_provider.UniformFloatProvider
-import net.minecraft.world.World
-import net.minecraft.world.event.GameEvent
-import net.minecraft.world.gen.blockpredicate.BlockPredicate
-import net.minecraft.world.gen.stateprovider.BlockStateProvider
+import net.minecraft.advancements.critereon.EntityEquipmentPredicate
+import net.minecraft.advancements.critereon.EntityPredicate
+import net.minecraft.advancements.critereon.ItemPredicate
+import net.minecraft.advancements.critereon.LocationPredicate
+import net.minecraft.core.Holder
+import net.minecraft.core.HolderGetter
+import net.minecraft.core.HolderSet
+import net.minecraft.core.Vec3i
+import net.minecraft.core.particles.BlockParticleOption
+import net.minecraft.core.particles.DustParticleOptions
+import net.minecraft.core.particles.ParticleOptions
+import net.minecraft.core.particles.ParticleTypes
+import net.minecraft.core.registries.Registries
+import net.minecraft.data.worldgen.BootstrapContext
+import net.minecraft.resources.ResourceKey
+import net.minecraft.sounds.SoundEvents
+import net.minecraft.tags.*
+import net.minecraft.util.valueproviders.ConstantFloat
+import net.minecraft.util.valueproviders.UniformFloat
+import net.minecraft.world.damagesource.DamageType
+import net.minecraft.world.damagesource.DamageTypes
+import net.minecraft.world.entity.EntityType
+import net.minecraft.world.entity.EquipmentSlotGroup
+import net.minecraft.world.item.Item
+import net.minecraft.world.item.enchantment.Enchantment
+import net.minecraft.world.item.enchantment.EnchantmentEffectComponents
+import net.minecraft.world.item.enchantment.EnchantmentTarget
+import net.minecraft.world.item.enchantment.LevelBasedValue
+import net.minecraft.world.item.enchantment.effects.*
+import net.minecraft.world.level.Level
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.gameevent.GameEvent
+import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate
+import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider
+import net.minecraft.world.level.material.Fluid
+import net.minecraft.world.level.storage.loot.LootContext
+import net.minecraft.world.level.storage.loot.predicates.*
+import net.minecraft.world.level.storage.loot.providers.number.EnchantmentLevelProvider
+import net.minecraft.world.phys.Vec3
 import org.teamvoided.dusk_debris.data.DuskEnchantments
 import org.teamvoided.dusk_debris.data.tags.DuskBlockTags
 import org.teamvoided.dusk_debris.data.tags.DuskEnchantmentTags
@@ -46,11 +52,11 @@ import java.util.function.Function
 object EnchantmentsProvider {
 
     fun bootstrap(c: BootstrapContext<Enchantment>) {
-        val damageType: HolderProvider<DamageType> = c.getRegistryLookup(RegistryKeys.DAMAGE_TYPE)
-        val enchantment: HolderProvider<Enchantment> = c.getRegistryLookup(RegistryKeys.ENCHANTMENT)
-        val item: HolderProvider<Item> = c.getRegistryLookup(RegistryKeys.ITEM)
-        val block: HolderProvider<Block> = c.getRegistryLookup(RegistryKeys.BLOCK)
-        val fluid: HolderProvider<Fluid> = c.getRegistryLookup(RegistryKeys.FLUID)
+        val damageType: HolderGetter<DamageType> = c.lookup(Registries.DAMAGE_TYPE)
+        val enchantment: HolderGetter<Enchantment> = c.lookup(Registries.ENCHANTMENT)
+        val item: HolderGetter<Item> = c.lookup(Registries.ITEM)
+        val block: HolderGetter<Block> = c.lookup(Registries.BLOCK)
+        val fluid: HolderGetter<Fluid> = c.lookup(Registries.FLUID)
 
         c.createParticles()
         c.createCurses()
@@ -59,42 +65,42 @@ object EnchantmentsProvider {
 
         c.register(
             DuskEnchantments.SONIC_BURST,
-            Enchantment.builder(
-                Enchantment.createProperties(
-                    item.getTagOrThrow(ItemTags.BOW_ENCHANTABLE),
+            Enchantment.enchantment(
+                Enchantment.definition(
+                    item.getOrThrow(ItemTags.BOW_ENCHANTABLE),
                     2,
                     1,
-                    Enchantment.cost(10, 20),
-                    Enchantment.cost(60, 20),
+                    Enchantment.dynamicCost(10, 20),
+                    Enchantment.dynamicCost(60, 20),
                     4,
                     EquipmentSlotGroup.ANY
                 )
-            ).addEffect(
-                EnchantmentEffectComponentTypes.POST_ATTACK,
-                EnchantmentEffectTarget.DAMAGING_ENTITY,
-                EnchantmentEffectTarget.VICTIM,
-                Explode(
+            ).withEffect(
+                EnchantmentEffectComponents.POST_ATTACK,
+                EnchantmentTarget.DAMAGING_ENTITY,
+                EnchantmentTarget.VICTIM,
+                ExplodeEffect(
                     false,
-                    Optional.of(damageType.getHolderOrThrow(DamageTypes.SONIC_BOOM)),
+                    Optional.of(damageType.getOrThrow(DamageTypes.SONIC_BOOM)),
                     Optional.of(LevelBasedValue.constant(1.25f)),
-                    block.getTag(BlockTags.BLOCKS_WIND_CHARGE_EXPLOSIONS)
-                        .map<HolderSet<Block>>(Function.identity<HolderSet.NamedSet<Block>>()),
-                    Vec3d.ZERO,
+                    block.get(BlockTags.BLOCKS_WIND_CHARGE_EXPLOSIONS)
+                        .map<HolderSet<Block>>(Function.identity<HolderSet.Named<Block>>()),
+                    Vec3.ZERO,
                     LevelBasedValue.constant(1.5f),
                     false,
-                    World.ExplosionSourceType.TRIGGER,
+                    Level.ExplosionInteraction.TRIGGER,
                     ParticleTypes.SONIC_BOOM,
                     ParticleTypes.SONIC_BOOM,
-                    Holder.createDirect(SoundEvents.ENTITY_WARDEN_SONIC_BOOM)
+                    Holder.direct(SoundEvents.WARDEN_SONIC_BOOM)
                 ),
-                EntityPropertiesLootCondition.builder(
+                LootItemEntityPropertyCondition.hasProperties(
                     LootContext.EntityTarget.DIRECT_ATTACKER,
-                    EntityPredicate.Builder.create().tagged(EntityTypeTags.IMPACT_PROJECTILES)
+                    EntityPredicate.Builder.entity().of(EntityTypeTags.IMPACT_PROJECTILES)
                 )
-            ).addEffect(
-                EnchantmentEffectComponentTypes.POST_ATTACK,
-                EnchantmentEffectTarget.ATTACKER,
-                EnchantmentEffectTarget.ATTACKER,
+            ).withEffect(
+                EnchantmentEffectComponents.POST_ATTACK,
+                EnchantmentTarget.ATTACKER,
+                EnchantmentTarget.ATTACKER,
                 DamageItem(LevelBasedValue.constant(128f))
 //            ).addEffect(
 //                EnchantmentEffectComponentTypes.TICK,
@@ -126,7 +132,7 @@ object EnchantmentsProvider {
 //                EnchantmentEffectComponentTypes.LOCATION_CHANGED,
 //                EnchantmentAttribute(
 //                    Identifier.ofDefault("enchantment.soul_speed"),
-//                    EntityAttributes.GENERIC_MOVEMENT_SPEED,
+//                    EntityAttributes.MOVEMENT_SPEED,
 //                    LevelBasedValue.linear(0.0405f, 0.0105f),
 //                    EntityAttributeModifier.Operation.ADD_VALUE
 //                ),
@@ -191,7 +197,7 @@ object EnchantmentsProvider {
 //                EnchantmentEffectComponentTypes.LOCATION_CHANGED,
 //                EnchantmentAttribute(
 //                    Identifier.ofDefault("enchantment.soul_speed"),
-//                    EntityAttributes.GENERIC_MOVEMENT_EFFICIENCY,
+//                    EntityAttributes.MOVEMENT_EFFICIENCY,
 //                    LevelBasedValue.constant(1.0f),
 //                    EntityAttributeModifier.Operation.ADD_VALUE
 //                ),
@@ -209,8 +215,8 @@ object EnchantmentsProvider {
 //                DamageItem(LevelBasedValue.constant(1.0f)),
 //                AllOfLootCondition.builder(
 //                    *arrayOf<LootCondition.Builder>(
-//                        RandomChanceLootCondition.method_60310(
-//                            EnchantmentLevelNumberProvider.method_60313(
+//                        RandomChanceLootCondition.randomChance(
+//                            EnchantmentLevelNumberProvider.forEnchantmentLevel(
 //                                LevelBasedValue.constant(0.04f)
 //                            )
 //                        ), EntityPropertiesLootCondition.builder(
@@ -261,125 +267,125 @@ object EnchantmentsProvider {
     private fun BootstrapContext<Enchantment>.createParticles() {
         this.particleEnchantment(
             DuskEnchantments.CURSE_OF_RA,
-            BlockStateParticleEffect(ParticleTypes.FALLING_DUST, Blocks.SAND.defaultState),
+            BlockParticleOption(ParticleTypes.FALLING_DUST, Blocks.SAND.defaultBlockState()),
             0.35f
         )
         this.particleEnchantment(
             DuskEnchantments.CURSE_OF_RA_RED,
-            BlockStateParticleEffect(ParticleTypes.FALLING_DUST, Blocks.RED_SAND.defaultState),
+            BlockParticleOption(ParticleTypes.FALLING_DUST, Blocks.RED_SAND.defaultBlockState()),
             0.35f
         )
         this.particleEnchantment(
             DuskEnchantments.PARTICLE_REDSTONE,
-            DustParticleEffect.DEFAULT,
+            DustParticleOptions.REDSTONE,
             0.1f
         )
         this.particleEnchantment(
             DuskEnchantments.PARTICLE_TRIAL,
             ParticleTypes.VAULT_CONNECTION,
             0.25f,
-            SpawnParticles.VelocitySource(0f, UniformFloatProvider.create(-0.1f, 0.1f)),
-            SpawnParticles.VelocitySource(0f, UniformFloatProvider.create(-0.1f, 0.1f))
+            SpawnParticlesEffect.VelocitySource(0f, UniformFloat.of(-0.1f, 0.1f)),
+            SpawnParticlesEffect.VelocitySource(0f, UniformFloat.of(-0.1f, 0.1f))
         )
         this.particleEnchantment(
             DuskEnchantments.PARTICLE_TRIAL_OMINOUS,
             ParticleTypes.OMINOUS_SPAWNING,
             0.25f,
-            SpawnParticles.VelocitySource(0f, UniformFloatProvider.create(-0.1f, 0.1f)),
-            SpawnParticles.VelocitySource(0f, UniformFloatProvider.create(-0.1f, 0.1f))
+            SpawnParticlesEffect.VelocitySource(0f, UniformFloat.of(-0.1f, 0.1f)),
+            SpawnParticlesEffect.VelocitySource(0f, UniformFloat.of(-0.1f, 0.1f))
         )
         this.particleEnchantment(
             DuskEnchantments.PARTICLE_TRIAL_DETECTION,
-            ParticleTypes.TRIAL_SPAWNER_DETECTION,
+            ParticleTypes.TRIAL_SPAWNER_DETECTED_PLAYER,
             0.2f
         )
         this.particleEnchantment(
             DuskEnchantments.PARTICLE_TRIAL_DETECTION_OMINOUS,
-            ParticleTypes.TRIAL_SPAWNER_DETECTION_OMINOUS,
+            ParticleTypes.TRIAL_SPAWNER_DETECTED_PLAYER_OMINOUS,
             0.2f
         )
     }
 
     private fun BootstrapContext<Enchantment>.createCurses() {
-        val damageType: HolderProvider<DamageType> = this.getRegistryLookup(RegistryKeys.DAMAGE_TYPE)
-        val enchantment: HolderProvider<Enchantment> = this.getRegistryLookup(RegistryKeys.ENCHANTMENT)
-        val item: HolderProvider<Item> = this.getRegistryLookup(RegistryKeys.ITEM)
-        val block: HolderProvider<Block> = this.getRegistryLookup(RegistryKeys.BLOCK)
+        val damageType: HolderGetter<DamageType> = this.lookup(Registries.DAMAGE_TYPE)
+        val enchantment: HolderGetter<Enchantment> = this.lookup(Registries.ENCHANTMENT)
+        val item: HolderGetter<Item> = this.lookup(Registries.ITEM)
+        val block: HolderGetter<Block> = this.lookup(Registries.BLOCK)
         this.register(
             DuskEnchantments.BREAKING,
-            Enchantment.builder(
-                Enchantment.createProperties(
-                    item.getTagOrThrow(ItemTags.DURABILITY_ENCHANTABLE),
+            Enchantment.enchantment(
+                Enchantment.definition(
+                    item.getOrThrow(ItemTags.DURABILITY_ENCHANTABLE),
                     1,
                     3,
-                    Enchantment.cost(5, 8),
-                    Enchantment.cost(55, 8),
+                    Enchantment.dynamicCost(5, 8),
+                    Enchantment.dynamicCost(55, 8),
                     2,
                     EquipmentSlotGroup.ANY
                 )
             )
-                .withExclusiveSet(enchantment.getTagOrThrow(DuskEnchantmentTags.UNBREAKING_EXCLUSIVE_SET))
-                .addEffect(
-                    EnchantmentEffectComponentTypes.ITEM_DAMAGE,
+                .exclusiveWith(enchantment.getOrThrow(DuskEnchantmentTags.UNBREAKING_EXCLUSIVE_SET))
+                .withEffect(
+                    EnchantmentEffectComponents.ITEM_DAMAGE,
                     MultiplyValue(
-                        LevelBasedValue.linear(1.25f, 0.25f)
+                        LevelBasedValue.perLevel(1.25f, 0.25f)
                     ),
-                    MatchToolLootCondition.builder(
-                        ItemPredicate.Builder.create().tag(ItemTags.ARMOR_ENCHANTABLE)
+                    MatchTool.toolMatches(
+                        ItemPredicate.Builder.item().of(ItemTags.ARMOR_ENCHANTABLE)
                     )
-                ).addEffect(
-                    EnchantmentEffectComponentTypes.ITEM_DAMAGE,
+                ).withEffect(
+                    EnchantmentEffectComponents.ITEM_DAMAGE,
                     MultiplyValue(
-                        LevelBasedValue.linear(1.5f, 0.5f)
+                        LevelBasedValue.perLevel(1.5f, 0.5f)
                     ),
-                    InvertedLootCondition.builder(
-                        MatchToolLootCondition.builder(ItemPredicate.Builder.create().tag(ItemTags.ARMOR_ENCHANTABLE))
+                    InvertedLootItemCondition.invert(
+                        MatchTool.toolMatches(ItemPredicate.Builder.item().of(ItemTags.ARMOR_ENCHANTABLE))
                     )
                 )
         )
         this.register(
             DuskEnchantments.MENDLESS,
-            Enchantment.builder(
-                Enchantment.createProperties(
-                    item.getTagOrThrow(ItemTags.DURABILITY_ENCHANTABLE),
+            Enchantment.enchantment(
+                Enchantment.definition(
+                    item.getOrThrow(ItemTags.DURABILITY_ENCHANTABLE),
                     1,
                     1,
-                    Enchantment.cost(5, 8),
-                    Enchantment.cost(55, 8),
+                    Enchantment.dynamicCost(5, 8),
+                    Enchantment.dynamicCost(55, 8),
                     4,
                     EquipmentSlotGroup.ANY
                 )
-            ).withExclusiveSet(enchantment.getTagOrThrow(DuskEnchantmentTags.MENDING_EXCLUSIVE_SET))
+            ).exclusiveWith(enchantment.getOrThrow(DuskEnchantmentTags.MENDING_EXCLUSIVE_SET))
         )
         this.register(
-            DuskEnchantments.CURSE_OF_THE_FUNNY, Enchantment.builder(
-                Enchantment.createProperties(
-                    item.getTagOrThrow(ItemTags.ARMOR_ENCHANTABLE),
+            DuskEnchantments.CURSE_OF_THE_FUNNY, Enchantment.enchantment(
+                Enchantment.definition(
+                    item.getOrThrow(ItemTags.ARMOR_ENCHANTABLE),
                     1,
                     4,
-                    Enchantment.cost(5, 0),
-                    Enchantment.cost(50, 0),
+                    Enchantment.dynamicCost(5, 0),
+                    Enchantment.dynamicCost(50, 0),
                     12,
                     EquipmentSlotGroup.ARMOR
                 )
-            ).addEffect(
-                EnchantmentEffectComponentTypes.TICK,
-                Explode(
+            ).withEffect(
+                EnchantmentEffectComponents.TICK,
+                ExplodeEffect(
                     false,
-                    Optional.of(damageType.getHolderOrThrow(DamageTypes.PLAYER_EXPLOSION)),
-                    Optional.of(LevelBasedValue.linear(0.1f, 0.5f)),
-                    block.getTag(BlockTags.BLOCKS_WIND_CHARGE_EXPLOSIONS)
-                        .map<HolderSet<Block>>(Function.identity<HolderSet.NamedSet<Block>>()),
-                    Vec3d.ZERO,
+                    Optional.of(damageType.getOrThrow(DamageTypes.PLAYER_EXPLOSION)),
+                    Optional.of(LevelBasedValue.perLevel(0.1f, 0.5f)),
+                    block.get(BlockTags.BLOCKS_WIND_CHARGE_EXPLOSIONS)
+                        .map<HolderSet<Block>>(Function.identity<HolderSet.Named<Block>>()),
+                    Vec3.ZERO,
                     LevelBasedValue.constant(1.5f),
                     false,
-                    World.ExplosionSourceType.NONE,
+                    Level.ExplosionInteraction.NONE,
                     ParticleTypes.EXPLOSION,
                     ParticleTypes.EXPLOSION_EMITTER,
-                    SoundEvents.ENTITY_GENERIC_EXPLODE
+                    SoundEvents.GENERIC_EXPLODE
                 ),
-                RandomChanceLootCondition.method_60310(
-                    EnchantmentLevelNumberProvider.method_60313(
+                LootItemRandomChanceCondition.randomChance(
+                    EnchantmentLevelProvider.forEnchantmentLevel(
                         LevelBasedValue.perLevel(0.00001f)
                     )
                 )
@@ -387,46 +393,46 @@ object EnchantmentsProvider {
         )
         this.register(
             DuskEnchantments.LIGHTNING_ROD,
-            Enchantment.builder(
-                Enchantment.createProperties(
-                    item.getTagOrThrow(ItemTags.ARMOR_ENCHANTABLE),
+            Enchantment.enchantment(
+                Enchantment.definition(
+                    item.getOrThrow(ItemTags.ARMOR_ENCHANTABLE),
                     2,
                     1,
-                    Enchantment.cost(10, 10),
-                    Enchantment.cost(25, 10),
+                    Enchantment.dynamicCost(10, 10),
+                    Enchantment.dynamicCost(25, 10),
                     4,
                     EquipmentSlotGroup.ANY
                 )
-            ).addEffect(
-                EnchantmentEffectComponentTypes.TICK,
-                SummonEntity(
-                    HolderSet.createDirect(EntityType.LIGHTNING_BOLT.builtInRegistryHolder),
+            ).withEffect(
+                EnchantmentEffectComponents.TICK,
+                SummonEntityEffect(
+                    HolderSet.direct(EntityType.LIGHTNING_BOLT.builtInRegistryHolder()),
                     false
                 ),
-                AllOfLootCondition.builder(
-                    RandomChanceLootCondition.method_60310(
-                        EnchantmentLevelNumberProvider.method_60313(
+                AllOfCondition.allOf(
+                    LootItemRandomChanceCondition.randomChance(
+                        EnchantmentLevelProvider.forEnchantmentLevel(
                             LevelBasedValue.perLevel(0.0001f)
                         )
                     ),
-                    WeatherCheckLootCondition.create().thundering(true),
-                    EntityPropertiesLootCondition.builder(
+                    WeatherCheck.weather().setThundering(true),
+                    LootItemEntityPropertyCondition.hasProperties(
                         LootContext.EntityTarget.THIS,
-                        EntityPredicate.Builder.create()
-                            .location(LocationPredicate.Builder.create().canSeeSky(true))
+                        EntityPredicate.Builder.entity()
+                            .located(LocationPredicate.Builder.location().setCanSeeSky(true))
                     )
                 )
             )
         )
         this.register(
             DuskEnchantments.MIDAS,
-            Enchantment.builder(
-                Enchantment.createProperties(
-                    item.getTagOrThrow(ItemTags.PICKAXES),
+            Enchantment.enchantment(
+                Enchantment.definition(
+                    item.getOrThrow(ItemTags.PICKAXES),
                     2,
                     1,
-                    Enchantment.cost(10, 10),
-                    Enchantment.cost(25, 10),
+                    Enchantment.dynamicCost(10, 10),
+                    Enchantment.dynamicCost(25, 10),
                     4,
                     EquipmentSlotGroup.ANY
                 )
@@ -459,12 +465,12 @@ object EnchantmentsProvider {
         block: Block,
         tag: TagKey<Block>
     ): Enchantment.Builder {
-        return this.addEffect(
-            EnchantmentEffectComponentTypes.HIT_BLOCK,
+        return this.withEffect(
+            EnchantmentEffectComponents.HIT_BLOCK,
             ReplaceBlock(
                 Vec3i.ZERO,
-                Optional.of(BlockPredicate.matchingBlockTags(tag)),
-                BlockStateProvider.of(block),
+                Optional.of(BlockPredicate.matchesTag(tag)),
+                BlockStateProvider.simple(block),
                 Optional.of(GameEvent.BLOCK_CHANGE)
             )
         )
@@ -472,41 +478,41 @@ object EnchantmentsProvider {
 
 
     private fun BootstrapContext<Enchantment>.createMinecraftOverrides(
-        enchantment: HolderProvider<Enchantment>,
-        item: HolderProvider<Item>,
-        fluid: HolderProvider<Fluid>
+        enchantment: HolderGetter<Enchantment>,
+        item: HolderGetter<Item>,
+        fluid: HolderGetter<Fluid>
     ) {
-        val item: HolderProvider<Item> = this.getRegistryLookup(RegistryKeys.ITEM)
+        val item: HolderGetter<Item> = this.lookup(Registries.ITEM)
         this.register(
-            DuskEnchantments.IMPALING, Enchantment.builder(
-                Enchantment.createProperties(
-                    item.getTagOrThrow(ItemTags.TRIDENT_ENCHANTABLE),
+            DuskEnchantments.IMPALING, Enchantment.enchantment(
+                Enchantment.definition(
+                    item.getOrThrow(ItemTags.TRIDENT_ENCHANTABLE),
                     2,
                     5,
-                    Enchantment.cost(1, 8),
-                    Enchantment.cost(21, 8),
+                    Enchantment.dynamicCost(1, 8),
+                    Enchantment.dynamicCost(21, 8),
                     4,
                     EquipmentSlotGroup.MAINHAND
                 )
-            ).withExclusiveSet(enchantment.getTagOrThrow(EnchantmentTags.DAMAGE_EXCLUSIVE_SET))
-                .addEffect(
-                    EnchantmentEffectComponentTypes.DAMAGE,
+            ).exclusiveWith(enchantment.getOrThrow(EnchantmentTags.DAMAGE_EXCLUSIVE))
+                .withEffect(
+                    EnchantmentEffectComponents.DAMAGE,
                     AddValue(LevelBasedValue.perLevel(2.5f)),
-                    AnyOfLootCondition.create(
-                        EntityPropertiesLootCondition.builder(
+                    AnyOfCondition.anyOf(
+                        LootItemEntityPropertyCondition.hasProperties(
                             LootContext.EntityTarget.THIS,
                             entityIsInTag(EntityTypeTags.SENSITIVE_TO_IMPALING)
                         ),
-                        EntityPropertiesLootCondition.builder(
+                        LootItemEntityPropertyCondition.hasProperties(
                             LootContext.EntityTarget.THIS,
                             fluid.entityIsInFluidTag(FluidTags.WATER)
                         ),
-                        AllOfLootCondition.builder(
-                            WeatherCheckLootCondition.create().raining(true),
-                            EntityPropertiesLootCondition.builder(
+                        AllOfCondition.allOf(
+                            WeatherCheck.weather().setRaining(true),
+                            LootItemEntityPropertyCondition.hasProperties(
                                 LootContext.EntityTarget.THIS,
-                                EntityPredicate.Builder.create()
-                                    .location(LocationPredicate.Builder.create().canSeeSky(true))
+                                EntityPredicate.Builder.entity()
+                                    .located(LocationPredicate.Builder.location().setCanSeeSky(true))
                             )
                         )
                     )
@@ -515,73 +521,73 @@ object EnchantmentsProvider {
     }
 
     private fun BootstrapContext<Enchantment>.particleEnchantment(
-        registryKey: RegistryKey<Enchantment>,
-        particle: ParticleEffect,
+        registryKey: ResourceKey<Enchantment>,
+        particle: ParticleOptions,
         chance: Float,
-        horizontalVelocity: SpawnParticles.VelocitySource = SpawnParticles.VelocitySource(
+        horizontalVelocity: SpawnParticlesEffect.VelocitySource = SpawnParticlesEffect.VelocitySource(
             0f,
-            ConstantFloatProvider.ZERO
+            ConstantFloat.ZERO
         ),
-        verticalVelocity: SpawnParticles.VelocitySource = SpawnParticles.VelocitySource(0f, ConstantFloatProvider.ZERO)
+        verticalVelocity: SpawnParticlesEffect.VelocitySource = SpawnParticlesEffect.VelocitySource(0f, ConstantFloat.ZERO)
     ) {
         this.particleEnchantment(
             registryKey,
             particle,
             chance,
             ItemTags.ARMOR_ENCHANTABLE,
-            SpawnParticles.inBoundingBox(),
-            SpawnParticles.inBoundingBox(),
+            SpawnParticlesEffect.inBoundingBox(),
+            SpawnParticlesEffect.inBoundingBox(),
             horizontalVelocity,
             verticalVelocity
         )
     }
 
     private fun BootstrapContext<Enchantment>.particleEnchantment(
-        registryKey: RegistryKey<Enchantment>,
-        particle: ParticleEffect,
+        registryKey: ResourceKey<Enchantment>,
+        particle: ParticleOptions,
         chance: Float,
         tag: TagKey<Item> = ItemTags.ARMOR_ENCHANTABLE,
-        horizontalPosition: SpawnParticles.PositionSource = SpawnParticles.inBoundingBox(),
-        verticalPosition: SpawnParticles.PositionSource = SpawnParticles.inBoundingBox(),
-        horizontalVelocity: SpawnParticles.VelocitySource = SpawnParticles.VelocitySource(
+        horizontalPosition: SpawnParticlesEffect.PositionSource = SpawnParticlesEffect.inBoundingBox(),
+        verticalPosition: SpawnParticlesEffect.PositionSource = SpawnParticlesEffect.inBoundingBox(),
+        horizontalVelocity: SpawnParticlesEffect.VelocitySource = SpawnParticlesEffect.VelocitySource(
             0f,
-            ConstantFloatProvider.ZERO
+            ConstantFloat.ZERO
         ),
-        verticalVelocity: SpawnParticles.VelocitySource = SpawnParticles.VelocitySource(0f, ConstantFloatProvider.ZERO)
+        verticalVelocity: SpawnParticlesEffect.VelocitySource = SpawnParticlesEffect.VelocitySource(0f, ConstantFloat.ZERO)
     ) {
-        val enchantment: HolderProvider<Enchantment> = this.getRegistryLookup(RegistryKeys.ENCHANTMENT)
-        val item: HolderProvider<Item> = this.getRegistryLookup(RegistryKeys.ITEM)
+        val enchantment: HolderGetter<Enchantment> = this.lookup(Registries.ENCHANTMENT)
+        val item: HolderGetter<Item> = this.lookup(Registries.ITEM)
         this.register(
             registryKey,
-            Enchantment.builder(
-                Enchantment.createProperties(
-                    item.getTagOrThrow(tag),
+            Enchantment.enchantment(
+                Enchantment.definition(
+                    item.getOrThrow(tag),
                     1,
                     1,
-                    Enchantment.cost(1),
-                    Enchantment.cost(1),
+                    Enchantment.constantCost(1),
+                    Enchantment.constantCost(1),
                     1,
                     EquipmentSlotGroup.ANY
                 )
             )
-                .withExclusiveSet(enchantment.getTagOrThrow(DuskEnchantmentTags.PARTICLE_EXCLUSIVE_SET))
-                .addEffect(
-                    EnchantmentEffectComponentTypes.TICK,
-                    SpawnParticles(
+                .exclusiveWith(enchantment.getOrThrow(DuskEnchantmentTags.PARTICLE_EXCLUSIVE_SET))
+                .withEffect(
+                    EnchantmentEffectComponents.TICK,
+                    SpawnParticlesEffect(
                         particle,
                         horizontalPosition,
                         verticalPosition,
                         horizontalVelocity,
                         verticalVelocity,
-                        ConstantFloatProvider.create(1f)
+                        ConstantFloat.of(1f)
                     ),
-                    AllOfLootCondition.builder(
-                        RandomChanceLootCondition.method_932(chance),
-                        InvertedLootCondition.builder(
-                            EntityPropertiesLootCondition.builder(
+                    AllOfCondition.allOf(
+                        LootItemRandomChanceCondition.randomChance(chance),
+                        InvertedLootItemCondition.invert(
+                            LootItemEntityPropertyCondition.hasProperties(
                                 LootContext.EntityTarget.THIS,
-                                EntityPredicate.Builder.create().equipment(
-                                    EntityEquipmentPredicate.Builder.create()
+                                EntityPredicate.Builder.entity().equipment(
+                                    EntityEquipmentPredicate.Builder.equipment()
                                         .mainhand(itemIsInTag(ItemTags.ARMOR_ENCHANTABLE))
                                 )
                             )
@@ -592,9 +598,9 @@ object EnchantmentsProvider {
     }
 
     fun BootstrapContext<Enchantment>.register(
-        registryKey: RegistryKey<Enchantment>,
+        registryKey: ResourceKey<Enchantment>,
         builder: Enchantment.Builder
     ) {
-        this.register(registryKey, builder.build(registryKey.value))
+        this.register(registryKey, builder.build(registryKey.location()))
     }
 }

@@ -1,25 +1,25 @@
 package org.teamvoided.dusk_debris.world.gen.configured_feature
 
 import com.mojang.serialization.Codec
-import net.minecraft.util.math.noise.DoublePerlinNoiseSampler
-import net.minecraft.util.random.LegacySimpleRandom
-import net.minecraft.world.gen.ChunkRandom
-import net.minecraft.world.gen.feature.Feature
-import net.minecraft.world.gen.feature.util.FeatureContext
+import net.minecraft.world.level.levelgen.LegacyRandomSource
+import net.minecraft.world.level.levelgen.WorldgenRandom
+import net.minecraft.world.level.levelgen.feature.Feature
+import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext
+import net.minecraft.world.level.levelgen.synth.NormalNoise
 import org.teamvoided.dusk_debris.world.gen.configured_feature.config.NoiseFeatureConfig
 
 class RandomNoiseFeature(codec: Codec<NoiseFeatureConfig>) : Feature<NoiseFeatureConfig>(codec) {
 
-    override fun place(context: FeatureContext<NoiseFeatureConfig>): Boolean {
-        val cfg = context.config
-        val random = context.random
-        val world = context.world
-        val gen = context.generator
-        val pos = context.origin
+    override fun place(context: FeaturePlaceContext<NoiseFeatureConfig>): Boolean {
+        val cfg = context.config()
+        val random = context.random()
+        val world = context.level()
+        val gen = context.chunkGenerator()
+        val pos = context.origin()
 
-        val chunkRandom = ChunkRandom(LegacySimpleRandom(world.seed))
-        val dps = DoublePerlinNoiseSampler.create(chunkRandom, cfg.firstNoiseOctave, *cfg.amplitudes.toDoubleArray())
-        val sample = dps.sample(pos.x.toDouble(), 0.0, pos.z.toDouble())
+        val chunkRandom = WorldgenRandom(LegacyRandomSource(world.seed))
+        val dps = NormalNoise.create(chunkRandom, cfg.firstNoiseOctave, *cfg.amplitudes.toDoubleArray())
+        val sample = dps.getValue(pos.x.toDouble(), 0.0, pos.z.toDouble())
 
         for (features in cfg.features) {
             if (sample >= features.threshold)

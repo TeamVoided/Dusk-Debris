@@ -1,29 +1,29 @@
 package org.teamvoided.dusk_debris.block
 
 import com.mojang.serialization.MapCodec
-import net.minecraft.block.BlockRenderType
-import net.minecraft.block.BlockState
-import net.minecraft.block.BlockWithEntity
-import net.minecraft.block.entity.BlockEntity
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.util.ActionResult
-import net.minecraft.util.hit.BlockHitResult
-import net.minecraft.util.math.BlockPos
-import net.minecraft.world.World
+import net.minecraft.core.BlockPos
+import net.minecraft.world.InteractionResult
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.level.Level
+import net.minecraft.world.level.block.BaseEntityBlock
+import net.minecraft.world.level.block.RenderShape
+import net.minecraft.world.level.block.entity.BlockEntity
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.phys.BlockHitResult
 import org.teamvoided.dusk_debris.block.entity.StatueBlockEntity
 import org.teamvoided.dusk_debris.util.openStatuesScreen
 
-class StatueBlock(settings: Settings) : BlockWithEntity(settings) {
-    override fun getCodec(): MapCodec<StatueBlock> = createCodec(::StatueBlock)
-    override fun createBlockEntity(pos: BlockPos, state: BlockState): BlockEntity = StatueBlockEntity(pos, state)
-    override fun getRenderType(state: BlockState) = BlockRenderType.MODEL
-    override fun onUse(
-        state: BlockState, world: World, pos: BlockPos, entity: PlayerEntity, hitResult: BlockHitResult,
-    ): ActionResult {
+class StatueBlock(settings: Properties) : BaseEntityBlock(settings) {
+    override fun codec(): MapCodec<StatueBlock> = simpleCodec(::StatueBlock)
+    override fun newBlockEntity(pos: BlockPos, state: BlockState): BlockEntity = StatueBlockEntity(pos, state)
+    override fun getRenderShape(state: BlockState) = RenderShape.MODEL
+    override fun useWithoutItem(
+        state: BlockState, world: Level, pos: BlockPos, entity: Player, hitResult: BlockHitResult,
+    ): InteractionResult {
         val statue = world.getBlockEntity(pos)
         return if (statue is StatueBlockEntity) {
             entity.openStatuesScreen(statue)
-            ActionResult.success(world.isClient)
-        } else ActionResult.PASS
+            InteractionResult.sidedSuccess(world.isClientSide)
+        } else InteractionResult.PASS
     }
 }

@@ -1,17 +1,16 @@
 package org.teamvoided.dusk_debris.data.gen.world.gen
 
-import net.minecraft.block.Block
-import net.minecraft.block.Blocks
-import net.minecraft.registry.BootstrapContext
-import net.minecraft.registry.RegistryKeys
-import net.minecraft.world.biome.Biomes
-import net.minecraft.world.biome.source.util.OverworldBiomeParameters
-import net.minecraft.world.gen.YOffset
-import net.minecraft.world.gen.chunk.ChunkGeneratorSettings
-import net.minecraft.world.gen.chunk.GenerationShapeConfig
-import net.minecraft.world.gen.noise.NoiseParametersKeys
-import net.minecraft.world.gen.surfacebuilder.SurfaceRules.*
-import net.minecraft.world.gen.surfacebuilder.VanillaSurfaceRules
+import net.minecraft.data.worldgen.BootstrapContext
+import net.minecraft.data.worldgen.SurfaceRuleData
+import net.minecraft.world.level.biome.Biomes
+import net.minecraft.world.level.biome.OverworldBiomeBuilder
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.levelgen.NoiseGeneratorSettings
+import net.minecraft.world.level.levelgen.NoiseSettings
+import net.minecraft.world.level.levelgen.Noises
+import net.minecraft.world.level.levelgen.SurfaceRules.*
+import net.minecraft.world.level.levelgen.VerticalAnchor
 import org.teamvoided.dusk_debris.data.gen.world.gen.density_function.NetherDensityFunctionCreator.createNether
 import org.teamvoided.dusk_debris.data.gen.world.gen.density_function.OverworldDensityFunctionCreator.overworld
 import org.teamvoided.dusk_debris.data.worldgen.DuskBiomes
@@ -21,7 +20,7 @@ import org.teamvoided.dusk_debris.world.gen.terrain_parameters.overworld.Offset
 object NoiseSettingsGenerator {
     //ChunkGeneratorSettings
 
-    fun bootstrap(c: BootstrapContext<ChunkGeneratorSettings>) {
+    fun bootstrap(c: BootstrapContext<NoiseGeneratorSettings>) {
         c.register(DuskNoiseSettings.OVERWORLD, c.createOverworldSettings())
         c.register(DuskNoiseSettings.NETHER, c.createNetherSettings())
 //        c.register(DuskNoiseSettings.NETHER_LARGE_BIOME, createNetherSettings(c, false, true))
@@ -35,17 +34,17 @@ object NoiseSettingsGenerator {
     }
 
 
-    private fun BootstrapContext<ChunkGeneratorSettings>.createOverworldSettings(
+    private fun BootstrapContext<NoiseGeneratorSettings>.createOverworldSettings(
         amplified: Boolean = false,
         largeBiomes: Boolean = false
-    ): ChunkGeneratorSettings {
-        return ChunkGeneratorSettings(
-            GenerationShapeConfig.create(-64, 384, 1, 2),
-            Blocks.STONE.defaultState,
-            Blocks.WATER.defaultState,
+    ): NoiseGeneratorSettings {
+        return NoiseGeneratorSettings(
+            NoiseSettings.create(-64, 384, 1, 2),
+            Blocks.STONE.defaultBlockState(),
+            Blocks.WATER.defaultBlockState(),
             this.overworld(largeBiomes, amplified),
-            VanillaSurfaceRules.getOverworldRules(),
-            OverworldBiomeParameters().spawnSuitabilityNoises,
+            SurfaceRuleData.overworld(),
+            OverworldBiomeBuilder().spawnTarget(),
             Offset.SEA_LEVEL,
             false,
             true,
@@ -55,14 +54,14 @@ object NoiseSettingsGenerator {
     }
 
 
-    private fun BootstrapContext<ChunkGeneratorSettings>.createNetherSettings(
+    private fun BootstrapContext<NoiseGeneratorSettings>.createNetherSettings(
         amplified: Boolean = false,
         largeBiomes: Boolean = false
-    ): ChunkGeneratorSettings {
-        return ChunkGeneratorSettings(
-            GenerationShapeConfig.create(0, 256, 1, 2),
-            Blocks.NETHERRACK.defaultState,
-            Blocks.LAVA.defaultState,
+    ): NoiseGeneratorSettings {
+        return NoiseGeneratorSettings(
+            NoiseSettings.create(0, 256, 1, 2),
+            Blocks.NETHERRACK.defaultBlockState(),
+            Blocks.LAVA.defaultBlockState(),
             this.createNether(amplified, largeBiomes),
             getNetherRules(),
             listOf(),
@@ -75,7 +74,7 @@ object NoiseSettingsGenerator {
     }
 
 
-    fun getNetherRules(): MaterialRule {
+    fun getNetherRules(): RuleSource {
         val lava = block(Blocks.LAVA)
         val gravel = block(Blocks.GRAVEL)
         val bedrock = block(Blocks.BEDROCK)
@@ -89,95 +88,95 @@ object NoiseSettingsGenerator {
         val soulSand = block(Blocks.SOUL_SAND)
         val soulSoil = block(Blocks.SOUL_SOIL)
 
-        val netherWastes = biome(Biomes.NETHER_WASTES, DuskBiomes.NETHER_WASTES)
+        val netherWastes = isBiome(Biomes.NETHER_WASTES, DuskBiomes.NETHER_WASTES)
         val crimsonForest =
-            biome(Biomes.CRIMSON_FOREST, DuskBiomes.CRIMSON_FOREST, DuskBiomes.CRIMSON_WASTES)
+            isBiome(Biomes.CRIMSON_FOREST, DuskBiomes.CRIMSON_FOREST, DuskBiomes.CRIMSON_WASTES)
         val warpedForest =
-            biome(Biomes.WARPED_FOREST, DuskBiomes.WARPED_FOREST, DuskBiomes.WARPED_WASTES)
-        val basaltDelta = biome(Biomes.BASALT_DELTAS, DuskBiomes.BASALT_DELTAS)
-        val soulValley = biome(Biomes.SOUL_SAND_VALLEY, DuskBiomes.SOUL_SAND_VALLEY)
+            isBiome(Biomes.WARPED_FOREST, DuskBiomes.WARPED_FOREST, DuskBiomes.WARPED_WASTES)
+        val basaltDelta = isBiome(Biomes.BASALT_DELTAS, DuskBiomes.BASALT_DELTAS)
+        val soulValley = isBiome(Biomes.SOUL_SAND_VALLEY, DuskBiomes.SOUL_SAND_VALLEY)
 
-        val aboveY31 = aboveY(YOffset.fixed(31), 0)
-        val aboveY32 = aboveY(YOffset.fixed(32), 0)
-        val aboveY30AndDepth = aboveYWithStoneDepth(YOffset.fixed(30), 0)
-        val belowY35AndDepth = not(aboveYWithStoneDepth(YOffset.fixed(35), 0))
-        val aboveY5BelowTop = aboveY(YOffset.belowTop(5), 0)
+        val aboveY31 = yBlockCheck(VerticalAnchor.absolute(31), 0)
+        val aboveY32 = yBlockCheck(VerticalAnchor.absolute(32), 0)
+        val aboveY30AndDepth = yStartCheck(VerticalAnchor.absolute(30), 0)
+        val belowY35AndDepth = not(yStartCheck(VerticalAnchor.absolute(35), 0))
+        val aboveY5BelowTop = yBlockCheck(VerticalAnchor.belowTop(5), 0)
         val hole = hole()
-        val soulSandLayer = noiseThreshold(NoiseParametersKeys.SOUL_SAND_LAYER, -0.012)
-        val gravelLayer = noiseThreshold(NoiseParametersKeys.GRAVEL_LAYER, -0.012)
-        val patch = noiseThreshold(NoiseParametersKeys.PATCH, -0.012)
-        val netherStateSelector = noiseThreshold(NoiseParametersKeys.NETHER_STATE_SELECTOR, 0.0)
-        val atSeaLevel = condition(
+        val soulSandLayer = noiseCondition(Noises.SOUL_SAND_LAYER, -0.012)
+        val gravelLayer = noiseCondition(Noises.GRAVEL_LAYER, -0.012)
+        val patch = noiseCondition(Noises.PATCH, -0.012)
+        val netherStateSelector = noiseCondition(Noises.NETHER_STATE_SELECTOR, 0.0)
+        val atSeaLevel = ifTrue(
             patch,
-            condition(
+            ifTrue(
                 aboveY30AndDepth,
-                condition(belowY35AndDepth, gravel)
+                ifTrue(belowY35AndDepth, gravel)
             )
         )
 
-        val basaltDeltasSurface = condition(
+        val basaltDeltasSurface = ifTrue(
             basaltDelta,
             sequence(
-                condition(
+                ifTrue(
                     UNDER_CEILING,
                     basalt
                 ),
-                condition(
+                ifTrue(
                     UNDER_FLOOR,
                     sequence(
                         atSeaLevel,
-                        condition(netherStateSelector, basalt),
+                        ifTrue(netherStateSelector, basalt),
                         blackstone
                     )
                 )
             )
         )
-        val soulValleySurface = condition(
+        val soulValleySurface = ifTrue(
             soulValley,
             sequence(
-                condition(
+                ifTrue(
                     UNDER_CEILING,
                     sequence(
-                        condition(
+                        ifTrue(
                             netherStateSelector,
                             soulSand
                         ), soulSoil
                     )
                 ),
-                condition(
+                ifTrue(
                     UNDER_FLOOR,
                     sequence(
                         atSeaLevel,
-                        condition(netherStateSelector, soulSand),
+                        ifTrue(netherStateSelector, soulSand),
                         soulSoil
                     )
                 )
             )
         )
-        val netherwartForestSurface = condition(
+        val netherwartForestSurface = ifTrue(
             ON_FLOOR,
             sequence(
-                condition(
+                ifTrue(
                     not(aboveY32),
-                    condition(hole, lava)
+                    ifTrue(hole, lava)
                 ),
                 wartForest(warpedForest, warpedNylium, warpedWartBlock),
                 wartForest(crimsonForest, crimsonNylium, netherWartBlock)
             )
         )
-        val netherWastesSurface = condition(
+        val netherWastesSurface = ifTrue(
             netherWastes,
             sequence(
-                condition(
+                ifTrue(
                     UNDER_FLOOR,
-                    condition(
+                    ifTrue(
                         soulSandLayer,
                         sequence(
-                            condition(
+                            ifTrue(
                                 not(hole),
-                                condition(
+                                ifTrue(
                                     aboveY30AndDepth,
-                                    condition(
+                                    ifTrue(
                                         belowY35AndDepth,
                                         soulSand
                                     )
@@ -186,20 +185,20 @@ object NoiseSettingsGenerator {
                         )
                     )
                 ),
-                condition(
+                ifTrue(
                     ON_FLOOR,
-                    condition(
+                    ifTrue(
                         aboveY31,
-                        condition(
+                        ifTrue(
                             belowY35AndDepth,
-                            condition(
+                            ifTrue(
                                 gravelLayer,
                                 sequence(
-                                    condition(
+                                    ifTrue(
                                         aboveY32,
                                         gravel
                                     ),
-                                    condition(
+                                    ifTrue(
                                         not(hole),
                                         gravel
                                     )
@@ -212,23 +211,23 @@ object NoiseSettingsGenerator {
         )
 
         return sequence(
-            condition(
+            ifTrue(
                 verticalGradient(
                     "bedrock_floor",
-                    YOffset.getBottom(),
-                    YOffset.aboveBottom(5)
+                    VerticalAnchor.bottom(),
+                    VerticalAnchor.aboveBottom(5)
                 ), bedrock
             ),
-            condition(
+            ifTrue(
                 not(
                     verticalGradient(
                         "bedrock_roof",
-                        YOffset.belowTop(5),
-                        YOffset.getTop()
+                        VerticalAnchor.belowTop(5),
+                        VerticalAnchor.top()
                     )
                 ), bedrock
             ),
-            condition(aboveY5BelowTop, netherrack),
+            ifTrue(aboveY5BelowTop, netherrack),
             basaltDeltasSurface,
             soulValleySurface,
             netherwartForestSurface,
@@ -237,20 +236,20 @@ object NoiseSettingsGenerator {
     }
 
     fun wartForest(
-        biome: MaterialCondition,
-        nyliumBlock: MaterialRule,
-        wartBlock: MaterialRule
-    ): MaterialRule {
-        val netherrackNoise = noiseThreshold(NoiseParametersKeys.NETHERRACK, 0.54)
-        val netherWartCondition = noiseThreshold(NoiseParametersKeys.NETHER_WART, (1.17 / 2))
-        return condition(
+        biome: ConditionSource,
+        nyliumBlock: RuleSource,
+        wartBlock: RuleSource
+    ): RuleSource {
+        val netherrackNoise = noiseCondition(Noises.NETHERRACK, 0.54)
+        val netherWartCondition = noiseCondition(Noises.NETHER_WART, (1.17 / 2))
+        return ifTrue(
             biome,
-            condition(
+            ifTrue(
                 not(netherrackNoise),
-                condition(
-                    aboveY(YOffset.fixed(31), 0),
+                ifTrue(
+                    yBlockCheck(VerticalAnchor.absolute(31), 0),
                     sequence(
-                        condition(
+                        ifTrue(
                             netherWartCondition,
                             wartBlock
                         ),
@@ -261,7 +260,7 @@ object NoiseSettingsGenerator {
         )
     }
 
-    private fun block(block: Block): MaterialRule {
-        return block(block.defaultState)
+    private fun block(block: Block): RuleSource {
+        return state(block.defaultBlockState())
     }
 }

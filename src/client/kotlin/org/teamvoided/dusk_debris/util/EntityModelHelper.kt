@@ -1,11 +1,11 @@
 package org.teamvoided.dusk_debris.util
 
-import net.minecraft.client.render.animation.Animator
-import net.minecraft.client.util.math.MatrixStack
+import com.mojang.blaze3d.vertex.PoseStack
+import net.minecraft.client.animation.KeyframeAnimations
 import org.joml.Vector3f
 
-fun MatrixStack.scale(scale: Float) = this.scale(scale, scale, scale)
+fun PoseStack.scale(scale: Float) = this.scale(scale, scale, scale)
 
 fun scale(x: Float, y: Float, z: Float): Vector3f {
-    return Animator.scale(x.toDouble(), y.toDouble(), z.toDouble())
+    return KeyframeAnimations.scaleVec(x.toDouble(), y.toDouble(), z.toDouble())
 }

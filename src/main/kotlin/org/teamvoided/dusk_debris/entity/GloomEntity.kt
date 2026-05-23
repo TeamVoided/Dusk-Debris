@@ -1,82 +1,84 @@
 package org.teamvoided.dusk_debris.entity
 
-import net.minecraft.entity.*
-import net.minecraft.entity.ai.goal.*
-import net.minecraft.entity.attribute.DefaultAttributeContainer
-import net.minecraft.entity.attribute.EntityAttributes
-import net.minecraft.entity.damage.DamageSource
-import net.minecraft.entity.data.DataTracker
-import net.minecraft.entity.data.TrackedData
-import net.minecraft.entity.data.TrackedDataHandlerRegistry
-import net.minecraft.entity.effect.StatusEffect
-import net.minecraft.entity.effect.StatusEffectInstance
-import net.minecraft.entity.effect.StatusEffects
-import net.minecraft.entity.mob.AbstractSkeletonEntity
-import net.minecraft.entity.mob.HostileEntity
-import net.minecraft.entity.passive.TurtleEntity
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.entity.projectile.ArrowEntity
-import net.minecraft.entity.projectile.PersistentProjectileEntity
-import net.minecraft.item.ItemStack
-import net.minecraft.item.Items
-import net.minecraft.nbt.NbtCompound
-import net.minecraft.registry.Holder
-import net.minecraft.sound.SoundEvent
-import net.minecraft.sound.SoundEvents
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.random.RandomGenerator
-import net.minecraft.world.LocalDifficulty
-import net.minecraft.world.ServerWorldAccess
-import net.minecraft.world.World
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Holder
+import net.minecraft.nbt.CompoundTag
+import net.minecraft.network.syncher.EntityDataAccessor
+import net.minecraft.network.syncher.EntityDataSerializers
+import net.minecraft.network.syncher.SynchedEntityData
+import net.minecraft.sounds.SoundEvent
+import net.minecraft.sounds.SoundEvents
+import net.minecraft.util.RandomSource
+import net.minecraft.world.DifficultyInstance
+import net.minecraft.world.damagesource.DamageSource
+import net.minecraft.world.effect.MobEffect
+import net.minecraft.world.effect.MobEffectInstance
+import net.minecraft.world.effect.MobEffects
+import net.minecraft.world.entity.*
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier
+import net.minecraft.world.entity.ai.attributes.Attributes
+import net.minecraft.world.entity.ai.goal.*
+import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal
+import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal
+import net.minecraft.world.entity.animal.Turtle
+import net.minecraft.world.entity.monster.AbstractSkeleton
+import net.minecraft.world.entity.monster.Monster
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.entity.projectile.AbstractArrow
+import net.minecraft.world.entity.projectile.Arrow
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.Items
+import net.minecraft.world.level.Level
+import net.minecraft.world.level.ServerLevelAccessor
 import org.teamvoided.dusk_debris.data.tags.DuskDamageTypeTags
 import org.teamvoided.dusk_debris.data.tags.DuskEntityTypeTags
 import org.teamvoided.dusk_debris.entity.ai.goal.EnterDarknessGoal
 import java.awt.Color
 
-class GloomEntity(entityType: EntityType<out GloomEntity>, world: World) :
-    AbstractSkeletonEntity(entityType, world) {
+class GloomEntity(entityType: EntityType<out GloomEntity>, world: Level) :
+    AbstractSkeleton(entityType, world) {
     var darkModeTransitionTime: Int = 0
 
-    override fun initGoals() {
-        goalSelector.add(3, AvoidSunlightGoal(this))
-        goalSelector.add(3, EnterDarknessGoal(this, 1.0, lightThreshold))
-        goalSelector.add(
-            3, FleeEntityGoal(
+    override fun registerGoals() {
+        goalSelector.addGoal(3, RestrictSunGoal(this))
+        goalSelector.addGoal(3, EnterDarknessGoal(this, 1.0, lightThreshold))
+        goalSelector.addGoal(
+            3, AvoidEntityGoal(
                 this, LivingEntity::class.java, 6.0f, 1.0, 1.2
-            ) { it.type.isIn(DuskEntityTypeTags.DUSK_SKELETON_RETREATS) })
-        goalSelector.add(5, WanderAroundFarGoal(this, 1.0))
-        goalSelector.add(
-            6, LookAtEntityGoal(
-                this, PlayerEntity::class.java, 8.0f
+            ) { it.type.`is`(DuskEntityTypeTags.DUSK_SKELETON_RETREATS) })
+        goalSelector.addGoal(5, WaterAvoidingRandomStrollGoal(this, 1.0))
+        goalSelector.addGoal(
+            6, LookAtPlayerGoal(
+                this, Player::class.java, 8.0f
             )
         )
-        goalSelector.add(6, LookAroundGoal(this))
-        targetSelector.add(1, RevengeGoal(this, *arrayOfNulls(0)))
-        targetSelector.add(
-            2, TargetGoal(
-                this, PlayerEntity::class.java, true
+        goalSelector.addGoal(6, RandomLookAroundGoal(this))
+        targetSelector.addGoal(1, HurtByTargetGoal(this, *arrayOfNulls(0)))
+        targetSelector.addGoal(
+            2, NearestAttackableTargetGoal(
+                this, Player::class.java, true
             )
         )
-        targetSelector.add(
+        targetSelector.addGoal(
             3,
-            TargetGoal(this, LivingEntity::class.java, true) { it.type.isIn(DuskEntityTypeTags.DUSK_SKELETON_ATTACKS) })
-        targetSelector.add(
-            3, TargetGoal(
-                this, TurtleEntity::class.java, 10, true, false, TurtleEntity.BABY_TURTLE_ON_LAND_FILTER
+            NearestAttackableTargetGoal(this, LivingEntity::class.java, true) { it.type.`is`(DuskEntityTypeTags.DUSK_SKELETON_ATTACKS) })
+        targetSelector.addGoal(
+            3, NearestAttackableTargetGoal(
+                this, Turtle::class.java, 10, true, false, Turtle.BABY_ON_LAND_SELECTOR
             )
         )
     }
 
-    override fun initDataTracker(builder: DataTracker.Builder) {
-        super.initDataTracker(builder)
+    override fun defineSynchedData(builder: SynchedEntityData.Builder) {
+        super.defineSynchedData(builder)
         builder
-            .add(CONVERTING_TO_STRAY, false)
-            .add(CONVERTING_TO_DARK_MODE, false)
-            .add(EYE_COLOR, eyeColorDefault)
+            .define(CONVERTING_TO_STRAY, false)
+            .define(CONVERTING_TO_DARK_MODE, false)
+            .define(EYE_COLOR, eyeColorDefault)
     }
 
-    override fun readCustomDataFromNbt(nbt: NbtCompound) {
-        super.readCustomDataFromNbt(nbt)
+    override fun readAdditionalSaveData(nbt: CompoundTag) {
+        super.readAdditionalSaveData(nbt)
         if (nbt.contains(STRAY_CONVERSION_TIME_KEY, 99) && nbt.getInt(STRAY_CONVERSION_TIME_KEY) > -1)
             setConversionToStrayTime(nbt.getInt(STRAY_CONVERSION_TIME_KEY))
         if (nbt.contains(MODE_CONVERSION_TIME_KEY, 99) && nbt.getInt(MODE_CONVERSION_TIME_KEY) > -1)
@@ -85,16 +87,16 @@ class GloomEntity(entityType: EntityType<out GloomEntity>, world: World) :
             this.eyeColor = nbt.getInt(EYE_COLOR_KEY)
     }
 
-    override fun writeCustomDataToNbt(nbt: NbtCompound) {
-        super.writeCustomDataToNbt(nbt)
+    override fun addAdditionalSaveData(nbt: CompoundTag) {
+        super.addAdditionalSaveData(nbt)
         nbt.putInt(STRAY_CONVERSION_TIME_KEY, if (isConvertingToStray()) conversionToStrayTime else -1)
         nbt.putInt(MODE_CONVERSION_TIME_KEY, if (isLightMode()) countdownToDarkMode else -1)
         nbt.putInt(EYE_COLOR_KEY, this.eyeColor)
     }
 
     override fun tick() {
-        if (!world.isClient && isAlive && !isAiDisabled) {
-            if (inPowderSnow) {
+        if (!level().isClientSide && isAlive && !isNoAi) {
+            if (isInPowderSnow) {
                 if (isConvertingToStray()) {
                     --conversionToStrayTime
                     if (conversionToStrayTime < 0) {
@@ -115,25 +117,25 @@ class GloomEntity(entityType: EntityType<out GloomEntity>, world: World) :
                     if (countdownToDarkMode > 0) {
                         --countdownToDarkMode
                     } else {
-                        this.addStatusEffect(StatusEffectInstance(StatusEffects.DARKNESS, 60), this)
+                        this.addEffect(MobEffectInstance(MobEffects.DARKNESS, 60), this)
                         setConvertingToDarkMode(false)
                         countdownToDarkMode = -1
                     }
                 }
             } else if (countdownToDarkMode <= 240 || !isLightMode()) {
-//                getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED)!!.removeModifier(STUNNED_MOVEMENT_PENALTY_MODIFIER.id())
+//                getAttributeInstance(EntityAttributes.MOVEMENT_SPEED)!!.removeModifier(STUNNED_MOVEMENT_PENALTY_MODIFIER.id())
                 if (!isLightMode()) {
 //          found some funky things in the witch file, no idea why they are the most complex mob with such a small file :)
-//                    val entityAttributeInstance = this.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED)
+//                    val entityAttributeInstance = this.getAttributeInstance(EntityAttributes.MOVEMENT_SPEED)
 //                    entityAttributeInstance!!.removeModifier(stunned)
 //                    entityAttributeInstance.addTemporaryModifier(STUNNED_MOVEMENT_PENALTY_MODIFIER)
-                    this.addStatusEffect(StatusEffectInstance(StatusEffects.SLOWNESS, 60, 255), this)
+                    this.addEffect(MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 60, 255), this)
                 }
                 setConvertingToDarkMode(true)
                 countdownToDarkMode = LIGHT_MODE_TIME
 
             }
-        } else if (world.isClient) {
+        } else if (level().isClientSide) {
             if (isLightMode()) {
                 if (darkModeTransitionTime < 60)
                     darkModeTransitionTime++
@@ -146,11 +148,11 @@ class GloomEntity(entityType: EntityType<out GloomEntity>, world: World) :
 
     //Become Skeleton
     fun isConvertingToStray(): Boolean {
-        return getDataTracker().get(CONVERTING_TO_STRAY)
+        return entityData.get(CONVERTING_TO_STRAY)
     }
 
     fun setConvertingToStray(converting: Boolean) {
-        dataTracker.set(CONVERTING_TO_STRAY, converting)
+        entityData.set(CONVERTING_TO_STRAY, converting)
     }
 
 
@@ -162,27 +164,27 @@ class GloomEntity(entityType: EntityType<out GloomEntity>, world: World) :
     protected fun convertToStray() {
         convertTo(EntityType.SKELETON, true)
         if (!isSilent) {
-            world.syncWorldEvent(null as PlayerEntity?, 1048, blockPos, 0)
+            level().levelEvent(null as Player?, 1048, blockPosition(), 0)
         }
     }
 
     //Become Edgy
 
     fun isLightMode(): Boolean {
-        return getDataTracker().get(CONVERTING_TO_DARK_MODE)
+        return entityData.get(CONVERTING_TO_DARK_MODE)
     }
 
     fun setConvertingToDarkMode(converting: Boolean) {
-        dataTracker.set(CONVERTING_TO_DARK_MODE, converting)
+        entityData.set(CONVERTING_TO_DARK_MODE, converting)
     }
 
     var eyeColor: Int
-        get() = dataTracker.get(EYE_COLOR)
-        set(color) = dataTracker.set(EYE_COLOR, color)
+        get() = entityData.get(EYE_COLOR)
+        set(color) = entityData.set(EYE_COLOR, color)
 
 
     fun inDarkness(): Boolean {
-        return world.getLightLevel(blockPos) < lightThreshold
+        return level().getMaxLocalRawBrightness(blockPosition()) < lightThreshold
     }
 
     //Other things
@@ -195,7 +197,7 @@ class GloomEntity(entityType: EntityType<out GloomEntity>, world: World) :
         return false
     }
 
-    override fun isAffectedByDaylight(): Boolean {
+    override fun isSunBurnTick(): Boolean {
         return false
     }
 
@@ -205,61 +207,61 @@ class GloomEntity(entityType: EntityType<out GloomEntity>, world: World) :
     }
 
     override fun getAmbientSound(): SoundEvent {
-        return SoundEvents.ENTITY_STRAY_AMBIENT
+        return SoundEvents.STRAY_AMBIENT
     }
 
     override fun getHurtSound(source: DamageSource): SoundEvent {
-        return SoundEvents.ENTITY_STRAY_HURT
+        return SoundEvents.STRAY_HURT
     }
 
     override fun getDeathSound(): SoundEvent {
-        return SoundEvents.ENTITY_STRAY_DEATH
+        return SoundEvents.STRAY_DEATH
     }
 
     override fun getStepSound(): SoundEvent {
-        return SoundEvents.ENTITY_STRAY_STEP
+        return SoundEvents.STRAY_STEP
     }
 
-    override fun applyEnchantmentsToDamage(source: DamageSource, amount: Float): Float {
+    override fun getDamageAfterMagicAbsorb(source: DamageSource, amount: Float): Float {
         var damage = amount
-        if (!isLightMode() && !source.isTypeIn(DuskDamageTypeTags.BYPASSES_GLOOM_RESISTANCE)) {
+        if (!isLightMode() && !source.`is`(DuskDamageTypeTags.BYPASSES_GLOOM_RESISTANCE)) {
             damage *= 0.01f
         }
-        return super.applyEnchantmentsToDamage(source, damage)
+        return super.getDamageAfterMagicAbsorb(source, damage)
     }
 
 
-    override fun tryAttack(target: Entity): Boolean {
-        if (!super.tryAttack(target)) {
+    override fun doHurtTarget(target: Entity): Boolean {
+        if (!super.doHurtTarget(target)) {
             return false
         } else {
             if (target is LivingEntity && !isLightMode()) {
-                target.addStatusEffect(StatusEffectInstance(statusEffect, 200), this)
+                target.addEffect(MobEffectInstance(statusEffect, 200), this)
             }
             return true
         }
     }
 
-    override fun createArrowProjectile(
+    override fun getArrow(
         itemStack: ItemStack,
         f: Float,
         itemStack2: ItemStack?
-    ): PersistentProjectileEntity {
-        val persistentProjectileEntity = super.createArrowProjectile(itemStack, f, itemStack2)
-        if (persistentProjectileEntity is ArrowEntity) {
-            persistentProjectileEntity.addEffect(StatusEffectInstance(statusEffect, 600))
+    ): AbstractArrow {
+        val persistentProjectileEntity = super.getArrow(itemStack, f, itemStack2)
+        if (persistentProjectileEntity is Arrow) {
+            persistentProjectileEntity.addEffect(MobEffectInstance(statusEffect, 600))
         }
         return persistentProjectileEntity
     }
 
-    override fun initEquipment(random: RandomGenerator, difficulty: LocalDifficulty) {
+    override fun populateDefaultEquipmentSlots(random: RandomSource, difficulty: DifficultyInstance) {
         val weaponMaterial = random.nextFloat()
         val weaponTypeAxe = random.nextInt(25) == 0
         if (weaponMaterial > 0.95) {
             if (weaponTypeAxe) {
-                this.equipStack(EquipmentSlot.MAINHAND, ItemStack(Items.IRON_AXE))
+                this.setItemSlot(EquipmentSlot.MAINHAND, ItemStack(Items.IRON_AXE))
             } else {
-                this.equipStack(EquipmentSlot.MAINHAND, ItemStack(Items.IRON_SWORD))
+                this.setItemSlot(EquipmentSlot.MAINHAND, ItemStack(Items.IRON_SWORD))
             }
 //        } else if (weaponMaterial > 0.85) {
 //            if (weaponTypeAxe) {
@@ -269,28 +271,28 @@ class GloomEntity(entityType: EntityType<out GloomEntity>, world: World) :
 //            }
         } else if (weaponMaterial > 0.5) {
             if (weaponTypeAxe) {
-                this.equipStack(EquipmentSlot.MAINHAND, ItemStack(Items.STONE_AXE))
+                this.setItemSlot(EquipmentSlot.MAINHAND, ItemStack(Items.STONE_AXE))
             } else {
-                this.equipStack(EquipmentSlot.MAINHAND, ItemStack(Items.STONE_SWORD))
+                this.setItemSlot(EquipmentSlot.MAINHAND, ItemStack(Items.STONE_SWORD))
             }
         } else {
-            this.equipStack(EquipmentSlot.MAINHAND, ItemStack(Items.BOW))
+            this.setItemSlot(EquipmentSlot.MAINHAND, ItemStack(Items.BOW))
         }
     }
 
     companion object {
         private const val lightThreshold: Int = 10
-        val statusEffect: Holder<StatusEffect> = StatusEffects.DARKNESS
+        val statusEffect: Holder<MobEffect> = MobEffects.DARKNESS
 
-        private val CONVERTING_TO_STRAY: TrackedData<Boolean> =
-            DataTracker.registerData(GloomEntity::class.java, TrackedDataHandlerRegistry.BOOLEAN)
+        private val CONVERTING_TO_STRAY: EntityDataAccessor<Boolean> =
+            SynchedEntityData.defineId(GloomEntity::class.java, EntityDataSerializers.BOOLEAN)
         const val STRAY_CONVERSION_TIME_KEY: String = "StrayConversionTime"
         private const val STRAY_CONVERSION_TIME = 300
         private var inPowderSnowTime = 0
         private var conversionToStrayTime = 0
 
-        private val CONVERTING_TO_DARK_MODE: TrackedData<Boolean> =
-            DataTracker.registerData(GloomEntity::class.java, TrackedDataHandlerRegistry.BOOLEAN)
+        private val CONVERTING_TO_DARK_MODE: EntityDataAccessor<Boolean> =
+            SynchedEntityData.defineId(GloomEntity::class.java, EntityDataSerializers.BOOLEAN)
         const val MODE_CONVERSION_TIME_KEY: String = "LightModeTime"
         private const val LIGHT_MODE_TIME = 300
         private var countdownToDarkMode = -1
@@ -298,26 +300,26 @@ class GloomEntity(entityType: EntityType<out GloomEntity>, world: World) :
 //        val STUNNED_MOVEMENT_PENALTY_MODIFIER =
 //            EntityAttributeModifier(stunned, -0.25, EntityAttributeModifier.Operation.ADD_VALUE)
 
-        private val EYE_COLOR: TrackedData<Int> =
-            DataTracker.registerData(GloomEntity::class.java, TrackedDataHandlerRegistry.INTEGER)
+        private val EYE_COLOR: EntityDataAccessor<Int> =
+            SynchedEntityData.defineId(GloomEntity::class.java, EntityDataSerializers.INT)
         val EYE_COLOR_KEY: String = "EyeColor"
         private var eyeColorDefault: Int = Color(217, 230, 244).rgb
 
 
-        fun createAttributes(): DefaultAttributeContainer.Builder {
-            return HostileEntity.createAttributes()
-                .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.25)
+        fun createAttributes(): AttributeSupplier.Builder {
+            return Monster.createMonsterAttributes()
+                .add(Attributes.MOVEMENT_SPEED, 0.25)
         }
 
         fun canSpawn(
             type: EntityType<GloomEntity>,
-            world: ServerWorldAccess,
-            spawnReason: SpawnReason,
+            world: ServerLevelAccessor,
+            spawnReason: MobSpawnType,
             pos: BlockPos,
-            random: RandomGenerator
+            random: RandomSource
         ): Boolean {
-            return canSpawnInDark(type, world, spawnReason, pos, random) ||
-                    (SpawnReason.isSpawner(spawnReason))
+            return checkMonsterSpawnRules(type, world, spawnReason, pos, random) ||
+                    (MobSpawnType.isSpawner(spawnReason))
         }
     }
 }

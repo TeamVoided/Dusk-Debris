@@ -3,71 +3,71 @@ package org.teamvoided.dusk_debris.particle
 import com.mojang.blaze3d.vertex.VertexConsumer
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
+import net.minecraft.client.Camera
+import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.client.particle.*
-import net.minecraft.client.render.Camera
-import net.minecraft.client.world.ClientWorld
-import net.minecraft.particle.DefaultParticleType
-import net.minecraft.util.math.MathHelper.lerp
-import net.minecraft.util.math.Vec3d
+import net.minecraft.core.particles.SimpleParticleType
+import net.minecraft.util.Mth.lerp
+import net.minecraft.world.phys.Vec3
 import org.joml.Quaternionf
 
 class LazerSourceParticle(
-    world: ClientWorld,
+    world: ClientLevel,
     x: Double,
     y: Double,
     z: Double,
     velocityX: Double,
     velocityY: Double,
     velocityZ: Double
-) : SpriteBillboardParticle(world, x, y, z, velocityX, velocityY, velocityZ) {
+) : TextureSheetParticle(world, x, y, z, velocityX, velocityY, velocityZ) {
     init {
-        this.velocityX = velocityX
-        this.velocityY = velocityY
-        this.velocityZ = velocityZ
-        this.scale = random.nextFloat() * 0.25f + 0.25f
-        this.maxAge = 10 + random.nextInt(10)
+        this.xd = velocityX
+        this.yd = velocityY
+        this.zd = velocityZ
+        this.quadSize = random.nextFloat() * 0.25f + 0.25f
+        this.lifetime = 10 + random.nextInt(10)
     }
 
     override fun tick() {
-        this.prevPosX = this.x
-        this.prevPosY = this.y
-        this.prevPosZ = this.z
-        if (this.age++ >= this.maxAge) {
-            this.markDead()
+        this.xo = this.x
+        this.yo = this.y
+        this.zo = this.z
+        if (this.age++ >= this.lifetime) {
+            this.remove()
         } else {
-            this.x += this.velocityX
-            this.y += this.velocityY
-            this.z += this.velocityZ
+            this.x += this.xd
+            this.y += this.yd
+            this.z += this.zd
         }
     }
 
-    override fun getSize(tickDelta: Float): Float = super.getSize(tickDelta) * mult(tickDelta)
+    override fun getQuadSize(tickDelta: Float): Float = super.getQuadSize(tickDelta) * mult(tickDelta)
 
-    override fun method_60373(
+    override fun renderRotatedQuad(
         vertexConsumer: VertexConsumer,
         camera: Camera,
         quaternionf: Quaternionf,
         tickDelta: Float
     ) {
-        val cameraPos = camera.pos
-        val particlePos = Vec3d(
-            lerp(tickDelta.toDouble(), this.prevPosX, this.x),
-            lerp(tickDelta.toDouble(), this.prevPosY, this.y),
-            lerp(tickDelta.toDouble(), this.prevPosZ, this.z)
+        val cameraPos = camera.position
+        val particlePos = Vec3(
+            lerp(tickDelta.toDouble(), this.xo, this.x),
+            lerp(tickDelta.toDouble(), this.yo, this.y),
+            lerp(tickDelta.toDouble(), this.zo, this.z)
         )
 
-        val offsetPos = Vec3d(
+        val offsetPos = Vec3(
             particlePos.x - cameraPos.x,
             particlePos.y - cameraPos.y,
             particlePos.z - cameraPos.z
-        ).normalize().multiply(mult(tickDelta).toDouble())
-        val returnPos = Vec3d(
+        ).normalize().scale(mult(tickDelta).toDouble())
+        val returnPos = Vec3(
             (particlePos.x - (offsetPos.x) - cameraPos.x),
             (particlePos.y - (offsetPos.y) - cameraPos.y),
             (particlePos.z - (offsetPos.z) - cameraPos.z)
         )
 
-        this.method_60374(
+        this.renderRotatedQuad(
             vertexConsumer,
             quaternionf,
             returnPos.x.toFloat(),
@@ -78,20 +78,20 @@ class LazerSourceParticle(
     }
 
     private fun mult(tickDelta: Float): Float {
-        val mult = (2f / (maxAge - 1f)) * (age + tickDelta) - 1f
+        val mult = (2f / (lifetime - 1f)) * (age + tickDelta) - 1f
         return 1f - (mult * mult)
     }
 
-    override fun getType(): ParticleTextureSheet = ParticleTextureSheet.PARTICLE_SHEET_LIT
+    override fun getRenderType(): ParticleRenderType = ParticleRenderType.PARTICLE_SHEET_LIT
 
-    override fun getBrightness(tint: Float): Int = 240
+    override fun getLightColor(tint: Float): Int = 240
 
 
     @Environment(EnvType.CLIENT)
-    class Factory(private val spriteProvider: SpriteProvider) : ParticleFactory<DefaultParticleType> {
+    class Factory(private val spriteProvider: SpriteSet) : ParticleProvider<SimpleParticleType> {
         override fun createParticle(
-            type: DefaultParticleType,
-            world: ClientWorld,
+            type: SimpleParticleType,
+            world: ClientLevel,
             posX: Double,
             posY: Double,
             posZ: Double,
@@ -100,7 +100,7 @@ class LazerSourceParticle(
             velZ: Double,
         ): Particle {
             val particle = LazerSourceParticle(world, posX, posY, posZ, velX, velY, velZ)
-            particle.setSprite(spriteProvider)
+            particle.pickSprite(spriteProvider)
             return particle
         }
     }

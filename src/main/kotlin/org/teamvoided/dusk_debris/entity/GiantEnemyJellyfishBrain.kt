@@ -3,15 +3,15 @@ package org.teamvoided.dusk_debris.entity
 import com.google.common.collect.ImmutableList
 import com.google.common.collect.ImmutableSet
 import com.mojang.datafixers.util.Pair
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.ai.brain.Activity
-import net.minecraft.entity.ai.brain.Brain
-import net.minecraft.entity.ai.brain.MemoryModuleState
-import net.minecraft.entity.ai.brain.MemoryModuleType
-import net.minecraft.entity.ai.brain.sensor.Sensor
-import net.minecraft.entity.ai.brain.sensor.SensorType
-import net.minecraft.entity.ai.brain.task.*
-import net.minecraft.util.dynamic.GlobalPos
+import net.minecraft.core.GlobalPos
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.ai.Brain
+import net.minecraft.world.entity.ai.behavior.*
+import net.minecraft.world.entity.ai.memory.MemoryModuleType
+import net.minecraft.world.entity.ai.memory.MemoryStatus
+import net.minecraft.world.entity.ai.sensing.Sensor
+import net.minecraft.world.entity.ai.sensing.SensorType
+import net.minecraft.world.entity.schedule.Activity
 import org.teamvoided.dusk_debris.init.brain.DuskSensorType
 import java.util.Set
 
@@ -37,10 +37,10 @@ object GiantEnemyJellyfishBrain {
     val MEMORY_MODULES: List<MemoryModuleType<out Any>> =
         listOf(
             MemoryModuleType.LOOK_TARGET,
-            MemoryModuleType.MOBS,
-            MemoryModuleType.VISIBLE_MOBS,
+            MemoryModuleType.NEAREST_LIVING_ENTITIES,
+            MemoryModuleType.NEAREST_VISIBLE_LIVING_ENTITIES,
             MemoryModuleType.NEAREST_VISIBLE_PLAYER,
-            MemoryModuleType.NEAREST_VISIBLE_TARGETABLE_PLAYER,
+            MemoryModuleType.NEAREST_VISIBLE_ATTACKABLE_PLAYER,
             MemoryModuleType.HURT_BY,
             MemoryModuleType.HURT_BY_ENTITY,
             MemoryModuleType.WALK_TARGET,
@@ -63,39 +63,39 @@ object GiantEnemyJellyfishBrain {
         addFightTasks(jellyfish, brain)
         brain.setCoreActivities(Set.of(Activity.CORE))
         brain.setDefaultActivity(Activity.IDLE)
-        brain.resetPossibleActivities()
+        brain.useDefaultActivity()
         return brain
     }
 
-    fun createProfile(): Brain.Profile<GiantEnemyJellyfishEntity> =
-        Brain.createProfile(MEMORY_MODULES, SENSORS as Nothing?)
+    fun createProfile(): Brain.Provider<GiantEnemyJellyfishEntity> =
+        Brain.provider(MEMORY_MODULES, SENSORS as Nothing?)
 
 
     internal fun setCurrentPosAsHome(jellyfish: GiantEnemyJellyfishEntity) {
-        val globalPos = GlobalPos.create(jellyfish.world.registryKey, jellyfish.blockPos)
-        jellyfish.brain.remember(MemoryModuleType.HOME, globalPos)
+        val globalPos = GlobalPos.of(jellyfish.level().dimension(), jellyfish.blockPosition())
+        jellyfish.brain.setMemory(MemoryModuleType.HOME, globalPos)
     }
 
 
     private fun addCoreTasks(brain: Brain<GiantEnemyJellyfishEntity>) {
-        brain.setTaskList(Activity.CORE, 0, ImmutableList.of(StayAboveWaterTask(0.8f), LookAroundTask(45, 90)))
+        brain.addActivity(Activity.CORE, 0, ImmutableList.of(Swim(0.8f), LookAtTargetSink(45, 90)))
     }
 
     private fun addIdleTasks(brain: Brain<GiantEnemyJellyfishEntity>) {
-        brain.setTaskList(
+        brain.addActivity(
             Activity.IDLE,
             ImmutableList.of(
                 Pair.of(
-                    0, UpdateAttackTargetTask.create { jellyfish: GiantEnemyJellyfishEntity ->
-                        jellyfish.brain.getOptionalMemory(MemoryModuleType.NEAREST_ATTACKABLE)
+                    0, StartAttacking.create { jellyfish: GiantEnemyJellyfishEntity ->
+                        jellyfish.brain.getMemory(MemoryModuleType.NEAREST_ATTACKABLE)
                     }),
-                Pair.of(1, UpdateAttackTargetTask.create { it.getRecentAttacker() }),
-                Pair.of(2, WanderAroundTask(20, 40)),
+                Pair.of(1, StartAttacking.create { it.getRecentAttacker() }),
+                Pair.of(2, MoveToTargetSink(20, 40)),
                 Pair.of(
-                    3, RandomTask(
+                    3, RunOne(
                         ImmutableList.of(
-                            Pair.of(WaitTask(20, 100), 1),
-                            Pair.of(MeanderTask.create(0.6f), 2)
+                            Pair.of(DoNothing(20, 100), 1),
+                            Pair.of(RandomStroll.stroll(0.6f), 2)
                         )
                     )
                 )
@@ -104,13 +104,13 @@ object GiantEnemyJellyfishBrain {
     }
 
     private fun addFightTasks(jellyfish: GiantEnemyJellyfishEntity, brain: Brain<GiantEnemyJellyfishEntity>) {
-        brain.setTaskList(
+        brain.addActivityWithConditions(
             Activity.FIGHT,
-            ImmutableList.of<Pair<Int, TaskControl<GiantEnemyJellyfishEntity>>>(
+            ImmutableList.of<Pair<Int, BehaviorControl<GiantEnemyJellyfishEntity>>>(
                 Pair.of(
                     0,
-                    ForgetAttackTargetTask.create { target: LivingEntity ->
-                        !Sensor.testAttackableTargetPredicate(jellyfish, target)
+                    StopAttackingIfTargetInvalid.create { target: LivingEntity ->
+                        !Sensor.isEntityAttackable(jellyfish, target)
                     }),
 //                Pair.of(1, BreezeShootTask()),
 //                Pair.of(2, BreezeLongJumpTask()),
@@ -118,13 +118,13 @@ object GiantEnemyJellyfishBrain {
 //                Pair.of(4, BreezeSlideTask())
             ),
             ImmutableSet.of(
-                Pair.of(MemoryModuleType.ATTACK_TARGET, MemoryModuleState.VALUE_PRESENT),
-                Pair.of(MemoryModuleType.WALK_TARGET, MemoryModuleState.VALUE_ABSENT)
+                Pair.of(MemoryModuleType.ATTACK_TARGET, MemoryStatus.VALUE_PRESENT),
+                Pair.of(MemoryModuleType.WALK_TARGET, MemoryStatus.VALUE_ABSENT)
             )
         )
     }
 
     fun updateActivities(jellyfish: GiantEnemyJellyfishEntity) {
-        jellyfish.brain.resetPossibleActivities(ImmutableList.of(Activity.FIGHT, Activity.IDLE))
+        jellyfish.brain.setActiveActivityToFirstValid(ImmutableList.of(Activity.FIGHT, Activity.IDLE))
     }
 }

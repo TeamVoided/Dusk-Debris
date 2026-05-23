@@ -1,8 +1,12 @@
 package org.teamvoided.dusk_debris.entity.jellyfish.volaphyra.model
 
 
-import net.minecraft.client.model.*
-import net.minecraft.client.render.entity.model.SinglePartEntityModel
+import net.minecraft.client.model.HierarchicalModel
+import net.minecraft.client.model.geom.ModelPart
+import net.minecraft.client.model.geom.PartPose
+import net.minecraft.client.model.geom.builders.CubeListBuilder
+import net.minecraft.client.model.geom.builders.LayerDefinition
+import net.minecraft.client.model.geom.builders.MeshDefinition
 import org.teamvoided.dusk_debris.entity.AbstractVolaphyraEntity
 import org.teamvoided.dusk_debris.entity.jellyfish.volaphyra.animation.VolaphyraEntityAnimations
 import org.teamvoided.dusk_debris.entity.jellyfish.volaphyra.model.VolaphyraMesogleaModel.Companion.ARMS_EAST
@@ -12,7 +16,7 @@ import org.teamvoided.dusk_debris.entity.jellyfish.volaphyra.model.VolaphyraMeso
 import org.teamvoided.dusk_debris.util.Utils.rotate45
 
 class VolaphyraCoreModel(val root: ModelPart, val offset: Float = 0f) :
-    SinglePartEntityModel<AbstractVolaphyraEntity>() {
+    HierarchicalModel<AbstractVolaphyraEntity>() {
     val core: ModelPart = root.getChild("core")
     var manubrium: ModelPart = core.getChild("manubrium")
     var armsNorth: ModelPart = core.getChild(ARMS_NORTH)
@@ -20,20 +24,20 @@ class VolaphyraCoreModel(val root: ModelPart, val offset: Float = 0f) :
     var armsEast: ModelPart = core.getChild(ARMS_EAST)
     var armsWest: ModelPart = core.getChild(ARMS_WEST)
 
-    override fun getPart(): ModelPart {
+    override fun root(): ModelPart {
         return this.root
     }
 
-    override fun setAngles(
+    override fun setupAnim(
         entity: AbstractVolaphyraEntity, limbAngle: Float, //f
         limbDistance: Float, //g
         animationProgress: Float, //h
         headYaw: Float, //i
         headPitch: Float //j
     ) {
-        this.part.traverse().forEach(ModelPart::resetTransform)
+        this.root().allParts.forEach(ModelPart::resetPose)
         if (offset != 0f) {
-            core.setPivot(core.pivotX, core.pivotY - offset, core.pivotZ)
+            core.setPos(core.x, core.y - offset, core.z)
         }
         this.animate(entity.idleAnimationState, VolaphyraEntityAnimations.IDLE, animationProgress, 1.0f)
         VolaphyraMesogleaModel.animateArms(
@@ -49,42 +53,42 @@ class VolaphyraCoreModel(val root: ModelPart, val offset: Float = 0f) :
     }
 
     companion object {
-        val texturedModelData: TexturedModelData
+        val texturedModelData: LayerDefinition
             get() {
-                val modelData = ModelData()
+                val modelData = MeshDefinition()
                 val modelPartData = modelData.root
-                val core = modelPartData.addChild(
+                val core = modelPartData.addOrReplaceChild(
                     "core",
-                    ModelPartBuilder.create().uv(0, 0).cuboid(-4f, -8f, -4f, 8f, 8f, 8f),
-                    ModelTransform.pivot(0f, 24f, 0f)
+                    CubeListBuilder.create().texOffs(0, 0).addBox(-4f, -8f, -4f, 8f, 8f, 8f),
+                    PartPose.offset(0f, 24f, 0f)
                 )
-                core.addChild(
+                core.addOrReplaceChild(
                     "manubrium",
-                    ModelPartBuilder.create().uv(32, -8).cuboid(0f, -4f, -4f, 0f, 20f, 8f).uv(32, 0)
-                        .cuboid(-4f, -4f, 0f, 8f, 20f, 0f),
-                    ModelTransform.of(0f, 2f, 0f, 0f, -rotate45, 0f)
+                    CubeListBuilder.create().texOffs(32, -8).addBox(0f, -4f, -4f, 0f, 20f, 8f).texOffs(32, 0)
+                        .addBox(-4f, -4f, 0f, 8f, 20f, 0f),
+                    PartPose.offsetAndRotation(0f, 2f, 0f, 0f, -rotate45, 0f)
                 )
-                core.addChild(
+                core.addOrReplaceChild(
                     ARMS_NORTH,
-                    ModelPartBuilder.create().uv(0, 16).cuboid(-4f, 0f, 0f, 8f, 16f, 0f),
-                    ModelTransform.pivot(0f, 0f, -3f)
+                    CubeListBuilder.create().texOffs(0, 16).addBox(-4f, 0f, 0f, 8f, 16f, 0f),
+                    PartPose.offset(0f, 0f, -3f)
                 )
-                core.addChild(
+                core.addOrReplaceChild(
                     ARMS_SOUTH,
-                    ModelPartBuilder.create().uv(16, 16).cuboid(-4f, 0f, 0f, 8f, 16f, 0f),
-                    ModelTransform.pivot(0f, 0f, 3f)
+                    CubeListBuilder.create().texOffs(16, 16).addBox(-4f, 0f, 0f, 8f, 16f, 0f),
+                    PartPose.offset(0f, 0f, 3f)
                 )
-                core.addChild(
+                core.addOrReplaceChild(
                     ARMS_EAST,
-                    ModelPartBuilder.create().uv(16, 8).cuboid(0f, 0f, -4f, 0f, 16f, 8f),
-                    ModelTransform.pivot(-3f, 0f, 0f)
+                    CubeListBuilder.create().texOffs(16, 8).addBox(0f, 0f, -4f, 0f, 16f, 8f),
+                    PartPose.offset(-3f, 0f, 0f)
                 )
-                core.addChild(
+                core.addOrReplaceChild(
                     ARMS_WEST,
-                    ModelPartBuilder.create().uv(0, 8).cuboid(0f, 0f, -4f, 0f, 16f, 8f),
-                    ModelTransform.pivot(3f, 0f, 0f)
+                    CubeListBuilder.create().texOffs(0, 8).addBox(0f, 0f, -4f, 0f, 16f, 8f),
+                    PartPose.offset(3f, 0f, 0f)
                 )
-                return TexturedModelData.of(modelData, 64, 32)
+                return LayerDefinition.create(modelData, 64, 32)
             }
     }
 }

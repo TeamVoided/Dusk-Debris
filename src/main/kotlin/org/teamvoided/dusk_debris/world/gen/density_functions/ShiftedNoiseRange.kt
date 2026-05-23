@@ -3,9 +3,9 @@ package org.teamvoided.dusk_debris.world.gen.density_functions
 import com.mojang.serialization.Codec
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
-import net.minecraft.util.dynamic.CodecHolder
-import net.minecraft.world.gen.DensityFunction
-import net.minecraft.world.gen.DensityFunction.ContextProvider
+import net.minecraft.util.KeyDispatchDataCodec
+import net.minecraft.world.level.levelgen.DensityFunction
+import net.minecraft.world.level.levelgen.DensityFunction.ContextProvider
 import org.teamvoided.dusk_debris.util.world_helper.makeCodec
 
 class ShiftedNoiseRange(
@@ -30,7 +30,7 @@ class ShiftedNoiseRange(
         val y: Double = y3 * this.verticalScale + shiftY.compute(c)
         val z: Double = c.blockZ() * this.horizontalScale + shiftZ.compute(c)
 
-        return noise.sample(x, y, z)
+        return noise.getValue(x, y, z)
     }
 
     override fun fillArray(array: DoubleArray, context: ContextProvider) = context.fillAllDirectly(array, this)
@@ -52,9 +52,9 @@ class ShiftedNoiseRange(
 
     override fun minValue(): Double = -this.maxValue()
 
-    override fun maxValue(): Double = noise.maxValue
+    override fun maxValue(): Double = noise.maxValue()
 
-    override fun codec(): CodecHolder<ShiftedNoiseRange> = CODEC
+    override fun codec(): KeyDispatchDataCodec<ShiftedNoiseRange> = CODEC
 
     companion object {
         private val DATA_CODEC: MapCodec<ShiftedNoiseRange> =
@@ -71,6 +71,6 @@ class ShiftedNoiseRange(
                     .apply(instance, ::ShiftedNoiseRange)
             }
 
-        val CODEC: CodecHolder<ShiftedNoiseRange> = makeCodec(DATA_CODEC)
+        val CODEC: KeyDispatchDataCodec<ShiftedNoiseRange> = makeCodec(DATA_CODEC)
     }
 }

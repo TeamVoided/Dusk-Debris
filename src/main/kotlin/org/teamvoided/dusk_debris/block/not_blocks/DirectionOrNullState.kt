@@ -1,10 +1,9 @@
 package org.teamvoided.dusk_debris.block.not_blocks
 
-import kotlinx.serialization.modules.serializersModuleOf
-import net.minecraft.util.StringIdentifiable
-import net.minecraft.util.math.Direction
+import net.minecraft.core.Direction
+import net.minecraft.util.StringRepresentable
 
-enum class DirectionOrNullState(val direction: Direction?) : StringIdentifiable {
+enum class DirectionOrNullState(val direction: Direction?) : StringRepresentable {
     DOWN(Direction.DOWN),
     UP(Direction.UP),
     NORTH(Direction.NORTH),
@@ -15,14 +14,14 @@ enum class DirectionOrNullState(val direction: Direction?) : StringIdentifiable 
 
     override fun toString(): String = string()
 
-    override fun asString(): String = string()
+    override fun getSerializedName(): String = string()
 
     private fun string(): String = direction?.toString() ?: "source"
 
     companion object {
         fun fromDirection(direction: Direction?): DirectionOrNullState =
             if (direction != null)
-                fromInt(direction.id)
+                fromInt(direction.get3DDataValue())
             else
                 NONE
 

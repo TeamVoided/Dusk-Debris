@@ -1,16 +1,16 @@
 package org.teamvoided.dusk_debris.particle.cube_particles.abstracts
 
-import net.minecraft.client.particle.SpriteProvider
-import net.minecraft.client.texture.Sprite
-import net.minecraft.client.world.ClientWorld
+import net.minecraft.client.multiplayer.ClientLevel
+import net.minecraft.client.particle.SpriteSet
+import net.minecraft.client.renderer.texture.TextureAtlasSprite
 
 abstract class SpriteBillboardKotlinParticle : BillboardKotlinParticle {
-    private var sprite: Sprite? = null
+    private var sprite: TextureAtlasSprite? = null
 
-    protected constructor(world: ClientWorld, x: Double, y: Double, z: Double) : super(world, x, y, z)
+    protected constructor(world: ClientLevel, x: Double, y: Double, z: Double) : super(world, x, y, z)
 
     protected constructor(
-        world: ClientWorld,
+        world: ClientLevel,
         x: Double,
         y: Double,
         z: Double,
@@ -21,25 +21,25 @@ abstract class SpriteBillboardKotlinParticle : BillboardKotlinParticle {
 
     init {}
 
-    protected fun setSprite(sprite: Sprite) {
+    protected fun setSprite(sprite: TextureAtlasSprite) {
         this.sprite = sprite
     }
 
-    override fun minU(): Float = sprite?.minU ?: error("null sprite provided")
+    override fun minU(): Float = sprite?.u0 ?: error("null sprite provided")
 
-    override fun maxU(): Float = sprite?.maxU ?: error("null sprite provided")
+    override fun maxU(): Float = sprite?.u1 ?: error("null sprite provided")
 
-    override fun minV(): Float = sprite?.minV ?: error("null sprite provided")
+    override fun minV(): Float = sprite?.v0 ?: error("null sprite provided")
 
-    override fun maxV(): Float = sprite?.maxV ?: error("null sprite provided")
+    override fun maxV(): Float = sprite?.v1 ?: error("null sprite provided")
 
-    open fun setSprite(spriteProvider: SpriteProvider) {
-        this.setSprite(spriteProvider.getRandom(this.random))
+    open fun setSprite(spriteProvider: SpriteSet) {
+        this.setSprite(spriteProvider.get(this.random))
     }
 
-    open fun setSpriteForAge(spriteProvider: SpriteProvider) {
-        if (!this.dead) {
-            this.setSprite(spriteProvider.getSprite(this.age, this.maxAge))
+    open fun setSpriteForAge(spriteProvider: SpriteSet) {
+        if (!this.removed) {
+            this.setSprite(spriteProvider.get(this.age, this.lifetime))
         }
     }
 }

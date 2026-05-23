@@ -1,10 +1,10 @@
 package org.teamvoided.dusk_debris.mixin.pixel_accurate;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.SignBlockEntity;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screen.ingame.AbstractSignEditScreen;
-import net.minecraft.client.gui.screen.ingame.SignEditScreen;
+import net.minecraft.client.gui.screens.inventory.AbstractSignEditScreen;
+import net.minecraft.client.gui.screens.inventory.SignEditScreen;
+import net.minecraft.world.level.block.entity.SignBlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.teamvoided.dusk_debris.util.SignFunctions;
 

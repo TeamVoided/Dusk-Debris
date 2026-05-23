@@ -3,7 +3,7 @@ package org.teamvoided.dusk_debris.init
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap
 import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandlerRegistry
 import net.fabricmc.fabric.api.client.render.fluid.v1.SimpleFluidRenderHandler
-import net.minecraft.client.render.RenderLayer
+import net.minecraft.client.renderer.RenderType
 import org.teamvoided.dusk_debris.DuskDebris
 
 object DuskFluidsClient {
@@ -15,6 +15,6 @@ object DuskFluidsClient {
                 DuskDebris.id("liquid/acid")
             )
         )
-        BlockRenderLayerMap.INSTANCE.putFluids(RenderLayer.getTranslucent(), DuskFluids.ACID, DuskFluids.FLOWING_ACID)
+        BlockRenderLayerMap.INSTANCE.putFluids(RenderType.translucent(), DuskFluids.ACID, DuskFluids.FLOWING_ACID)
     }
 }

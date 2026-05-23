@@ -1,7 +1,7 @@
 package org.teamvoided.dusk_debris.particle.cube_particles.models
 
 import com.mojang.blaze3d.vertex.VertexConsumer
-import net.minecraft.util.math.Direction
+import net.minecraft.core.Direction
 import org.joml.Quaternionf
 import org.joml.Vector3f
 import org.joml.Vector4f
@@ -100,7 +100,7 @@ open class CubeSimple(
         constructor(vertices: Array<Vertex>, uv: UV, direction: Direction) :
                 this(vertices, uv.minU, uv.maxU, uv.minV, uv.maxV, direction)
 
-        val direction: Vector3f = direction.unitVector
+        val direction: Vector3f = direction.step()
 
         init {
             vertices[0] = vertices[0].remap(maxU, minV)
@@ -143,10 +143,10 @@ open class CubeSimple(
                     .mul(size)
                     .add(x, y, z)
                 vertexConsumer
-                    .xyz(vector3f.x, vector3f.y, vector3f.z)
-                    .uv0(vertex.u, vertex.v)
-                    .color(color.x, color.y, color.z, color.w)
-                    .uv2(brightness)
+                    .addVertex(vector3f.x, vector3f.y, vector3f.z)
+                    .setUv(vertex.u, vertex.v)
+                    .setColor(color.x, color.y, color.z, color.w)
+                    .setLight(brightness)
             }
         }
     }

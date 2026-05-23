@@ -2,19 +2,19 @@ package org.teamvoided.dusk_debris.data.gen.tags
 
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider
-import net.minecraft.enchantment.Enchantment
-import net.minecraft.enchantment.Enchantments
-import net.minecraft.registry.HolderLookup
-import net.minecraft.registry.RegistryKey
-import net.minecraft.registry.RegistryKeys
-import net.minecraft.registry.tag.EnchantmentTags
+import net.minecraft.core.HolderLookup
+import net.minecraft.core.registries.Registries
+import net.minecraft.resources.ResourceKey
+import net.minecraft.tags.EnchantmentTags
+import net.minecraft.world.item.enchantment.Enchantment
+import net.minecraft.world.item.enchantment.Enchantments
 import org.teamvoided.dusk_debris.data.DuskEnchantments
 import org.teamvoided.dusk_debris.data.tags.DuskEnchantmentTags
 import java.util.concurrent.CompletableFuture
 
 class EnchantmentTagsProvider(o: FabricDataOutput, r: CompletableFuture<HolderLookup.Provider>) :
-    FabricTagProvider<Enchantment>(o, RegistryKeys.ENCHANTMENT, r) {
-    override fun configure(arg: HolderLookup.Provider) {
+    FabricTagProvider<Enchantment>(o, Registries.ENCHANTMENT, r) {
+    override fun addTags(arg: HolderLookup.Provider) {
         duskTags()
         vanillaTags()
     }
@@ -37,7 +37,7 @@ class EnchantmentTagsProvider(o: FabricDataOutput, r: CompletableFuture<HolderLo
         getOrCreateTagBuilder(EnchantmentTags.TREASURE)
             .add(DuskEnchantments.TREASURE)
         getOrCreateTagBuilder(EnchantmentTags.NON_TREASURE)
-            .add(DuskEnchantments.ENCHANTMENTS.filterNot(DuskEnchantments.TREASURE::contains))
+            .addAll(DuskEnchantments.ENCHANTMENTS.filterNot(DuskEnchantments.TREASURE::contains))
     }
 
     fun conventionTags() {}
@@ -47,7 +47,7 @@ class EnchantmentTagsProvider(o: FabricDataOutput, r: CompletableFuture<HolderLo
         return this
     }
 
-    fun FabricTagProvider<Enchantment>.FabricTagBuilder.add(list: Collection<RegistryKey<Enchantment>>): FabricTagProvider<Enchantment>.FabricTagBuilder {
+    fun FabricTagProvider<Enchantment>.FabricTagBuilder.add(list: Collection<ResourceKey<Enchantment>>): FabricTagProvider<Enchantment>.FabricTagBuilder {
         list.forEach { this.add(it) }
         return this
     }

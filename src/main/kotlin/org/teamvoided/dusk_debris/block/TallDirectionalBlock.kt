@@ -1,51 +1,48 @@
 package org.teamvoided.dusk_debris.block
 
 
-import net.minecraft.block.*
-import net.minecraft.block.enums.DoubleBlockHalf
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.fluid.FluidState
-import net.minecraft.fluid.Fluids
-import net.minecraft.item.ItemPlacementContext
-import net.minecraft.item.ItemStack
-import net.minecraft.state.StateManager
-import net.minecraft.state.property.BooleanProperty
-import net.minecraft.state.property.DirectionProperty
-import net.minecraft.state.property.EnumProperty
-import net.minecraft.state.property.Properties
-import net.minecraft.util.BlockMirror
-import net.minecraft.util.BlockRotation
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Direction
-import net.minecraft.util.shape.VoxelShape
-import net.minecraft.world.BlockView
-import net.minecraft.world.World
-import net.minecraft.world.WorldAccess
-import net.minecraft.world.WorldView
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.context.BlockPlaceContext
+import net.minecraft.world.level.BlockGetter
+import net.minecraft.world.level.Level
+import net.minecraft.world.level.LevelAccessor
+import net.minecraft.world.level.LevelReader
+import net.minecraft.world.level.block.*
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.block.state.StateDefinition
+import net.minecraft.world.level.block.state.properties.*
+import net.minecraft.world.level.material.FluidState
+import net.minecraft.world.level.material.Fluids
+import net.minecraft.world.phys.shapes.CollisionContext
+import net.minecraft.world.phys.shapes.VoxelShape
 
-open class TallDirectionalBlock(settings: Settings) :
-    Block(settings), Waterloggable {
+open class TallDirectionalBlock(settings: Properties) :
+    Block(settings), SimpleWaterloggedBlock {
 
     init {
-        this.defaultState =
-            defaultState
-                .with(FACING, Direction.UP)
-                .with(HALF, DoubleBlockHalf.LOWER)
-                .with(WATERLOGGED, false)
+        this.registerDefaultState(
+            defaultBlockState()
+                .setValue(FACING, Direction.UP)
+                .setValue(HALF, DoubleBlockHalf.LOWER)
+                .setValue(WATERLOGGED, false)
+        )
     }
 
-    override fun appendProperties(builder: StateManager.Builder<Block, BlockState>) {
+    override fun createBlockStateDefinition(builder: StateDefinition.Builder<Block, BlockState>) {
         builder.add(FACING, HALF, WATERLOGGED)
     }
 
-    override fun getOutlineShape(
+    override fun getShape(
         state: BlockState,
-        world: BlockView,
+        world: BlockGetter,
         pos: BlockPos,
-        context: ShapeContext
+        context: CollisionContext
     ): VoxelShape {
-        val direction = state.get(FACING).axis
+        val direction = state.getValue(FACING).axis
         return when (direction) {
             Direction.Axis.Z -> zShape
             Direction.Axis.X -> xShape
@@ -54,113 +51,113 @@ open class TallDirectionalBlock(settings: Settings) :
         }
     }
 
-    override fun canPlaceAt(state: BlockState, world: WorldView, pos: BlockPos): Boolean {
-        val direction = state.get(FACING)
-        val blockPos = pos.offset(direction.opposite)
+    override fun canSurvive(state: BlockState, world: LevelReader, pos: BlockPos): Boolean {
+        val direction = state.getValue(FACING)
+        val blockPos = pos.relative(direction.opposite)
         val blockState = world.getBlockState(blockPos)
 
-        return if (state.get(HALF) == DoubleBlockHalf.LOWER) {
-            blockState.isSideSolidFullSquare(world, blockPos, direction)
+        return if (state.getValue(HALF) == DoubleBlockHalf.LOWER) {
+            blockState.isFaceSturdy(world, blockPos, direction)
         } else {
-            blockState.isOf(this) && blockState.get(HALF) == DoubleBlockHalf.LOWER
+            blockState.`is`(this) && blockState.getValue(HALF) == DoubleBlockHalf.LOWER
         }
     }
 
-    override fun getStateForNeighborUpdate(
+    override fun updateShape(
         state: BlockState,
         direction: Direction,
         neighborState: BlockState,
-        world: WorldAccess,
+        world: LevelAccessor,
         pos: BlockPos,
         neighborPos: BlockPos
     ): BlockState {
-        if (state.get(WATERLOGGED)) {
-            world.scheduleFluidTick(pos, Fluids.WATER, Fluids.WATER.getTickRate(world))
+        if (state.getValue(WATERLOGGED)) {
+            world.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(world))
         }
-        val blockstate = state.get(FACING)
+        val blockstate = state.getValue(FACING)
         val blockstateOther =
-            world.getBlockState(pos.offset(getDirectionTowardsOtherPart(state.get(HALF), blockstate)))
+            world.getBlockState(pos.relative(getDirectionTowardsOtherPart(state.getValue(HALF), blockstate)))
         return if (
-            blockstateOther.isOf(this) &&
-            state.canPlaceAt(world, pos)
+            blockstateOther.`is`(this) &&
+            state.canSurvive(world, pos)
         ) {
             state
-        } else Blocks.AIR.defaultState
+        } else Blocks.AIR.defaultBlockState()
     }
 
-    override fun onBreak(world: World, pos: BlockPos, state: BlockState, player: PlayerEntity): BlockState {
-        if (!world.isClient && player.isCreative) {
-            val crystalHalf = state.get(HALF)
+    override fun playerWillDestroy(world: Level, pos: BlockPos, state: BlockState, player: Player): BlockState {
+        if (!world.isClientSide && player.isCreative) {
+            val crystalHalf = state.getValue(HALF)
             if (crystalHalf == DoubleBlockHalf.LOWER) {
-                val blockPos = pos.offset(
-                    getDirectionTowardsOtherPart(crystalHalf, state.get(FACING))
+                val blockPos = pos.relative(
+                    getDirectionTowardsOtherPart(crystalHalf, state.getValue(FACING))
                 )
                 val blockState = world.getBlockState(blockPos)
-                if (blockState.isOf(this) && blockState.get(HALF) == DoubleBlockHalf.UPPER) {
-                    world.setBlockState(blockPos, Blocks.AIR.defaultState, 35)
-                    world.syncWorldEvent(player, 2001, blockPos, getRawIdFromState(blockState))
+                if (blockState.`is`(this) && blockState.getValue(HALF) == DoubleBlockHalf.UPPER) {
+                    world.setBlock(blockPos, Blocks.AIR.defaultBlockState(), 35)
+                    world.levelEvent(player, 2001, blockPos, getId(blockState))
                 }
             }
         }
-        return super.onBreak(world, pos, state, player)
+        return super.playerWillDestroy(world, pos, state, player)
     }
 
-    override fun getPlacementState(ctx: ItemPlacementContext): BlockState? {
-        val direction = ctx.side
-        val world: WorldAccess = ctx.world
-        val blockPos = ctx.blockPos
-        val blockPos2 = blockPos.offset(direction)
-        return if (world.getBlockState(blockPos2).canReplace(ctx) &&
-            blockPos2.y < world.topY && blockPos2.y > world.bottomY &&
-            world.worldBorder.contains(blockPos2)
-        ) defaultState
-            .with(FACING, direction)
-            .with(WATERLOGGED, world.getFluidState(blockPos).fluid == Fluids.WATER)
+    override fun getStateForPlacement(ctx: BlockPlaceContext): BlockState? {
+        val direction = ctx.clickedFace
+        val world: LevelAccessor = ctx.level
+        val blockPos = ctx.clickedPos
+        val blockPos2 = blockPos.relative(direction)
+        return if (world.getBlockState(blockPos2).canBeReplaced(ctx) &&
+            blockPos2.y < world.maxBuildHeight && blockPos2.y > world.minBuildHeight &&
+            world.worldBorder.isWithinBounds(blockPos2)
+        ) defaultBlockState()
+            .setValue(FACING, direction)
+            .setValue(WATERLOGGED, world.getFluidState(blockPos).type == Fluids.WATER)
         else null
     }
 
-    override fun onPlaced(world: World, pos: BlockPos, state: BlockState, placer: LivingEntity?, itemStack: ItemStack) {
-        super.onPlaced(world, pos, state, placer, itemStack)
-        if (!world.isClient) {
-            val blockPos = pos.offset(state.get(FACING))
-            world.setBlockState(
+    override fun setPlacedBy(world: Level, pos: BlockPos, state: BlockState, placer: LivingEntity?, itemStack: ItemStack) {
+        super.setPlacedBy(world, pos, state, placer, itemStack)
+        if (!world.isClientSide) {
+            val blockPos = pos.relative(state.getValue(FACING))
+            world.setBlock(
                 blockPos,
                 state
-                    .with(HALF, DoubleBlockHalf.UPPER)
-                    .with(WATERLOGGED, world.getFluidState(blockPos).fluid == Fluids.WATER),
+                    .setValue(HALF, DoubleBlockHalf.UPPER)
+                    .setValue(WATERLOGGED, world.getFluidState(blockPos).type == Fluids.WATER),
                 3
             )
-            world.updateNeighbors(pos, Blocks.AIR)
-            state.updateNeighbors(world, pos, 3)
+            world.blockUpdated(pos, Blocks.AIR)
+            state.updateNeighbourShapes(world, pos, 3)
         }
     }
 
-    override fun rotate(state: BlockState, rotation: BlockRotation): BlockState {
-        return state.with(FACING, rotation.rotate(state.get(FACING)))
+    override fun rotate(state: BlockState, rotation: Rotation): BlockState {
+        return state.setValue(FACING, rotation.rotate(state.getValue(FACING)))
     }
 
-    override fun mirror(state: BlockState, mirror: BlockMirror): BlockState {
-        return state.rotate(mirror.getRotation(state.get(FACING)))
+    override fun mirror(state: BlockState, mirror: Mirror): BlockState {
+        return state.rotate(mirror.getRotation(state.getValue(FACING)))
     }
 
     override fun getFluidState(state: BlockState): FluidState {
-        return if (state.get(WATERLOGGED)) Fluids.WATER.getStill(false) else super.getFluidState(state)
+        return if (state.getValue(WATERLOGGED)) Fluids.WATER.getSource(false) else super.getFluidState(state)
     }
 
     companion object {
-        val FACING: DirectionProperty = Properties.FACING
-        val HALF: EnumProperty<DoubleBlockHalf> = Properties.DOUBLE_BLOCK_HALF
-        val WATERLOGGED: BooleanProperty = Properties.WATERLOGGED
+        val FACING: DirectionProperty = BlockStateProperties.FACING
+        val HALF: EnumProperty<DoubleBlockHalf> = BlockStateProperties.DOUBLE_BLOCK_HALF
+        val WATERLOGGED: BooleanProperty = BlockStateProperties.WATERLOGGED
 
-        val yShape = createCuboidShape(
+        val yShape = box(
             2.0, 0.0, 2.0,
             14.0, 16.0, 14.0
         )
-        val xShape = createCuboidShape(
+        val xShape = box(
             0.0, 2.0, 2.0,
             16.0, 14.0, 14.0
         )
-        val zShape = createCuboidShape(
+        val zShape = box(
             2.0, 2.0, 0.0,
             14.0, 14.0, 16.0
         )
@@ -170,7 +167,7 @@ open class TallDirectionalBlock(settings: Settings) :
         }
 
         fun getOppositeCrystalState(part: BlockState): DoubleBlockHalf {
-            return if (part.get(HALF) == DoubleBlockHalf.LOWER) DoubleBlockHalf.UPPER else DoubleBlockHalf.LOWER
+            return if (part.getValue(HALF) == DoubleBlockHalf.LOWER) DoubleBlockHalf.UPPER else DoubleBlockHalf.LOWER
         }
     }
 }

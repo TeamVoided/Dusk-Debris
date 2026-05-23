@@ -1,25 +1,25 @@
 package org.teamvoided.dusk_debris.entity
 
-import net.minecraft.entity.AreaEffectCloudEntity
-import net.minecraft.entity.EntityDimensions
-import net.minecraft.entity.EntityPose
-import net.minecraft.entity.EntityType
-import net.minecraft.particle.ColoredParticleEffect
-import net.minecraft.particle.ParticleTypes
-import net.minecraft.util.math.MathHelper
-import net.minecraft.util.math.Vec3d
-import net.minecraft.world.World
+import net.minecraft.core.particles.ColorParticleOption
+import net.minecraft.core.particles.ParticleTypes
+import net.minecraft.util.Mth
+import net.minecraft.world.entity.AreaEffectCloud
+import net.minecraft.world.entity.EntityDimensions
+import net.minecraft.world.entity.EntityType
+import net.minecraft.world.entity.Pose
+import net.minecraft.world.level.Level
+import net.minecraft.world.phys.Vec3
 
-class BoxAreaEffectCloud(entityType: EntityType<out BoxAreaEffectCloud>, world: World) :
-    AreaEffectCloudEntity(entityType, world) {
+class BoxAreaEffectCloud(entityType: EntityType<out BoxAreaEffectCloud>, world: Level) :
+    AreaEffectCloud(entityType, world) {
 
-    override fun getDimensions(pose: EntityPose): EntityDimensions {
+    override fun getDimensions(pose: Pose): EntityDimensions {
         val dimensions = radius * 2f
-        return EntityDimensions.changing(dimensions, dimensions)
+        return EntityDimensions.scalable(dimensions, dimensions)
     }
 
     override fun tick() {
-        if (!this.world.isClient)
+        if (!this.level().isClientSide)
             super.tick()
         else {
             val isWaiting = this.isWaiting
@@ -28,28 +28,28 @@ class BoxAreaEffectCloud(entityType: EntityType<out BoxAreaEffectCloud>, world: 
                 return
             }
 
-            val particleEffect = this.particleType
+            val particleEffect = this.particle
             val count: Int
             val radius: Float
             if (isWaiting) {
                 count = 2
                 radius = 0.2f
             } else {
-                count = MathHelper.ceil((3.1415927f * setRadius * setRadius) / 5)
+                count = Mth.ceil((3.1415927f * setRadius * setRadius) / 5)
                 radius = setRadius
             }
 
             for (j in 0 until count) {
-                val randInRadius = MathHelper.sqrt(random.nextFloat()) * radius * 1.5f
-                val inSphere = Vec3d(
+                val randInRadius = Mth.sqrt(random.nextFloat()) * radius * 1.5f
+                val inSphere = Vec3(
                     random.nextDouble() - random.nextDouble(),
                     random.nextDouble() - random.nextDouble(),
                     random.nextDouble() - random.nextDouble()
-                ).normalize().multiply(randInRadius.toDouble()).add(x, y + setRadius / 2, z)
+                ).normalize().scale(randInRadius.toDouble()).add(x, y + setRadius / 2, z)
                 if (particleEffect.type === ParticleTypes.ENTITY_EFFECT) {
                     if (isWaiting && random.nextBoolean()) {
-                        world.addParticle(
-                            ColoredParticleEffect.create(ParticleTypes.ENTITY_EFFECT, -1),
+                        level().addParticle(
+                            ColorParticleOption.create(ParticleTypes.ENTITY_EFFECT, -1),
                             inSphere.x,
                             inSphere.y,
                             inSphere.z,
@@ -58,15 +58,15 @@ class BoxAreaEffectCloud(entityType: EntityType<out BoxAreaEffectCloud>, world: 
                             0.0
                         )
                     } else {
-                        world.addParticle(particleEffect, inSphere.x, inSphere.y, inSphere.z, 0.0, 0.0, 0.0)
+                        level().addParticle(particleEffect, inSphere.x, inSphere.y, inSphere.z, 0.0, 0.0, 0.0)
                     }
                 } else if (isWaiting) {
-                    world.addParticle(particleEffect, inSphere.x, inSphere.y, inSphere.z, 0.0, 0.0, 0.0)
+                    level().addParticle(particleEffect, inSphere.x, inSphere.y, inSphere.z, 0.0, 0.0, 0.0)
                 } else {
                     if (j <= 3) {
-                        world.addImportantParticle(particleEffect, inSphere.x, inSphere.y, inSphere.z, 0.0, 0.0, 0.0)
+                        level().addAlwaysVisibleParticle(particleEffect, inSphere.x, inSphere.y, inSphere.z, 0.0, 0.0, 0.0)
                     }
-                    world.addParticle(
+                    level().addParticle(
                         particleEffect,
                         inSphere.x,
                         inSphere.y,
@@ -81,7 +81,7 @@ class BoxAreaEffectCloud(entityType: EntityType<out BoxAreaEffectCloud>, world: 
                 }
             }
         }
-        val y = this.y - this.radiusGrowth
-        this.setPosition(this.x, y, this.z)
+        val y = this.y - this.radiusPerTick
+        this.setPos(this.x, y, this.z)
     }
 }

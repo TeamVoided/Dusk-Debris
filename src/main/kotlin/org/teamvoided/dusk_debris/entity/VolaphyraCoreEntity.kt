@@ -1,104 +1,104 @@
 package org.teamvoided.dusk_debris.entity
 
-import net.minecraft.entity.Entity
-import net.minecraft.entity.EntityType
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.MovementType
-import net.minecraft.entity.ai.goal.TargetGoal
-import net.minecraft.entity.attribute.DefaultAttributeContainer
-import net.minecraft.entity.attribute.EntityAttributes
-import net.minecraft.entity.mob.CreeperEntity
-import net.minecraft.entity.mob.Monster
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.particle.ParticleTypes
-import net.minecraft.server.world.ServerWorld
-import net.minecraft.util.math.MathHelper
-import net.minecraft.util.math.Vec3d
-import net.minecraft.world.World
+import net.minecraft.core.particles.ParticleTypes
+import net.minecraft.server.level.ServerLevel
+import net.minecraft.util.Mth
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.EntityType
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.MoverType
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier
+import net.minecraft.world.entity.ai.attributes.Attributes
+import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal
+import net.minecraft.world.entity.monster.Creeper
+import net.minecraft.world.entity.monster.Enemy
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.level.Level
+import net.minecraft.world.phys.Vec3
 import org.teamvoided.dusk_debris.util.Utils.RAD_TO_DEG
 import org.teamvoided.dusk_debris.world.explosion.custom.DuskExplosion
 
-class VolaphyraCoreEntity(entityType: EntityType<VolaphyraCoreEntity>, world: World) :
+class VolaphyraCoreEntity(entityType: EntityType<VolaphyraCoreEntity>, world: Level) :
     AbstractVolaphyraEntity(entityType, world) {
-    override fun initGoals() {
-        targetSelector.add(
-            3, TargetGoal(
+    override fun registerGoals() {
+        targetSelector.addGoal(
+            3, NearestAttackableTargetGoal(
                 this,
                 LivingEntity::class.java, 5, false, false
-            ) { it is Monster && it !is CreeperEntity && it !is AbstractVolaphyraEntity }
+            ) { it is Enemy && it !is Creeper && it !is AbstractVolaphyraEntity }
         )
     }
 
-    override fun move(movementType: MovementType, movement: Vec3d) {
+    override fun move(movementType: MoverType, movement: Vec3) {
         super.move(movementType, movement)
         checkCollisionForPop()
     }
 
-    override fun tickMovement() {
-        super.tickMovement()
+    override fun aiStep() {
+        super.aiStep()
         if (target != null) {
             val lookX: Double = this.target!!.x - this.x
             val lookY: Double = this.target!!.z - this.z
-            this.yaw = MathHelper.atan2(lookX, lookY).toFloat() * -RAD_TO_DEG
-            this.bodyYaw = this.yaw
+            this.setYRot(Mth.atan2(lookX, lookY).toFloat() * -RAD_TO_DEG)
+            this.yBodyRot = this.yRot
 
 //            this.getLookControl().lookAt(target!!.x, target!!.eyeY, target!!.z)
         }
     }
 
-    override fun travel(movementInput: Vec3d?) {
-        if (this.canAiMove() && this.age > 20) {
+    override fun travel(movementInput: Vec3?) {
+        if (this.isEffectiveAi && this.tickCount > 20) {
             val target = target
             if (target != null) {
-                this.move(MovementType.SELF, this.velocity)
-                if (this.age % 3 == 0) {
-                    val targetPos = target.eyePos
-                    val moveDirection = targetPos.subtract(this.pos).normalize().multiply(0.5)
-                    this.velocity = this.velocity.add(moveDirection)
+                this.move(MoverType.SELF, this.deltaMovement)
+                if (this.tickCount % 3 == 0) {
+                    val targetPos = target.eyePosition
+                    val moveDirection = targetPos.subtract(this.position()).normalize().scale(0.5)
+                    this.setDeltaMovement(this.deltaMovement.add(moveDirection))
                 }
             } else {
-                this.move(MovementType.SELF, this.velocity)
-                val gravity = this.getAttributeInstance(EntityAttributes.GENERIC_GRAVITY)?.value
-                this.velocity = this.velocity.multiply(0.9).add(0.0, -gravity!!, 0.0)
+                this.move(MoverType.SELF, this.deltaMovement)
+                val gravity = this.getAttribute(Attributes.GRAVITY)?.value
+                this.setDeltaMovement(this.deltaMovement.scale(0.9).add(0.0, -gravity!!, 0.0))
             }
         } else {
-            this.velocity = this.velocity.multiply(0.1)
+            this.setDeltaMovement(this.deltaMovement.scale(0.1))
         }
-        this.updateVelocity(velocity.length().toFloat(), movementInput)
+        this.moveRelative(deltaMovement.length().toFloat(), movementInput)
     }
 
-    override fun pushAwayFrom(entity: Entity?) {
+    override fun push(entity: Entity?) {
         if (entity != null) {
             if (entity !is AbstractVolaphyraEntity && entity.isAlive && entity.isAttackable) {
-                if (!(entity is PlayerEntity && (entity.isCreative || entity.isSpectator)))
+                if (!(entity is Player && (entity.isCreative || entity.isSpectator)))
                     this.onDestroyed()
             }
         }
-        super.pushAwayFrom(entity)
+        super.push(entity)
     }
 
     override fun onDestroyed() {
         super.onDestroyed()
-        val world = world
-        if (world is ServerWorld) {
-            val attackDamage = this.getAttributeInstance(EntityAttributes.GENERIC_ATTACK_DAMAGE)?.value!!.toFloat()
+        val world = level()
+        if (world is ServerLevel) {
+            val attackDamage = this.getAttribute(Attributes.ATTACK_DAMAGE)?.value!!.toFloat()
             DuskExplosion(
                 world,
                 9.0,
                 attackDamage,
-                this.damageSources.sonicBoom(this),
-                this.pos,
+                this.damageSources().sonicBoom(this),
+                this.position(),
                 ParticleTypes.GUST_EMITTER_SMALL
             )
         }
     }
 
-    override fun chooseRandomAngerTime() {}
+    override fun startPersistentAngerTimer() {}
 
     companion object {
-        fun createAttributes(): DefaultAttributeContainer.Builder {
+        fun createAttributes(): AttributeSupplier.Builder {
             return AbstractVolaphyraEntity.createAttributes()
-                .add(EntityAttributes.GENERIC_GRAVITY, GRAVITY_VALUE)
+                .add(Attributes.GRAVITY, GRAVITY_VALUE)
         }
     }
 }

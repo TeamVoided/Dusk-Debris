@@ -1,33 +1,33 @@
 package org.teamvoided.dusk_debris.world.gen.configured_feature
 
 import com.mojang.serialization.Codec
-import net.minecraft.block.MushroomBlock
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.random.RandomGenerator
-import net.minecraft.world.WorldAccess
+import net.minecraft.core.BlockPos
+import net.minecraft.util.RandomSource
+import net.minecraft.world.level.LevelAccessor
+import net.minecraft.world.level.block.HugeMushroomBlock
 import org.teamvoided.dusk_debris.world.gen.configured_feature.config.HugeNethershroomFeatureConfig
 
 open class HugePurpleNethershroomFeature(codec: Codec<HugeNethershroomFeatureConfig>) :
     AbstractHugeMushroomFeature<HugeNethershroomFeatureConfig>(codec) {
 
     override fun generateCap(
-        world: WorldAccess,
-        random: RandomGenerator,
+        world: LevelAccessor,
+        random: RandomSource,
         start: BlockPos,
         yStart: Int,
-        mutable: BlockPos.Mutable,
+        mutable: BlockPos.MutableBlockPos,
         config: HugeNethershroomFeatureConfig
     ) {
-        val radius = config.capRadius[random]
-        val height = config.capHeight[random]
+        val radius = config.capRadius.sample(random)
+        val height = config.capHeight.sample(random)
 //        var offsetXZ = 0
-        val codecOffsetXZ = config.capXZInletOffset[random]
+        val codecOffsetXZ = config.capXZInletOffset.sample(random)
         var offsetXZ = if (1 >= (radius - codecOffsetXZ)) {
             radius -1
         } else {
             codecOffsetXZ
         }
-        val offsetY = config.capYInletOffset[random]
+        val offsetY = config.capYInletOffset.sample(random)
         val heightUpper = height - 2
         val heightLower = -1
         for (x in -radius..radius) {
@@ -49,8 +49,8 @@ open class HugePurpleNethershroomFeature(codec: Codec<HugeNethershroomFeatureCon
                         if (offsetY >= height) height - 1
                         else offsetY
                     else 0
-                    mutable[start, x, y + yStart + yOffset] = z
-                    if (world.getBlockState(mutable).isIn(config.replaceable)) {
+                    mutable.setWithOffset(start, x, y + yStart + yOffset, z)
+                    if (world.getBlockState(mutable).`is`(config.replaceable)) {
                         val lowerY = (y < heightLower + offsetY)
                         val upperY = (y > heightLower)
                         val edgeZRange = (z > -radius + offsetXZ - 1 && z < radius - offsetXZ + 1)
@@ -68,21 +68,21 @@ open class HugePurpleNethershroomFeature(codec: Codec<HugeNethershroomFeatureCon
                                 (lowerY && z == radius - offsetXZ && !isNotInlet) ||
                                 (upperY && z == offsetXZ - radius - 1 && edgeXRange)
                         val upEdge = edgePosY || edgeY && y == heightUpper
-                        var blockState = config.capBlock.getBlockState(random, start)
-                        if (blockState.contains(MushroomBlock.WEST) &&
-                            blockState.contains(MushroomBlock.EAST) &&
-                            blockState.contains(MushroomBlock.NORTH) &&
-                            blockState.contains(MushroomBlock.SOUTH) &&
-                            blockState.contains(MushroomBlock.UP)
+                        var blockState = config.capBlock.getState(random, start)
+                        if (blockState.hasProperty(HugeMushroomBlock.WEST) &&
+                            blockState.hasProperty(HugeMushroomBlock.EAST) &&
+                            blockState.hasProperty(HugeMushroomBlock.NORTH) &&
+                            blockState.hasProperty(HugeMushroomBlock.SOUTH) &&
+                            blockState.hasProperty(HugeMushroomBlock.UP)
                         ) {
                             blockState = blockState
-                                .with(MushroomBlock.WEST, westEdge)
-                                .with(MushroomBlock.EAST, eastEdge)
-                                .with(MushroomBlock.NORTH, northEdge)
-                                .with(MushroomBlock.SOUTH, southEdge)
-                                .with(MushroomBlock.UP, upEdge)
+                                .setValue(HugeMushroomBlock.WEST, westEdge)
+                                .setValue(HugeMushroomBlock.EAST, eastEdge)
+                                .setValue(HugeMushroomBlock.NORTH, northEdge)
+                                .setValue(HugeMushroomBlock.SOUTH, southEdge)
+                                .setValue(HugeMushroomBlock.UP, upEdge)
                         }
-                        this.setBlockState(world, mutable, blockState)
+                        this.setBlock(world, mutable, blockState)
                     }
                 }
             }

@@ -1,39 +1,43 @@
 package org.teamvoided.dusk_debris.util
 
-import net.minecraft.block.Block
-import net.minecraft.network.packet.Packet
-import net.minecraft.network.packet.s2c.play.ParticleS2CPacket
-import net.minecraft.particle.ParticleEffect
-import net.minecraft.registry.HolderSet
-import net.minecraft.registry.tag.TagKey
-import net.minecraft.server.network.ServerPlayerEntity
-import net.minecraft.server.world.ServerWorld
-import net.minecraft.state.property.BooleanProperty
-import net.minecraft.state.property.Properties
-import net.minecraft.util.math.*
-import net.minecraft.util.math.noise.DoublePerlinNoiseSampler
-import net.minecraft.util.shape.VoxelShape
-import net.minecraft.util.shape.VoxelShapes
-import net.minecraft.world.TestableWorld
-import net.minecraft.world.World
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
+import net.minecraft.core.HolderSet
+import net.minecraft.core.Vec3i
+import net.minecraft.core.particles.ParticleOptions
+import net.minecraft.network.protocol.Packet
+import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket
+import net.minecraft.server.level.ServerLevel
+import net.minecraft.server.level.ServerPlayer
+import net.minecraft.tags.TagKey
+import net.minecraft.world.level.Level
+import net.minecraft.world.level.LevelSimulatedReader
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.state.properties.BlockStateProperties
+import net.minecraft.world.level.block.state.properties.BooleanProperty
+import net.minecraft.world.level.levelgen.synth.NormalNoise
+import net.minecraft.world.phys.AABB
+import net.minecraft.world.phys.Vec3
+import net.minecraft.world.phys.shapes.Shapes
+import net.minecraft.world.phys.shapes.VoxelShape
 import kotlin.math.floor
 import kotlin.math.sqrt
 
-fun ServerWorld.spawnParticles(particle: ParticleEffect, pos: Vec3d, velocity: Vec3d) =
-    this.spawnParticles(particle, pos.x, pos.y, pos.z, 0, velocity.x, velocity.y, velocity.z, 1.0)
+fun ServerLevel.spawnParticles(particle: ParticleOptions, pos: Vec3, velocity: Vec3) =
+    this.sendParticles(particle, pos.x, pos.y, pos.z, 0, velocity.x, velocity.y, velocity.z, 1.0)
 
-fun World.addParticle(parameters: ParticleEffect, pos: Vec3d, velocity: Vec3d) {
+fun Level.addParticle(parameters: ParticleOptions, pos: Vec3, velocity: Vec3) {
     this.addParticle(parameters, false, pos.x, pos.y, pos.z, velocity.x, velocity.y, velocity.z)
 }
 
-fun World.addParticle(parameters: ParticleEffect, alwaysSpawn: Boolean, pos: Vec3d, velocity: Vec3d) {
+fun Level.addParticle(parameters: ParticleOptions, alwaysSpawn: Boolean, pos: Vec3, velocity: Vec3) {
     this.addParticle(parameters, alwaysSpawn, pos.x, pos.y, pos.z, velocity.x, velocity.y, velocity.z)
 }
 
-fun ServerWorld.spawnParticles(
-    particle: ParticleEffect, pos: Vec3d, velocity: Vec3d, distance: Double
+fun ServerLevel.spawnParticles(
+    particle: ParticleOptions, pos: Vec3, velocity: Vec3, distance: Double
 ): Int {
-    val particleS2CPacket = ParticleS2CPacket(
+    val particleS2CPacket = ClientboundLevelParticlesPacket(
         particle,
         distance > 32,
         pos.x,
@@ -46,8 +50,8 @@ fun ServerWorld.spawnParticles(
         0
     )
     var i = 0
-    for (j in this.players.indices) {
-        val serverPlayerEntity = this.players[j]
+    for (j in this.players().indices) {
+        val serverPlayerEntity = this.players()[j]
         if (this.sendToPlayerIfNearby(serverPlayerEntity, distance, pos.x, pos.y, pos.z, particleS2CPacket)) {
             ++i
         }
@@ -55,20 +59,20 @@ fun ServerWorld.spawnParticles(
     return i
 }
 
-fun ServerWorld.sendToPlayerIfNearby(
-    player: ServerPlayerEntity,
+fun ServerLevel.sendToPlayerIfNearby(
+    player: ServerPlayer,
     distance: Double,
     x: Double,
     y: Double,
     z: Double,
     packet: Packet<*>?
 ): Boolean {
-    if (player.world != this) {
+    if (player.level() != this) {
         return false
     } else {
-        val blockPos = player.blockPos
-        if (blockPos.isCenterWithinDistance(Vec3d(x, y, z), distance)) {
-            player.networkHandler.send(packet)
+        val blockPos = player.blockPosition()
+        if (blockPos.closerToCenterThan(Vec3(x, y, z), distance)) {
+            player.connection.send(packet)
             return true
         } else {
             return false
@@ -76,50 +80,50 @@ fun ServerWorld.sendToPlayerIfNearby(
     }
 }
 
-fun DoublePerlinNoiseSampler.sample(blockPos: BlockPos): Double = this.sample(blockPos.toVec3d())
+fun NormalNoise.sample(blockPos: BlockPos): Double = this.sample(blockPos.toVec3d())
 
-fun DoublePerlinNoiseSampler.sample(vec3d: Vec3d): Double = this.sample(vec3d.x, vec3d.y, vec3d.z)
+fun NormalNoise.sample(vec3d: Vec3): Double = this.getValue(vec3d.x, vec3d.y, vec3d.z)
 
 fun createCuboidShape(minXZ: Double, minY: Double, maxXZ: Double, maxY: Double): VoxelShape {
-    return Block.createCuboidShape(minXZ, minY, minXZ, maxXZ, maxY, maxXZ)
+    return Block.box(minXZ, minY, minXZ, maxXZ, maxY, maxXZ)
 }
 
 fun createCuboidShape(min1: Double, min2: Double, max1: Double, max2: Double, axis: Direction.Axis): VoxelShape {
     return when (axis) {
         Direction.Axis.Y -> createCuboidShape(min1, min2, max1, max2)
-        Direction.Axis.X -> Block.createCuboidShape(min2, min1, min1, max2, max1, max1)
-        Direction.Axis.Z -> Block.createCuboidShape(min1, min1, min2, max1, max1, max2)
+        Direction.Axis.X -> Block.box(min2, min1, min1, max2, max1, max1)
+        Direction.Axis.Z -> Block.box(min1, min1, min2, max1, max1, max2)
     }
 }
 
-fun Vec3d.normalizeHorizontal(yMult: Double = 1.0): Vec3d {
+fun Vec3.normalizeHorizontal(yMult: Double = 1.0): Vec3 {
     val xz = sqrt(this.x * this.x + this.z * this.z)
     val y = this.y * yMult
-    return if (xz < 1.0E-4) Vec3d(0.0, y, 0.0)
-    else Vec3d(this.x / xz, y, this.z / xz)
+    return if (xz < 1.0E-4) Vec3(0.0, y, 0.0)
+    else Vec3(this.x / xz, y, this.z / xz)
 }
 
-fun Vec3d.getSquaredDistanceToCenter(vec: Vec3d): Double {
+fun Vec3.getSquaredDistanceToCenter(vec: Vec3): Double {
     val d: Double = this.x - vec.x
     val e: Double = this.y - vec.y
     val f: Double = this.z - vec.z
     return d * d + e * e + f * f
 }
 
-fun Vec3d.toBlockPos(): BlockPos {
+fun Vec3.toBlockPos(): BlockPos {
     return BlockPos(floor(this.x).toInt(), floor(this.y).toInt(), floor(this.z).toInt())
 }
 
-fun Vec3i.toVec3d(): Vec3d {
-    return Vec3d(this.x.toDouble(), this.y.toDouble(), this.z.toDouble())
+fun Vec3i.toVec3d(): Vec3 {
+    return Vec3(this.x.toDouble(), this.y.toDouble(), this.z.toDouble())
 }
 
-fun box(double: Double): Box {
-    return Box(-double, -double, -double, double, double, double)
+fun box(double: Double): AABB {
+    return AABB(-double, -double, -double, double, double, double)
 }
 
-fun TestableWorld.isInSet(pos: BlockPos, tag: HolderSet<Block>): Boolean = this.testBlockState(pos) { it.isIn(tag) }
-fun TestableWorld.isInTag(pos: BlockPos, tag: TagKey<Block>): Boolean = this.testBlockState(pos) { it.isIn(tag) }
+fun LevelSimulatedReader.isInSet(pos: BlockPos, tag: HolderSet<Block>): Boolean = this.isStateAtPosition(pos) { it.`is`(tag) }
+fun LevelSimulatedReader.isInTag(pos: BlockPos, tag: TagKey<Block>): Boolean = this.isStateAtPosition(pos) { it.`is`(tag) }
 
 fun VoxelShape.rotate(times: Int) = rotateVoxelShape(times, this)
 fun VoxelShape.rotateY(times: Int = 1) = rotateVoxelShapeY(times, this)
@@ -135,25 +139,25 @@ fun VoxelShape.rotateFromDown(direction: Direction) = when (direction) {
 }
 
 fun rotateVoxelShape(times: Int, shape: VoxelShape): VoxelShape {
-    val shapes = arrayOf(shape, VoxelShapes.empty())
+    val shapes = arrayOf(shape, Shapes.empty())
     for (i in 0 until times) {
-        shapes[0].forEachBox { minX, minY, minZ, maxX, maxY, maxZ ->
-            shapes[1] = VoxelShapes.union(shapes[1], VoxelShapes.cuboid(1 - maxZ, minY, minX, 1 - minZ, maxY, maxX))
+        shapes[0].forAllBoxes { minX, minY, minZ, maxX, maxY, maxZ ->
+            shapes[1] = Shapes.or(shapes[1], Shapes.box(1 - maxZ, minY, minX, 1 - minZ, maxY, maxX))
         }
         shapes[0] = shapes[1]
-        shapes[1] = VoxelShapes.empty()
+        shapes[1] = Shapes.empty()
     }
     return shapes[0]
 }
 
 fun rotateVoxelShapeY(times: Int, shape: VoxelShape): VoxelShape {
-    val shapes = arrayOf(shape, VoxelShapes.empty())
+    val shapes = arrayOf(shape, Shapes.empty())
     for (i in 0 until times) {
-        shapes[0].forEachBox { minX, minY, minZ, maxX, maxY, maxZ ->
-            shapes[1] = VoxelShapes.union(shapes[1], VoxelShapes.cuboid(minX, 1 - maxZ, minY, maxX, 1 - minZ, maxY))
+        shapes[0].forAllBoxes { minX, minY, minZ, maxX, maxY, maxZ ->
+            shapes[1] = Shapes.or(shapes[1], Shapes.box(minX, 1 - maxZ, minY, maxX, 1 - minZ, maxY))
         }
         shapes[0] = shapes[1]
-        shapes[1] = VoxelShapes.empty()
+        shapes[1] = Shapes.empty()
     }
     return shapes[0]
 }
@@ -161,12 +165,12 @@ fun rotateVoxelShapeY(times: Int, shape: VoxelShape): VoxelShape {
 
 fun Direction.asProperty(): BooleanProperty {
     return when (this) {
-        Direction.UP -> Properties.UP
-        Direction.DOWN -> Properties.DOWN
-        Direction.NORTH -> Properties.NORTH
-        Direction.SOUTH -> Properties.SOUTH
-        Direction.WEST -> Properties.WEST
-        Direction.EAST -> Properties.EAST
+        Direction.UP -> BlockStateProperties.UP
+        Direction.DOWN -> BlockStateProperties.DOWN
+        Direction.NORTH -> BlockStateProperties.NORTH
+        Direction.SOUTH -> BlockStateProperties.SOUTH
+        Direction.WEST -> BlockStateProperties.WEST
+        Direction.EAST -> BlockStateProperties.EAST
     }
 }
 

@@ -1,16 +1,16 @@
 package org.teamvoided.dusk_debris.block.big
 
-import net.minecraft.block.BlockState
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.random.RandomGenerator
-import net.minecraft.world.World
+import net.minecraft.core.BlockPos
+import net.minecraft.util.RandomSource
+import net.minecraft.world.level.Level
+import net.minecraft.world.level.block.state.BlockState
 import org.teamvoided.dusk_debris.particle.color.SpiralParticleEffect
 
-class BigLanternWithSpiralBlock(private val color1: Int, private val color2: Int, settings: Settings) :
+class BigLanternWithSpiralBlock(private val color1: Int, private val color2: Int, settings: Properties) :
     BigLanternBlock(settings) {
-    override fun randomDisplayTick(state: BlockState, world: World, pos: BlockPos, random: RandomGenerator) {
-        super.randomDisplayTick(state, world, pos, random)
-        if (state.get(HANGING)) {
+    override fun animateTick(state: BlockState, world: Level, pos: BlockPos, random: RandomSource) {
+        super.animateTick(state, world, pos, random)
+        if (state.getValue(HANGING)) {
             world.addParticle(
                 SpiralParticleEffect(color1, color2),
                 pos.x + 0.5,

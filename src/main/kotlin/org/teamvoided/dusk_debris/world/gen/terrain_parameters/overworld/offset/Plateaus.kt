@@ -1,7 +1,7 @@
 package org.teamvoided.dusk_debris.world.gen.terrain_parameters.overworld.offset
 
-import net.minecraft.util.function.ToFloatFunction
-import net.minecraft.util.math.Spline
+import net.minecraft.util.CubicSpline
+import net.minecraft.util.ToFloatFunction
 import org.teamvoided.dusk_debris.util.world_helper.add
 import org.teamvoided.dusk_debris.util.world_helper.calculateSlope
 import org.teamvoided.dusk_debris.world.gen.terrain_parameters.OverworldTerrainCreator
@@ -32,14 +32,14 @@ object Plateaus {
     fun <C, I : ToFloatFunction<C>> createPlateaus(
         contNumber: Float,
         data: OverworldTerrainCreator.TerrainParametersData<C, I>
-    ): Spline<C, I> {
+    ): CubicSpline<C, I> {
         val cave = plateau(contNumber, data, true)
         val plateau = plateau(contNumber, data)
         val canyon = plateau(contNumber, data, false, data.grandCanyonRF)
         val eroded = canyon(contNumber, data)
         val layered = canyon(contNumber, data)
 
-        val spline = Spline.builder(data.plateauType, data.amplifier)
+        val spline = CubicSpline.builder(data.plateauType, data.amplifier)
             .add(PlatType.Layered.max, layered)
             .add(PlatType.Eroded.min, eroded)
             .add(PlatType.Eroded.max, eroded)
@@ -56,7 +56,7 @@ object Plateaus {
         data: OverworldTerrainCreator.TerrainParametersData<C, I>,
         depress: Boolean = false,
         rf: I = data.ridgesFolded
-    ): Spline<C, I> {
+    ): CubicSpline<C, I> {
         val riverbed = -1f to (Offset.elev(if (depress) 85 + contNumber * 16 else 30 + contNumber * 8))
         val plateau = -0.4f to Offset.elev(108 + contNumber * 20)
         val plateauEnd = 0.4f to plateau.second
@@ -65,7 +65,7 @@ object Plateaus {
         val riverbedSlope = calculateSlope(riverbed, plateauEnd)
         val finalSlope = calculateSlope(plateauEnd, final)
 
-        val spline = Spline.builder(rf, data.amplifier)
+        val spline = CubicSpline.builder(rf, data.amplifier)
             .add(riverbed, riverbedSlope)
             .add(plateau)
             .add(plateauEnd)
@@ -76,7 +76,7 @@ object Plateaus {
     private fun <C, I : ToFloatFunction<C>> canyon(
         contNumber: Float,
         data: OverworldTerrainCreator.TerrainParametersData<C, I>
-    ): Spline<C, I> {
+    ): CubicSpline<C, I> {
         val carve = if (contNumber > 0.5f) 1f else 0f
 
         val riverbed = -1f to Offset.elev(30 + carve * 8)
@@ -89,7 +89,7 @@ object Plateaus {
         val riverbedSlope = calculateSlope(riverbed, plateau1End)
 
 
-        val spline = Spline.builder(data.grandCanyonRF, data.amplifier)
+        val spline = CubicSpline.builder(data.grandCanyonRF, data.amplifier)
             .add(riverbed, riverbedSlope)
             .add(riverbank)
             .add(plateau1Start)

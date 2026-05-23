@@ -1,73 +1,73 @@
 package org.teamvoided.dusk_debris.item
 
-import net.minecraft.advancement.criterion.Criteria
-import net.minecraft.component.DataComponentTypes
-import net.minecraft.component.type.NbtComponent
-import net.minecraft.entity.EntityType
-import net.minecraft.entity.SpawnReason
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.item.Item
-import net.minecraft.item.ItemStack
-import net.minecraft.server.network.ServerPlayerEntity
-import net.minecraft.server.world.ServerWorld
-import net.minecraft.sound.SoundCategory
-import net.minecraft.sound.SoundEvent
-import net.minecraft.stat.Stats
-import net.minecraft.util.Hand
-import net.minecraft.util.TypedActionResult
-import net.minecraft.util.hit.HitResult
-import net.minecraft.util.math.BlockPos
-import net.minecraft.world.RaycastContext
-import net.minecraft.world.World
-import net.minecraft.world.WorldAccess
-import net.minecraft.world.event.GameEvent
+import net.minecraft.advancements.CriteriaTriggers
+import net.minecraft.core.BlockPos
+import net.minecraft.core.component.DataComponents
+import net.minecraft.server.level.ServerLevel
+import net.minecraft.server.level.ServerPlayer
+import net.minecraft.sounds.SoundEvent
+import net.minecraft.sounds.SoundSource
+import net.minecraft.stats.Stats
+import net.minecraft.world.InteractionHand
+import net.minecraft.world.InteractionResultHolder
+import net.minecraft.world.entity.EntityType
+import net.minecraft.world.entity.MobSpawnType
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.item.Item
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.component.CustomData
+import net.minecraft.world.level.ClipContext
+import net.minecraft.world.level.Level
+import net.minecraft.world.level.LevelAccessor
+import net.minecraft.world.level.gameevent.GameEvent
+import net.minecraft.world.phys.HitResult
 import org.teamvoided.dusk_debris.entity.Pickupable
 
 class EntityItem(
     private val entityType: EntityType<*>,
     private val emptyingSound: SoundEvent,
-    settings: Settings
+    settings: Properties
 ) : Item(settings) {
 
-    override fun use(world: World, user: PlayerEntity, hand: Hand): TypedActionResult<ItemStack> {
-        val itemStack = user.getStackInHand(hand)
-        val blockHitResult = raycast(world, user, RaycastContext.FluidHandling.SOURCE_ONLY)
+    override fun use(world: Level, user: Player, hand: InteractionHand): InteractionResultHolder<ItemStack> {
+        val itemStack = user.getItemInHand(hand)
+        val blockHitResult = getPlayerPOVHitResult(world, user, ClipContext.Fluid.SOURCE_ONLY)
         // RaycastContext.FluidHandling.NONE
         if (!(blockHitResult.type == HitResult.Type.MISS || blockHitResult.type != HitResult.Type.BLOCK)) {
             val blockPos = blockHitResult.blockPos
-            val direction = blockHitResult.side
-            val blockPos2 = blockPos.offset(direction)
-            if (world.canPlayerModifyAt(user, blockPos) && user.canPlaceOn(blockPos2, direction, itemStack)) {
-                if (user is ServerPlayerEntity) {
-                    Criteria.PLACED_BLOCK.trigger(user, blockPos, itemStack)
+            val direction = blockHitResult.direction
+            val blockPos2 = blockPos.relative(direction)
+            if (world.mayInteract(user, blockPos) && user.mayUseItemAt(blockPos2, direction, itemStack)) {
+                if (user is ServerPlayer) {
+                    CriteriaTriggers.PLACED_BLOCK.trigger(user, blockPos, itemStack)
                 }
                 onEmptied(user, world, itemStack, blockPos)
                 playEmptyingSound(user, world, blockPos)
-                user.incrementStat(Stats.USED.getOrCreateStat(this))
+                user.awardStat(Stats.ITEM_USED.get(this))
                 itemStack.consume(1, user)
-                return TypedActionResult.success(itemStack, world.isClient())
+                return InteractionResultHolder.sidedSuccess(itemStack, world.isClientSide)
             }
         }
         return super.use(world, user, hand)
     }
 
-    fun onEmptied(player: PlayerEntity, world: World, stack: ItemStack, pos: BlockPos) {
-        if (world is ServerWorld) {
+    fun onEmptied(player: Player, world: Level, stack: ItemStack, pos: BlockPos) {
+        if (world is ServerLevel) {
             this.spawnEntity(world, stack, pos)
-            world.emitGameEvent(player, GameEvent.ENTITY_PLACE, pos)
+            world.gameEvent(player, GameEvent.ENTITY_PLACE, pos)
         }
     }
 
-    fun playEmptyingSound(player: PlayerEntity, world: WorldAccess, pos: BlockPos) {
-        world.playSound(player, pos, this.emptyingSound, SoundCategory.NEUTRAL, 1.0f, 1.0f)
+    fun playEmptyingSound(player: Player, world: LevelAccessor, pos: BlockPos) {
+        world.playSound(player, pos, this.emptyingSound, SoundSource.NEUTRAL, 1.0f, 1.0f)
     }
 
-    private fun spawnEntity(world: ServerWorld, stack: ItemStack, pos: BlockPos) {
+    private fun spawnEntity(world: ServerLevel, stack: ItemStack, pos: BlockPos) {
         val entity =
-            entityType.spawnFromItemStack(world, stack, null as PlayerEntity?, pos, SpawnReason.BUCKET, true, false)
+            entityType.spawn(world, stack, null as Player?, pos, MobSpawnType.BUCKET, true, false)
         if (entity is Pickupable) {
-            val nbtComponent = stack.getOrDefault(DataComponentTypes.BUCKET_ENTITY_DATA, NbtComponent.DEFAULT)
-            entity.copyDataFromNbt(nbtComponent.copy())
+            val nbtComponent = stack.getOrDefault(DataComponents.BUCKET_ENTITY_DATA, CustomData.EMPTY)
+            entity.copyDataFromNbt(nbtComponent.copyTag())
             entity.placed = true
         }
     }

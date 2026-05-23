@@ -1,20 +1,20 @@
 package org.teamvoided.dusk_debris.block.sot.entity
 
-import net.minecraft.block.BlockState
-import net.minecraft.block.entity.BlockEntity
-import net.minecraft.item.ItemStack
-import net.minecraft.nbt.NbtCompound
-import net.minecraft.nbt.NbtElement
-import net.minecraft.nbt.NbtList
+import net.minecraft.core.BlockPos
+import net.minecraft.core.HolderLookup
+import net.minecraft.core.NonNullList
+import net.minecraft.nbt.CompoundTag
+import net.minecraft.nbt.ListTag
 import net.minecraft.nbt.NbtOps
-import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket
-import net.minecraft.registry.HolderLookup
-import net.minecraft.util.collection.DefaultedList
-import net.minecraft.util.math.BlockPos
+import net.minecraft.nbt.Tag
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.level.block.entity.BlockEntity
+import net.minecraft.world.level.block.state.BlockState
 import org.teamvoided.dusk_debris.init.DuskBlockEntities.STACKED_CHALICE
 
 class StackedChaliceBlockEntity(pos: BlockPos, state: BlockState?) : BlockEntity(STACKED_CHALICE, pos, state) {
-    val chalices: DefaultedList<ItemStack> = DefaultedList.ofSize(4, ItemStack.EMPTY)
+    val chalices: NonNullList<ItemStack> = NonNullList.withSize(4, ItemStack.EMPTY)
     fun isEmpty(): Boolean {
         for (item in chalices) {
             if (!item.isEmpty) return false
@@ -22,25 +22,25 @@ class StackedChaliceBlockEntity(pos: BlockPos, state: BlockState?) : BlockEntity
         return true
     }
 
-    override fun readNbtImpl(nbt: NbtCompound, lookupProvider: HolderLookup.Provider?) {
-        super.readNbtImpl(nbt, lookupProvider)
+    override fun loadAdditional(nbt: CompoundTag, lookupProvider: HolderLookup.Provider?) {
+        super.loadAdditional(nbt, lookupProvider)
         println("Read: $nbt")
 
         if (nbt.contains(KEY)) {
-            val list = nbt.getList(KEY, NbtElement.COMPOUND_TYPE.toInt())
+            val list = nbt.getList(KEY, Tag.TAG_COMPOUND.toInt())
             list.forEachIndexed { index, nbt ->
                 chalices[index] =
-                    ItemStack.field_49266.parse(NbtOps.INSTANCE, nbt).resultOrPartial().orElse(ItemStack.EMPTY)
+                    ItemStack.OPTIONAL_CODEC.parse(NbtOps.INSTANCE, nbt).resultOrPartial().orElse(ItemStack.EMPTY)!!
             }
         }
     }
 
-    override fun writeNbt(nbt: NbtCompound, lookupProvider: HolderLookup.Provider) {
-        super.writeNbt(nbt, lookupProvider)
-        val list = NbtList()
+    override fun saveAdditional(nbt: CompoundTag, lookupProvider: HolderLookup.Provider) {
+        super.saveAdditional(nbt, lookupProvider)
+        val list = ListTag()
         for (stack in chalices) {
             val ops = lookupProvider.createSerializationContext(NbtOps.INSTANCE)
-            list.add(ItemStack.field_49266.encodeStart(ops, stack).getOrThrow())
+            list.add(ItemStack.OPTIONAL_CODEC.encodeStart(ops, stack).getOrThrow())
         }
         nbt.put(KEY, list)
 
@@ -48,10 +48,10 @@ class StackedChaliceBlockEntity(pos: BlockPos, state: BlockState?) : BlockEntity
     }
 
 
-    override fun toUpdatePacket(): BlockEntityUpdateS2CPacket = BlockEntityUpdateS2CPacket.of(this)
-    override fun toSyncedNbt(lookupProvider: HolderLookup.Provider): NbtCompound {
+    override fun getUpdatePacket(): ClientboundBlockEntityDataPacket = ClientboundBlockEntityDataPacket.create(this)
+    override fun getUpdateTag(lookupProvider: HolderLookup.Provider): CompoundTag {
         println("Sync")
-        return this.toComponentlessNbt(lookupProvider)
+        return this.saveCustomOnly(lookupProvider)
     }
 
     companion object {

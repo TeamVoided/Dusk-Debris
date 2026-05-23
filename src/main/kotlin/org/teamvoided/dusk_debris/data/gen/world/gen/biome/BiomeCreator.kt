@@ -1,16 +1,16 @@
 package org.teamvoided.dusk_debris.data.gen.world.gen.biome
 
-import net.minecraft.client.sound.MusicType
-import net.minecraft.entity.EntityType
-import net.minecraft.entity.SpawnGroup
-import net.minecraft.registry.BootstrapContext
-import net.minecraft.registry.RegistryKeys
-import net.minecraft.sound.BiomeMoodSound
-import net.minecraft.sound.SoundEvents
-import net.minecraft.world.biome.*
-import net.minecraft.world.gen.GenerationStep
-import net.minecraft.world.gen.feature.DefaultBiomeFeatures
-import net.minecraft.world.gen.feature.VegetationPlacedFeatures
+import net.minecraft.core.registries.Registries
+import net.minecraft.data.worldgen.BiomeDefaultFeatures
+import net.minecraft.data.worldgen.BootstrapContext
+import net.minecraft.data.worldgen.biome.OverworldBiomes
+import net.minecraft.data.worldgen.placement.VegetationPlacements
+import net.minecraft.sounds.Musics
+import net.minecraft.sounds.SoundEvents
+import net.minecraft.world.entity.EntityType
+import net.minecraft.world.entity.MobCategory
+import net.minecraft.world.level.biome.*
+import net.minecraft.world.level.levelgen.GenerationStep
 import org.teamvoided.dusk_debris.data.gen.world.gen.biome.creators.HollowKnightBiomeCreators.createFogCanyon
 import org.teamvoided.dusk_debris.data.gen.world.gen.biome.creators.NetherBiomeCreators.createBasaltDeltas
 import org.teamvoided.dusk_debris.data.gen.world.gen.biome.creators.NetherBiomeCreators.createCrimsonForest
@@ -41,63 +41,63 @@ object BiomeCreator {
     }
 
     fun BootstrapContext<Biome>.createFreezingForest(): Biome {
-        val spawnSettings = SpawnSettings.Builder()
-        val generationSettings = GenerationSettings.Builder(
-            this.getRegistryLookup(RegistryKeys.PLACED_FEATURE),
-            this.getRegistryLookup(RegistryKeys.CONFIGURED_CARVER)
+        val spawnSettings = MobSpawnSettings.Builder()
+        val generationSettings = BiomeGenerationSettings.Builder(
+            this.lookup(Registries.PLACED_FEATURE),
+            this.lookup(Registries.CONFIGURED_CARVER)
         )
 
-        DefaultBiomeFeatures.addFarmAnimals(spawnSettings)
-        spawnSettings.spawn(SpawnGroup.CREATURE, SpawnSettings.SpawnEntry(EntityType.WOLF, 8, 4, 4))
-        spawnSettings.spawn(SpawnGroup.CREATURE, SpawnSettings.SpawnEntry(EntityType.RABBIT, 4, 2, 3))
-        spawnSettings.spawn(SpawnGroup.CREATURE, SpawnSettings.SpawnEntry(EntityType.FOX, 8, 2, 4))
-        DefaultBiomeFeatures.addBatsAndMonsters(spawnSettings)
+        BiomeDefaultFeatures.farmAnimals(spawnSettings)
+        spawnSettings.addSpawn(MobCategory.CREATURE, MobSpawnSettings.SpawnerData(EntityType.WOLF, 8, 4, 4))
+        spawnSettings.addSpawn(MobCategory.CREATURE, MobSpawnSettings.SpawnerData(EntityType.RABBIT, 4, 2, 3))
+        spawnSettings.addSpawn(MobCategory.CREATURE, MobSpawnSettings.SpawnerData(EntityType.FOX, 8, 2, 4))
+        BiomeDefaultFeatures.commonSpawns(spawnSettings)
 
-        OverworldBiomeCreator.addBasicFeatures(generationSettings)
-        DefaultBiomeFeatures.addMossyRocks(generationSettings)
-        DefaultBiomeFeatures.addLargeFerns(generationSettings)
-        DefaultBiomeFeatures.addDefaultOres(generationSettings)
-        DefaultBiomeFeatures.addDefaultDisks(generationSettings)
-        generationSettings.feature(
-            GenerationStep.Feature.VEGETAL_DECORATION,
+        OverworldBiomes.globalOverworldGeneration(generationSettings)
+        BiomeDefaultFeatures.addMossyStoneBlock(generationSettings)
+        BiomeDefaultFeatures.addFerns(generationSettings)
+        BiomeDefaultFeatures.addDefaultOres(generationSettings)
+        BiomeDefaultFeatures.addDefaultSoftDisks(generationSettings)
+        generationSettings.addFeature(
+            GenerationStep.Decoration.VEGETAL_DECORATION,
             DuskPlacedFeatures.BOREAL_VALLEY_VEGETATION
         )
-        DefaultBiomeFeatures.addDefaultFlowers(generationSettings)
-        DefaultBiomeFeatures.addGiantTaigaGrass(generationSettings)
-        DefaultBiomeFeatures.addDefaultMushrooms(generationSettings)
-        DefaultBiomeFeatures.addDefaultVegetation(generationSettings)
-        DefaultBiomeFeatures.addCommonBerries(generationSettings)
-        val musicSound = MusicType.createIngameMusic(SoundEvents.MUSIC_OVERWORLD_OLD_GROWTH_TAIGA)
-        return Biome.Builder().temperature(-0.25f).downfall(0.6f).effects(
-            BiomeEffects.Builder()
+        BiomeDefaultFeatures.addDefaultFlowers(generationSettings)
+        BiomeDefaultFeatures.addGiantTaigaVegetation(generationSettings)
+        BiomeDefaultFeatures.addDefaultMushrooms(generationSettings)
+        BiomeDefaultFeatures.addDefaultExtraVegetation(generationSettings)
+        BiomeDefaultFeatures.addCommonBerryBushes(generationSettings)
+        val musicSound = Musics.createGameMusic(SoundEvents.MUSIC_BIOME_OLD_GROWTH_TAIGA)
+        return Biome.BiomeBuilder().temperature(-0.25f).downfall(0.6f).specialEffects(
+            BiomeSpecialEffects.Builder()
                 .waterColor(4159204)
                 .waterFogColor(329011)
                 .fogColor(12638463)
-                .skyColor(OverworldBiomeCreator.getSkyColor(-0.25f))
-                .moodSound(BiomeMoodSound.CAVE)
-                .music(musicSound)
+                .skyColor(OverworldBiomes.calculateSkyColor(-0.25f))
+                .ambientMoodSound(AmbientMoodSettings.LEGACY_CAVE_SETTINGS)
+                .backgroundMusic(musicSound)
                 .build()
-        ).spawnSettings(spawnSettings.build()).generationSettings(generationSettings.build()).build()
+        ).mobSpawnSettings(spawnSettings.build()).generationSettings(generationSettings.build()).build()
     }
 
 //    0xC196E0
 
     fun createTest(c: BootstrapContext<Biome>): Biome {
-        val spawnSettings = SpawnSettings.Builder()
-        val generationSettings = GenerationSettings.Builder(
-            c.getRegistryLookup(RegistryKeys.PLACED_FEATURE),
-            c.getRegistryLookup(RegistryKeys.CONFIGURED_CARVER)
+        val spawnSettings = MobSpawnSettings.Builder()
+        val generationSettings = BiomeGenerationSettings.Builder(
+            c.lookup(Registries.PLACED_FEATURE),
+            c.lookup(Registries.CONFIGURED_CARVER)
         )
 
-        generationSettings.carver(GenerationStep.Carver.AIR, DuskConfiguredCarvers.AMETHYST_GEODE)
+        generationSettings.addCarver(GenerationStep.Carving.AIR, DuskConfiguredCarvers.AMETHYST_GEODE)
 
-        DefaultBiomeFeatures.addDefaultDisks(generationSettings)
-        generationSettings.feature(GenerationStep.Feature.VEGETAL_DECORATION, VegetationPlacedFeatures.TREES_PLAINS)
+        BiomeDefaultFeatures.addDefaultSoftDisks(generationSettings)
+        generationSettings.addFeature(GenerationStep.Decoration.VEGETAL_DECORATION, VegetationPlacements.TREES_PLAINS)
 
-        DefaultBiomeFeatures.addDefaultMushrooms(generationSettings)
-        DefaultBiomeFeatures.addDefaultVegetation(generationSettings)
+        BiomeDefaultFeatures.addDefaultMushrooms(generationSettings)
+        BiomeDefaultFeatures.addDefaultExtraVegetation(generationSettings)
 
-        return OverworldBiomeCreator.create(
+        return OverworldBiomes.biome(
             true,
             0.8f,
             0.4f,

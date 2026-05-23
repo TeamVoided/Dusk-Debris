@@ -2,36 +2,36 @@ package org.teamvoided.dusk_debris.render.fog.status_effect
 
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
-import net.minecraft.client.render.BackgroundRenderer
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.effect.StatusEffect
-import net.minecraft.entity.effect.StatusEffectInstance
-import net.minecraft.registry.Holder
-import net.minecraft.util.math.MathHelper
+import net.minecraft.client.renderer.FogRenderer
+import net.minecraft.core.Holder
+import net.minecraft.util.Mth
+import net.minecraft.world.effect.MobEffect
+import net.minecraft.world.effect.MobEffectInstance
+import net.minecraft.world.entity.LivingEntity
 import org.teamvoided.dusk_debris.init.DuskEffects
 
 
 @Environment(EnvType.CLIENT)
-class ColorTestFogEffect : BackgroundRenderer.FogEffect {
-    override fun getStatusEffect(): Holder<StatusEffect> {
+class ColorTestFogEffect : FogRenderer.MobEffectFogFunction {
+    override fun getMobEffect(): Holder<MobEffect> {
         return DuskEffects.MADNESS
     }
 
-    override fun applyFogEffects(
-        parameters: BackgroundRenderer.FogParameters,
+    override fun setupFog(
+        parameters: FogRenderer.FogData,
         entity: LivingEntity?,
-        effect: StatusEffectInstance,
+        effect: MobEffectInstance,
         viewDistance: Float,
         tickDelta: Float
     ) {
-        val f = MathHelper.lerp(effect.getBlendFactor(entity, tickDelta), viewDistance, 15.0f)
-        parameters.fogStart = if (parameters.fogType == BackgroundRenderer.FogType.FOG_SKY) 0.0f else f * 0.75f
-        parameters.fogEnd = f
+        val f = Mth.lerp(effect.getBlendFactor(entity, tickDelta), viewDistance, 15.0f)
+        parameters.start = if (parameters.mode == FogRenderer.FogMode.FOG_SKY) 0.0f else f * 0.75f
+        parameters.end = f
     }
 
-    override fun fadeAsEffectWearsOff(
+    override fun getModifiedVoidDarkness(
         entity: LivingEntity?,
-        effect: StatusEffectInstance,
+        effect: MobEffectInstance,
         horizonShading: Float,
         tickDelta: Float
     ): Float {

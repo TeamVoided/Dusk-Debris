@@ -1,57 +1,57 @@
 package org.teamvoided.dusk_debris.entity.ai.goal
 
-import net.minecraft.component.DataComponentTypes
-import net.minecraft.component.type.ItemEnchantmentsComponent
-import net.minecraft.enchantment.EnchantmentHelper
-import net.minecraft.enchantment.provider.EnchantmentProviders
-import net.minecraft.entity.EntityData
-import net.minecraft.entity.EntityType
-import net.minecraft.entity.EquipmentSlot
-import net.minecraft.entity.SpawnReason
-import net.minecraft.entity.ai.goal.SkeletonHorseTrapTriggerGoal
-import net.minecraft.entity.mob.WitherSkeletonEntity
-import net.minecraft.entity.passive.AbstractHorseEntity
-import net.minecraft.item.ItemStack
-import net.minecraft.item.Items
-import net.minecraft.server.world.ServerWorld
-import net.minecraft.world.LocalDifficulty
+import net.minecraft.core.component.DataComponents
+import net.minecraft.server.level.ServerLevel
+import net.minecraft.world.DifficultyInstance
+import net.minecraft.world.entity.EntityType
+import net.minecraft.world.entity.EquipmentSlot
+import net.minecraft.world.entity.MobSpawnType
+import net.minecraft.world.entity.SpawnGroupData
+import net.minecraft.world.entity.animal.horse.AbstractHorse
+import net.minecraft.world.entity.animal.horse.SkeletonTrapGoal
+import net.minecraft.world.entity.monster.WitherSkeleton
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.Items
+import net.minecraft.world.item.enchantment.EnchantmentHelper
+import net.minecraft.world.item.enchantment.ItemEnchantments
+import net.minecraft.world.item.enchantment.providers.VanillaEnchantmentProviders
 import org.teamvoided.dusk_debris.entity.WitherSkeletonHorseEntity
 import org.teamvoided.dusk_debris.init.DuskEntities
 
-class WitherSkeletonHorseTrapTriggerGoal(witherSkeletonHorse: WitherSkeletonHorseEntity) : SkeletonHorseTrapTriggerGoal(
+class WitherSkeletonHorseTrapTriggerGoal(witherSkeletonHorse: WitherSkeletonHorseEntity) : SkeletonTrapGoal(
     witherSkeletonHorse
 ) {
 
 
     override fun tick() {
-        val serverWorld = skeletonHorse.world as ServerWorld
-        val localDifficulty = serverWorld.getLocalDifficulty(skeletonHorse.blockPos)
-        skeletonHorse.isTrapped = false
-        skeletonHorse.isTame = true
-        skeletonHorse.breedingAge = 0
+        val serverWorld = horse.level() as ServerLevel
+        val localDifficulty = serverWorld.getCurrentDifficultyAt(horse.blockPosition())
+        horse.setTrap(false)
+        horse.setTamed(true)
+        horse.setAge(0)
         val lightningEntity = EntityType.LIGHTNING_BOLT.create(serverWorld)
         if (lightningEntity != null) {
-            lightningEntity.refreshPositionAfterTeleport(
-                skeletonHorse.x,
-                skeletonHorse.y, skeletonHorse.z
+            lightningEntity.moveTo(
+                horse.x,
+                horse.y, horse.z
             )
-            lightningEntity.setCosmetic(true)
-            serverWorld.spawnEntity(lightningEntity)
-            val skeletonEntity = this.getWitherSkeleton(localDifficulty, this.skeletonHorse)
+            lightningEntity.setVisualOnly(true)
+            serverWorld.addFreshEntity(lightningEntity)
+            val skeletonEntity = this.getWitherSkeleton(localDifficulty, this.horse)
             if (skeletonEntity != null) {
-                skeletonEntity.startRiding(this.skeletonHorse)
-                serverWorld.spawnEntityAndPassengers(skeletonEntity)
+                skeletonEntity.startRiding(this.horse)
+                serverWorld.addFreshEntityWithPassengers(skeletonEntity)
                 for (i in 0..2) {
                     val abstractHorseEntity = this.getWitherHorse(localDifficulty)
                     if (abstractHorseEntity != null) {
                         val skeletonEntity2 = this.getWitherSkeleton(localDifficulty, abstractHorseEntity)
                         if (skeletonEntity2 != null) {
                             skeletonEntity2.startRiding(abstractHorseEntity)
-                            abstractHorseEntity.addVelocity(
-                                skeletonHorse.getRandom().nextTriangular(0.0, 1.1485), 0.0,
-                                skeletonHorse.getRandom().nextTriangular(0.0, 1.1485)
+                            abstractHorseEntity.push(
+                                horse.getRandom().triangle(0.0, 1.1485), 0.0,
+                                horse.getRandom().triangle(0.0, 1.1485)
                             )
-                            serverWorld.spawnEntityAndPassengers(abstractHorseEntity)
+                            serverWorld.addFreshEntityWithPassengers(abstractHorseEntity)
                         }
                     }
                 }
@@ -59,43 +59,43 @@ class WitherSkeletonHorseTrapTriggerGoal(witherSkeletonHorse: WitherSkeletonHors
         }
     }
 
-    fun getWitherHorse(localDifficulty: LocalDifficulty): AbstractHorseEntity? {
-        val skeletonHorseEntity = DuskEntities.WITHER_SKELETON_HORSE.create(skeletonHorse.world)
+    fun getWitherHorse(localDifficulty: DifficultyInstance): AbstractHorse? {
+        val skeletonHorseEntity = DuskEntities.WITHER_SKELETON_HORSE.create(horse.level())
         if (skeletonHorseEntity != null) {
-            skeletonHorseEntity.initialize(
-                skeletonHorse.world as ServerWorld,
+            skeletonHorseEntity.finalizeSpawn(
+                horse.level() as ServerLevel,
                 localDifficulty,
-                SpawnReason.TRIGGERED,
-                null as EntityData?
+                MobSpawnType.TRIGGERED,
+                null as SpawnGroupData?
             )
-            skeletonHorseEntity.setPosition(
-                skeletonHorse.x,
-                skeletonHorse.y,
-                skeletonHorse.z
+            skeletonHorseEntity.setPos(
+                horse.x,
+                horse.y,
+                horse.z
             )
-            skeletonHorseEntity.timeUntilRegen = 60
-            skeletonHorseEntity.setPersistent()
-            skeletonHorseEntity.isTame = true
-            skeletonHorseEntity.breedingAge = 0
+            skeletonHorseEntity.invulnerableTime = 60
+            skeletonHorseEntity.setPersistenceRequired()
+            skeletonHorseEntity.setTamed(true)
+            skeletonHorseEntity.setAge(0)
         }
 
         return skeletonHorseEntity
     }
 
-    fun getWitherSkeleton(localDifficulty: LocalDifficulty, vehicle: AbstractHorseEntity): WitherSkeletonEntity? {
-        val witherSkeletonEntity = EntityType.WITHER_SKELETON.create(vehicle.world)
+    fun getWitherSkeleton(localDifficulty: DifficultyInstance, vehicle: AbstractHorse): WitherSkeleton? {
+        val witherSkeletonEntity = EntityType.WITHER_SKELETON.create(vehicle.level())
         if (witherSkeletonEntity != null) {
-            witherSkeletonEntity.initialize(
-                vehicle.world as ServerWorld,
+            witherSkeletonEntity.finalizeSpawn(
+                vehicle.level() as ServerLevel,
                 localDifficulty,
-                SpawnReason.TRIGGERED,
-                null as EntityData?
+                MobSpawnType.TRIGGERED,
+                null as SpawnGroupData?
             )
-            witherSkeletonEntity.setPosition(vehicle.x, vehicle.y, vehicle.z)
-            witherSkeletonEntity.timeUntilRegen = 60
-            witherSkeletonEntity.setPersistent()
-            if (witherSkeletonEntity.getEquippedStack(EquipmentSlot.HEAD).isEmpty) {
-                witherSkeletonEntity.equipStack(EquipmentSlot.HEAD, ItemStack(Items.IRON_HELMET))
+            witherSkeletonEntity.setPos(vehicle.x, vehicle.y, vehicle.z)
+            witherSkeletonEntity.invulnerableTime = 60
+            witherSkeletonEntity.setPersistenceRequired()
+            if (witherSkeletonEntity.getItemBySlot(EquipmentSlot.HEAD).isEmpty) {
+                witherSkeletonEntity.setItemSlot(EquipmentSlot.HEAD, ItemStack(Items.IRON_HELMET))
             }
             this.enchantHelmetAndSword(witherSkeletonEntity, EquipmentSlot.MAINHAND, localDifficulty)
             this.enchantHelmetAndSword(witherSkeletonEntity, EquipmentSlot.HEAD, localDifficulty)
@@ -105,19 +105,19 @@ class WitherSkeletonHorseTrapTriggerGoal(witherSkeletonHorse: WitherSkeletonHors
     }
 
     fun enchantHelmetAndSword(
-        witherSkeleton: WitherSkeletonEntity,
+        witherSkeleton: WitherSkeleton,
         equipmentSlot: EquipmentSlot,
-        difficulty: LocalDifficulty
+        difficulty: DifficultyInstance
     ) {
-        val itemStack = witherSkeleton.getEquippedStack(equipmentSlot)
-        itemStack.set(DataComponentTypes.ENCHANTMENTS, ItemEnchantmentsComponent.DEFAULT)
-        EnchantmentHelper.enchantFromProvider(
+        val itemStack = witherSkeleton.getItemBySlot(equipmentSlot)
+        itemStack.set(DataComponents.ENCHANTMENTS, ItemEnchantments.EMPTY)
+        EnchantmentHelper.enchantItemFromProvider(
             itemStack,
-            witherSkeleton.world.registryManager,
-            EnchantmentProviders.MOB_SPAWN_EQUIPMENT,
+            witherSkeleton.level().registryAccess(),
+            VanillaEnchantmentProviders.MOB_SPAWN_EQUIPMENT,
             difficulty,
             witherSkeleton.getRandom()
         )
-        witherSkeleton.equipStack(equipmentSlot, itemStack)
+        witherSkeleton.setItemSlot(equipmentSlot, itemStack)
     }
 }

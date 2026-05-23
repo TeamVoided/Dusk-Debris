@@ -1,23 +1,23 @@
 package org.teamvoided.dusk_debris.data.gen.world.gen.structure
 
-import net.minecraft.registry.BootstrapContext
-import net.minecraft.registry.HolderProvider
-import net.minecraft.registry.RegistryKey
-import net.minecraft.registry.RegistryKeys
-import net.minecraft.registry.tag.BiomeTags
-import net.minecraft.registry.tag.TagKey
-import net.minecraft.structure.pool.StructurePool
-import net.minecraft.structure.pool.StructurePools
-import net.minecraft.world.biome.Biome
-import net.minecraft.world.gen.GenerationStep
-import net.minecraft.world.gen.YOffset
-import net.minecraft.world.gen.feature.DimensionPadding
-import net.minecraft.world.gen.feature.JigsawFeature
-import net.minecraft.world.gen.feature.StructureFeature
-import net.minecraft.world.gen.heightprovider.ConstantHeightProvider
-import net.minecraft.world.gen.heightprovider.HeightProvider
-import net.minecraft.world.gen.heightprovider.UniformHeightProvider
-import net.minecraft.world.gen.structure.TerrainAdjustment
+import net.minecraft.core.HolderGetter
+import net.minecraft.core.registries.Registries
+import net.minecraft.data.worldgen.BootstrapContext
+import net.minecraft.data.worldgen.Pools
+import net.minecraft.resources.ResourceKey
+import net.minecraft.tags.BiomeTags
+import net.minecraft.tags.TagKey
+import net.minecraft.world.level.biome.Biome
+import net.minecraft.world.level.levelgen.GenerationStep
+import net.minecraft.world.level.levelgen.VerticalAnchor
+import net.minecraft.world.level.levelgen.heightproviders.ConstantHeight
+import net.minecraft.world.level.levelgen.heightproviders.HeightProvider
+import net.minecraft.world.level.levelgen.heightproviders.UniformHeight
+import net.minecraft.world.level.levelgen.structure.Structure
+import net.minecraft.world.level.levelgen.structure.TerrainAdjustment
+import net.minecraft.world.level.levelgen.structure.pools.DimensionPadding
+import net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool
+import net.minecraft.world.level.levelgen.structure.structures.JigsawStructure
 import org.teamvoided.dusk_debris.data.tags.DuskBiomeTags
 import org.teamvoided.dusk_debris.data.worldgen.structure.DuskStructurePools
 import org.teamvoided.dusk_debris.data.worldgen.structure.DuskStructures
@@ -26,51 +26,51 @@ import org.teamvoided.dusk_debris.world.gen.structure.CaveStructureFeature
 import java.util.Map
 
 object StructureCreator {
-    fun bootstrap(c: BootstrapContext<StructureFeature>) {
-        val biomes: HolderProvider<Biome> = c.getRegistryLookup(RegistryKeys.BIOME)
-        val pool: HolderProvider<StructurePool> = c.getRegistryLookup(RegistryKeys.STRUCTURE_POOL)
+    fun bootstrap(c: BootstrapContext<Structure>) {
+        val biomes: HolderGetter<Biome> = c.lookup(Registries.BIOME)
+        val pool: HolderGetter<StructureTemplatePool> = c.lookup(Registries.TEMPLATE_POOL)
 
         c.register(
             DuskStructures.TEST,
             DuskBiomeTags.TEST,
             DuskStructurePools.TEST,
             20,
-            UniformHeightProvider.create(YOffset.aboveBottom(30), YOffset.belowTop(180))
+            UniformHeight.of(VerticalAnchor.aboveBottom(30), VerticalAnchor.belowTop(180))
         )
         c.registerCave(
             DuskStructures.ANCIENT_STRUCTURES,
-            BiomeTags.HAS_ANCIENT_CITY_STRUCTURE,
-            StructurePools.createKey("ancient_city/structures"),
+            BiomeTags.HAS_ANCIENT_CITY,
+            Pools.createKey("ancient_city/structures"),
             3,
-            ConstantHeightProvider.create(YOffset.aboveBottom(17)),
+            ConstantHeight.of(VerticalAnchor.aboveBottom(17)),
             DimensionPadding(16, 128),
             true
         )
     }
 
-    private fun BootstrapContext<StructureFeature>.registerCave(
-        key: RegistryKey<StructureFeature>,
+    private fun BootstrapContext<Structure>.registerCave(
+        key: ResourceKey<Structure>,
         biomeTag: TagKey<Biome>,
-        structurePool: RegistryKey<StructurePool>,
+        structurePool: ResourceKey<StructureTemplatePool>,
         size: Int,
         heightProvider: HeightProvider,
         dimensionPadding: DimensionPadding,
         bottomUpSearch: Boolean,
         placeIfReachLimit: Boolean = false
     ) {
-        val biomes: HolderProvider<Biome> = this.getRegistryLookup(RegistryKeys.BIOME)
-        val pool: HolderProvider<StructurePool> = this.getRegistryLookup(RegistryKeys.STRUCTURE_POOL)
+        val biomes: HolderGetter<Biome> = this.lookup(Registries.BIOME)
+        val pool: HolderGetter<StructureTemplatePool> = this.lookup(Registries.TEMPLATE_POOL)
 
         this.register(
             key,
             CaveJigsawStructureFeature(
-                StructureFeature.StructureSettings(
-                    biomes.getTagOrThrow(biomeTag),
+                Structure.StructureSettings(
+                    biomes.getOrThrow(biomeTag),
                     Map.of(),
-                    GenerationStep.Feature.UNDERGROUND_STRUCTURES,
+                    GenerationStep.Decoration.UNDERGROUND_STRUCTURES,
                     TerrainAdjustment.BEARD_BOX
                 ),
-                pool.getHolderOrThrow(structurePool),
+                pool.getOrThrow(structurePool),
                 size,
                 heightProvider,
                 placeIfReachLimit,
@@ -80,52 +80,52 @@ object StructureCreator {
         )
     }
 
-    private fun BootstrapContext<StructureFeature>.registerCave(
-        key: RegistryKey<StructureFeature>,
+    private fun BootstrapContext<Structure>.registerCave(
+        key: ResourceKey<Structure>,
         biomeTag: TagKey<Biome>,
-        structurePool: RegistryKey<StructurePool>,
+        structurePool: ResourceKey<StructureTemplatePool>,
         initialHeight: HeightProvider,
-        bottom: YOffset
+        bottom: VerticalAnchor
     ) {
-        val biomes: HolderProvider<Biome> = this.getRegistryLookup(RegistryKeys.BIOME)
-        val pool: HolderProvider<StructurePool> = this.getRegistryLookup(RegistryKeys.STRUCTURE_POOL)
+        val biomes: HolderGetter<Biome> = this.lookup(Registries.BIOME)
+        val pool: HolderGetter<StructureTemplatePool> = this.lookup(Registries.TEMPLATE_POOL)
 
         this.register(
             key,
             CaveStructureFeature(
-                StructureFeature.StructureSettings(
-                    biomes.getTagOrThrow(biomeTag),
+                Structure.StructureSettings(
+                    biomes.getOrThrow(biomeTag),
                     Map.of(),
-                    GenerationStep.Feature.UNDERGROUND_STRUCTURES,
+                    GenerationStep.Decoration.UNDERGROUND_STRUCTURES,
                     TerrainAdjustment.BEARD_THIN
                 ),
-                pool.getHolderOrThrow(structurePool),
+                pool.getOrThrow(structurePool),
                 initialHeight,
-                ConstantHeightProvider.create(bottom)
+                ConstantHeight.of(bottom)
             )
         )
     }
 
-    private fun BootstrapContext<StructureFeature>.register(
-        key: RegistryKey<StructureFeature>,
+    private fun BootstrapContext<Structure>.register(
+        key: ResourceKey<Structure>,
         biomeTag: TagKey<Biome>,
-        structurePool: RegistryKey<StructurePool>,
+        structurePool: ResourceKey<StructureTemplatePool>,
         size: Int = 1,
-        initialHeight: HeightProvider = ConstantHeightProvider.create(YOffset.fixed(0)),
+        initialHeight: HeightProvider = ConstantHeight.of(VerticalAnchor.absolute(0)),
     ) {
-        val biomes: HolderProvider<Biome> = this.getRegistryLookup(RegistryKeys.BIOME)
-        val pool: HolderProvider<StructurePool> = this.getRegistryLookup(RegistryKeys.STRUCTURE_POOL)
+        val biomes: HolderGetter<Biome> = this.lookup(Registries.BIOME)
+        val pool: HolderGetter<StructureTemplatePool> = this.lookup(Registries.TEMPLATE_POOL)
 
         this.register(
             key,
-            JigsawFeature(
-                StructureFeature.StructureSettings(
-                    biomes.getTagOrThrow(biomeTag),
+            JigsawStructure(
+                Structure.StructureSettings(
+                    biomes.getOrThrow(biomeTag),
                     Map.of(),
-                    GenerationStep.Feature.UNDERGROUND_STRUCTURES,
+                    GenerationStep.Decoration.UNDERGROUND_STRUCTURES,
                     TerrainAdjustment.NONE
                 ),
-                pool.getHolderOrThrow(structurePool),
+                pool.getOrThrow(structurePool),
                 size,
                 initialHeight,
                 false

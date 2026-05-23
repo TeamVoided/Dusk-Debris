@@ -1,13 +1,14 @@
 package org.teamvoided.dusk_debris.data.gen.providers
 
-import net.minecraft.registry.*
-import net.minecraft.text.Text
+import net.minecraft.core.Holder
+import net.minecraft.data.worldgen.BootstrapContext
+import net.minecraft.resources.ResourceKey
 import org.teamvoided.dusk_debris.data.DuskSpells
 import org.teamvoided.dusk_debris.init.DuskSpellTypes
-import org.teamvoided.dusk_debris.spell.settings.GenericSpellSettings
 import org.teamvoided.dusk_debris.spell.Spell
 import org.teamvoided.dusk_debris.spell.SpellSettings
 import org.teamvoided.dusk_debris.spell.SpellType
+import org.teamvoided.dusk_debris.spell.settings.GenericSpellSettings
 
 object Spells {
 
@@ -18,7 +19,7 @@ object Spells {
 
 
     private fun BootstrapContext<Spell<*, *>>.registerSpirit(
-        registryKey: RegistryKey<Spell<*, *>>,
+        registryKey: ResourceKey<Spell<*, *>>,
         priority: Int,
         cooldown: Int
     ): Holder.Reference<Spell<*, *>> {
@@ -30,7 +31,7 @@ object Spells {
     }
 
     private fun BootstrapContext<Spell<*, *>>.registerDive(
-        registryKey: RegistryKey<Spell<*, *>>,
+        registryKey: ResourceKey<Spell<*, *>>,
         priority: Int,
         cooldown: Int
     ): Holder.Reference<Spell<*, *>> {
@@ -42,7 +43,7 @@ object Spells {
     }
 
     private fun <SS : SpellSettings, S : SpellType<SS>> BootstrapContext<Spell<*, *>>.register(
-        registryKey: RegistryKey<Spell<*, *>>,
+        registryKey: ResourceKey<Spell<*, *>>,
         spellType: S,
         spellSettings: SS
     ): Holder.Reference<Spell<*, *>> = this.register(registryKey, Spell(spellType, spellSettings))

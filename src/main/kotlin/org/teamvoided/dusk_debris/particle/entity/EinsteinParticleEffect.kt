@@ -3,17 +3,17 @@ package org.teamvoided.dusk_debris.particle.entity
 import com.mojang.serialization.Codec
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
-import net.minecraft.entity.Entity
-import net.minecraft.network.RegistryByteBuf
-import net.minecraft.network.codec.PacketCodec
-import net.minecraft.network.codec.PacketCodecs
-import net.minecraft.particle.ParticleEffect
-import net.minecraft.particle.ParticleType
+import net.minecraft.core.particles.ParticleOptions
+import net.minecraft.core.particles.ParticleType
+import net.minecraft.network.RegistryFriendlyByteBuf
+import net.minecraft.network.codec.ByteBufCodecs
+import net.minecraft.network.codec.StreamCodec
+import net.minecraft.world.entity.Entity
 import org.teamvoided.dusk_debris.init.DuskParticles
 
 class EinsteinParticleEffect(
     val entity: Int? = null
-) : ParticleEffect {
+) : ParticleOptions {
 
     constructor(entity: Entity?) : this(entity?.id)  //UUID.fromString(entity)
 
@@ -26,9 +26,9 @@ class EinsteinParticleEffect(
                     Codec.INT.fieldOf("entity").forGetter { it.entity }
                 ).apply(instance, ::EinsteinParticleEffect)
             }
-        val PACKET_CODEC: PacketCodec<RegistryByteBuf, EinsteinParticleEffect> =
-            PacketCodec.tuple(
-                PacketCodecs.INT, { it.entity },
+        val PACKET_CODEC: StreamCodec<RegistryFriendlyByteBuf, EinsteinParticleEffect> =
+            StreamCodec.composite(
+                ByteBufCodecs.INT, { it.entity },
                 ::EinsteinParticleEffect
             )
     }

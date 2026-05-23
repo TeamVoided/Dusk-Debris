@@ -38,11 +38,11 @@
 //        this.inventory = DefaultedList.ofSize(this.size(), ItemStack.EMPTY)
 //        this.stateManager = object : ViewerCountManager() {
 //            override fun onContainerOpen(world: World, pos: BlockPos, state: BlockState) {
-//                playSound(world, pos, state, SoundEvents.BLOCK_CHEST_OPEN)
+//                playSound(world, pos, state, SoundEvents.CHEST_OPEN)
 //            }
 //
 //            override fun onContainerClose(world: World, pos: BlockPos, state: BlockState) {
-//                playSound(world, pos, state, SoundEvents.BLOCK_CHEST_CLOSE)
+//                playSound(world, pos, state, SoundEvents.CHEST_CLOSE)
 //            }
 //
 //            override fun onViewerCountUpdate(
@@ -100,13 +100,13 @@
 //
 //    override fun onOpen(player: PlayerEntity) {
 //        if (!this.removed && !player.isSpectator) {
-//            stateManager.openContainer(player, this.getWorld(), this.getPos(), this.cachedState)
+//            stateManager.openContainer(player, this.getLevel(), blockPos, this.cachedState)
 //        }
 //    }
 //
 //    override fun onClose(player: PlayerEntity) {
 //        if (!this.removed && !player.isSpectator) {
-//            stateManager.closeContainer(player, this.getWorld(), this.getPos(), this.cachedState)
+//            stateManager.closeContainer(player, this.getLevel(), blockPos, this.cachedState)
 //        }
 //    }
 //
@@ -124,7 +124,7 @@
 //
 //    fun onScheduledTick() {
 //        if (!this.removed) {
-//            stateManager.updateViewerCount(this.getWorld(), this.getPos(), this.cachedState)
+//            stateManager.updateViewerCount(this.getLevel(), blockPos, this.cachedState)
 //        }
 //    }
 //

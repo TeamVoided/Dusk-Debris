@@ -1,26 +1,26 @@
 package org.teamvoided.dusk_debris.particle.vanilla
 
+import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.client.particle.Particle
-import net.minecraft.client.particle.ParticleFactory
-import net.minecraft.client.particle.SpriteProvider
-import net.minecraft.client.particle.WaterSuspendParticle
-import net.minecraft.client.world.ClientWorld
-import net.minecraft.particle.DefaultParticleType
+import net.minecraft.client.particle.ParticleProvider
+import net.minecraft.client.particle.SpriteSet
+import net.minecraft.client.particle.SuspendedParticle
+import net.minecraft.core.particles.SimpleParticleType
 
 class AdditionalWaterSuspendParticle(
-    world: ClientWorld,
-    spriteProvider: SpriteProvider,
+    world: ClientLevel,
+    spriteProvider: SpriteSet,
     x: Double,
     y: Double,
     z: Double,
     velx: Double,
     vely: Double,
     velz: Double
-) : WaterSuspendParticle(world, spriteProvider, x, y, z, velx, vely, velz) {
-    class UnderacidFactory(private val spriteProvider: SpriteProvider) : ParticleFactory<DefaultParticleType> {
+) : SuspendedParticle(world, spriteProvider, x, y, z, velx, vely, velz) {
+    class UnderacidFactory(private val spriteProvider: SpriteSet) : ParticleProvider<SimpleParticleType> {
         override fun createParticle(
-            defaultParticleType: DefaultParticleType,
-            world: ClientWorld,
+            defaultParticleType: SimpleParticleType,
+            world: ClientLevel,
             d: Double,
             e: Double,
             f: Double,
@@ -28,7 +28,7 @@ class AdditionalWaterSuspendParticle(
             h: Double,
             i: Double
         ): Particle {
-            val waterSuspendParticle = WaterSuspendParticle(world, spriteProvider, d, e, f, g, h, i)
+            val waterSuspendParticle = SuspendedParticle(world, spriteProvider, d, e, f, g, h, i)
             waterSuspendParticle.setColor(0.3f, 0.6f, 0.35f)
             return waterSuspendParticle
         }
