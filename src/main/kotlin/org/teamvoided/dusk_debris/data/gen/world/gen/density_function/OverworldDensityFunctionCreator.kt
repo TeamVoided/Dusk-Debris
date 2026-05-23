@@ -184,9 +184,9 @@ object OverworldDensityFunctionCreator {
         val urCondition: RegistryKey<DensityFunction> = DuskDensityFunctions.UR_CONDITION
         val urDensity: RegistryKey<DensityFunction> = DuskDensityFunctions.UR_DENSITY
 
-        val caveLakeCondition: RegistryKey<DensityFunction> = DuskDensityFunctions.LAKE_CAVE_CONDITION
-        val caveLakeAquifer: RegistryKey<DensityFunction> = DuskDensityFunctions.LAKE_CAVE_AQUIFER
-        val caveLakeDensity: RegistryKey<DensityFunction> = DuskDensityFunctions.LAKE_CAVE_DENSITY
+        //val caveLakeCondition: RegistryKey<DensityFunction> = DuskDensityFunctions.LAKE_CAVE_CONDITION
+        //val caveLakeAquifer: RegistryKey<DensityFunction> = DuskDensityFunctions.LAKE_CAVE_AQUIFER
+        //val caveLakeDensity: RegistryKey<DensityFunction> = DuskDensityFunctions.LAKE_CAVE_DENSITY
 
         val data = OverworldTerrainCreator.TerrainParametersData(
             this.wrap(continents),
@@ -200,14 +200,13 @@ object OverworldDensityFunctionCreator {
         )
 
         this.caveRiver(data, urCondition, urDensity)
-        this.caveLake(caveLakeCondition, caveLakeAquifer, caveLakeDensity)
+        //this.caveLake(caveLakeCondition, caveLakeAquifer, caveLakeDensity)
         this.register(
             aquiferFloodedness,
             this.everyAquiferModifier(
                 noise(this.noiseHold(NoiseParametersKeys.AQUIFER_FLUID_LEVEL_FLOODEDNESS), 0.67),
                 1,
-                urCondition,
-                caveLakeAquifer
+                urCondition
             )
         )
         this.register(
@@ -215,8 +214,7 @@ object OverworldDensityFunctionCreator {
             this.everyAquiferModifier(
                 noise(this.noiseHold(NoiseParametersKeys.AQUIFER_FLUID_LEVEL_SPREAD), 0.7142857),
                 0.5,
-                urCondition,
-                caveLakeAquifer
+                urCondition
             )
         )
 
@@ -295,16 +293,15 @@ object OverworldDensityFunctionCreator {
         } else {
             this.register(
                 finalDensity,
-                add(0, this.dense(DuskDensityFunctions.LAKE_CAVE_DENSITY))
-                //multiply(
-                //    0.64,
-                //    min(
-                //        this.dense(urDensity),
-                //        interpolated(
-                //                blendDensity(surfaceSlide(amplified, this.dense(cheese)))
-                //            )
-                //    )
-                //).squeeze()
+                multiply(
+                    0.64,
+                    min(
+                        this.dense(urDensity),
+                        interpolated(
+                            blendDensity(surfaceSlide(amplified, this.dense(cheese)))
+                        )
+                    )
+                ).squeeze()
             )
         }
     }

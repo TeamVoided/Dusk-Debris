@@ -70,7 +70,7 @@ class BubbleBlossomBlock(settings: Settings) : Block(settings) {
         if (random.nextInt(1024) == 0) {
             val spawnCap = world.chunkManager.spawnInfo
             if (spawnCap != null && spawnCap.groupToCount.getInt(SpawnGroup.AMBIENT) < SpawnGroup.AMBIENT.capacity) {
-                repeat(random.nextInt(2) + 1) {
+                repeat(random.nextInt(4) + 1) {
                     SpawnUtil.method_42122(
                         DuskEntities.TINY_ENEMY_JELLYFISH,
                         SpawnReason.TRIGGERED,
